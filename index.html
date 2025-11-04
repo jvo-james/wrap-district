@@ -4,338 +4,193 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Wrap District — Fresh & Loaded</title>
-
-  <!-- Fonts & Icons (no kit script to avoid CORS) -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Montserrat:wght@600;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
-
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
   <style>
-    /* ===========================
-       Wrap District — Clean Premium
-       =========================== */
+    /* ---------- GLOBAL ---------- */
     :root{
-      --red-500:#D9302A; --red-700:#B71C1C; --yellow:#FFBF00; --muted-yellow:#FFCF66;
-      --bg-900:#0f0f10; --text:#f6f6f6; --muted:#cfcfcf; --glass:rgba(255,255,255,0.03);
-      --radius-lg:18px; --radius-md:12px; --max-w:1200px; --ease:cubic-bezier(.2,.9,.25,1);
+      --bg:#0f1112;
+      --panel:linear-gradient(180deg,#121214,#0f1112);
+      --accent:#ffd04a;
+      --accent-2:#ff9b3b;
+      --red:#d9302a;
+      --muted:#bdbdbd;
+      --card:#111214;
+      --glass:rgba(255,255,255,0.03);
+      --radius:16px;
+      --max:1200px;
+      --ease:cubic-bezier(.2,.9,.25,1);
     }
     *{box-sizing:border-box}
-    html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial;background:
-      linear-gradient(180deg,#0b0b0c 0%, #0f1112 100%);color:var(--text);-webkit-font-smoothing:antialiased}
-    img{max-width:100%;display:block;height:auto}
-    a{color:inherit;text-decoration:none}
-    .container{max-width:var(--max-w);margin:0 auto;padding:0 20px}
+    html,body{height:100%;margin:0;background:linear-gradient(180deg,#0b0b0b,#0f1112 120%);color:#fff;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial}
+    img{max-width:100%;display:block}
+    a{text-decoration:none;color:inherit}
+    .container{max-width:var(--max);margin:0 auto;padding:0 20px}
 
-    /* header */
-    .site-header{position:sticky;top:0;z-index:50;padding:12px 0;background:linear-gradient(180deg, rgba(15,15,16,0.7), rgba(11,11,12,0.35));backdrop-filter:blur(6px);border-bottom:1px solid rgba(255,255,255,0.02)}
-    .header-inner{display:flex;align-items:center;justify-content:space-between;gap:12px}
-    .brand{display:flex;align-items:center;gap:12px}
-    .logo{width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,var(--yellow),#ff9e00);display:flex;align-items:center;justify-content:center;box-shadow:0 12px 36px rgba(0,0,0,0.45)}
-    .brand-title{font-family:Montserrat, sans-serif;font-weight:800;color:var(--red-700);font-size:18px}
-    .brand-sub{display:block;font-size:12px;color:var(--muted);margin-top:-4px}
-
-    .main-nav .nav-list{display:flex;gap:14px;align-items:center;margin:0;padding:0;list-style:none}
-    .nav-link{color:var(--muted);font-weight:700;padding:8px 12px;border-radius:10px;position:relative;transition:all 220ms var(--ease)}
-    .nav-link:hover{color:var(--text);background:rgba(255,255,255,0.03);transform:translateY(-3px)}
-    .nav-link::after{content:'';position:absolute;left:12px;right:12px;height:3px;background:linear-gradient(90deg,var(--yellow),var(--muted-yellow));bottom:-6px;border-radius:3px;opacity:0;transform:translateY(6px);transition:all 240ms}
-    .nav-link:hover::after{opacity:1;transform:translateY(0)}
-
+    /* ---------- HEADER ---------- */
+    header.site-header{position:sticky;top:0;z-index:120;background:linear-gradient(180deg,rgba(15,15,16,0.6),rgba(11,11,12,0.35));backdrop-filter:blur(6px);border-bottom:1px solid rgba(255,255,255,0.03)}
+    .header-inner{display:flex;align-items:center;justify-content:space-between;padding:14px 0}
+    .brand{display:flex;align-items:center;gap:14px}
+    .logo{width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent-2));display:grid;place-items:center;font-family:Montserrat;font-weight:800;color:#1b1b1b}
+    .brand-title{font-family:Montserrat;font-weight:800;color:var(--red);letter-spacing:0.6px}
+    nav.main-nav ul{display:flex;gap:18px;align-items:center;margin:0;padding:0;list-style:none}
+    .nav-link{padding:8px 12px;border-radius:10px;color:var(--muted);font-weight:700;transition:all 220ms var(--ease)}
+    .nav-link:hover{color:#fff;background:rgba(255,255,255,0.02);transform:translateY(-3px)}
     .header-actions{display:flex;align-items:center;gap:10px}
-    .icon-btn{width:44px;height:44px;border-radius:10px;background:transparent;border:1px solid rgba(255,255,255,0.03);display:grid;place-items:center;color:var(--text);cursor:pointer}
     .btn{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:12px;border:none;cursor:pointer;font-weight:800}
-    .btn-cta{background:linear-gradient(90deg,var(--yellow),var(--muted-yellow));color:#111;box-shadow:0 16px 48px rgba(255,191,0,0.12)}
-    .btn-ghost{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted)}
+    .btn-cta{background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#111}
+    .icon-btn{background:transparent;border-radius:10px;padding:8px;border:1px solid rgba(255,255,255,0.03);cursor:pointer}
 
-    .cart-badge{min-width:22px;height:22px;border-radius:999px;background:linear-gradient(90deg,var(--yellow),#ffd46a);color:#111;font-weight:800;font-size:13px;display:inline-grid;place-items:center}
+    /* ---------- HERO ---------- */
+    .hero{padding:46px 0}
+    .hero-grid{display:grid;grid-template-columns:1fr 380px;gap:28px;align-items:start}
 
-    /* HERO */
-    .hero-section{padding:44px 0 18px}
-    .hero-inner{display:grid;grid-template-columns:1fr 380px;gap:28px;align-items:start;max-width:var(--max-w);margin:0 auto;padding:0 20px}
-    .hero-card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:20px;padding:18px;border:1px solid rgba(255,255,255,0.03);box-shadow:0 30px 80px rgba(0,0,0,0.6)}
-    .hero-left{position:relative;border-radius:16px;overflow:visible;padding:18px}
-    .hero-media{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:center}
-    .hero-visual{border-radius:14px;overflow:hidden;min-height:220px;box-shadow:0 30px 90px rgba(0,0,0,0.6)}
-    .hero-visual img{width:100%;height:100%;object-fit:cover;display:block}
-    .hero-big{grid-column:1 / -1;min-height:320px}
-    .hero-title{font-family:Montserrat, sans-serif;font-weight:900;font-size:32px;margin:12px 0 6px;color:var(--text)}
-    .hero-sub{color:var(--muted);margin:0 0 16px;font-size:15px;max-width:70%}
+    .hero-card{background:var(--panel);border-radius:18px;padding:28px;position:relative;overflow:hidden;border:1px solid var(--glass);box-shadow:0 30px 80px rgba(0,0,0,0.6)}
+    .hero-media{position:absolute;inset:0;right:auto;width:60%;max-width:900px;opacity:0.13;filter:blur(24px);pointer-events:none;background-image:url('https://images.unsplash.com/photo-1604908554325-1ff3a7b1b0f8?q=80&w=1400&auto=format&fit=crop');background-size:cover;background-position:center;transform:translate(20%, -6%)}
 
-    .hero-actions{display:flex;gap:12px;margin-top:8px}
-    .badges{display:flex;gap:8px;margin-top:10px}
-    .badge{padding:6px 10px;border-radius:999px;font-weight:800;font-size:12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.03)}
-    .badge.hot{background:linear-gradient(90deg,var(--red-500),var(--red-700));color:#fff}
+    .hero-content{position:relative;z-index:2;max-width:58%}
+    .kicker{display:inline-block;padding:6px 10px;background:rgba(255,255,255,0.04);border-radius:999px;color:var(--accent);font-weight:800;font-size:13px}
+    h1.title{font-family:Montserrat;font-size:46px;margin:14px 0 8px;line-height:1.02;color:#fff}
+    p.lead{color:var(--muted);font-size:16px;max-width:60%}
 
-    /* right column - quick picks */
-    .hero-right{position:sticky;top:86px}
-    .featured-card{padding:18px;border-radius:14px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.02));border:1px solid rgba(255,255,255,0.03);box-shadow:0 18px 48px rgba(0,0,0,0.55)}
-    .featured-title{font-family:Montserrat;font-weight:900;font-size:18px}
-    .quick-picks{list-style:none;padding:0;margin:12px 0 0;display:flex;flex-direction:column;gap:12px}
-    .pick{display:flex;align-items:center;gap:12px;padding:10px;border-radius:12px;border:1px solid rgba(255,255,255,0.02);background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.008))}
-    .pick-media{width:64px;height:64px;border-radius:10px;overflow:hidden;display:flex;align-items:center;justify-content:center}
-    .pick-media img{width:100%;height:100%;object-fit:cover}
-    .pick-info strong{display:block}
-    .pick-actions{margin-left:auto;display:flex;gap:8px}
+    .hero-ctas{margin-top:18px;display:flex;gap:12px;align-items:center}
+    .hero-ctas .btn{font-size:16px}
 
-    /* BUILDER (inline panel, not modal) */
-    .builder-panel{margin-top:18px;border-radius:14px;padding:18px;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.008));border:1px solid rgba(255,255,255,0.03);display:none}
-    .builder-panel[aria-expanded="true"]{display:block}
-    .builder-grid{display:grid;grid-template-columns:320px 1fr;gap:18px}
-    .builder-preview{border-radius:12px;padding:14px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.03)}
-    .options-grid{display:flex;flex-wrap:wrap;gap:10px}
-    .option{padding:10px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.03);cursor:pointer;background:transparent;font-weight:700}
-    .option.selected{background:linear-gradient(90deg,var(--yellow),var(--muted-yellow));color:#111}
+    .hero-right{position:relative}
+    .quick-card{background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(0,0,0,0.02));padding:18px;border-radius:14px;border:1px solid rgba(255,255,255,0.03)}
+    .quick-card h4{margin:0 0 6px;font-family:Montserrat}
+    .pick{display:flex;align-items:center;gap:12px;padding:10px;border-radius:12px;background:rgba(255,255,255,0.01);margin-bottom:10px}
+    .pick .thumb{width:64px;height:64px;border-radius:10px;background-size:cover;background-position:center}
+    .pick .meta{flex:1}
+    .pick .meta strong{display:block}
 
-    .preview-image{width:100%;height:160px;border-radius:10px;overflow:hidden}
-    .preview-image img{width:100%;height:100%;object-fit:cover}
+    /* ---------- MENU ---------- */
+    .menu{padding:28px 0}
+    .menu-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+    .card{background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(0,0,0,0.02));border-radius:14px;padding:12px;border:1px solid rgba(255,255,255,0.02);transition:transform 280ms var(--ease), box-shadow 280ms}
+    .card:hover{transform:translateY(-8px);box-shadow:0 40px 120px rgba(0,0,0,0.6)}
+    .card .thumb{height:160px;border-radius:10px;background-size:cover;background-position:center;margin-bottom:10px}
+    .price{color:var(--accent);font-weight:900}
+    .card .actions{display:flex;gap:8px;align-items:center;margin-top:8px}
 
-    .builder-controls{display:flex;gap:8px;align-items:center;margin-top:12px}
-    .qty-box{display:inline-flex;align-items:center;gap:8px;padding:6px 8px;border-radius:10px;border:1px solid rgba(255,255,255,0.03)}
+    /* ---------- CART DRAWER ---------- */
+    .drawer{position:fixed;right:18px;top:18px;width:360px;background:linear-gradient(180deg,#0f0f11,#121217);border-radius:12px;padding:14px;border:1px solid rgba(255,255,255,0.03);box-shadow:0 40px 120px rgba(0,0,0,0.6);display:none;z-index:999}
+    .drawer.open{display:block}
+    .drawer h4{margin:0 0 8px}
+    .cart-items{max-height:320px;overflow:auto;margin-top:8px}
+    .cart-item{display:flex;justify-content:space-between;gap:12px;padding:8px;border-radius:10px;background:rgba(255,255,255,0.01);margin-bottom:8px}
 
-    /* Promo */
-    .promo-radiant{margin:32px auto;border-radius:14px;padding:18px;background:linear-gradient(90deg, rgba(217,48,42,0.06), rgba(255,191,0,0.03));border:1px solid rgba(255,255,255,0.02);max-width:var(--max-w);box-shadow:0 30px 80px rgba(0,0,0,0.55)}
-    .promo-inner{display:flex;align-items:center;justify-content:space-between;gap:18px}
-    .promo-title{font-family:Montserrat;font-weight:900;font-size:22px;margin:6px 0}
-    .promo-desc{color:var(--muted);max-width:520px}
+    /* ---------- FOOTER ---------- */
+    footer{padding:28px 0;margin-top:40px;border-top:1px dashed rgba(255,255,255,0.02)}
 
-    /* Menu Grid */
-    .menu-section{padding:30px 20px 60px;max-width:var(--max-w);margin:0 auto}
-    .section-title{font-family:Montserrat;font-weight:900;font-size:20px}
-    .menu-filters{display:flex;gap:10px;margin:12px 0}
-    .filter{padding:8px 12px;border-radius:999px;background:transparent;border:1px solid rgba(255,255,255,0.02);color:var(--muted);cursor:pointer}
-    .filter.active{background:linear-gradient(90deg,var(--yellow),#ffd46a);color:#111;font-weight:900}
-    .menu-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
-    .menu-item{display:flex;gap:14px;align-items:flex-start;padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.02);background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.008))}
-    .thumb{width:140px;height:96px;border-radius:10px;overflow:hidden}
-    .thumb img{width:100%;height:100%;object-fit:cover}
-
-    /* About & Footer */
-    .about-section{padding:36px 20px;max-width:var(--max-w);margin:0 auto}
-    .about-grid{display:grid;grid-template-columns:360px 1fr;gap:22px}
-    .about-media{height:260px;border-radius:12px;overflow:hidden}
-    .about-media img{width:100%;height:100%;object-fit:cover}
-    .site-footer{padding:26px 20px;border-top:1px solid rgba(255,255,255,0.02);margin-top:36px;background:linear-gradient(180deg,#0b0b0b,#0d0d0d)}
-    .footer-inner{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;max-width:var(--max-w);margin:0 auto}
-
-    .copyright{padding-top:12px;border-top:1px dashed rgba(255,255,255,0.02);margin-top:12px;text-align:center;color:var(--muted)}
-
-    /* small screens */
-    @media (max-width:980px){
-      .hero-inner{grid-template-columns:1fr;gap:18px}
-      .hero-right{position:static;top:auto}
+    /* ---------- RESPONSIVE ---------- */
+    @media (max-width:1000px){
+      .hero-grid{grid-template-columns:1fr 320px}
+      .hero-content{max-width:60%}
+    }
+    @media (max-width:800px){
+      .hero-grid{grid-template-columns:1fr}
+      .hero-content{max-width:100%}
       .menu-grid{grid-template-columns:repeat(2,1fr)}
-      .about-grid{grid-template-columns:1fr}
+      nav.main-nav ul{display:none}
     }
-    @media (max-width:520px){
+    @media (max-width:420px){
       .menu-grid{grid-template-columns:1fr}
-      .nav-list{display:none}
-      .header-inner{justify-content:space-between}
+      h1.title{font-size:28px}
+      .hero-ctas{flex-direction:column;align-items:stretch}
     }
 
-    /* subtle interactions */
-    .option:focus, .btn:focus, .icon-btn:focus{outline:3px solid rgba(255,191,0,0.12);outline-offset:2px}
-    .menu-item:hover{transform:translateY(-6px);transition:transform 320ms var(--ease)}
+    /* small helpers */
+    .muted{color:var(--muted);font-size:14px}
+    .sr-only{position:absolute;height:1px;width:1px;overflow:hidden;clip:rect(1px,1px,1px,1px)}
   </style>
 </head>
 <body>
-
-  <!-- HEADER -->
-  <header class="site-header" role="banner" aria-label="Wrap District header">
+  <header class="site-header" role="banner">
     <div class="container header-inner">
-      <a class="brand" href="#" aria-label="Wrap District home" id="logo-link">
-        <div class="logo" aria-hidden="true">
-          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect x="1.5" y="3" width="21" height="18" rx="4" fill="#FFD000"></rect>
-            <text x="50%" y="62%" dominant-baseline="middle" text-anchor="middle" font-family="Montserrat, sans-serif" font-weight="800" font-size="8" fill="#B71C1C">WRAP</text>
-          </svg>
-        </div>
+      <a class="brand" href="#" aria-label="Wrap District home">
+        <div class="logo">WRAP</div>
         <div>
           <div class="brand-title">WRAP DISTRICT</div>
-          <small class="brand-sub">Fresh · Loaded · Fast</small>
+          <div class="muted">Fresh • Loaded • Fast</div>
         </div>
       </a>
 
-      <nav class="main-nav" role="navigation" aria-label="Main navigation">
-        <ul class="nav-list">
-          <li><a href="#menu" class="nav-link">Menu</a></li>
-          <li><a href="#build" class="nav-link">Build</a></li>
-          <li><a href="#promo" class="nav-link">Promos</a></li>
-          <li><a href="#about" class="nav-link">About</a></li>
-          <li><a href="#contact" class="nav-link">Contact</a></li>
+      <nav class="main-nav" aria-label="Main navigation">
+        <ul>
+          <li><a class="nav-link" href="#menu">Menu</a></li>
+          <li><a class="nav-link" href="#build">Build</a></li>
+          <li><a class="nav-link" href="#promo">Promos</a></li>
+          <li><a class="nav-link" href="#about">About</a></li>
         </ul>
       </nav>
 
-      <div class="header-actions" role="group" aria-label="Header actions">
-        <button class="icon-btn" id="search-btn" aria-label="Search menu"><i class="fa fa-magnifying-glass"></i></button>
-        <button class="icon-btn" id="loc-btn" aria-label="Location"><i class="fa fa-location-dot"></i></button>
-        <button class="icon-btn" id="cart-open" aria-label="Open cart"><i class="fa fa-cart-shopping"></i></button>
-        <span id="cart-count" class="cart-badge" aria-live="polite">0</span>
-        <a class="btn btn-cta" href="https://wa.me/233552509241" aria-label="Order on WhatsApp"><i class="fa fa-whatsapp"></i><span> Order Now</span></a>
+      <div class="header-actions" role="group">
+        <button class="icon-btn" id="open-cart" aria-label="Open cart"><i class="fa fa-shopping-cart"></i></button>
+        <a class="btn btn-cta" href="https://wa.me/233552509241" target="_blank" rel="noopener noreferrer">Order Now <i class="fa fa-whatsapp"></i></a>
       </div>
     </div>
   </header>
 
-  <!-- MAIN -->
-  <main id="main" role="main">
+  <main>
+    <section class="hero">
+      <div class="container hero-grid">
+        <div class="hero-card">
+          <div class="hero-media" aria-hidden="true"></div>
+          <div class="hero-content">
+            <span class="kicker">Best Seller</span>
+            <h1 class="title">Wraps & Shawarmas — Loaded, Juicy, Iconic</h1>
+            <p class="lead">Hand-sliced shawarma, freshly made fries and local favourites — build your meal, add extras and order directly on WhatsApp. Fast pickup & local delivery in Tema.</p>
 
-    <!-- HERO -->
-    <section id="hero" class="hero-section" aria-label="Hero featured">
-      <div class="hero-inner">
-        <div class="hero-left hero-card">
-          <div class="hero-media">
-            <div class="hero-big hero-visual">
-              <img src="https://images.unsplash.com/photo-1604908554325-1ff3a7b1b0f8?q=80&w=1400&auto=format&fit=crop" alt="Delicious shawarma" loading="eager">
+            <div class="hero-ctas">
+              <button class="btn btn-cta" id="open-builder">Build Your Shawarma</button>
+              <a class="btn" href="#menu">See full menu</a>
             </div>
 
-            <div>
-              <h1 class="hero-title">The Ultimate Shawarma Experience</h1>
-              <p class="hero-sub">Hand-sliced, heavily loaded — customize your fillings & sauces. Fresh daily from Tema Community 25.</p>
-
-              <div class="hero-actions">
-                <button class="btn btn-cta" data-action="open-builder" data-item="shawarma">Build Your Shawarma</button>
-                <button class="btn btn-ghost" data-action="quick-order" data-item="shawarma">Quick Order</button>
-              </div>
-
-              <div class="badges">
-                <span class="badge hot">Best Seller</span>
-                <span class="badge">Build Your Own</span>
-              </div>
-
-              <!-- slim carousel look (static thumbnails to switch hero images) -->
-              <div style="display:flex;gap:8px;margin-top:12px;">
-                <button class="icon-btn thumb-switch" data-src="https://images.unsplash.com/photo-1604908554325-1ff3a7b1b0f8?q=80&w=1400&auto=format&fit=crop" aria-label="shawarma image">
-                  <img src="https://images.unsplash.com/photo-1604908554325-1ff3a7b1b0f8?q=80&w=200&auto=format&fit=crop" alt="" style="width:44px;height:44px;object-fit:cover;border-radius:8px">
-                </button>
-                <button class="icon-btn thumb-switch" data-src="https://images.unsplash.com/photo-1542444459-db0b8c7dfb3a?q=80&w=1400&auto=format&fit=crop" aria-label="fries image">
-                  <img src="https://images.unsplash.com/photo-1542444459-db0b8c7dfb3a?q=80&w=200&auto=format&fit=crop" alt="" style="width:44px;height:44px;object-fit:cover;border-radius:8px">
-                </button>
-                <button class="icon-btn thumb-switch" data-src="https://images.unsplash.com/photo-1627308595229-7830a5c91f9f?q=80&w=1400&auto=format&fit=crop" aria-label="angwamo image">
-                  <img src="https://images.unsplash.com/photo-1627308595229-7830a5c91f9f?q=80&w=200&auto=format&fit=crop" alt="" style="width:44px;height:44px;object-fit:cover;border-radius:8px">
-                </button>
-              </div>
+            <div style="margin-top:18px;display:flex;gap:8px;align-items:center">
+              <div style="display:flex;gap:6px;align-items:center"><span style="background:rgba(255,255,255,0.04);padding:6px 10px;border-radius:999px">⭐ 4.8</span><span class="muted">(1.2k+ orders)</span></div>
+              <div style="margin-left:12px" class="muted">Free Coke on Loaded Fries (Tuesdays)</div>
             </div>
           </div>
-
-          <!-- Inline builder panel (hidden by default; no modal) -->
-          <div id="builder" class="builder-panel" aria-expanded="false" aria-labelledby="builder-title">
-            <!-- Accessible anchor for #build -->
-            <div id="build" style="position:relative;top:-8px"></div>
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-              <div>
-                <h3 id="builder-title" style="margin:0;font-family:Montserrat">Build Your Meal</h3>
-                <small style="color:var(--muted)">Customize size, protein, fillings & sauces</small>
-              </div>
-              <div>
-                <button class="btn btn-ghost" id="close-builder">Close</button>
-              </div>
-            </div>
-
-            <div class="builder-grid">
-              <div>
-                <div style="margin-bottom:12px">
-                  <strong>Size</strong>
-                  <div class="options-grid" id="sizes"></div>
-                </div>
-
-                <div style="margin-bottom:12px">
-                  <strong>Protein</strong>
-                  <div class="options-grid" id="proteins"></div>
-                </div>
-
-                <div style="margin-bottom:12px">
-                  <strong>Fillings</strong>
-                  <div class="options-grid" id="fillings"></div>
-                </div>
-
-                <div style="margin-bottom:4px">
-                  <strong>Sauces</strong>
-                  <div class="options-grid" id="sauces"></div>
-                </div>
-
-                <div style="margin-top:12px;display:flex;align-items:center;gap:10px">
-                  <div class="qty-box" aria-label="Quantity">
-                    <button class="btn" id="qty-dec">−</button>
-                    <span id="qty-val" style="min-width:28px;text-align:center;font-weight:800">1</span>
-                    <button class="btn" id="qty-inc">+</button>
-                  </div>
-                  <label style="color:var(--muted)"><input type="radio" name="delivery" value="pickup" checked> Pickup</label>
-                  <label style="color:var(--muted)"><input type="radio" name="delivery" value="delivery"> Delivery (+GHC 10)</label>
-                </div>
-
-                <div style="margin-top:12px;display:flex;gap:10px">
-                  <button class="btn btn-cta" id="add-to-cart-inline">Add to Cart</button>
-                  <button class="btn btn-ghost" id="order-now-inline">Order on WhatsApp</button>
-                </div>
-              </div>
-
-              <aside class="builder-preview" aria-hidden="false">
-                <div class="preview-image" id="preview-image"><img src="https://images.unsplash.com/photo-1604908554325-1ff3a7b1b0f8?q=80&w=800&auto=format&fit=crop" alt="Preview"></div>
-                <div style="margin-top:12px;display:flex;justify-content:space-between;align-items:center">
-                  <div>
-                    <h4 id="preview-title" style="margin:0">Your Meal</h4>
-                    <small id="preview-desc" style="color:var(--muted)">Summary will appear here</small>
-                  </div>
-                  <div style="text-align:right">
-                    <div style="color:var(--yellow);font-weight:900" id="preview-price">GHC 0</div>
-                    <small style="color:var(--muted)">Est. total</small>
-                  </div>
-                </div>
-              </aside>
-            </div>
-          </div>
-
         </div>
 
-        <!-- RIGHT: Quick picks + mini cart -->
         <aside class="hero-right">
-          <div class="featured-card">
-            <h3 class="featured-title">Fast Picks</h3>
-            <p style="color:var(--muted);margin-top:6px">Top choices ready to go — customize or quick order.</p>
+          <div class="quick-card">
+            <h4>Fast Picks</h4>
+            <p class="muted">Top sellers — ready to order or customise.</p>
 
-            <ul class="quick-picks" role="list" id="quick-picks">
-              <li class="pick" data-id="shawarma" data-price-min="45" data-price-max="80">
-                <div class="pick-media"><img src="https://images.unsplash.com/photo-1604908554325-1ff3a7b1b0f8?q=80&w=800&auto=format&fit=crop" alt="Shawarma"></div>
-                <div class="pick-info">
+            <div style="margin-top:12px">
+              <div class="pick">
+                <div class="thumb" style="background-image:url('https://images.unsplash.com/photo-1604908554325-1ff3a7b1b0f8?q=80&w=800&auto=format&fit=crop')"></div>
+                <div class="meta">
                   <strong>Shawarma</strong>
-                  <span style="color:var(--muted)">GHC 45 - 80</span>
+                  <div class="muted">GHC 45 — GHC 80</div>
                 </div>
-                <div class="pick-actions">
-                  <button class="btn btn-ghost" data-action="open-builder" data-item="shawarma">Customize</button>
-                  <button class="btn" data-action="add-to-cart" data-item="shawarma">Add</button>
+                <div>
+                  <button class="btn" data-item="shawarma">Customize</button>
                 </div>
-              </li>
-
-              <li class="pick" data-id="fries" data-price-min="55" data-price-max="70">
-                <div class="pick-media"><img src="https://images.unsplash.com/photo-1542444459-db0b8c7dfb3a?q=80&w=800&auto=format&fit=crop" alt="Fries"></div>
-                <div class="pick-info">
-                  <strong>Loaded Fries</strong>
-                  <span style="color:var(--muted)">GHC 55 - 70</span>
-                </div>
-                <div class="pick-actions">
-                  <button class="btn btn-ghost" data-action="open-builder" data-item="fries">Customize</button>
-                  <button class="btn" data-action="add-to-cart" data-item="fries">Add</button>
-                </div>
-              </li>
-
-              <li class="pick" data-id="angwamo" data-price-min="55" data-price-max="70">
-                <div class="pick-media"><img src="https://images.unsplash.com/photo-1627308595229-7830a5c91f9f?q=80&w=800&auto=format&fit=crop" alt="Angwamo"></div>
-                <div class="pick-info">
-                  <strong>Loaded Angwamo</strong>
-                  <span style="color:var(--muted)">GHC 55 / 60 / 70</span>
-                </div>
-                <div class="pick-actions">
-                  <button class="btn btn-ghost" data-action="open-builder" data-item="angwamo">Customize</button>
-                  <button class="btn" data-action="add-to-cart" data-item="angwamo">Add</button>
-                </div>
-              </li>
-            </ul>
-
-            <div style="margin-top:14px;border-top:1px dashed rgba(255,255,255,0.02);padding-top:12px">
-              <div style="display:flex;justify-content:space-between;align-items:center">
-                <span style="color:var(--muted)">Cart</span>
-                <strong id="mini-cart-total">GHC 0</strong>
               </div>
-              <div style="margin-top:10px;display:flex;gap:8px">
-                <button class="btn btn-ghost" id="view-cart">View Cart</button>
-                <a class="btn btn-cta" href="#checkout" id="checkout-wa">Checkout</a>
+
+              <div class="pick">
+                <div class="thumb" style="background-image:url('https://images.unsplash.com/photo-1542444459-db0b8c7dfb3a?q=80&w=800&auto=format&fit=crop')"></div>
+                <div class="meta">
+                  <strong>Loaded Fries</strong>
+                  <div class="muted">GHC 55 — GHC 70</div>
+                </div>
+                <div>
+                  <button class="btn" data-item="fries">Customize</button>
+                </div>
+              </div>
+
+              <div style="margin-top:10px;border-top:1px dashed rgba(255,255,255,0.03);padding-top:12px">
+                <div style="display:flex;justify-content:space-between;align-items:center">
+                  <div class="muted">Cart</div>
+                  <div class="price" id="mini-total">GHC 0</div>
+                </div>
+                <div style="margin-top:10px;display:flex;gap:8px">
+                  <button class="btn" id="view-cart">View</button>
+                  <a class="btn btn-cta" href="https://wa.me/233552509241" target="_blank">Checkout</a>
+                </div>
               </div>
             </div>
           </div>
@@ -343,511 +198,204 @@
       </div>
     </section>
 
-    <!-- PROMO -->
-    <section id="promo" class="promo-radiant" aria-label="Promo">
-      <div class="promo-inner container">
+    <section id="promo" class="container" style="padding:22px 0">
+      <div style="display:flex;gap:18px;align-items:center;justify-content:space-between;background:linear-gradient(90deg,rgba(217,48,42,0.06),rgba(255,191,0,0.03));padding:18px;border-radius:14px;border:1px solid rgba(255,255,255,0.02)">
         <div>
-          <div class="badge">Limited Time</div>
-          <h2 class="promo-title">Buy 2 Shawarmas — Get 1 FREE</h2>
-          <p class="promo-desc">Every Tuesday this month. Add two qualifying shawarmas to your cart and the third one will be free. Free Coke with Loaded Fries.</p>
-          <div style="margin-top:12px">
-            <button class="btn btn-cta" data-action="open-builder" data-item="shawarma">Build & Claim</button>
-            <a class="btn btn-ghost" href="#menu">See Menu</a>
-          </div>
+          <div style="font-weight:900;color:var(--red)">Limited Time</div>
+          <h3 style="margin:6px 0">Buy 2 Shawarmas — Get 1 Free</h3>
+          <p class="muted" style="margin:0">Every Tuesday. Add two qualifying shawarmas to cart, the third will be free. Free Coke with Loaded Fries.</p>
         </div>
-
-        <div style="width:360px;display:grid;place-items:center">
-          <div style="width:320px;height:200px;border-radius:12px;overflow:hidden;box-shadow:0 40px 120px rgba(0,0,0,0.6)">
-            <img src="https://images.unsplash.com/photo-1604908554325-1ff3a7b1b0f8?q=80&w=1200&auto=format&fit=crop" alt="Promo" style="width:100%;height:100%;object-fit:cover">
-          </div>
-        </div>
+        <div style="width:260px;height:160px;border-radius:12px;background-image:url('https://images.unsplash.com/photo-1627308595229-7830a5c91f9f?q=80&w=900&auto=format&fit=crop');background-size:cover;background-position:center;border:4px solid rgba(255,255,255,0.03)"></div>
       </div>
     </section>
 
-    <!-- MENU -->
-    <section id="menu" class="menu-section" aria-label="Full menu">
-      <header style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+    <section id="menu" class="menu container">
+      <header style="display:flex;align-items:end;justify-content:space-between;gap:12px;margin-bottom:14px">
         <div>
-          <h2 class="section-title">Full Menu</h2>
-          <p style="color:var(--muted);margin-top:6px">Choose, customize and order. Everything is priced transparently.</p>
+          <h2 style="margin:0;font-family:Montserrat;">Full Menu</h2>
+          <div class="muted">Choose, customize and order. Prices shown are starting prices.</div>
         </div>
-        <div class="menu-filters" role="tablist" aria-label="Filter menu">
-          <button class="filter active" data-filter="all">All</button>
-          <button class="filter" data-filter="shawarma">Shawarma</button>
-          <button class="filter" data-filter="fries">Loaded Fries</button>
-          <button class="filter" data-filter="angwamo">Angwamo</button>
-          <button class="filter" data-filter="rice">Fried Rice</button>
+        <div>
+          <div style="display:flex;gap:8px">
+            <button class="btn">All</button>
+            <button class="btn">Shawarma</button>
+            <button class="btn">Fries</button>
+            <button class="btn">Angwamo</button>
+          </div>
         </div>
       </header>
 
-      <div class="menu-grid" role="list" id="menu-grid" style="margin-top:18px">
-        <!-- Items (static sample) -->
-        <article class="menu-item" data-id="shawarma-regular" data-category="shawarma" data-price="45" role="listitem">
-          <div class="thumb"><img src="https://images.unsplash.com/photo-1604908554325-1ff3a7b1b0f8?q=80&w=800&auto=format&fit=crop" alt="Shawarma"></div>
-          <div style="flex:1">
-            <h3 style="margin:0;font-weight:800">Shawarma — Regular</h3>
-            <p style="margin:6px 0;color:var(--muted)">Classic size with your choice of protein & fillings.</p>
-            <div style="display:flex;justify-content:space-between;align-items:center">
-              <span>GHC 45</span>
-              <div style="display:flex;gap:8px">
-                <button class="btn btn-ghost" data-action="open-builder" data-item="shawarma">Customize</button>
-                <button class="btn" data-action="add-to-cart">Add</button>
-              </div>
+      <div class="menu-grid" id="menu-grid">
+        <!-- Item 1 -->
+        <article class="card">
+          <div class="thumb" style="background-image:url('https://images.unsplash.com/photo-1604908554325-1ff3a7b1b0f8?q=80&w=800&auto=format&fit=crop')"></div>
+          <h3 style="margin:6px 0">Shawarma — Regular</h3>
+          <div class="muted">Classic size with your choice of protein.</div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px">
+            <div class="price">GHC 45</div>
+            <div class="actions">
+              <button class="btn" data-action="custom" data-item="shawarma">Customize</button>
+              <button class="btn" data-action="add" data-item="shawarma">Add</button>
             </div>
           </div>
         </article>
 
-        <article class="menu-item" data-id="fries-single" data-category="fries" data-price="55" role="listitem">
-          <div class="thumb"><img src="https://images.unsplash.com/photo-1542444459-db0b8c7dfb3a?q=80&w=800&auto=format&fit=crop" alt="Loaded Fries"></div>
-          <div style="flex:1">
-            <h3 style="margin:0;font-weight:800">Loaded Fries — Single</h3>
-            <p style="margin:6px 0;color:var(--muted)">Cheese, sauce, choice of protein.</p>
-            <div style="display:flex;justify-content:space-between;align-items:center">
-              <span>GHC 55</span>
-              <div style="display:flex;gap:8px">
-                <button class="btn btn-ghost" data-action="open-builder" data-item="fries">Customize</button>
-                <button class="btn" data-action="add-to-cart">Add</button>
-              </div>
+        <!-- Item 2 -->
+        <article class="card">
+          <div class="thumb" style="background-image:url('https://images.unsplash.com/photo-1542444459-db0b8c7dfb3a?q=80&w=800&auto=format&fit=crop')"></div>
+          <h3 style="margin:6px 0">Loaded Fries — Single</h3>
+          <div class="muted">Cheese, sauce, choice of protein.</div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px">
+            <div class="price">GHC 55</div>
+            <div class="actions">
+              <button class="btn" data-action="custom" data-item="fries">Customize</button>
+              <button class="btn" data-action="add" data-item="fries">Add</button>
             </div>
           </div>
         </article>
 
-        <article class="menu-item" data-id="angwamo-plate" data-category="angwamo" data-price="55" role="listitem">
-          <div class="thumb"><img src="https://images.unsplash.com/photo-1627308595229-7830a5c91f9f?q=80&w=800&auto=format&fit=crop" alt="Angwamo"></div>
-          <div style="flex:1">
-            <h3 style="margin:0;font-weight:800">Loaded Angwamo — Plate</h3>
-            <p style="margin:6px 0;color:var(--muted)">A hearty plate with eggs, sides & toppings.</p>
-            <div style="display:flex;justify-content:space-between;align-items:center">
-              <span>GHC 55</span>
-              <div style="display:flex;gap:8px">
-                <button class="btn btn-ghost" data-action="open-builder" data-item="angwamo">Customize</button>
-                <button class="btn" data-action="add-to-cart">Add</button>
-              </div>
+        <!-- Item 3 -->
+        <article class="card">
+          <div class="thumb" style="background-image:url('https://images.unsplash.com/photo-1627308595229-7830a5c91f9f?q=80&w=800&auto=format&fit=crop')"></div>
+          <h3 style="margin:6px 0">Loaded Angwamo — Plate</h3>
+          <div class="muted">A hearty plate with eggs, sides & toppings.</div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px">
+            <div class="price">GHC 55</div>
+            <div class="actions">
+              <button class="btn" data-action="custom" data-item="angwamo">Customize</button>
+              <button class="btn" data-action="add" data-item="angwamo">Add</button>
             </div>
           </div>
         </article>
 
-        <article class="menu-item" data-id="fried-rice" data-category="rice" data-price="60" role="listitem">
-          <div class="thumb"><img src="https://images.unsplash.com/photo-1604754521116-9c6a1a2bde9a?q=80&w=800&auto=format&fit=crop" alt="Fried Rice"></div>
-          <div style="flex:1">
-            <h3 style="margin:0;font-weight:800">Fried Rice</h3>
-            <p style="margin:6px 0;color:var(--muted)">Served with your choice of protein.</p>
-            <div style="display:flex;justify-content:space-between;align-items:center">
-              <span>GHC 60</span>
-              <div style="display:flex;gap:8px">
-                <button class="btn btn-ghost" data-action="open-builder" data-item="rice">Customize</button>
-                <button class="btn" data-action="add-to-cart">Add</button>
-              </div>
+        <!-- Item 4 -->
+        <article class="card">
+          <div class="thumb" style="background-image:url('https://images.unsplash.com/photo-1604754521116-9c6a1a2bde9a?q=80&w=800&auto=format&fit=crop')"></div>
+          <h3 style="margin:6px 0">Fried Rice</h3>
+          <div class="muted">Served with your choice of protein.</div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px">
+            <div class="price">GHC 60</div>
+            <div class="actions">
+              <button class="btn" data-action="custom" data-item="rice">Customize</button>
+              <button class="btn" data-action="add" data-item="rice">Add</button>
             </div>
           </div>
         </article>
+
       </div>
     </section>
 
-    <!-- ABOUT -->
-    <section id="about" class="about-section" aria-label="About Wrap District">
-      <div class="about-grid container">
-        <div class="about-media"><img src="https://images.unsplash.com/photo-1541542684-32e1077b2a3e?q=80&w=1200&auto=format&fit=crop" alt="Kitchen"></div>
+    <section id="about" class="container" style="padding:28px 0">
+      <div style="display:grid;grid-template-columns:320px 1fr;gap:18px;align-items:center">
+        <div style="height:220px;border-radius:12px;background-image:url('https://images.unsplash.com/photo-1541542684-32e1077b2a3e?q=80&w=1200&auto=format&fit=crop');background-size:cover;background-position:center;border:1px solid rgba(255,255,255,0.03)"></div>
         <div>
-          <h2 style="margin-top:0">Why Wrap District?</h2>
-          <p style="color:var(--muted)">We prepare fresh shawarmas, loaded fries and local favourites with premium ingredients. Customize every meal and get it delivered hot. Based in Tema Community 25 — trusted by locals.</p>
-
-          <ul style="list-style:none;padding:0;margin-top:12px;display:flex;flex-direction:column;gap:10px">
-            <li><strong>Fresh Ingredients</strong> <small style="color:var(--muted)">Sourced daily</small></li>
-            <li><strong>Build your meal</strong> <small style="color:var(--muted)">Full customization</small></li>
-            <li><strong>Fast Delivery</strong> <small style="color:var(--muted)">Local coverage</small></li>
+          <h3 style="margin-top:0">Why Wrap District?</h3>
+          <p class="muted">Fresh ingredients, fully customizable builds, fast local delivery and friendly prices. Based in Tema Community 25 — trusted by locals.</p>
+          <ul style="margin-top:12px;color:var(--muted);list-style:none;padding:0">
+            <li>• Fresh Ingredients — sourced daily</li>
+            <li>• Build your meal — full customization</li>
+            <li>• Fast Delivery — local coverage</li>
           </ul>
         </div>
       </div>
     </section>
 
-    <!-- FOOTER -->
-    <footer id="contact" class="site-footer" role="contentinfo" aria-label="Footer and contact">
-      <div class="footer-inner">
+    <footer class="container">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
         <div>
-          <a class="brand" href="#" aria-label="Wrap District home">
-            <div style="display:flex;gap:12px;align-items:center">
-              <div class="logo" style="width:44px;height:44px"><svg width="28" height="28" viewBox="0 0 24 24" fill="none"><rect x="1.5" y="3" width="21" height="18" rx="4" fill="#FFD000"></rect></svg></div>
-              <div>
-                <strong>WRAP DISTRICT</strong><br>
-                <small style="color:var(--muted)">Tema Community 25, Devtraco</small>
-              </div>
-            </div>
-          </a>
-
-          <div style="margin-top:12px">
-            <div style="display:flex;gap:8px;align-items:center;color:var(--muted)"><i class="fa fa-phone"></i> <a href="tel:+233552509241">+233 55 250 9241</a></div>
-            <div style="color:var(--muted);margin-top:8px"><i class="fa fa-location-dot"></i> Tema Community 25, Devtraco</div>
-            <div style="color:var(--muted);margin-top:6px"><i class="fa fa-clock"></i> Mon–Fri: 5pm • Sat–Sun: 9am</div>
-          </div>
+          <strong>WRAP DISTRICT</strong>
+          <div class="muted">Tema Community 25 • +233 55 250 9241</div>
         </div>
-
-        <div>
-          <h4 style="margin-top:0">Quick Links</h4>
-          <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px">
-            <li><a href="#menu">Menu</a></li>
-            <li><a href="#build">Build</a></li>
-            <li><a href="#promo">Promos</a></li>
-            <li><a href="#about">About</a></li>
-          </ul>
-        </div>
-
-        <div>
-          <h4 style="margin-top:0">Follow</h4>
-          <div style="display:flex;gap:8px;margin-bottom:8px">
-            <a class="icon-btn" href="#" aria-label="Instagram"><i class="fa fa-instagram"></i></a>
-            <a class="icon-btn" href="#" aria-label="WhatsApp"><i class="fa fa-whatsapp"></i></a>
-            <a class="icon-btn" href="#" aria-label="Facebook"><i class="fa fa-facebook"></i></a>
-          </div>
-          <div>
-            <label style="color:var(--muted)">Get promos & deals</label>
-            <div style="display:flex;gap:8px;margin-top:8px">
-              <input id="newsletter" type="email" placeholder="Email address" style="flex:1;padding:8px;border-radius:10px;border:1px solid rgba(255,255,255,0.03);background:transparent;color:var(--text)">
-              <button class="btn">Subscribe</button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="container copyright">
-        <small style="color:var(--muted)">© <span id="year"></span> Wrap District. All rights reserved.</small>
+        <div class="muted">© <span id="year"></span> Wrap District. All rights reserved.</div>
       </div>
     </footer>
 
   </main>
 
-  <!-- TOAST -->
-  <div id="toast" style="position:fixed;left:50%;transform:translateX(-50%);bottom:26px;padding:12px 18px;border-radius:999px;background:linear-gradient(90deg,var(--red-500),var(--red-700));color:#fff;font-weight:800;opacity:0;pointer-events:none;transition:opacity 220ms,transform 220ms;z-index:999;"></div>
+  <!-- CART DRAWER (simple) -->
+  <div id="drawer" class="drawer" role="dialog" aria-modal="true" aria-label="Cart drawer">
+    <h4>Your cart</h4>
+    <div class="cart-items" id="cart-items"></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px">
+      <div class="muted">Total</div>
+      <div class="price" id="cart-total">GHC 0</div>
+    </div>
+    <div style="margin-top:10px;display:flex;gap:8px">
+      <a class="btn btn-cta" id="checkout-wa" href="#">Checkout on WhatsApp</a>
+      <button class="btn" id="clear-cart">Clear</button>
+    </div>
+  </div>
 
   <script>
     (function(){
-      // Basic helpers & state
-      const WA_PHONE = '233552509241';
-      const wa = (text) => `https://wa.me/${WA_PHONE}?text=${encodeURIComponent(text)}`;
-      const $ = (s, ctx=document) => ctx.querySelector(s);
-      const $$ = (s, ctx=document) => Array.from(ctx.querySelectorAll(s));
-      const formatGhc = n => `GHC ${Number(n).toFixed(2)}`;
+      document.getElementById('year').textContent = new Date().getFullYear();
+      const WA='233552509241';
+      const wa = (text)=> `https://wa.me/${WA}?text=${encodeURIComponent(text)}`;
 
-      // Catalog (same as before)
-      const CATALOG = {
-        shawarma: {
-          name: 'Shawarma',
-          sizes: [{id:'regular',label:'Regular',price:45},{id:'jumbo',label:'Jumbo',price:65}],
-          proteins:[{id:'chicken',label:'Chicken',price:0},{id:'beef',label:'Beef',price:10},{id:'mixed',label:'Mixed',price:15}],
-          fillings:[{id:'lettuce',label:'Lettuce',price:0},{id:'tomato',label:'Tomato',price:0},{id:'onion',label:'Onion',price:0},{id:'cheese',label:'Cheese',price:5},{id:'egg',label:'Egg',price:6}],
-          sauces:[{id:'garlic',label:'Garlic Mayo'},{id:'bbq',label:'BBQ'},{id:'chilli',label:'Chilli'}]
-        },
-        fries: {
-          name:'Loaded Fries',
-          sizes:[{id:'single',label:'Single',price:55},{id:'large',label:'Large',price:70}],
-          proteins:[{id:'none',label:'No protein',price:0},{id:'chicken',label:'Chicken',price:10},{id:'bacon',label:'Bacon',price:12}],
-          fillings:[{id:'cheese',label:'Cheese',price:4},{id:'jalapeno',label:'Jalapeno',price:3}],
-          sauces:[{id:'cheese',label:'Cheese Sauce'},{id:'mayo',label:'Garlic Mayo'}]
-        },
-        angwamo:{
-          name:'Loaded Angwamo',
-          sizes:[{id:'plate',label:'Plate',price:55},{id:'combo',label:'Combo',price:70}],
-          proteins:[{id:'chicken',label:'Chicken',price:0},{id:'beef',label:'Beef',price:10}],
-          fillings:[{id:'egg',label:'Egg',price:0},{id:'coleslaw',label:'Coleslaw',price:5}],
-          sauces:[{id:'spice',label:'Spicy'},{id:'mild',label:'Mild'}]
-        },
-        rice:{
-          name:'Fried Rice',
-          sizes:[{id:'regular',label:'Regular',price:60},{id:'extra',label:'Extra',price:80}],
-          proteins:[{id:'chicken',label:'Chicken',price:0},{id:'beef',label:'Beef',price:12},{id:'shrimp',label:'Shrimp',price:18}],
-          fillings:[{id:'veg',label:'Veg',price:0},{id:'egg',label:'Egg',price:6}],
-          sauces:[]
-        }
-      };
-
-      /* ----------------
-         CART logic (localStorage)
-         ---------------- */
-      const CART_KEY = 'wrapdistrict_cart_v2';
+      // lightweight cart (localStorage)
+      const CART_KEY='wrap_cart_v1';
       let cart = JSON.parse(localStorage.getItem(CART_KEY) || '[]');
 
-      function saveCart(){ localStorage.setItem(CART_KEY, JSON.stringify(cart)); }
-      function cartTotals(){
-        const subtotal = cart.reduce((s,it)=>s + (it.unitPrice * it.qty),0);
-        const delivery = cart.length ? 10 : 0;
-        return {subtotal, delivery, total: subtotal + delivery};
-      }
-      function updateCartUI(){
-        const count = cart.reduce((s,i)=>s + i.qty, 0);
-        $('#cart-count').textContent = count;
-        $('#mini-cart-total').textContent = formatGhc(cart.reduce((s,i)=>s + i.unitPrice * i.qty,0));
-      }
-      function addToCart(item){
-        // merge same option items
-        const key = item.id + '|' + (item.optionsSummary||'');
-        const idx = cart.findIndex(c=> (c.id+'|'+(c.optionsSummary||'')) === key);
-        if(idx>-1){ cart[idx].qty += item.qty; }
-        else cart.push(item);
-        saveCart(); updateCartUI(); showToast('Added to cart');
-      }
-      function showToast(txt, t=1800){
-        const el = $('#toast');
-        el.textContent = txt; el.style.opacity = '1'; el.style.transform='translateY(-6px)';
-        setTimeout(()=>{ el.style.opacity='0'; el.style.transform='translateY(0)'; }, t);
-      }
+      function save(){localStorage.setItem(CART_KEY,JSON.stringify(cart));renderMini();}
+      function add(item){cart.push(item);save();showToast('Added to cart');}
+      function clearCart(){cart=[];save();}
 
-      /* ----------------
-         Hero thumb image switching
-         ---------------- */
-      $$('.thumb-switch').forEach(btn=>{
-        btn.addEventListener('click', e=>{
-          const src = btn.getAttribute('data-src');
-          const big = $('.hero-big img');
-          if(src && big){ big.src = src; }
-        });
-      });
-
-      /* ----------------
-         Quick order (simple WA)
-         ---------------- */
-      document.body.addEventListener('click', e=>{
-        const btn = e.target.closest('[data-action]');
-        if(!btn) return;
-        const action = btn.getAttribute('data-action');
-        if(action === 'quick-order'){
-          const key = btn.dataset.item;
-          const cat = CATALOG[key];
-          if(!cat) return showToast('Item not available');
-          const size = cat.sizes[0];
-          const msg = `Hello Wrap District, I'd like 1 ${cat.name} (${size.label}). Please deliver to [address].`;
-          window.open(wa(msg), '_blank');
-        }
-        if(action === 'add-to-cart'){
-          e.preventDefault();
-          const itemKey = btn.dataset.item || (btn.closest('.pick')?.dataset.id) || (btn.closest('[data-id]')?.dataset.id?.split('-')[0]);
-          const cat = CATALOG[itemKey] || Object.values(CATALOG).find(c=> c.name.toLowerCase().includes((itemKey||'').toLowerCase()));
-          if(!cat){
-            // fallback: use static menu item price
-            const parent = btn.closest('[data-price]');
-            const price = parent ? Number(parent.dataset.price) : (btn.closest('[data-id]')? Number(btn.closest('[data-id]').dataset.price) : 45);
-            const id = (itemKey||'item') + '-' + Date.now();
-            addToCart({id,name: parent?.querySelector('h3')?.innerText || 'Item', qty:1, unitPrice: price, optionsSummary: 'Default'});
-            return;
-          }
-          const defaultSize = cat.sizes[0];
-          addToCart({id: `${itemKey||cat.name}-${Date.now()}`, name: cat.name, qty:1, unitPrice: defaultSize.price, optionsSummary: defaultSize.label});
-        }
-
-        if(action === 'open-builder'){
-          e.preventDefault();
-          const itemKey = btn.dataset.item;
-          openBuilderInline(itemKey);
-        }
-      });
-
-      // initial render
-      updateCartUI();
-
-      /* ----------------
-         Inline builder (no modal)
-         ---------------- */
-      const builderEl = $('#builder');
-      const sizesEl = $('#sizes');
-      const proteinsEl = $('#proteins');
-      const fillingsEl = $('#fillings');
-      const saucesEl = $('#sauces');
-      const previewImage = $('#preview-image img');
-      const previewPrice = $('#preview-price');
-      const previewTitle = $('#preview-title');
-      const previewDesc = $('#preview-desc');
-      const qtyVal = $('#qty-val');
-
-      let builderState = {
-        itemKey: null, size: null, protein: null, fillings: new Set(), sauces: new Set(), qty: 1, delivery: 'pickup'
-      };
-
-      function openBuilderInline(itemKey){
-        const cfg = CATALOG[itemKey];
-        if(!cfg) return showToast('Item unavailable to build');
-        builderState.itemKey = itemKey;
-        builderState.size = cfg.sizes[0].id;
-        builderState.protein = cfg.proteins[0].id;
-        builderState.fillings = new Set();
-        builderState.sauces = new Set();
-        builderState.qty = 1;
-        builderState.delivery = 'pickup';
-
-        // populate UI
-        previewTitle.textContent = cfg.name;
-        previewDesc.textContent = 'Customize below';
-        previewImage.src = (itemKey === 'fries') ? 'https://images.unsplash.com/photo-1542444459-db0b8c7dfb3a?q=80&w=800&auto=format&fit=crop' : (itemKey === 'angwamo' ? 'https://images.unsplash.com/photo-1627308595229-7830a5c91f9f?q=80&w=800&auto=format&fit=crop' : 'https://images.unsplash.com/photo-1604908554325-1ff3a7b1b0f8?q=80&w=800&auto=format&fit=crop');
-
-        // sizes
-        sizesEl.innerHTML = ''; proteinsEl.innerHTML=''; fillingsEl.innerHTML=''; saucesEl.innerHTML='';
-        cfg.sizes.forEach(s=>{
-          const b = document.createElement('button');
-          b.className = 'option';
-          b.type='button'; b.dataset.optType='size'; b.dataset.optId=s.id; b.dataset.optPrice=s.price;
-          b.innerHTML = `<span>${s.label}</span><div style="font-size:12px;color:var(--muted)">${formatGhc(s.price)}</div>`;
-          if(s.id === builderState.size) b.classList.add('selected');
-          b.addEventListener('click', ()=>{
-            builderState.size = s.id;
-            sizesEl.querySelectorAll('.option').forEach(x=>x.classList.remove('selected'));
-            b.classList.add('selected'); updateBuilderPreview();
-          });
-          sizesEl.appendChild(b);
-        });
-
-        // proteins
-        cfg.proteins.forEach(p=>{
-          const b = document.createElement('button');
-          b.className = 'option'; b.type='button'; b.dataset.optType='protein'; b.dataset.optId=p.id; b.dataset.optPrice=p.price;
-          b.innerHTML = `<span>${p.label}</span><div style="font-size:12px;color:var(--muted)">${p.price?'+ '+formatGhc(p.price):'Included'}</div>`;
-          if(p.id === builderState.protein) b.classList.add('selected');
-          b.addEventListener('click', ()=>{ builderState.protein = p.id; proteinsEl.querySelectorAll('.option').forEach(x=>x.classList.remove('selected')); b.classList.add('selected'); updateBuilderPreview(); });
-          proteinsEl.appendChild(b);
-        });
-
-        // fillings (multi)
-        cfg.fillings.forEach(f=>{
-          const b = document.createElement('button'); b.className='option'; b.type='button'; b.dataset.optType='fillings'; b.dataset.optId=f.id; b.dataset.optPrice=f.price;
-          b.innerHTML = `<span>${f.label}</span><div style="font-size:12px;color:var(--muted)">${f.price?'+ '+formatGhc(f.price):''}</div>`;
-          b.addEventListener('click', ()=>{
-            if(builderState.fillings.has(f.id)) { builderState.fillings.delete(f.id); b.classList.remove('selected'); }
-            else { builderState.fillings.add(f.id); b.classList.add('selected'); }
-            updateBuilderPreview();
-          });
-          fillingsEl.appendChild(b);
-        });
-
-        // sauces
-        cfg.sauces.forEach(s=>{
-          const b = document.createElement('button'); b.className='option'; b.type='button'; b.dataset.optType='sauces'; b.dataset.optId=s.id;
-          b.textContent = s.label;
-          b.addEventListener('click', ()=>{
-            if(builderState.sauces.has(s.id)) { builderState.sauces.delete(s.id); b.classList.remove('selected'); }
-            else { builderState.sauces.add(s.id); b.classList.add('selected'); }
-            updateBuilderPreview();
-          });
-          saucesEl.appendChild(b);
-        });
-
-        // set qty and delivery radio
-        qtyVal.textContent = String(builderState.qty);
-        $$('input[name="delivery"]').forEach(r=> r.checked = (r.value === 'pickup'));
-        // show builder
-        builderEl.setAttribute('aria-expanded','true');
-        builderEl.scrollIntoView({behavior:'smooth', block:'center'});
-        updateBuilderPreview();
-      }
-
-      function closeBuilderInline(){ builderEl.setAttribute('aria-expanded','false'); }
-
-      function updateBuilderPreview(){
-        const cfg = CATALOG[builderState.itemKey];
-        if(!cfg) return;
-        const sizeObj = cfg.sizes.find(s=>s.id === builderState.size) || cfg.sizes[0];
-        const protObj = cfg.proteins.find(p=>p.id === builderState.protein) || cfg.proteins[0];
-        let unit = (sizeObj?.price||0) + (protObj?.price||0);
-        cfg.fillings.forEach(f=>{ if(builderState.fillings.has(f.id)) unit += (f.price||0); });
-        const deliveryFee = builderState.delivery === 'delivery' ? 10 : 0;
-        const total = (unit + deliveryFee) * builderState.qty;
-        previewPrice.textContent = formatGhc(total);
-        previewDesc.textContent = `Size: ${sizeObj.label} • Protein: ${protObj.label}` + (builderState.fillings.size ? ` • ${[...builderState.fillings].join(', ')}` : '');
-      }
-
-      // qty controls
-      $('#qty-inc').addEventListener('click', ()=>{ builderState.qty = Math.min(99, builderState.qty + 1); qtyVal.textContent = builderState.qty; updateBuilderPreview(); });
-      $('#qty-dec').addEventListener('click', ()=>{ builderState.qty = Math.max(1, builderState.qty - 1); qtyVal.textContent = builderState.qty; updateBuilderPreview(); });
-      $('#close-builder').addEventListener('click', ()=> closeBuilderInline());
-      $$('input[name="delivery"]').forEach(r=> r.addEventListener('change', e=>{ builderState.delivery = e.target.value; updateBuilderPreview(); }));
-
-      // Add to cart from inline builder
-      $('#add-to-cart-inline').addEventListener('click', ()=>{
-        const cfg = CATALOG[builderState.itemKey];
-        if(!cfg) return showToast('Nothing selected');
-        const sizeObj = cfg.sizes.find(s=>s.id===builderState.size) || cfg.sizes[0];
-        const protObj = cfg.proteins.find(p=>p.id===builderState.protein) || cfg.proteins[0];
-        let unit = (sizeObj.price||0) + (protObj.price||0);
-        const selections = [];
-        cfg.fillings.forEach(f=>{ if(builderState.fillings.has(f.id)){ unit += (f.price||0); selections.push(f.label); }});
-        const sauces = cfg.sauces.filter(s=> builderState.sauces.has(s.id)).map(s=>s.label);
-        const optionsSummary = [`Size: ${sizeObj.label}`, `Protein: ${protObj.label}`].concat(selections.length?['Fillings: '+selections.join(', '):[]]).concat(sauces.length?['Sauces: '+sauces.join(', '):[]]).join(' • ');
-        const itemObj = {
-          id: `${builderState.itemKey}-${sizeObj.id}-${[...builderState.fillings].sort().join(',')}`,
-          name: cfg.name,
-          qty: builderState.qty,
-          unitPrice: Number(unit.toFixed(2)),
-          optionsSummary
-        };
-        addToCart(itemObj);
-        closeBuilderInline();
-      });
-
-      // Order now (WA) from inline builder
-      $('#order-now-inline').addEventListener('click', ()=>{
-        const cfg = CATALOG[builderState.itemKey]; if(!cfg) return;
-        const sizeObj = cfg.sizes.find(s=>s.id===builderState.size) || cfg.sizes[0];
-        const protObj = cfg.proteins.find(p=>p.id===builderState.protein) || cfg.proteins[0];
-        const fillings = cfg.fillings.filter(f=> builderState.fillings.has(f.id)).map(f=>f.label).join(', ') || 'None';
-        const sauces = cfg.sauces.filter(s=> builderState.sauces.has(s.id)).map(s=>s.label).join(', ') || 'None';
-        const unit = (sizeObj.price||0) + (protObj.price||0) + cfg.fillings.reduce((s,f)=> s + (builderState.fillings.has(f.id)?(f.price||0):0),0);
-        const total = ((unit) + (builderState.delivery==='delivery'?10:0)) * builderState.qty;
-        const message = `Hello Wrap District, I want ${builderState.qty} x ${cfg.name} (${sizeObj.label} / ${protObj.label}). Fillings: ${fillings}. Sauces: ${sauces}. Delivery: ${builderState.delivery === 'delivery' ? 'Yes' : 'No'}. Total: ${formatGhc(total)}.`;
-        window.open(wa(message), '_blank');
-      });
-
-      /* ----------------
-         Menu filters
-         ---------------- */
-      $$('.filter').forEach(btn=> btn.addEventListener('click', ()=>{
-        $$('.filter').forEach(x=>x.classList.remove('active'));
-        btn.classList.add('active');
-        const f = btn.dataset.filter;
-        $$('#menu-grid .menu-item').forEach(it=>{
-          if(f === 'all' || it.dataset.category === f){ it.style.display = ''; }
-          else { it.style.display = 'none'; }
-        });
+      // wire add buttons
+      document.querySelectorAll('[data-action="add"]').forEach(b=>b.addEventListener('click',()=>{
+        const key=b.dataset.item||'item';
+        const prices={shawarma:45,fries:55,angwamo:55,rice:60};
+        add({id:key+'-'+Date.now(),name:key,qty:1,unit:prices[key]||50});
       }));
 
-      /* ----------------
-         Cart drawer simplified (open new window WA for checkout)
-         ---------------- */
-      $('#view-cart').addEventListener('click', ()=> {
-        const t = cartTotals();
-        const lines = cart.map(it => `${it.qty} x ${it.name} (${it.optionsSummary||'Default'}) — ${formatGhc(it.unitPrice)}`);
-        lines.push('', `Subtotal: ${formatGhc(t.subtotal)}`, `Delivery: ${formatGhc(t.delivery)}`, `Total: ${formatGhc(t.total)}`);
-        const message = `Hello Wrap District, I'd like to place an order:\n${lines.join('\n')}\nDeliver to: [address]`;
-        window.open(wa(message), '_blank');
+      // show cart drawer
+      const drawer=document.getElementById('drawer');
+      document.getElementById('open-cart').addEventListener('click',()=>{
+        drawer.classList.toggle('open');renderDrawer();
       });
+      document.getElementById('view-cart').addEventListener('click',()=>{drawer.classList.add('open');renderDrawer();});
+      document.getElementById('clear-cart').addEventListener('click',()=>{if(confirm('Clear cart?')){clearCart();renderDrawer();}});
 
-      $('#checkout-wa').addEventListener('click', (e)=>{
+      function renderMini(){
+        const total = cart.reduce((s,i)=>s+i.unit*i.qty,0);
+        document.getElementById('mini-total').textContent = 'GHC ' + total.toFixed(2);
+      }
+
+      function renderDrawer(){
+        const el = document.getElementById('cart-items'); el.innerHTML='';
+        cart.forEach((it,idx)=>{
+          const node = document.createElement('div'); node.className='cart-item';
+          node.innerHTML = `<div><strong>${it.name}</strong><div class=\"muted\">Qty: ${it.qty}</div></div><div><div>${'GHC '+(it.unit*it.qty).toFixed(2)}</div><button data-remove='${idx}' class='btn'>Remove</button></div>`;
+          el.appendChild(node);
+        });
+        document.getElementById('cart-total').textContent = 'GHC '+cart.reduce((s,i)=>s+i.unit*i.qty,0).toFixed(2);
+        // remove handlers
+        el.querySelectorAll('[data-remove]').forEach(b=>b.addEventListener('click',()=>{cart.splice(Number(b.dataset.remove),1);save();renderDrawer();}));
+      }
+
+      // checkout via WA
+      document.getElementById('checkout-wa').addEventListener('click',function(e){
         e.preventDefault();
-        const t = cartTotals();
-        if(!cart.length) { showToast('Cart is empty'); return; }
-        let lines = cart.map(it=> `${it.qty} x ${it.name} (${it.optionsSummary||'Default'}) — ${formatGhc(it.unitPrice)}`);
-        lines.push('', `Subtotal: ${formatGhc(t.subtotal)}`, `Delivery: ${formatGhc(t.delivery)}`, `Total: ${formatGhc(t.total)}`);
-        const message = `Hello Wrap District, I'd like to place an order:\n${lines.join('\n')}\nPlease deliver to: [address]`;
-        window.open(wa(message), '_blank');
+        if(!cart.length){alert('Cart is empty');return}
+        const lines = cart.map(i=>`${i.qty} x ${i.name} — GHC ${i.unit.toFixed(2)}`);
+        const total = cart.reduce((s,i)=>s+i.unit*i.qty,0);
+        lines.push('Total: GHC '+total.toFixed(2));
+        lines.push('Please deliver to: [address]');
+        window.open(wa(lines.join('\n')),'_blank');
       });
 
-      /* ----------------
-         Search button
-         ---------------- */
-      $('#search-btn').addEventListener('click', ()=>{
-        const q = prompt('Search menu (type name):');
-        if(!q) return;
-        const items = Array.from(document.querySelectorAll('.menu-item, .pick'));
-        const found = items.find(it => (it.dataset.id || it.textContent || '').toLowerCase().includes(q.toLowerCase()));
-        if(found){
-          found.scrollIntoView({behavior:'smooth', block:'center'}); found.classList.add('pulse');
-          setTimeout(()=> found.classList.remove('pulse'), 1200);
-        } else alert('No matching menu item found.');
-      });
+      // builder quick open (simplified)
+      document.getElementById('open-builder').addEventListener('click',()=>{window.location.hash='#build';document.querySelector('[data-item="shawarma"]')?.scrollIntoView({behavior:'smooth'})});
 
-      /* ----------------
-         Year & small niceties
-         ---------------- */
-      document.getElementById('year').textContent = new Date().getFullYear();
-      $('#logo-link').addEventListener('click', (e)=>{ e.preventDefault(); window.scrollTo({top:0,behavior:'smooth'}); });
+      // Toast
+      let tTimer=null;
+      function showToast(text){
+        let t = document.querySelector('.site-toast');
+        if(!t){t=document.createElement('div');t.className='site-toast';t.style.cssText='position:fixed;left:50%;transform:translateX(-50%);bottom:26px;background:linear-gradient(90deg,var(--red),var(--accent));padding:10px 18px;border-radius:999px;color:#fff;font-weight:700;z-index:9999';document.body.appendChild(t)}
+        t.textContent=text; t.style.opacity=1; if(tTimer)clearTimeout(tTimer); tTimer=setTimeout(()=>t.style.opacity=0,2000);
+      }
 
-      // initial small welcome
-      setTimeout(()=> showToast('Welcome — Build your meal!'), 700);
+      // init
+      renderMini();
     })();
   </script>
 </body>
