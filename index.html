@@ -2,401 +2,542 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Wrap District — Fresh & Loaded</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Montserrat:wght@600;800&display=swap" rel="stylesheet">
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Wrap District — Premium Hero</title>
+
+  <!-- Google font -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+
   <style>
-    /* ---------- GLOBAL ---------- */
     :root{
-      --bg:#0f1112;
-      --panel:linear-gradient(180deg,#121214,#0f1112);
-      --accent:#ffd04a;
-      --accent-2:#ff9b3b;
-      --red:#d9302a;
-      --muted:#bdbdbd;
-      --card:#111214;
-      --glass:rgba(255,255,255,0.03);
-      --radius:16px;
-      --max:1200px;
-      --ease:cubic-bezier(.2,.9,.25,1);
+      --red:#e53935;
+      --deep-red:#b71c1c;
+      --yellow:#ffc107;
+      --bg:#0b0b0b;
+      --glass: rgba(255,255,255,0.06);
+      --max-width: 1200px;
     }
+
     *{box-sizing:border-box}
-    html,body{height:100%;margin:0;background:linear-gradient(180deg,#0b0b0b,#0f1112 120%);color:#fff;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial}
-    img{max-width:100%;display:block}
-    a{text-decoration:none;color:inherit}
-    .container{max-width:var(--max);margin:0 auto;padding:0 20px}
-
-    /* ---------- HEADER ---------- */
-    header.site-header{position:sticky;top:0;z-index:120;background:linear-gradient(180deg,rgba(15,15,16,0.6),rgba(11,11,12,0.35));backdrop-filter:blur(6px);border-bottom:1px solid rgba(255,255,255,0.03)}
-    .header-inner{display:flex;align-items:center;justify-content:space-between;padding:14px 0}
-    .brand{display:flex;align-items:center;gap:14px}
-    .logo{width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent-2));display:grid;place-items:center;font-family:Montserrat;font-weight:800;color:#1b1b1b}
-    .brand-title{font-family:Montserrat;font-weight:800;color:var(--red);letter-spacing:0.6px}
-    nav.main-nav ul{display:flex;gap:18px;align-items:center;margin:0;padding:0;list-style:none}
-    .nav-link{padding:8px 12px;border-radius:10px;color:var(--muted);font-weight:700;transition:all 220ms var(--ease)}
-    .nav-link:hover{color:#fff;background:rgba(255,255,255,0.02);transform:translateY(-3px)}
-    .header-actions{display:flex;align-items:center;gap:10px}
-    .btn{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:12px;border:none;cursor:pointer;font-weight:800}
-    .btn-cta{background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#111}
-    .icon-btn{background:transparent;border-radius:10px;padding:8px;border:1px solid rgba(255,255,255,0.03);cursor:pointer}
-
-    /* ---------- HERO ---------- */
-    .hero{padding:46px 0}
-    .hero-grid{display:grid;grid-template-columns:1fr 380px;gap:28px;align-items:start}
-
-    .hero-card{background:var(--panel);border-radius:18px;padding:28px;position:relative;overflow:hidden;border:1px solid var(--glass);box-shadow:0 30px 80px rgba(0,0,0,0.6)}
-    .hero-media{position:absolute;inset:0;right:auto;width:60%;max-width:900px;opacity:0.13;filter:blur(24px);pointer-events:none;background-image:url('https://images.unsplash.com/photo-1604908554325-1ff3a7b1b0f8?q=80&w=1400&auto=format&fit=crop');background-size:cover;background-position:center;transform:translate(20%, -6%)}
-
-    .hero-content{position:relative;z-index:2;max-width:58%}
-    .kicker{display:inline-block;padding:6px 10px;background:rgba(255,255,255,0.04);border-radius:999px;color:var(--accent);font-weight:800;font-size:13px}
-    h1.title{font-family:Montserrat;font-size:46px;margin:14px 0 8px;line-height:1.02;color:#fff}
-    p.lead{color:var(--muted);font-size:16px;max-width:60%}
-
-    .hero-ctas{margin-top:18px;display:flex;gap:12px;align-items:center}
-    .hero-ctas .btn{font-size:16px}
-
-    .hero-right{position:relative}
-    .quick-card{background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(0,0,0,0.02));padding:18px;border-radius:14px;border:1px solid rgba(255,255,255,0.03)}
-    .quick-card h4{margin:0 0 6px;font-family:Montserrat}
-    .pick{display:flex;align-items:center;gap:12px;padding:10px;border-radius:12px;background:rgba(255,255,255,0.01);margin-bottom:10px}
-    .pick .thumb{width:64px;height:64px;border-radius:10px;background-size:cover;background-position:center}
-    .pick .meta{flex:1}
-    .pick .meta strong{display:block}
-
-    /* ---------- MENU ---------- */
-    .menu{padding:28px 0}
-    .menu-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
-    .card{background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(0,0,0,0.02));border-radius:14px;padding:12px;border:1px solid rgba(255,255,255,0.02);transition:transform 280ms var(--ease), box-shadow 280ms}
-    .card:hover{transform:translateY(-8px);box-shadow:0 40px 120px rgba(0,0,0,0.6)}
-    .card .thumb{height:160px;border-radius:10px;background-size:cover;background-position:center;margin-bottom:10px}
-    .price{color:var(--accent);font-weight:900}
-    .card .actions{display:flex;gap:8px;align-items:center;margin-top:8px}
-
-    /* ---------- CART DRAWER ---------- */
-    .drawer{position:fixed;right:18px;top:18px;width:360px;background:linear-gradient(180deg,#0f0f11,#121217);border-radius:12px;padding:14px;border:1px solid rgba(255,255,255,0.03);box-shadow:0 40px 120px rgba(0,0,0,0.6);display:none;z-index:999}
-    .drawer.open{display:block}
-    .drawer h4{margin:0 0 8px}
-    .cart-items{max-height:320px;overflow:auto;margin-top:8px}
-    .cart-item{display:flex;justify-content:space-between;gap:12px;padding:8px;border-radius:10px;background:rgba(255,255,255,0.01);margin-bottom:8px}
-
-    /* ---------- FOOTER ---------- */
-    footer{padding:28px 0;margin-top:40px;border-top:1px dashed rgba(255,255,255,0.02)}
-
-    /* ---------- RESPONSIVE ---------- */
-    @media (max-width:1000px){
-      .hero-grid{grid-template-columns:1fr 320px}
-      .hero-content{max-width:60%}
-    }
-    @media (max-width:800px){
-      .hero-grid{grid-template-columns:1fr}
-      .hero-content{max-width:100%}
-      .menu-grid{grid-template-columns:repeat(2,1fr)}
-      nav.main-nav ul{display:none}
-    }
-    @media (max-width:420px){
-      .menu-grid{grid-template-columns:1fr}
-      h1.title{font-size:28px}
-      .hero-ctas{flex-direction:column;align-items:stretch}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: "Montserrat", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      background: linear-gradient(180deg,#0b0b0b 0%, #0d0d0d 100%);
+      color:#fff;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      overflow-x:hidden;
     }
 
-    /* small helpers */
-    .muted{color:var(--muted);font-size:14px}
-    .sr-only{position:absolute;height:1px;width:1px;overflow:hidden;clip:rect(1px,1px,1px,1px)}
+    /* header */
+    .site-header{
+      width:100%;
+      background: linear-gradient(90deg, rgba(0,0,0,0.18), transparent);
+      position:fixed;
+      top:0;
+      left:0;
+      z-index:80;
+      backdrop-filter: blur(6px);
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    .container{
+      max-width:var(--max-width);
+      margin:0 auto;
+      padding:18px 28px;
+      display:flex;
+      align-items:center;
+      gap:20px;
+      justify-content:space-between;
+    }
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:14px;
+      cursor:default;
+    }
+    .logo{
+      width:62px;
+      height:62px;
+      border-radius:12px;
+      background: linear-gradient(135deg,var(--yellow),var(--red));
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      box-shadow: 0 6px 20px rgba(229,57,53,0.25), inset 0 -6px 18px rgba(0,0,0,0.15);
+      flex-shrink:0;
+    }
+    .logo svg{width:36px;height:36px}
+    .brand h1{
+      margin:0;
+      font-size:18px;
+      letter-spacing:0.6px;
+      font-weight:800;
+      color:#fff;
+      line-height:1;
+      text-shadow:0 6px 18px rgba(0,0,0,0.6);
+    }
+    .brand p{margin:0;font-size:12px;color:rgba(255,255,255,0.75)}
+
+    .nav{
+      display:flex;
+      gap:18px;
+      align-items:center;
+    }
+    .nav a{
+      color:rgba(255,255,255,0.9);
+      text-decoration:none;
+      font-weight:600;
+      opacity:0.95;
+      padding:8px 10px;
+      border-radius:8px;
+      transition: all .18s ease;
+      font-size:14px;
+    }
+    .nav a:hover{transform:translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,0.45); background: rgba(255,255,255,0.03)}
+    .cta{
+      background: linear-gradient(90deg,var(--yellow),#ffb000);
+      color:#111;
+      border-radius:12px;
+      padding:10px 14px;
+      font-weight:800;
+      display:inline-flex;
+      gap:10px;
+      align-items:center;
+      box-shadow: 0 12px 28px rgba(255,193,7,0.12);
+    }
+    .cta svg{width:18px;height:18px}
+
+    /* hero */
+    .hero-wrap{
+      margin-top:110px;
+      max-width:var(--max-width);
+      margin-left:auto;margin-right:auto;
+      padding:36px;
+      display:grid;
+      grid-template-columns: 1fr 520px;
+      gap:40px;
+      align-items:center;
+      position:relative;
+    }
+
+    /* left content */
+    .hero-left{
+      color:#fff;
+      padding-right:14px;
+    }
+
+    .kicker{
+      display:inline-flex;
+      gap:10px;
+      align-items:center;
+      background: linear-gradient(90deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+      padding:8px 12px;
+      border-radius:999px;
+      width:max-content;
+      font-weight:700;
+      letter-spacing:0.6px;
+      text-transform:uppercase;
+      color:var(--yellow);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.45);
+      margin-bottom:18px;
+    }
+
+    .headline{
+      font-family:"Playfair Display", serif;
+      font-size:56px;
+      line-height:1;
+      margin:0 0 14px 0;
+      letter-spacing:-1px;
+      text-shadow: 0 18px 40px rgba(0,0,0,0.7);
+      color: linear-gradient(45deg,#fff,#ffd9a6);
+      -webkit-background-clip: text;
+    }
+    .headline .accent{
+      display:inline-block;
+      background: linear-gradient(90deg,var(--yellow),#fff3b8);
+      color:#111;
+      padding:6px 10px;
+      border-radius:10px;
+      transform:skewX(-6deg);
+      margin-left:8px;
+      font-weight:800;
+    }
+
+    .sub{
+      font-size:18px;
+      color:rgba(255,255,255,0.86);
+      margin-bottom:26px;
+      max-width:560px;
+    }
+
+    .hero-actions{display:flex;gap:16px;flex-wrap:wrap;align-items:center}
+    .btn-primary{
+      background: linear-gradient(90deg,var(--red),var(--deep-red));
+      color:#fff;
+      border:0;
+      padding:14px 20px;
+      border-radius:12px;
+      font-weight:800;
+      cursor:pointer;
+      box-shadow: 0 16px 40px rgba(229,57,53,0.25);
+      transition: transform .14s ease, box-shadow .14s ease;
+    }
+    .btn-primary:hover{transform:translateY(-4px); box-shadow: 0 26px 60px rgba(229,57,53,0.26)}
+    .btn-ghost{
+      border-radius:12px;
+      padding:12px 16px;
+      background:transparent;
+      border:1px solid rgba(255,255,255,0.08);
+      color:#fff;
+      display:inline-flex;
+      gap:10px;
+      align-items:center;
+      font-weight:700;
+      cursor:pointer;
+      transition: all .14s ease;
+    }
+    .btn-ghost:hover{transform:translateY(-4px); background:rgba(255,255,255,0.02)}
+
+    .feature-row{
+      margin-top:22px;
+      display:flex;
+      gap:18px;
+      align-items:center;
+      flex-wrap:wrap;
+    }
+    .feature{
+      display:inline-flex;
+      gap:10px;
+      align-items:center;
+      background:var(--glass);
+      padding:10px 12px;
+      border-radius:12px;
+      font-weight:700;
+      color:rgba(255,255,255,0.95);
+      backdrop-filter: blur(6px);
+      border: 1px solid rgba(255,255,255,0.03);
+    }
+    .feature svg{width:18px;height:18px;flex-shrink:0}
+
+    /* right composition */
+    .hero-right{
+      position:relative;
+      height:520px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      pointer-events:none;
+    }
+    .scene{
+      width:100%;
+      max-width:520px;
+      height:420px;
+      position:relative;
+      border-radius:28px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.05));
+      box-shadow: 0 26px 60px rgba(0,0,0,0.7), inset 0 -6px 28px rgba(0,0,0,0.25);
+      overflow:visible;
+      transform-style:preserve-3d;
+    }
+
+    /* smoky animated glow */
+    .scene::before{
+      content:"";
+      position:absolute; inset:-40px;
+      background: radial-gradient(600px 120px at 80% 10%, rgba(255,193,7,0.08), transparent 8%),
+                  radial-gradient(400px 90px at 10% 80%, rgba(229,57,53,0.06), transparent 10%);
+      filter: blur(28px);
+      z-index:1;
+      pointer-events:none;
+    }
+
+    /* images */
+    .plate{
+      position:absolute;
+      right:28px;
+      bottom:-26px;
+      width:360px;
+      transform: rotate(-6deg);
+      z-index:6;
+      border-radius:20px;
+      overflow:visible;
+      transition:transform .3s ease;
+    }
+    .plate img{
+      width:100%;
+      height:auto;
+      display:block;
+      border-radius:18px;
+      box-shadow: 0 26px 60px rgba(0,0,0,0.6);
+    }
+
+    .wrap{
+      position:absolute;
+      left:10px;
+      top:18px;
+      width:320px;
+      transform: rotate(6deg);
+      z-index:8;
+      border-radius:18px;
+      overflow:visible;
+    }
+    .wrap img{width:100%; display:block; border-radius:18px; box-shadow: 0 28px 70px rgba(0,0,0,0.6);}
+
+    .fries{
+      position:absolute;
+      right:18px;
+      top:6px;
+      width:140px;
+      transform: rotate(-4deg);
+      z-index:9;
+      border-radius:14px;
+      overflow:visible;
+      filter: drop-shadow(0 18px 36px rgba(0,0,0,0.6));
+    }
+    .fries img{width:100%; display:block; border-radius:12px;}
+
+    /* steam effect (animated) */
+    .steam{
+      position:absolute;
+      left:18%;
+      bottom:18%;
+      width:320px;
+      height:320px;
+      z-index:5;
+      pointer-events:none;
+      mix-blend-mode:screen;
+      opacity:0.95;
+    }
+    .steam span{
+      position:absolute;
+      left:0; right:0;
+      top:100%;
+      height:300px;
+      filter: blur(14px);
+      background: linear-gradient(180deg, rgba(255,255,255,0.22), rgba(255,255,255,0.06), transparent);
+      transform:translateY(0) rotate(-6deg);
+      animation: rise 6s linear infinite;
+      opacity:0.5;
+    }
+    .steam span:nth-child(2){left:20%; top:90%; animation-duration:7.6s; animation-delay: -2s; transform:rotate(4deg)}
+    .steam span:nth-child(3){left:60%; top:95%; animation-duration:5.2s; animation-delay: -1.2s; transform:rotate(-12deg)}
+
+    @keyframes rise{
+      0%{transform:translateY(0) scaleY(0.9); opacity:0}
+      10%{opacity:0.6}
+      50%{transform:translateY(-140px) scaleY(1.3); opacity:0.9}
+      100%{transform:translateY(-320px) scaleY(1.6); opacity:0}
+    }
+
+    /* price badge */
+    .price-badge{
+      position:absolute;
+      left:26px;
+      bottom:18px;
+      z-index:10;
+      background: linear-gradient(90deg,var(--yellow),#ffd34d);
+      color:#111;
+      padding:12px 18px;
+      border-radius:14px;
+      font-weight:900;
+      box-shadow: 0 12px 40px rgba(255,193,7,0.12);
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      transform: translateZ(40px);
+    }
+
+    .price-badge small{font-weight:700; font-size:12px; color:#111; opacity:0.9}
+
+    /* responsive */
+    @media (max-width:1060px){
+      .hero-wrap{grid-template-columns:1fr 420px; gap:28px; padding:28px}
+      .headline{font-size:46px}
+    }
+    @media (max-width:860px){
+      .hero-wrap{grid-template-columns:1fr; gap:20px; padding:20px; margin-top:92px}
+      .hero-right{order:2;height:auto}
+      .scene{max-width:100%;height:380px}
+      .plate{position:relative;right:auto;bottom:auto;transform:none;width:80%;margin:0 auto 8px;top:auto}
+      .wrap{position:relative;left:auto;top:auto;width:70%;margin:0 auto}
+      .fries{position:relative;right:auto;top:auto;width:36%;margin:0 auto}
+      .headline{font-size:38px}
+    }
+    @media (max-width:460px){
+      .container{padding:14px}
+      .logo{width:54px;height:54px}
+      .headline{font-size:28px}
+      .sub{font-size:15px}
+      .cta{padding:8px 10px}
+      .kicker{font-size:12px}
+    }
   </style>
 </head>
 <body>
-  <header class="site-header" role="banner">
-    <div class="container header-inner">
-      <a class="brand" href="#" aria-label="Wrap District home">
-        <div class="logo">WRAP</div>
-        <div>
-          <div class="brand-title">WRAP DISTRICT</div>
-          <div class="muted">Fresh • Loaded • Fast</div>
+
+  <!-- header -->
+  <header class="site-header" role="banner" aria-label="Top header">
+    <div class="container">
+      <div class="brand" aria-hidden="false">
+        <div class="logo" aria-hidden="true">
+          <!-- chef hat icon (inline SVG) -->
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M7 11h10a3 3 0 0 0 3-3 5 5 0 0 0-10 0 3 3 0 0 0-3 3z" fill="#fff" opacity="0.95"/>
+            <path d="M4 16c0 2.2 3 4 8 4s8-1.8 8-4" stroke="#fff" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" opacity="0.7"/>
+          </svg>
         </div>
-      </a>
-
-      <nav class="main-nav" aria-label="Main navigation">
-        <ul>
-          <li><a class="nav-link" href="#menu">Menu</a></li>
-          <li><a class="nav-link" href="#build">Build</a></li>
-          <li><a class="nav-link" href="#promo">Promos</a></li>
-          <li><a class="nav-link" href="#about">About</a></li>
-        </ul>
-      </nav>
-
-      <div class="header-actions" role="group">
-        <button class="icon-btn" id="open-cart" aria-label="Open cart"><i class="fa fa-shopping-cart"></i></button>
-        <a class="btn btn-cta" href="https://wa.me/233552509241" target="_blank" rel="noopener noreferrer">Order Now <i class="fa fa-whatsapp"></i></a>
+        <div>
+          <h1>WRAP DISTRICT</h1>
+          <p>Bold. Loaded. Delicious.</p>
+        </div>
       </div>
+
+      <nav class="nav" role="navigation" aria-label="Main navigation">
+        <a href="#menu">Menu</a>
+        <a href="#promos">Promos</a>
+        <a href="#about">About</a>
+        <a href="#contact">Contact</a>
+        <a class="cta" id="header-order">
+          <!-- cart icon -->
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 6h13l-1.5 9h-11z" stroke="#111" stroke-width="1.6" stroke-linejoin="round"/><circle cx="10" cy="20" r="1.6" fill="#111"/><circle cx="18" cy="20" r="1.6" fill="#111"/></svg>
+          Order
+        </a>
+      </nav>
     </div>
   </header>
 
+  <!-- hero -->
   <main>
-    <section class="hero">
-      <div class="container hero-grid">
-        <div class="hero-card">
-          <div class="hero-media" aria-hidden="true"></div>
-          <div class="hero-content">
-            <span class="kicker">Best Seller</span>
-            <h1 class="title">Wraps & Shawarmas — Loaded, Juicy, Iconic</h1>
-            <p class="lead">Hand-sliced shawarma, freshly made fries and local favourites — build your meal, add extras and order directly on WhatsApp. Fast pickup & local delivery in Tema.</p>
+    <section class="hero-wrap" aria-label="Hero section">
+      <div class="hero-left">
+        <div class="kicker">Fresh • Fast • Loaded</div>
+        <h2 class="headline">Crave-worthy <span class="accent">Shawarma & Loaded Fries</span></h2>
+        <p class="sub">Sizzling shawarmas folded with tender spiced meat, dripping sauces, and the crispiest loaded fries — crafted to hit every craving. Delivery across Tema — made fast, served hot.</p>
 
-            <div class="hero-ctas">
-              <button class="btn btn-cta" id="open-builder">Build Your Shawarma</button>
-              <a class="btn" href="#menu">See full menu</a>
-            </div>
+        <div class="hero-actions" role="group" aria-label="Hero actions">
+          <button class="btn-primary" id="order-now">
+            <!-- whatsapp icon -->
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M21 3a11 11 0 1 0 0 18l-1-1a9 9 0 1 1 0-16" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M8.8 14.5c.9.6 2 .9 3.2 1 1.5.2 2.4 0 3.3-.5.8-.5 1.6-1.3 2-2.1.3-.6 0-1.1-.4-1.5l-1.2-1c-.3-.3-.7-.3-1-.2-.4.1-.8.3-1.2.3-.3 0-.6 0-.9-.2" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Order Now
+          </button>
 
-            <div style="margin-top:18px;display:flex;gap:8px;align-items:center">
-              <div style="display:flex;gap:6px;align-items:center"><span style="background:rgba(255,255,255,0.04);padding:6px 10px;border-radius:999px">⭐ 4.8</span><span class="muted">(1.2k+ orders)</span></div>
-              <div style="margin-left:12px" class="muted">Free Coke on Loaded Fries (Tuesdays)</div>
-            </div>
-          </div>
+          <button class="btn-ghost" id="view-menu">
+            <!-- menu icon -->
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 7h18M3 12h18M3 17h18" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            View Menu
+          </button>
         </div>
 
-        <aside class="hero-right">
-          <div class="quick-card">
-            <h4>Fast Picks</h4>
-            <p class="muted">Top sellers — ready to order or customise.</p>
-
-            <div style="margin-top:12px">
-              <div class="pick">
-                <div class="thumb" style="background-image:url('https://images.unsplash.com/photo-1604908554325-1ff3a7b1b0f8?q=80&w=800&auto=format&fit=crop')"></div>
-                <div class="meta">
-                  <strong>Shawarma</strong>
-                  <div class="muted">GHC 45 — GHC 80</div>
-                </div>
-                <div>
-                  <button class="btn" data-item="shawarma">Customize</button>
-                </div>
-              </div>
-
-              <div class="pick">
-                <div class="thumb" style="background-image:url('https://images.unsplash.com/photo-1542444459-db0b8c7dfb3a?q=80&w=800&auto=format&fit=crop')"></div>
-                <div class="meta">
-                  <strong>Loaded Fries</strong>
-                  <div class="muted">GHC 55 — GHC 70</div>
-                </div>
-                <div>
-                  <button class="btn" data-item="fries">Customize</button>
-                </div>
-              </div>
-
-              <div style="margin-top:10px;border-top:1px dashed rgba(255,255,255,0.03);padding-top:12px">
-                <div style="display:flex;justify-content:space-between;align-items:center">
-                  <div class="muted">Cart</div>
-                  <div class="price" id="mini-total">GHC 0</div>
-                </div>
-                <div style="margin-top:10px;display:flex;gap:8px">
-                  <button class="btn" id="view-cart">View</button>
-                  <a class="btn btn-cta" href="https://wa.me/233552509241" target="_blank">Checkout</a>
-                </div>
-              </div>
-            </div>
+        <div class="feature-row" aria-hidden="false">
+          <div class="feature">
+            <!-- clock icon -->
+            <svg viewBox="0 0 24 24" fill="none"><path d="M12 7v6l4 2" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Ready in 10–15 mins
           </div>
-        </aside>
+
+          <div class="feature">
+            <!-- location icon -->
+            <svg viewBox="0 0 24 24" fill="none"><path d="M12 11.5a3 3 0 1 0 0-6 3 3 0 0 0 0 6z" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 10c0 6-9 12-9 12S3 16 3 10a9 9 0 1 1 18 0z" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Tema — Community 25
+          </div>
+
+          <div class="feature">
+            <!-- star icon -->
+            <svg viewBox="0 0 24 24" fill="none"><path d="M12 17.3 7 20l1.2-5.8L4 11.2l5.9-.5L12 5l2.1 5.7 5.9.5-4.2 3.1L17 20z" stroke="#fff" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Customer favorite
+          </div>
+        </div>
       </div>
-    </section>
 
-    <section id="promo" class="container" style="padding:22px 0">
-      <div style="display:flex;gap:18px;align-items:center;justify-content:space-between;background:linear-gradient(90deg,rgba(217,48,42,0.06),rgba(255,191,0,0.03));padding:18px;border-radius:14px;border:1px solid rgba(255,255,255,0.02)">
-        <div>
-          <div style="font-weight:900;color:var(--red)">Limited Time</div>
-          <h3 style="margin:6px 0">Buy 2 Shawarmas — Get 1 Free</h3>
-          <p class="muted" style="margin:0">Every Tuesday. Add two qualifying shawarmas to cart, the third will be free. Free Coke with Loaded Fries.</p>
-        </div>
-        <div style="width:260px;height:160px;border-radius:12px;background-image:url('https://images.unsplash.com/photo-1627308595229-7830a5c91f9f?q=80&w=900&auto=format&fit=crop');background-size:cover;background-position:center;border:4px solid rgba(255,255,255,0.03)"></div>
-      </div>
-    </section>
-
-    <section id="menu" class="menu container">
-      <header style="display:flex;align-items:end;justify-content:space-between;gap:12px;margin-bottom:14px">
-        <div>
-          <h2 style="margin:0;font-family:Montserrat;">Full Menu</h2>
-          <div class="muted">Choose, customize and order. Prices shown are starting prices.</div>
-        </div>
-        <div>
-          <div style="display:flex;gap:8px">
-            <button class="btn">All</button>
-            <button class="btn">Shawarma</button>
-            <button class="btn">Fries</button>
-            <button class="btn">Angwamo</button>
+      <div class="hero-right" aria-hidden="false">
+        <div class="scene" id="scene">
+          <!-- layered images -->
+          <div class="steam" aria-hidden="true">
+            <span></span><span></span><span></span>
           </div>
-        </div>
-      </header>
 
-      <div class="menu-grid" id="menu-grid">
-        <!-- Item 1 -->
-        <article class="card">
-          <div class="thumb" style="background-image:url('https://images.unsplash.com/photo-1604908554325-1ff3a7b1b0f8?q=80&w=800&auto=format&fit=crop')"></div>
-          <h3 style="margin:6px 0">Shawarma — Regular</h3>
-          <div class="muted">Classic size with your choice of protein.</div>
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px">
-            <div class="price">GHC 45</div>
-            <div class="actions">
-              <button class="btn" data-action="custom" data-item="shawarma">Customize</button>
-              <button class="btn" data-action="add" data-item="shawarma">Add</button>
+          <div class="wrap" id="wrap">
+            <!-- main wrap image -->
+            <img alt="Loaded shawarma wrap with sauces" src="https://images.unsplash.com/photo-1604908177522-13f0f3a2f6f4?auto=format&fit=crop&w=900&q=80">
+          </div>
+
+          <div class="fries" id="fries">
+            <img alt="Loaded fries" src="https://images.unsplash.com/photo-1551782450-a2132b4ba21d?auto=format&fit=crop&w=640&q=80">
+          </div>
+
+          <div class="plate" id="plate">
+            <img alt="Fried rice plate" src="https://images.unsplash.com/photo-1601050690553-2c1a7a59f5d7?auto=format&fit=crop&w=900&q=80">
+          </div>
+
+          <div class="price-badge" aria-hidden="true">
+            <div>
+              <div style="font-size:13px">Starting at</div>
+              <div style="font-size:20px">GH₵ 45</div>
             </div>
           </div>
-        </article>
-
-        <!-- Item 2 -->
-        <article class="card">
-          <div class="thumb" style="background-image:url('https://images.unsplash.com/photo-1542444459-db0b8c7dfb3a?q=80&w=800&auto=format&fit=crop')"></div>
-          <h3 style="margin:6px 0">Loaded Fries — Single</h3>
-          <div class="muted">Cheese, sauce, choice of protein.</div>
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px">
-            <div class="price">GHC 55</div>
-            <div class="actions">
-              <button class="btn" data-action="custom" data-item="fries">Customize</button>
-              <button class="btn" data-action="add" data-item="fries">Add</button>
-            </div>
-          </div>
-        </article>
-
-        <!-- Item 3 -->
-        <article class="card">
-          <div class="thumb" style="background-image:url('https://images.unsplash.com/photo-1627308595229-7830a5c91f9f?q=80&w=800&auto=format&fit=crop')"></div>
-          <h3 style="margin:6px 0">Loaded Angwamo — Plate</h3>
-          <div class="muted">A hearty plate with eggs, sides & toppings.</div>
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px">
-            <div class="price">GHC 55</div>
-            <div class="actions">
-              <button class="btn" data-action="custom" data-item="angwamo">Customize</button>
-              <button class="btn" data-action="add" data-item="angwamo">Add</button>
-            </div>
-          </div>
-        </article>
-
-        <!-- Item 4 -->
-        <article class="card">
-          <div class="thumb" style="background-image:url('https://images.unsplash.com/photo-1604754521116-9c6a1a2bde9a?q=80&w=800&auto=format&fit=crop')"></div>
-          <h3 style="margin:6px 0">Fried Rice</h3>
-          <div class="muted">Served with your choice of protein.</div>
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px">
-            <div class="price">GHC 60</div>
-            <div class="actions">
-              <button class="btn" data-action="custom" data-item="rice">Customize</button>
-              <button class="btn" data-action="add" data-item="rice">Add</button>
-            </div>
-          </div>
-        </article>
-
-      </div>
-    </section>
-
-    <section id="about" class="container" style="padding:28px 0">
-      <div style="display:grid;grid-template-columns:320px 1fr;gap:18px;align-items:center">
-        <div style="height:220px;border-radius:12px;background-image:url('https://images.unsplash.com/photo-1541542684-32e1077b2a3e?q=80&w=1200&auto=format&fit=crop');background-size:cover;background-position:center;border:1px solid rgba(255,255,255,0.03)"></div>
-        <div>
-          <h3 style="margin-top:0">Why Wrap District?</h3>
-          <p class="muted">Fresh ingredients, fully customizable builds, fast local delivery and friendly prices. Based in Tema Community 25 — trusted by locals.</p>
-          <ul style="margin-top:12px;color:var(--muted);list-style:none;padding:0">
-            <li>• Fresh Ingredients — sourced daily</li>
-            <li>• Build your meal — full customization</li>
-            <li>• Fast Delivery — local coverage</li>
-          </ul>
         </div>
       </div>
     </section>
-
-    <footer class="container">
-      <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
-        <div>
-          <strong>WRAP DISTRICT</strong>
-          <div class="muted">Tema Community 25 • +233 55 250 9241</div>
-        </div>
-        <div class="muted">© <span id="year"></span> Wrap District. All rights reserved.</div>
-      </div>
-    </footer>
-
   </main>
 
-  <!-- CART DRAWER (simple) -->
-  <div id="drawer" class="drawer" role="dialog" aria-modal="true" aria-label="Cart drawer">
-    <h4>Your cart</h4>
-    <div class="cart-items" id="cart-items"></div>
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px">
-      <div class="muted">Total</div>
-      <div class="price" id="cart-total">GHC 0</div>
-    </div>
-    <div style="margin-top:10px;display:flex;gap:8px">
-      <a class="btn btn-cta" id="checkout-wa" href="#">Checkout on WhatsApp</a>
-      <button class="btn" id="clear-cart">Clear</button>
-    </div>
-  </div>
-
   <script>
-    (function(){
-      document.getElementById('year').textContent = new Date().getFullYear();
-      const WA='233552509241';
-      const wa = (text)=> `https://wa.me/${WA}?text=${encodeURIComponent(text)}`;
+    // --- configuration
+    const WA_NUMBER = "233552509241"; // replace with your number (country code +233)
+    const WA_MESSAGE = encodeURIComponent("Hi Wrap District! I want to place an order.");
 
-      // lightweight cart (localStorage)
-      const CART_KEY='wrap_cart_v1';
-      let cart = JSON.parse(localStorage.getItem(CART_KEY) || '[]');
+    // Order CTA open WhatsApp
+    const openForWhatsApp = () => {
+      const url = `https://wa.me/${WA_NUMBER}?text=${WA_MESSAGE}`;
+      window.open(url, "_blank");
+    };
 
-      function save(){localStorage.setItem(CART_KEY,JSON.stringify(cart));renderMini();}
-      function add(item){cart.push(item);save();showToast('Added to cart');}
-      function clearCart(){cart=[];save();}
+    document.getElementById('order-now').addEventListener('click', openForWhatsApp);
+    document.getElementById('header-order').addEventListener('click', openForWhatsApp);
 
-      // wire add buttons
-      document.querySelectorAll('[data-action="add"]').forEach(b=>b.addEventListener('click',()=>{
-        const key=b.dataset.item||'item';
-        const prices={shawarma:45,fries:55,angwamo:55,rice:60};
-        add({id:key+'-'+Date.now(),name:key,qty:1,unit:prices[key]||50});
-      }));
+    // smooth scroll for view menu (demo)
+    document.getElementById('view-menu').addEventListener('click', () => {
+      alert("Menu page coming soon — this demo hero links to the full menu page.");
+    });
 
-      // show cart drawer
-      const drawer=document.getElementById('drawer');
-      document.getElementById('open-cart').addEventListener('click',()=>{
-        drawer.classList.toggle('open');renderDrawer();
-      });
-      document.getElementById('view-cart').addEventListener('click',()=>{drawer.classList.add('open');renderDrawer();});
-      document.getElementById('clear-cart').addEventListener('click',()=>{if(confirm('Clear cart?')){clearCart();renderDrawer();}});
+    // small parallax tilt on mouse move for the scene
+    const scene = document.getElementById('scene');
+    const wrap = document.getElementById('wrap');
+    const fries = document.getElementById('fries');
+    const plate = document.getElementById('plate');
 
-      function renderMini(){
-        const total = cart.reduce((s,i)=>s+i.unit*i.qty,0);
-        document.getElementById('mini-total').textContent = 'GHC ' + total.toFixed(2);
-      }
+    function onMove(e){
+      const rect = scene.getBoundingClientRect();
+      const x = (e.clientX - rect.left) / rect.width - 0.5;
+      const y = (e.clientY - rect.top) / rect.height - 0.5;
 
-      function renderDrawer(){
-        const el = document.getElementById('cart-items'); el.innerHTML='';
-        cart.forEach((it,idx)=>{
-          const node = document.createElement('div'); node.className='cart-item';
-          node.innerHTML = `<div><strong>${it.name}</strong><div class=\"muted\">Qty: ${it.qty}</div></div><div><div>${'GHC '+(it.unit*it.qty).toFixed(2)}</div><button data-remove='${idx}' class='btn'>Remove</button></div>`;
-          el.appendChild(node);
-        });
-        document.getElementById('cart-total').textContent = 'GHC '+cart.reduce((s,i)=>s+i.unit*i.qty,0).toFixed(2);
-        // remove handlers
-        el.querySelectorAll('[data-remove]').forEach(b=>b.addEventListener('click',()=>{cart.splice(Number(b.dataset.remove),1);save();renderDrawer();}));
-      }
+      // transform layers slightly
+      wrap.style.transform = `translate3d(${x * 14}px, ${y * 10}px, 30px) rotate(${x*6}deg)`;
+      fries.style.transform = `translate3d(${x * -18}px, ${y * -8}px, 60px) rotate(${x*-4}deg)`;
+      plate.style.transform = `translate3d(${x * 10}px, ${y * 6}px, 10px) rotate(${x*-3}deg)`;
+    }
 
-      // checkout via WA
-      document.getElementById('checkout-wa').addEventListener('click',function(e){
-        e.preventDefault();
-        if(!cart.length){alert('Cart is empty');return}
-        const lines = cart.map(i=>`${i.qty} x ${i.name} — GHC ${i.unit.toFixed(2)}`);
-        const total = cart.reduce((s,i)=>s+i.unit*i.qty,0);
-        lines.push('Total: GHC '+total.toFixed(2));
-        lines.push('Please deliver to: [address]');
-        window.open(wa(lines.join('\n')),'_blank');
-      });
+    function resetTransform(){
+      wrap.style.transform = `rotate(6deg)`;
+      fries.style.transform = `rotate(-4deg)`;
+      plate.style.transform = `rotate(-6deg)`;
+    }
 
-      // builder quick open (simplified)
-      document.getElementById('open-builder').addEventListener('click',()=>{window.location.hash='#build';document.querySelector('[data-item="shawarma"]')?.scrollIntoView({behavior:'smooth'})});
+    scene.addEventListener('mousemove', onMove);
+    scene.addEventListener('mouseleave', resetTransform);
 
-      // Toast
-      let tTimer=null;
-      function showToast(text){
-        let t = document.querySelector('.site-toast');
-        if(!t){t=document.createElement('div');t.className='site-toast';t.style.cssText='position:fixed;left:50%;transform:translateX(-50%);bottom:26px;background:linear-gradient(90deg,var(--red),var(--accent));padding:10px 18px;border-radius:999px;color:#fff;font-weight:700;z-index:9999';document.body.appendChild(t)}
-        t.textContent=text; t.style.opacity=1; if(tTimer)clearTimeout(tTimer); tTimer=setTimeout(()=>t.style.opacity=0,2000);
-      }
-
-      // init
-      renderMini();
-    })();
+    // small entrance animations
+    window.addEventListener('load', () => {
+      wrap.style.transition = 'transform .9s cubic-bezier(.16,.8,.2,1), opacity .8s';
+      fries.style.transition = 'transform 1s cubic-bezier(.16,.8,.2,1), opacity .8s';
+      plate.style.transition = 'transform 1.1s cubic-bezier(.16,.8,.2,1), opacity .9s';
+      scene.style.opacity = 1;
+      // initial pop
+      wrap.style.transform = 'translate3d(-6px, -6px, 30px) rotate(4deg)';
+      fries.style.transform = 'translate3d(6px, -8px, 60px) rotate(-2deg)';
+      plate.style.transform = 'translate3d(6px, 10px, 10px) rotate(-4deg)';
+      setTimeout(resetTransform, 1200);
+    });
   </script>
 </body>
 </html>
