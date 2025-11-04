@@ -1,0 +1,491 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Wrap District — Fresh & Loaded</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Montserrat:wght@600;800&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --red:#d9302a;
+      --deep-red:#b71c1c;
+      --yellow:#ffbf00;
+      --black:#111113;
+      --muted:#f4f4f4;
+      --glass: rgba(255,255,255,0.06);
+      --accent-shadow: 0 12px 30px rgba(0,0,0,0.45);
+    }
+    *{box-sizing:border-box}
+    body{font-family:Inter,system-ui,Arial; margin:0; background: linear-gradient(180deg,#0f0f10 0%, #111113 60%); color:#fff; -webkit-font-smoothing:antialiased;}
+
+    /* Top nav */
+    header{display:flex;align-items:center;justify-content:space-between;padding:18px 28px;background:linear-gradient(90deg,var(--black),#1b1b1c);position:sticky;top:0;z-index:40;box-shadow: 0 6px 20px rgba(0,0,0,0.6);}
+    .brand{display:flex;gap:12px;align-items:center}
+    .logo{background:linear-gradient(90deg,var(--yellow),#ff9e00);padding:8px 12px;border-radius:10px;display:flex;align-items:center;gap:8px}
+    .logo h1{font-family:Montserrat, sans-serif;margin:0;color:var(--deep-red);letter-spacing:1px}
+    nav a{color:#fff;text-decoration:none;margin-left:18px;font-weight:600;opacity:0.92}
+    .cta{background:var(--yellow);color:#111;padding:10px 14px;border-radius:12px;font-weight:700;box-shadow:var(--accent-shadow)}
+
+    /* Hero */
+    .hero{display:grid;grid-template-columns:1fr 420px;gap:28px;padding:36px 6vw;align-items:center}
+    .hero-left{background:linear-gradient(180deg, rgba(217,48,42,0.12), rgba(0,0,0,0.05)), url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600"><rect width="100%" height="100%" fill="%23ff6e40"/></svg>') center/cover no-repeat;border-radius:18px;padding:28px;position:relative;overflow:hidden}
+    .hero-left::after{content:'';position:absolute;inset:0;background-image:radial-gradient(circle at 10% 20%, rgba(255,255,255,0.03), transparent 10%), linear-gradient(135deg, rgba(0,0,0,0.08), transparent); }
+    .hero-title{font-family:Montserrat; font-size:44px;line-height:1;color:#fff;margin:0 0 12px}
+    .hero-sub{color:#fff;font-weight:500;opacity:0.95;margin-bottom:20px}
+    .hero-actions{display:flex;gap:12px}
+    .btn{background:var(--red);color:#fff;padding:12px 16px;border-radius:12px;font-weight:700;cursor:pointer;border:none}
+    .btn.secondary{background:transparent;border:2px solid rgba(255,255,255,0.06);}
+
+    .food-preview{display:flex;gap:16px;align-items:center}
+    .food-card{background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(0,0,0,0.06));padding:14px;border-radius:14px;box-shadow:var(--accent-shadow);display:flex;gap:12px;align-items:center}
+    .food-card img{width:120px;height:120px;border-radius:10px;object-fit:cover;border:4px solid rgba(0,0,0,0.25)}
+    .food-meta h3{margin:0;font-size:18px}
+    .food-meta p{margin:6px 0 0;opacity:0.9}
+
+    /* Right column menu card */
+    .menu-card{background:linear-gradient(180deg,#111111 0%, #1a1a1a 100%);border-radius:18px;padding:18px;box-shadow:var(--accent-shadow)}
+    .menu-card h3{margin:0 0 14px;font-family:Montserrat}
+    .menu-list{display:grid;grid-template-columns:1fr;gap:12px}
+    .menu-item{display:flex;align-items:center;gap:12px;padding:10px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent)}
+    .price{margin-left:auto;font-weight:800}
+
+    /* Promo strip */
+    .promo{display:flex;align-items:center;justify-content:space-between;padding:16px 6vw;background:linear-gradient(90deg,#b71c1c, #ff6f00);color:#fff;margin:18px 0}
+
+    /* Grid menu */
+    .section{padding:36px 6vw}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:22px}
+    .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.05));border-radius:14px;padding:16px;box-shadow: 0 14px 40px rgba(0,0,0,0.5);display:flex;flex-direction:column}
+    .card img{width:100%;height:160px;object-fit:cover;border-radius:10px}
+    .card h4{margin:12px 0 6px}
+    .card p{margin:0;opacity:0.85}
+    .card .actions{display:flex;gap:8px;margin-top:auto}
+
+    /* Footer */
+    footer{padding:22px 6vw;background:linear-gradient(90deg,#0b0b0b,#121212);display:flex;justify-content:space-between;align-items:center;border-top:1px solid rgba(255,255,255,0.02)}
+
+    /* Build modal */
+    .modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:linear-gradient(180deg, rgba(0,0,0,0.6), rgba(0,0,0,0.7));z-index:80}
+    .modal.open{display:flex}
+    .modal-card{width:920px;max-width:96%;background:#111;border-radius:16px;padding:18px;box-shadow:0 30px 80px rgba(0,0,0,0.7);display:grid;grid-template-columns:420px 1fr;gap:14px}
+    .builder-left{padding:12px;border-radius:10px;background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent)}
+    .step{margin-bottom:12px}
+    .step h5{margin:0 0 8px}
+    .options{display:flex;flex-wrap:wrap;gap:8px}
+    .option{padding:8px 12px;background:rgba(255,255,255,0.03);border-radius:10px;cursor:pointer;border:2px solid transparent}
+    .option.selected{background:linear-gradient(90deg,var(--yellow),#ffb347);color:#111;border-color:rgba(0,0,0,0.06);font-weight:700}
+    .qty{display:flex;gap:8px;align-items:center}
+    .summary{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.03));padding:12px;border-radius:10px}
+
+    /* chatbot */
+    .chat-bubble{position:fixed;right:22px;bottom:22px;z-index:100;}
+    .chat-bubble button{background:var(--red);border-radius:50%;width:64px;height:64px;border:none;color:#fff;font-size:28px;box-shadow:0 12px 30px rgba(0,0,0,0.45);cursor:pointer}
+    .chat-window{position:fixed;right:22px;bottom:96px;width:360px;background:#0f0f10;border-radius:14px;padding:12px;box-shadow:0 26px 60px rgba(0,0,0,0.6);display:none;flex-direction:column;z-index:120}
+    .chat-window.open{display:flex}
+    .chat-header{display:flex;align-items:center;gap:8px;padding:6px 8px}
+    .chat-messages{height:280px;overflow:auto;padding:8px;display:flex;flex-direction:column;gap:8px}
+    .msg{max-width:78%;padding:8px 12px;border-radius:12px}
+    .msg.user{align-self:flex-end;background:linear-gradient(90deg,var(--yellow),#ffb347);color:#111}
+    .msg.bot{align-self:flex-start;background:rgba(255,255,255,0.03);}
+    .chat-input{display:flex;gap:8px;padding-top:8px}
+    .chat-input input{flex:1;padding:10px;border-radius:10px;border:none;background:#0c0c0c;color:#fff}
+    .chip{display:inline-block;padding:6px 10px;border-radius:999px;background:rgba(255,255,255,0.03);cursor:pointer;margin-right:8px;font-weight:600}
+
+    /* responsive tweaks */
+    @media (max-width:900px){
+      .hero{grid-template-columns:1fr;gap:12px;padding:18px}
+      .menu-card{order:3}
+      .modal-card{grid-template-columns:1fr;}
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <div class="logo"><h1>WRAP</h1><div style="width:1px;background:rgba(0,0,0,0.08);height:28px;margin-left:6px"></div></div>
+      <div style="margin-left:6px">
+        <div style="font-weight:800;letter-spacing:0.6px">WRAP DISTRICT</div>
+        <small style="opacity:0.8">Fresh • Loaded • Fast</small>
+      </div>
+    </div>
+    <nav>
+      <a href="#menu">Menu</a>
+      <a href="#build">Build</a>
+      <a href="#contact">Contact</a>
+      <a class="cta" href="https://wa.me/233552509241?text=Hello%20Wrap%20District%20I%27d%20like%20to%20order">Order Now</a>
+    </nav>
+  </header>
+
+  <section class="hero">
+    <div class="hero-left">
+      <h2 class="hero-title">Wrap District</h2>
+      <p class="hero-sub">Fresh shawarmas, loaded fries and angwamo prepared the way you want. Build it, love it, order it.</p>
+      <div class="hero-actions">
+        <button class="btn" id="open-builder">Build Your Meal</button>
+        <button class="btn secondary" onclick="document.getElementById('menu').scrollIntoView({behavior:'smooth'})">View Menu</button>
+      </div>
+
+      <div style="margin-top:22px" class="food-preview">
+        <div class="food-card">
+          <img src="https://images.unsplash.com/photo-1604908554325-1ff3a7b1b0f8?q=80&w=600&auto=format&fit=crop&crop=faces" alt="shawarma">
+          <div class="food-meta">
+            <h3>Shawarma</h3>
+            <p>GHC 45 - 80 • Build-your-own</p>
+          </div>
+        </div>
+        <div class="food-card">
+          <img src="https://images.unsplash.com/photo-1604908893845-0f2a8e2f4f68?q=80&w=600&auto=format&fit=crop&crop=faces" alt="fries">
+          <div class="food-meta">
+            <h3>Loaded Fries</h3>
+            <p>GHC 55 - 70</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <aside class="menu-card">
+      <h3>Fast Picks</h3>
+      <div class="menu-list">
+        <div class="menu-item"><strong>Shawarma</strong><span class="price">GHC 45 - 80</span></div>
+        <div class="menu-item"><strong>Loaded Fries</strong><span class="price">GHC 55 - 70</span></div>
+        <div class="menu-item"><strong>Loaded Angwamo</strong><span class="price">GHC 55/60/70</span></div>
+        <div class="menu-item"><strong>Fried Rice</strong><span class="price">GHC 60</span></div>
+      </div>
+    </aside>
+  </section>
+
+  <div class="promo">
+    <div><strong>Promo:</strong> Buy 2 Shawarma, get 1 free — Tuesdays only. Loaded fries comes with a free Coke.</div>
+    <div id="promo-count"></div>
+  </div>
+
+  <section id="menu" class="section">
+    <h2 style="font-family:Montserrat;margin:0 0 18px">Menu</h2>
+    <div class="grid">
+      <!-- Shawarma Card -->
+      <div class="card">
+        <img src="https://images.unsplash.com/photo-1604908554325-1ff3a7b1b0f8?q=80&w=900&auto=format&fit=crop" alt="shawarma">
+        <h4>Shawarma</h4>
+        <p>Build your perfect shawarma — choose size, protein, fillings & sauces.</p>
+        <div class="actions">
+          <button class="btn" onclick="openBuilder('shawarma')">Customize</button>
+          <button class="btn secondary" onclick="quickOrder('Shawarma', 'GHC 45 - 80')">Order</button>
+        </div>
+      </div>
+
+      <!-- Loaded Fries -->
+      <div class="card">
+        <img src="https://images.unsplash.com/photo-1542444459-db0b8c7dfb3a?q=80&w=900&auto=format&fit=crop" alt="loaded-fries">
+        <h4>Loaded Fries</h4>
+        <p>Fries loaded with cheese, meat, sauces and more — pick toppings.</p>
+        <div class="actions">
+          <button class="btn" onclick="openBuilder('fries')">Customize</button>
+          <button class="btn secondary" onclick="quickOrder('Loaded Fries', 'GHC 55 - 70')">Order</button>
+        </div>
+      </div>
+
+      <!-- Angwamo -->
+      <div class="card">
+        <img src="https://images.unsplash.com/photo-1627308595229-7830a5c91f9f?q=80&w=900&auto=format&fit=crop" alt="angwamo">
+        <h4>Loaded Angwamo</h4>
+        <p>A local favorite — rice, beans, eggs and toppings. Choose combos.</p>
+        <div class="actions">
+          <button class="btn" onclick="openBuilder('angwamo')">Customize</button>
+          <button class="btn secondary" onclick="quickOrder('Loaded Angwamo', 'GHC 55/60/70')">Order</button>
+        </div>
+      </div>
+
+      <!-- Fried Rice -->
+      <div class="card">
+        <img src="https://images.unsplash.com/photo-1604754521116-9c6a1a2bde9a?q=80&w=900&auto=format&fit=crop" alt="fried-rice">
+        <h4>Fried Rice</h4>
+        <p>Classic fried rice served with choice of protein.</p>
+        <div class="actions">
+          <button class="btn" onclick="openBuilder('rice')">Customize</button>
+          <button class="btn secondary" onclick="quickOrder('Fried Rice', 'GHC 60')">Order</button>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <section class="section" id="build">
+    <h2 style="font-family:Montserrat;margin:0 0 18px">Build Your Own — Quick Guide</h2>
+    <p style="opacity:0.9">Click <strong>Customize</strong> on any item or press <strong>Build Your Meal</strong> to open the full builder. Prices update as you add extras.</p>
+  </section>
+
+  <footer id="contact">
+    <div>
+      <strong>Wrap District</strong><br>
+      Tema Community 25, Devtraco • Delivery available at a fee
+    </div>
+    <div style="text-align:right">
+      <div>WhatsApp: <a style="color:var(--yellow);text-decoration:none;font-weight:700" href="https://wa.me/233552509241">+233 55 250 9241</a></div>
+      <div style="margin-top:6px">Hours — Mon–Fri: 5pm • Sat–Sun: 9am</div>
+    </div>
+  </footer>
+
+  <!-- Modal builder -->
+  <div id="modal" class="modal">
+    <div class="modal-card">
+      <div class="builder-left">
+        <h3 id="builder-title">Build: Shawarma</h3>
+        <div class="step">
+          <h5>Size</h5>
+          <div class="options" id="opt-size"></div>
+        </div>
+        <div class="step">
+          <h5>Protein</h5>
+          <div class="options" id="opt-protein"></div>
+        </div>
+        <div class="step">
+          <h5>Fillings</h5>
+          <div class="options" id="opt-fillings"></div>
+        </div>
+        <div class="step">
+          <h5>Sauces</h5>
+          <div class="options" id="opt-sauce"></div>
+        </div>
+
+        <div class="step">
+          <h5>Quantity</h5>
+          <div class="qty"><button class="btn secondary" id="qty-dec">-</button><div id="qty" style="min-width:36px;text-align:center">1</div><button class="btn" id="qty-inc">+</button></div>
+        </div>
+
+      </div>
+
+      <div>
+        <div class="summary">
+          <h4>Order Summary</h4>
+          <div id="summary-items" style="margin:12px 0"></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px">
+            <strong>Total</strong><div id="total" style="font-size:20px;font-weight:800">GHC 0</div>
+          </div>
+          <div style="margin-top:12px;display:flex;gap:8px">
+            <button class="btn" id="order-whatsapp">Order on WhatsApp</button>
+            <button class="btn secondary" id="cancel-builder">Cancel</button>
+          </div>
+        </div>
+
+        <div style="margin-top:12px;padding:12px;background:rgba(255,255,255,0.02);border-radius:10px">
+          <h5 style="margin:0 0 8px">Delivery / Pickup</h5>
+          <label style="display:block;margin-bottom:8px"><input type="radio" name="deliveryType" value="pickup" checked> Pickup</label>
+          <label style="display:block;margin-bottom:8px"><input type="radio" name="deliveryType" value="delivery"> Delivery (+GHC 10)</label>
+          <div id="delivery-address" style="display:none;margin-top:8px">
+            <input id="address-input" placeholder="Enter delivery address" style="width:100%;padding:10px;border-radius:8px;border:none;background:#0d0d0d;color:#fff">
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Chatbot -->
+  <div class="chat-bubble">
+    <button id="open-chat">🍳</button>
+  </div>
+  <div class="chat-window" id="chat-window">
+    <div class="chat-header"><div style="width:44px;height:44px;border-radius:999px;background:var(--yellow);display:flex;align-items:center;justify-content:center;color:#111;font-weight:800">M</div><div><strong>Manef</strong><div style="font-size:12px;opacity:0.9">Your virtual chef</div></div></div>
+    <div class="chat-messages" id="chat-messages">
+      <div class="msg bot">Hello! I'm <strong>Manef</strong> 👨‍🍳 — Ask me about menu, promos, or say "build shawarma" to start crafting your meal.</div>
+    </div>
+    <div style="padding:8px">
+      <div class="chat-input"><input id="chat-in" placeholder="Hi Manef, I want..." /><button class="btn" id="send-chat">Send</button></div>
+      <div style="margin-top:8px"><span class="chip" data-sug="How much is shawarma?">How much is shawarma?</span><span class="chip" data-sug="Do you deliver?">Do you deliver?</span><span class="chip" data-sug="Build shawarma">Build shawarma</span></div>
+    </div>
+  </div>
+
+  <script>
+    // ---------- Utilities ----------
+    const WA_PHONE = '233552509241';
+    const waBase = (text)=> `https://wa.me/${WA_PHONE}?text=${encodeURIComponent(text)}`;
+
+    // Promo countdown (next Tuesday) - shows days left
+    (function promoCountdown(){
+      const el = document.getElementById('promo-count');
+      const now = new Date();
+      const day = now.getDay();
+      // 2 = Tuesday (0 Sun)
+      const daysUntil = (2 - day + 7) % 7 || 7;
+      const nextTue = new Date(now.getFullYear(), now.getMonth(), now.getDate()+daysUntil);
+      const d = Math.ceil((nextTue - now)/ (24*3600*1000));
+      el.textContent = `Next promo in ${d} day${d>1?'s':''}`;
+    })();
+
+    // ---------- Modal / Builder State ----------
+    const modal = document.getElementById('modal');
+    const builderTitle = document.getElementById('builder-title');
+    const qtyDisplay = document.getElementById('qty');
+    const qtyInc = document.getElementById('qty-inc');
+    const qtyDec = document.getElementById('qty-dec');
+    const totalEl = document.getElementById('total');
+    const summaryItems = document.getElementById('summary-items');
+    const orderWhatsBtn = document.getElementById('order-whatsapp');
+    const cancelBuilder = document.getElementById('cancel-builder');
+    const deliveryAddress = document.getElementById('delivery-address');
+    const addressInput = document.getElementById('address-input');
+
+    let state = {
+      item: 'shawarma',
+      size: null,
+      protein: null,
+      fillings: [],
+      sauces: [],
+      qty: 1,
+      delivery: 'pickup',
+    };
+
+    const catalog = {
+      shawarma:{
+        sizes:[{id:'regular',label:'Regular',price:45},{id:'jumbo',label:'Jumbo',price:65}],
+        proteins:[{id:'chicken',label:'Chicken',price:0},{id:'beef',label:'Beef',price:10},{id:'mixed',label:'Mixed',price:15}],
+        fillings:[{id:'lettuce',label:'Lettuce',price:0},{id:'tomato',label:'Tomato',price:0},{id:'onion',label:'Onion',price:0},{id:'cabbage',label:'Cabbage',price:0},{id:'cheese',label:'Cheese',price:5},{id:'sausage',label:'Sausage',price:8},{id:'egg',label:'Egg',price:6}],
+        sauces:[{id:'garlic',label:'Garlic Mayo'},{id:'ketchup',label:'Ketchup'},{id:'chili',label:'Chilli'},{id:'mustard',label:'Mustard'},{id:'bbq',label:'BBQ'}]
+      },
+      fries:{
+        sizes:[{id:'single',label:'Single',price:55},{id:'large',label:'Large',price:70}],
+        proteins:[{id:'none',label:'No protein',price:0},{id:'chicken',label:'Chicken',price:10},{id:'beef',label:'Beef',price:12},{id:'bacon',label:'Bacon',price:12}],
+        fillings:[{id:'cheese',label:'Cheese',price:4},{id:'jalapeno',label:'Jalapeno',price:3},{id:'onion',label:'Onion',price:0}],
+        sauces:[{id:'cheese',label:'Cheese Sauce'},{id:'chili',label:'Chili Sauce'},{id:'mayo',label:'Garlic Mayo'}]
+      },
+      angwamo:{
+        sizes:[{id:'plate',label:'Plate',price:55},{id:'combo',label:'Combo',price:70}],
+        proteins:[{id:'chicken',label:'Chicken',price:0},{id:'beef',label:'Beef',price:10}],
+        fillings:[{id:'egg',label:'Egg',price:0},{id:'coleslaw',label:'Coleslaw',price:5},{id:'salad',label:'Salad',price:4}],
+        sauces:[{id:'spice',label:'Spicy'},{id:'mild',label:'Mild'}]
+      },
+      rice:{
+        sizes:[{id:'regular',label:'Regular',price:60},{id:'extra',label:'Extra',price:80}],
+        proteins:[{id:'chicken',label:'Chicken',price:0},{id:'beef',label:'Beef',price:12},{id:'shrimp',label:'Shrimp',price:18}],
+        fillings:[{id:'veg',label:'Veg',price:0},{id:'egg',label:'Egg',price:6}],
+        sauces:[]
+      }
+    };
+
+    function openBuilder(item){
+      state = {item, size:null,protein:null,fillings:[],sauces:[],qty:1,delivery:'pickup'};
+      modal.classList.add('open');
+      builderTitle.textContent = `Build: ${capitalize(item)}`;
+      renderOptions();
+      updateSummary();
+    }
+    document.getElementById('open-builder').addEventListener('click', ()=>openBuilder('shawarma'));
+
+    function capitalize(s){return s.charAt(0).toUpperCase()+s.slice(1)}
+
+    function renderOptions(){
+      const cfg = catalog[state.item];
+      const sizeEl = document.getElementById('opt-size'); sizeEl.innerHTML='';
+      cfg.sizes.forEach(s=>{const d=document.createElement('div');d.className='option';d.textContent=`${s.label} — GHC ${s.price}`;d.onclick=()=>{state.size=s;document.querySelectorAll('#opt-size .option').forEach(x=>x.classList.remove('selected'));d.classList.add('selected');updateSummary()};sizeEl.appendChild(d)});
+
+      const pEl = document.getElementById('opt-protein'); pEl.innerHTML='';
+      cfg.proteins.forEach(p=>{const d=document.createElement('div');d.className='option';d.textContent=`${p.label}${p.price?(' +GHC'+p.price):''}`;d.onclick=()=>{state.protein=p;document.querySelectorAll('#opt-protein .option').forEach(x=>x.classList.remove('selected'));d.classList.add('selected');updateSummary()};pEl.appendChild(d)});
+
+      const fEl = document.getElementById('opt-fillings'); fEl.innerHTML='';
+      cfg.fillings.forEach(f=>{const d=document.createElement('div');d.className='option';d.textContent=`${f.label}${f.price?(' +GHC'+f.price):''}`;d.onclick=()=>{const idx=state.fillings.indexOf(f.id); if(idx>-1) state.fillings.splice(idx,1); else state.fillings.push(f.id); d.classList.toggle('selected'); updateSummary()};fEl.appendChild(d)});
+
+      const sEl = document.getElementById('opt-sauce'); sEl.innerHTML='';
+      cfg.sauces.forEach(s=>{const d=document.createElement('div');d.className='option';d.textContent=s.label;d.onclick=()=>{const idx=state.sauces.indexOf(s.id); if(idx>-1) state.sauces.splice(idx,1); else state.sauces.push(s.id); d.classList.toggle('selected'); updateSummary()};sEl.appendChild(d)});
+
+      // set delivery radio handlers
+      document.querySelectorAll('input[name="deliveryType"]').forEach(el=>el.onchange=(e)=>{state.delivery=e.target.value; deliveryAddress.style.display = (state.delivery==='delivery')? 'block' : 'none'; updateSummary()});
+
+      qtyDisplay.textContent = state.qty;
+      qtyInc.onclick = ()=>{state.qty++; qtyDisplay.textContent=state.qty; updateSummary()};
+      qtyDec.onclick = ()=>{if(state.qty>1) state.qty--; qtyDisplay.textContent=state.qty; updateSummary()};
+
+      cancelBuilder.onclick = ()=>{modal.classList.remove('open')};
+    }
+
+    function updateSummary(){
+      const cfg = catalog[state.item];
+      let base = 0; if(state.size) base += state.size.price; if(state.protein) base += state.protein.price;
+      let extras = 0;
+      // fillings cost
+      cfg.fillings.forEach(f=>{ if(state.fillings.includes(f.id)) extras += (f.price||0)});
+      cfg.proteins.forEach(p=>{ /*already counted*/ });
+      const delivery = (state.delivery==='delivery')?10:0;
+      const total = (base + extras + delivery) * state.qty;
+      totalEl.textContent = `GHC ${total}`;
+
+      summaryItems.innerHTML = `
+        <div><strong>${capitalize(state.item)}</strong> x ${state.qty}</div>
+        <div style="opacity:0.9;margin-top:6px">Size: ${state.size?state.size.label:'-'}</div>
+        <div style="opacity:0.9">Protein: ${state.protein?state.protein.label:'-'}</div>
+        <div style="opacity:0.9">Fillings: ${state.fillings.length?state.fillings.join(', '):'None'}</div>
+        <div style="opacity:0.9">Delivery: ${state.delivery}${delivery?(' (GHC '+delivery+')'):''}</div>
+      `;
+    }
+
+    orderWhatsBtn.onclick = ()=>{
+      const address = state.delivery==='delivery'? (addressInput.value||'Please deliver to: [enter address]') : 'Pickup';
+      const cfg = catalog[state.item];
+      const total = totalEl.textContent;
+      const message = `Hello Wrap District, I want to order ${state.qty} x ${capitalize(state.item)} (${state.size?state.size.label:'-'} / ${state.protein?state.protein.label:'-'})\nFillings: ${state.fillings.length?state.fillings.join(', '):'None'}\nSauces: ${state.sauces.length?state.sauces.join(', '):'None'}\nDelivery: ${address}\nTotal: ${total}.\nThanks!`;
+      window.open(waBase(message),'_blank');
+    }
+
+    // quickOrder - prefilled message
+    function quickOrder(name, price){
+      const msg = `Hello Wrap District, I would like to order 1 ${name} (${price}). Please deliver to [enter address] if delivery is available. Thanks.`;
+      window.open(waBase(msg),'_blank');
+    }
+
+    // Initialize with default builder open on load but hidden
+    document.addEventListener('click', (e)=>{
+      if(e.target.matches('[onclick*="openBuilder"]')){
+        // handled above
+      }
+    });
+
+    // ---------- Chatbot Manef (simple rule-based) ----------
+    const chatWindow = document.getElementById('chat-window');
+    const openChatBtn = document.getElementById('open-chat');
+    const chatMessages = document.getElementById('chat-messages');
+    const chatIn = document.getElementById('chat-in');
+    const sendChat = document.getElementById('send-chat');
+
+    openChatBtn.onclick = ()=>{chatWindow.classList.toggle('open');}
+    document.querySelectorAll('.chip').forEach(c=>c.onclick=()=>{chatIn.value=c.dataset.sug; sendUserMessage();});
+
+    sendChat.onclick = sendUserMessage;
+    chatIn.addEventListener('keydown',(e)=>{if(e.key==='Enter') sendUserMessage();});
+
+    function addMessage(text, who='bot'){
+      const d=document.createElement('div');d.className='msg '+(who==='user'?'user':'bot');d.innerHTML=text;chatMessages.appendChild(d);chatMessages.scrollTop = chatMessages.scrollHeight;}
+
+    function sendUserMessage(){
+      const text = chatIn.value.trim(); if(!text) return; addMessage(text,'user'); chatIn.value='';
+      // simulate typing
+      setTimeout(()=>{handleBot(text)},600 + Math.random()*600);
+    }
+
+    function handleBot(text){
+      const t = text.toLowerCase();
+      // simple intents
+      if(t.includes('shawarma')){ addMessage('Shawarma ranges from GHC 45 to 80 depending on size & fillings. Would you like to build one now? Type "build shawarma" or click the build button.') ; return }
+      if(t.includes('fries')){ addMessage('Loaded fries start at GHC 55. You can add chicken or bacon for an extra fee. Want to customize? Type "build fries".') ; return }
+      if(t.includes('delivery')){ addMessage('Yes, we deliver within Tema & nearby areas. Delivery fee is usually GHC 10. Enter your address when ordering or tell me your area and I can check.') ; return }
+      if(t.includes('price') || t.includes('how much') || t.includes('how much is')){ addMessage('Which item are you asking about? Shawarma, Loaded Fries, Angwamo or Fried Rice?') ; return }
+      if(t.includes('build') && t.includes('shawarma')){ addMessage('Opening the shawarma builder for you...'); openBuilder('shawarma'); return }
+      if(t.includes('build') && t.includes('fries')){ addMessage('Opening the loaded fries builder for you...'); openBuilder('fries'); return }
+      if(t.includes('menu')){ addMessage('You can view the full menu on the Menu section. Top items: Shawarma, Loaded Fries, Loaded Angwamo & Fried Rice. Want me to order for you?') ; return }
+      if(t.includes('promo') || t.includes('free') || t.includes('tuesday')){ addMessage('Current promo: Buy 2 Shawarma, get 1 free — Valid on Tuesdays. Loaded fries includes a free Coke right now.') ; return }
+      if(t.includes('order') && (t.includes('whatsapp') || t.includes('wa') || t.includes('watsapp'))){ addMessage('Click the yellow Order Now button or I can prepare an order for WhatsApp. Tell me the item and quantity.') ; return }
+      // fallback with suggestions
+      addMessage('I\'m Manef — your virtual chef! I can help with: menu, pricing, building a meal, or placing an order. Try: "How much is shawarma?" or "Build shawarma".');
+    }
+
+    // small helper to open builder when clicking customize
+    function openBuilder(item){
+      // reuse exported openBuilder
+      window.openBuilder && window.openBuilder(item);
+    }
+    // expose openBuilder for internal calls
+    window.openBuilder = openBuilder;
+
+    // open default builder reference
+    // ensure catalog images load
+  </script>
+</body>
+</html>
