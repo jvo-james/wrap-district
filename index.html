@@ -588,7 +588,28 @@ input, textarea, select { border-radius:10px; border:1px solid rgba(255,255,255,
   .hero-ingredients { gap:8px; }
 }
 
-/* Keep this block for future tweaks; end of stylesheet */
+ /* === Ensure modals/drawers/panels are truly hidden when `hidden` is used === */
+.modal-builder[hidden],
+#cart-drawer[hidden],
+.chat-panel[hidden],
+.overlay-dim[hidden],
+#cart-drawer[aria-hidden="true"],
+.modal-builder[aria-hidden="true"][hidden] {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* small a11y convenience: when shown, ensure visibility and pointer-events */
+.modal-builder:not([hidden]),
+#cart-drawer:not([hidden]),
+.chat-panel:not([hidden]) {
+  display: flex; /* or the display type you use (flex/grid) */
+  visibility: visible;
+  opacity: 1;
+  pointer-events: auto;
+} 
 </style>
 </style>
 </head>
@@ -971,7 +992,7 @@ input, textarea, select { border-radius:10px; border:1px solid rgba(255,255,255,
          BUILDER MODAL (full feature)
          - stepper panels; preview; order & add-to-cart
          ============================== -->
-    <div id="builder-modal" class="modal modal-builder" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="builder-title">
+    <div id="builder-modal" class="modal modal-builder" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="builder-title" hidden>
       <div class="modal-shell container" role="document">
         <div class="modal-left">
           <header class="modal-header">
@@ -1014,7 +1035,7 @@ input, textarea, select { border-radius:10px; border:1px solid rgba(255,255,255,
           </div>
         </div>
 
-        <aside class="modal-right">
+        <aside class="modal-right" hidden>
           <div class="live-preview">
             <div class="preview-image" data-preview-image="placeholder" role="img" aria-label="Preview image"></div>
             <div class="preview-info">
@@ -1269,8 +1290,41 @@ input, textarea, select { border-radius:10px; border:1px solid rgba(255,255,255,
 
 
 
+<script>
+  // Safety: make sure modals/drawers/panels are hidden on page load
+  window.addEventListener('DOMContentLoaded', () => {
+    try {
+      // target known panels
+      const panels = [
+        document.getElementById('builder-modal'),
+        document.getElementById('cart-drawer'),
+        document.getElementById('chat-panel'),
+        document.querySelector('.overlay-dim')
+      ];
+      panels.forEach(el => {
+        if (el) {
+          el.hidden = true;
+          el.setAttribute('aria-hidden', 'true');
+          // for overlays also remove active class if present
+          el.classList && el.classList.remove('active');
+        }
+      });
 
+      // remove body/document no-scroll if it was left on
+      document.documentElement.classList.remove('no-scroll');
+      document.body.classList.remove('no-scroll');
 
+      // ensure cart count is visible if your script uses it
+      const cartBadge = document.getElementById('cart-count');
+      if (cartBadge) {
+        cartBadge.style.display = '';
+      }
+    } catch (err) {
+      // silent safe-fail
+      console.warn('Startup safety script error:', err);
+    }
+  });
+</script>
 
 
 
