@@ -2296,4 +2296,87 @@ input, textarea, select { border-radius:10px; border:1px solid rgba(255,255,255,
 
 })();
 </script>
+  <script>
+document.addEventListener('DOMContentLoaded', () => {
+  // === Replace these names with the exact filenames in your repo root ===
+  const IMAGES = {
+    // hero slides (if you used keys like data-img="hero-shawarma-large")
+    'hero-shawarma-large': 'hero-shawarma.jpg',
+    'hero-fries-large'  : 'hero-fries.jpg',
+
+    // promo collage
+    'promo-shawarma'    : 'promo-shawarma.jpg',
+    'promo-fries'       : 'promo-fries.jpg',
+    'promo-angwamo'     : 'promo-angwamo.jpg',
+
+    // thumbs
+    'thumb-shawarma'    : 'thumb-shawarma.jpg',
+    'thumb-fries'       : 'thumb-fries.jpg',
+    'thumb-angwamo'     : 'thumb-angwamo.jpg',
+    'thumb-rice'        : 'thumb-rice.jpg',
+
+    // previews / about / avatar
+    'preview-shawarma'  : 'preview-shawarma.jpg',
+    'about-kitchen'     : 'about-kitchen.jpg',
+    'manef-avatar'      : 'manef-avatar.png'
+  };
+
+  // helper to set element background safely
+  function setBackground(el, url) {
+    if (!url) return;
+    // keep the same overlay gradient used in the site for premium look
+    el.style.backgroundImage = `linear-gradient(120deg, rgba(0,0,0,0.12), rgba(0,0,0,0.04)), url('${url}')`;
+    el.style.backgroundSize = 'cover';
+    el.style.backgroundPosition = 'center';
+    el.style.backgroundRepeat = 'no-repeat';
+  }
+
+  // 1. elements using data-img
+  document.querySelectorAll('[data-img]').forEach(el => {
+    const key = el.dataset.img;
+    const filename = IMAGES[key];
+    if (!filename) return;
+    // If element is an <img>, set src. Otherwise set background.
+    if (el.tagName.toLowerCase() === 'img') {
+      el.src = filename;
+      el.loading = el.loading || 'lazy';
+      el.decoding = 'async';
+    } else {
+      setBackground(el, filename);
+    }
+    // ensure accessible alt/label
+    if (!el.getAttribute('aria-label')) {
+      const alt = (key || filename).replace(/[-_]/g, ' ');
+      el.setAttribute('aria-label', alt);
+    }
+  });
+
+  // 2. elements using data-thumb (thumbnails)
+  document.querySelectorAll('[data-thumb]').forEach(el => {
+    const key = el.dataset.thumb;
+    const filename = IMAGES[key];
+    if (!filename) return;
+    if (el.tagName.toLowerCase() === 'img') {
+      el.src = filename;
+      el.loading = el.loading || 'lazy';
+      el.decoding = 'async';
+    } else {
+      setBackground(el, filename);
+    }
+  });
+
+  // 3. For plain <img class="slide-media"> elements with data-img
+  document.querySelectorAll('img.slide-media[data-img]').forEach(img => {
+    const key = img.dataset.img;
+    const filename = IMAGES[key];
+    if (filename) { img.src = filename; img.loading = img.loading || 'eager'; img.decoding = 'async'; }
+  });
+
+  // Very small check: log keys that had no match (helps if you misspelled a filename)
+  const usedKeys = new Set([...document.querySelectorAll('[data-img]')].map(el => el.dataset.img).concat([...document.querySelectorAll('[data-thumb]')].map(el => el.dataset.thumb)));
+  usedKeys.forEach(k => { if (k && !IMAGES[k]) console.warn('No image file mapped for key:', k, ' — add to IMAGES map'); });
+
+  // done
+});
+</script>
 </html>
