@@ -1366,6 +1366,233 @@ a:focus, button:focus { outline: 3px solid rgba(99,102,241,0.12); outline-offset
 /* End of menu styling */
 </style>
 
+  <style>
+/* ===============================
+   About / Testimonials / Contact / Footer
+   — Wrap District: polished, responsive, conversion-focused
+   Mobile-first, accessible, uses existing design tokens
+   =============================== */
+
+/* -------------------------
+   ABOUT / WHY WRAP DISTRICT
+   ------------------------- */
+.about-section{
+  padding: 28px 0;
+  background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(249,249,250,0.99));
+}
+.about-grid{
+  display:grid;
+  grid-template-columns: 1fr;
+  gap:18px;
+  align-items:center;
+  max-width: var(--max-width);
+  margin:0 auto;
+  padding:8px 18px;
+}
+
+/* media area */
+.about-media{
+  width:100%;
+  height: 240px;
+  border-radius:14px;
+  overflow:hidden;
+  box-shadow: 0 22px 60px rgba(12,12,12,0.06);
+  border: 1px solid rgba(16,16,16,0.04);
+  display:grid;
+  place-items:center;
+  background: linear-gradient(180deg,#fff,#fff);
+}
+.about-media img{ width:100%; height:100%; object-fit:cover; display:block; transition: transform 9s ease; }
+.about-media:hover img{ transform: scale(1.04); }
+
+/* content */
+.about-content{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  padding:12px 4px;
+}
+.about-content h2{ font-family: var(--text-hero); font-size:1.28rem; margin:0; color:#111; }
+.about-content p{ color: #333; line-height:1.48; margin:0; max-width:68ch; }
+
+/* features list */
+.features-list{
+  display:flex;
+  gap:12px;
+  flex-direction:column;
+  margin-top:8px;
+  padding:0;
+  list-style:none;
+}
+.features-list li{
+  display:flex; gap:12px; align-items:center;
+  padding:10px;
+  border-radius:12px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(250,250,250,0.96));
+  border:1px solid rgba(16,16,16,0.03);
+  box-shadow: 0 10px 30px rgba(12,12,12,0.04);
+}
+.features-list li i{ background: linear-gradient(135deg,var(--accent-2),var(--accent)); color:#111; width:44px;height:44px; display:grid; place-items:center; border-radius:10px; font-size:1.08rem; box-shadow: 0 10px 28px rgba(255,107,61,0.06); }
+.features-list li div strong{ display:block; font-weight:900; }
+.features-list li div .muted.small{ color:var(--muted); }
+
+/* desktop: two-column layout with image left, content right */
+@media (min-width:980px){
+  .about-grid{ grid-template-columns: 48% 52%; gap:28px; padding:12px 18px; align-items:center; }
+  .about-media{ height:360px; border-radius:18px; }
+  .about-content h2{ font-size:1.6rem; }
+  .features-list{ flex-direction:column; }
+}
+
+/* -------------------------
+   TESTIMONIALS / WHAT CUSTOMERS SAY
+   ------------------------- */
+.testimonials-section{ padding: 26px 0; background: linear-gradient(180deg, rgba(255,250,248,0.98), rgba(255,255,255,0.98)); }
+.testimonials-section .container{ max-width: var(--max-width); padding:8px 18px; margin:0 auto; }
+.testimonials-grid{ display:grid; grid-template-columns: 1fr; gap:14px; margin-top:12px; }
+
+/* testimonial card */
+.testimonial{
+  background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(250,250,250,0.98));
+  padding:16px;
+  border-radius:14px;
+  box-shadow: 0 18px 60px rgba(12,12,12,0.06);
+  border: 1px solid rgba(16,16,16,0.03);
+  display:flex;
+  gap:12px;
+  align-items:flex-start;
+  transition: transform .26s cubic-bezier(.2,.9,.2,1), box-shadow .26s;
+}
+.testimonial:hover{ transform: translateY(-6px); box-shadow: 0 30px 100px rgba(12,12,12,0.08); }
+
+/* quote icon and stars */
+.testimonial .fa-quote-left{ color: var(--accent); font-size:1.6rem; margin-right:6px; opacity:0.95; }
+.testimonial p{ margin:0; color:#222; line-height:1.46; font-size:0.98rem; }
+.testimonial footer.muted{ margin-top:10px; color:var(--muted); display:flex; gap:8px; align-items:center; font-weight:800; }
+
+/* grid on larger screens */
+@media (min-width:720px){
+  .testimonials-grid{ grid-template-columns: repeat(2, 1fr); }
+}
+@media (min-width:1200px){
+  .testimonials-grid{ grid-template-columns: repeat(3, 1fr); gap:20px; }
+}
+
+/* small decorative star accent */
+.testimonial::before{
+  content: '';
+  width:44px;height:44px;border-radius:10px;
+  background: linear-gradient(135deg,var(--accent),var(--accent-2));
+  position:absolute;
+  transform: translateY(-8px);
+  opacity:0;
+}
+
+/* -------------------------
+   CONTACT / VISIT & ORDER
+   ------------------------- */
+.contact-section{ padding: 28px 0; background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(248,248,249,0.98)); }
+.contact-inner{ max-width:var(--max-width); margin:0 auto; padding:8px 18px; display:grid; grid-template-columns: 1fr; gap:18px; align-items:start; }
+
+/* contact card */
+.contact-card{
+  background: linear-gradient(180deg, rgba(255,255,255,0.99), rgba(250,250,250,0.98));
+  border-radius:16px;
+  padding:18px;
+  box-shadow: 0 22px 80px rgba(12,12,12,0.06);
+  border: 1px solid rgba(16,16,16,0.03);
+}
+.contact-card h3{ margin:0 0 8px; font-size:1.06rem; font-family: var(--text-hero); }
+.contact-card p{ margin:6px 0; color:#333; }
+.contact-cta{ display:flex; gap:10px; margin-top:12px; flex-wrap:wrap; align-items:center; }
+.contact-cta .btn-pay{ padding:12px 16px; font-weight:900; box-shadow: 0 14px 46px rgba(59,130,246,0.08); }
+.contact-cta a.btn{ border:1px solid rgba(16,16,16,0.04); padding:10px 14px; }
+
+/* map card (visual) */
+.map-card{ min-height:220px; border-radius:16px; overflow:hidden; position:relative; box-shadow: 0 22px 80px rgba(12,12,12,0.06); }
+.map-placeholder{ width:100%; height:100%; min-height:220px; background: linear-gradient(180deg,#eee,#f8f8f8); display:grid; place-items:center; color:var(--muted); font-weight:900; }
+
+/* desktop layout: card + map side-by-side */
+@media (min-width:980px){
+  .contact-inner{ grid-template-columns: 1fr 420px; gap:22px; align-items:start; }
+  .contact-card{ padding:20px; position:sticky; top: calc(var(--header-h) + 22px); }
+  .map-card{ min-height:380px; border-radius:18px; }
+}
+
+/* -------------------------
+   FOOTER — polished
+   ------------------------- */
+.site-footer{
+  padding: 24px 0 36px;
+  background: linear-gradient(180deg, rgba(7,7,7,0.96), rgba(12,12,12,0.98));
+  color: #f2f3f5;
+  border-top: 1px solid rgba(255,255,255,0.02);
+}
+.footer-inner{
+  max-width:var(--max-width);
+  margin:0 auto;
+  padding:8px 18px;
+  display:grid;
+  grid-template-columns: 1fr;
+  gap:18px;
+  align-items:start;
+}
+
+/* footer columns */
+.footer-col{ padding:12px; }
+.footer-col h4{ color:#fff; margin:0 0 10px 0; font-size:1rem; display:flex; gap:8px; align-items:center; }
+.footer-col .muted.small{ color: rgba(255,255,255,0.65); }
+
+/* brand in footer */
+.site-footer .brand{ color:#fff; display:flex; gap:12px; align-items:center; text-decoration:none; }
+.site-footer .brand i{ font-size:20px; color: var(--accent-2); background: linear-gradient(135deg,#fff,#fff); padding:6px; border-radius:8px; }
+
+/* quick links & socials */
+.footer-links{ list-style:none; padding:0; margin:8px 0 0; display:flex; flex-direction:column; gap:8px; }
+.footer-links a{ color: rgba(255,255,255,0.9); text-decoration:none; font-weight:700; }
+.socials{ display:flex; gap:10px; margin-top:8px; }
+.socials .icon-btn{ background: rgba(255,255,255,0.04); color:#fff; width:44px;height:44px;border-radius:10px; display:grid; place-items:center; }
+
+/* newsletter */
+.newsletter{ margin-top:10px; display:flex; gap:8px; flex-direction:column; }
+.newsletter-form{ display:flex; gap:8px; align-items:center; }
+.newsletter input{ padding:10px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.06); background: rgba(255,255,255,0.02); color:#fff; flex:1; }
+.newsletter .btn.small{ background: linear-gradient(90deg,var(--accent-2),var(--accent)); color:#111; font-weight:900; }
+
+/* copyright row */
+.copyright{ margin-top:12px; color: rgba(255,255,255,0.6); font-size:0.88rem; padding-top:12px; border-top:1px solid rgba(255,255,255,0.02); }
+
+/* Desktop footer: three columns */
+@media (min-width:980px){
+  .footer-inner{ grid-template-columns: 1fr 1fr 320px; gap:22px; }
+  .footer-col{ padding:14px; }
+  .newsletter-form{ max-width:360px; }
+}
+
+/* small screens: stack, lighten shadows */
+@media (max-width:520px){
+  .about-media{ height:200px; }
+  .map-placeholder{ min-height:160px; }
+  .footer-inner{ padding:12px 12px; }
+  .newsletter-form{ flex-direction:column; gap:8px; }
+}
+
+/* reduced motion */
+@media (prefers-reduced-motion: reduce){
+  .about-media img, .testimonial, .menu-item { transition: none !important; transform: none !important; animation: none !important; }
+}
+
+/* accessible focus */
+a:focus, button:focus, input:focus { outline: 3px solid rgba(255,183,130,0.12); outline-offset:4px; border-radius:8px; }
+
+/* Final polish: ensure color contrast of key CTAs */
+.btn-cta, .btn-pay { font-weight:900; }
+
+/* ===============================
+   End: About / Testimonials / Contact / Footer
+   =============================== */
+</style>
+
 </head>
 <body>
 
