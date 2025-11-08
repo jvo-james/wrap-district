@@ -2607,7 +2607,8 @@ Breakpoint: <= 720px (phones) and finer at 420px
   padding:8px 12px; border-radius:999px; font-weight:800; cursor:pointer;
   box-shadow: 0 10px 30px rgba(12,12,12,0.04);
 }
-/* ===== VD HERO: white card on orange look (override current hero) ===== */
+
+    /* ===== VD HERO — Card on orange, overlapping circles, stacked headline ===== */
 :root{
   --vd-orange: #ff8a1a;
   --vd-card-bg: #fffefb;
@@ -2618,7 +2619,7 @@ Breakpoint: <= 720px (phones) and finer at 420px
 }
 
 /* outer hero area */
-#vd-hero { background: linear-gradient(180deg, var(--vd-orange), #ff7a00); padding: 48px 0; position: relative; overflow: visible; }
+#hero.vd-hero { background: linear-gradient(180deg, var(--vd-orange), #ff7a00); padding:48px 0; position: relative; overflow: visible; }
 .vd-hero-wrap{ display:flex; justify-content:center; align-items:center; padding: 8px 18px; }
 
 /* white card */
@@ -2634,29 +2635,36 @@ Breakpoint: <= 720px (phones) and finer at 420px
   box-sizing: border-box;
 }
 
-/* top small nav inside the card */
+/* top row inside the card */
 .vd-card-top{ display:flex; align-items:center; gap:12px; border-bottom:1px solid rgba(16,16,16,0.03); padding-bottom:12px; margin-bottom:14px; }
+.vd-brand{ display:flex; flex-direction:column; gap:2px; }
 .vd-brand-title{ font-family: 'Playfair Display', serif; letter-spacing:0.06em; font-size:1rem; color:#d35400; }
+.vd-brand-tag{ font-size:0.78rem; color:var(--vd-muted); font-weight:700; }
+
+/* small top nav */
 .vd-top-nav{ display:flex; gap:14px; margin-left:18px; flex:1; align-items:center; }
 .vd-top-nav a{ text-decoration:none; color:#888; font-weight:700; font-size:0.92rem; padding:6px 6px; }
 .vd-top-nav a:hover{ color:#111; transform: translateY(-2px); }
 
-/* main body: circles and text */
-.vd-hero-body{ display:flex; align-items:center; gap:22px; padding: 22px 6px 12px; position:relative; min-height: 300px; }
+/* socials */
+.vd-socials a{ margin-left:8px; color:#d35400; text-decoration:none; }
 
-/* circular images (left and right) */
+/* main body: left circle, center text, right circle */
+.vd-hero-body{ display:flex; align-items:center; gap:22px; padding: 22px 6px 12px; position:relative; min-height: 320px; }
+
+/* circular images */
 .vd-circle{ width: 260px; height:260px; border-radius:999px; overflow:hidden; flex-shrink:0; position:relative; display:grid; place-items:center; background:#f6f2ee; box-shadow: 0 20px 60px rgba(12,12,12,0.06); border:8px solid rgba(255,255,255,0.88); }
 .vd-circle img{ width:100%; height:100%; object-fit:cover; display:block; }
 
-/* positioning for left & right circles */
+/* placement tweaks */
 .vd-circle-left{ transform: translateX(-18px) translateY(6px); }
 .vd-circle-right{ transform: translateX(18px) translateY(-6px); }
 
-/* 50% off badge on right circle */
+/* 50% off badge */
 .vd-off-badge{ position:absolute; right: -18px; top: -22px; background: var(--vd-accent); color:#fff; width:96px; height:96px; border-radius:999px; display:flex; flex-direction:column; align-items:center; justify-content:center; box-shadow: 0 18px 48px rgba(0,0,0,0.12); font-weight:900; }
 .vd-off-badge small{ font-size:0.6rem; display:block; margin-top:2px; font-weight:800; }
 
-/* center text block */
+/* center text */
 .vd-center{ flex:1; text-align:left; padding: 6px 12px; min-width: 320px; max-width: 640px; }
 
 /* eyebrow */
@@ -2675,13 +2683,13 @@ Breakpoint: <= 720px (phones) and finer at 420px
 .vd-btn-ghost{ background:transparent; border:1px solid rgba(16,16,16,0.06); padding:10px 14px; border-radius:10px; font-weight:800; color:#444; cursor:pointer; }
 
 /* dots */
-.vd-dots{ margin-top:14px; display:flex; gap:8px; align-items:center; }
+.vd-dots{ margin-top:14px; display:flex; gap:8px; align-items:center; justify-content:flex-start; }
 .vd-dot{ width:12px; height:12px; border-radius:999px; background: rgba(0,0,0,0.14); border:0; cursor:pointer; transition: transform .22s ease, background .22s; }
 .vd-dot[aria-selected="true"], .vd-dot.active{ background: #ff8a1a; transform:scale(1.18); box-shadow: 0 8px 30px rgba(255,107,61,0.12); }
 
-/* responsive: collapse to stacked layout on small screens */
+/* responsive */
 @media (max-width: 940px){
-  .vd-hero { padding: 26px 0; }
+  #hero.vd-hero { padding: 26px 0; }
   .vd-hero-body{ flex-direction:column; gap:12px; align-items:center; min-height: auto; padding: 18px; }
   .vd-center{ text-align:center; max-width: 640px; }
   .vd-circle{ width: 180px; height:180px; border-width:6px; }
@@ -2689,8 +2697,13 @@ Breakpoint: <= 720px (phones) and finer at 420px
   .vd-title .vd-line{ font-size: clamp(1.5rem, 7vw, 2.2rem); }
 }
 
-/* small touch polish */
+/* minor polished touches */
 .vd-card, .vd-btn-primary, .vd-btn-ghost { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
+
+/* make sure hero dots are centered on very small screens */
+@media (max-width:520px){
+  .vd-dots{ justify-content:center; }
+}
 
   </style>
 </head>
@@ -2764,195 +2777,76 @@ Order Now
 
 
 <main id="main" role="main">
-<!-- VD HERO: replace existing <section id="hero"> with this block -->
-<section id="vd-hero" aria-label="Featured" class="vd-hero">
+<!-- HERO: REPLACE existing <section id="hero"> with this block -->
+<section id="hero" class="vd-hero" aria-label="Featured">
   <div class="vd-hero-wrap container">
 
-    <!-- Card -->
     <div class="vd-card" role="region" aria-label="Featured card">
-
-      <!-- Top small nav inside card -->
+      <!-- top row inside the card -->
       <div class="vd-card-top">
         <div class="vd-brand" aria-hidden="true">
           <strong class="vd-brand-title">WRAP DISTRICT</strong>
+          <span class="vd-brand-tag">Fresh • Loaded • Fast</span>
         </div>
 
-        <nav class="vd-top-nav" aria-label="Hero nav">
+        <nav class="vd-top-nav" aria-label="Hero quick links" style="display: none">
           <a href="#hero">HOME</a>
           <a href="#menu">MENU</a>
           <a href="#promo">PROMOS</a>
           <a href="#about">ABOUT</a>
         </nav>
 
-        <div class="vd-socials" aria-hidden="true">
+        <div class="vd-socials" aria-hidden="true" style="display: none">
           <a href="#" aria-label="facebook"><i class="fa fa-facebook-f"></i></a>
           <a href="#" aria-label="twitter"><i class="fa fa-twitter"></i></a>
           <a href="#" aria-label="instagram"><i class="fa fa-instagram"></i></a>
         </div>
       </div>
 
-      <!-- Hero main body -->
-      <div class="vd-hero-body" role="region" aria-label="Hero content">
+      <!-- body: left circle, center text, right circle -->
+      <div class="vd-hero-body" role="region" aria-label="Hero carousel">
 
         <!-- left circular image -->
         <figure class="vd-circle vd-circle-left" aria-hidden="true">
-          <img src="hero-shawarma-large.jpg" alt="" loading="lazy" />
+          <img src="" alt="" loading="lazy" class="vd-left-img" />
         </figure>
 
-        <!-- central text block (populated by JS from your CATALOG/DOM) -->
+        <!-- center text -->
         <div class="vd-center">
-          <div class="vd-eyebrow" id="vd-eyebrow">100% ORGANIC &amp; VEGAN</div>
+          <div class="vd-eyebrow" id="vd-eyebrow">100% FRESH & MADE DAILY</div>
 
           <h1 class="vd-title" id="vd-title" aria-live="polite" aria-atomic="true">
             <span class="vd-line vd-line-top">TASTE</span>
             <span class="vd-line vd-line-bottom">ORGANIC</span>
           </h1>
 
-          <p class="vd-desc" id="vd-desc">—</p>
+          <p class="vd-desc" id="vd-desc">We blend local flavours with fast, modern service — freshly made daily in Tema Community 25.</p>
 
           <div class="vd-ctas">
-            <button class="btn vd-btn-primary" id="vd-order" aria-label="Order current">ORDER NOW</button>
+            <button class="btn vd-btn-primary" id="vd-order" aria-label="Order now">ORDER NOW</button>
             <button class="btn vd-btn-ghost" id="vd-see-menu" aria-label="See menu">SEE MENU</button>
           </div>
 
-          <div class="vd-dots" role="tablist" aria-hidden="false" id="vd-dots">
+          <div class="vd-dots" role="tablist" aria-label="Slide indicators" id="vd-dots">
+            <!-- dots inserted by JS or statically present (JS will sync aria-selected) -->
             <button class="vd-dot" role="tab" aria-selected="true" data-index="0" aria-label="Slide 1"></button>
             <button class="vd-dot" role="tab" aria-selected="false" data-index="1" aria-label="Slide 2"></button>
             <button class="vd-dot" role="tab" aria-selected="false" data-index="2" aria-label="Slide 3"></button>
             <button class="vd-dot" role="tab" aria-selected="false" data-index="3" aria-label="Slide 4"></button>
+            <button class="vd-dot" role="tab" aria-selected="false" data-index="4" aria-label="Slide 5"></button>
+            <button class="vd-dot" role="tab" aria-selected="false" data-index="5" aria-label="Slide 6"></button>
           </div>
         </div>
 
-        <!-- right circular image + discount badge -->
+        <!-- right circular image + off badge -->
         <figure class="vd-circle vd-circle-right" aria-hidden="true">
-          <img src="hero-fries-large.jpg" alt="" loading="lazy" />
+          <img src="" alt="" loading="lazy" class="vd-right-img" />
           <div class="vd-off-badge" aria-hidden="true"><strong>50%</strong><small>OFF</small></div>
         </figure>
 
       </div>
     </div>
   </div>
-</section>
-
-
-
-<aside id="fast-picks" class="hero-right quick-picks-section" aria-label="Fast Picks and quick order">
-<div class="container">
-<div class="featured-card card-base" role="region" aria-label="Fast Picks">
-<div class="featured-head">
-<h3 class="featured-title"><i class="fa fa-bolt"></i> Fast Picks</h3>
-<p class="featured-sub">Top choices — ready for quick checkout or full customization.</p>
-</div>
-
-<ul class="quick-picks grid-3x1" role="list" aria-live="polite">
-<!-- Each pick has icons (fa) and designed quick actions -->
-<li class="pick" data-id="shawarma" data-price-min="45" data-price-max="80" role="listitem" aria-label="Shawarma quick pick">
-<div class="pick-media" aria-hidden="true" data-thumb="thumb-shawarma" role="img">
-<img src="" alt="Shawarma thumbnail" data-artwork="thumb-shawarma" loading="lazy" />
-</div>
-
-<div class="pick-info">
-<strong>Shawarma</strong>
-<span class="muted">GHC 45 - 80</span>
-<div class="pick-icons">
-<i class="fa fa-pepper-hot" title="Spicy option"></i>
-<i class="fa fa-cheese" title="Extra cheese"></i>
-</div>
-</div>
-
-<div class="pick-actions">
-<button class="btn small" data-action="open-builder" data-item="shawarma" aria-label="Customize shawarma">
-<i class="fa fa-wrench"></i> Customize
-</button>
-
-<button class="btn btn-pay small" data-action="add-to-cart" data-item="shawarma" data-paystack="true" aria-label="Add shawarma to cart">
-<i class="fa fa-plus-circle"></i> Add
-</button>
-</div>
-</li>
-
-<li class="pick" data-id="fries" data-price-min="55" data-price-max="70" role="listitem" aria-label="Loaded fries quick pick">
-<div class="pick-media" aria-hidden="true" data-thumb="thumb-fries" role="img">
-<img src="" alt="Loaded fries thumbnail" data-artwork="thumb-fries" loading="lazy" />
-</div>
-
-<div class="pick-info">
-<strong>Loaded Fries</strong>
-<span class="muted">GHC 55 - 70</span>
-<div class="pick-icons">
-<i class="fa fa-bacon"></i>
-<i class="fa fa-cheese"></i>
-</div>
-</div>
-
-<div class="pick-actions">
-<button class="btn small" data-action="open-builder" data-item="fries"><i class="fa fa-wrench"></i> Customize</button>
-<button class="btn btn-pay small" data-action="add-to-cart" data-item="fries" data-paystack="true"><i class="fa fa-plus-circle"></i> Add</button>
-</div>
-</li>
-
-<li class="pick" data-id="angwamo" data-price-min="55" data-price-max="70" role="listitem" aria-label="Loaded Angwamo quick pick">
-<div class="pick-media" aria-hidden="true" data-thumb="thumb-angwamo" role="img">
-<img src="" alt="Angwamo thumbnail" data-artwork="thumb-angwamo" loading="lazy" />
-</div>
-
-<div class="pick-info">
-<strong>Loaded Angwamo</strong>
-<span class="muted">GHC 55 / 60 / 70</span>
-<div class="pick-icons">
-<i class="fa fa-egg"></i>
-<i class="fa fa-utensils"></i>
-</div>
-</div>
-
-<div class="pick-actions">
-<button class="btn small" data-action="open-builder" data-item="angwamo"><i class="fa fa-wrench"></i> Customize</button>
-<button class="btn btn-pay small" data-action="add-to-cart" data-item="angwamo" data-paystack="true"><i class="fa fa-plus-circle"></i> Add</button>
-</div>
-</li>
-</ul>
-
-<div class="mini-cart" role="status" aria-live="polite">
-<div class="mini-cart-row">
-<span class="muted"><i class="fa fa-shopping-bag"></i> Cart</span>
-<strong class="cart-total" id="mini-cart-total">GHC 0</strong>
-</div>
-
-<div class="mini-cart-actions">
-<button class="btn" data-action="view-cart"><i class="fa fa-eye"></i> View Cart</button>
-<button class="btn btn-outline" data-action="open-builder"><i class="fa fa-edit"></i> Build</button>
-</div>
-</div>
-</div>
-</div>
-</aside>
-
-<!-- ==============================
-PROMO — RADIANT
-============================== -->
-<section id="promo" class="promo-radiant" aria-label="Promotions and offers">
-<div class="container promo-inner">
-<div class="promo-left">
-<div class="promo-header">
-<span class="promo-badge"><i class="fa fa-calendar-alt"></i> Limited Time</span>
-<h2 class="promo-title"><i class="fa fa-gift"></i> Buy 2 Shawarmas — Get 1 FREE</h2>
-<p class="promo-desc">Every Tuesday this month. Add two qualifying shawarmas to your cart and the third one will be free. Loaded Fries includes a free Coke today.</p>
-</div>
-
-<div class="promo-actions">
-<button class="btn btn-cta" data-action="open-builder" data-item="shawarma"><i class="fa fa-ticket-alt"></i> Build & Claim</button>
-<a class="btn btn-outline" href="#menu"><i class="fa fa-list"></i> See Full Menu</a>
-</div>
-</div>
-
-<div class="promo-right">
-<div class="promo-collage" aria-hidden="true">
-<div class="collage-item big" data-img="promo-shawarma" aria-hidden="true"></div>
-<div class="collage-item medium" data-img="promo-fries" aria-hidden="true"></div>
-<div class="collage-item small" data-img="promo-angwamo" aria-hidden="true"></div>
-</div>
-</div>
-</div>
 </section>
 
 
@@ -5190,224 +5084,196 @@ console.info('Wrap District script loaded — images will use local files when p
   console.info('Manef chat (enhanced) initialized.');
 })();
 </script>
-<script>
-/* VD Hero slideshow (4 slides) — integrates with your CATALOG / IMAGES and existing functions */
+
+  <script>
+/* VD HERO — 6-slide slideshow integrated with your CATALOG/IMAGES */
 (function(){
   'use strict';
-  const hero = document.getElementById('vd-hero');
+  const hero = document.getElementById('hero');
   if (!hero) return;
 
-  // slide keys (4 slides) — change order here if you want different items
-  const slideKeys = ['shawarma','fries','angwamo','rice'];
+  // Slide definitions (first slide matches the image visually but uses your business copy)
+  // Keys: helpful if you want builder open for that item (use same keys as your CATALOG)
+  const slidesData = [
+    { key: 'business', titleTop: 'TASTE', titleBottom: 'ORGANIC', eyebrow: 'WRAP DISTRICT • FRESH DAILY', desc: 'We blend local flavours with fast, modern service. From freshly sliced meat to house-made sauces — every meal is prepared to delight.', leftImgKey: 'promo-shawarma', rightImgKey: 'promo-fries', badge: null },
+    { key: 'shawarma', titleTop: 'BUILD', titleBottom: 'SHAWARMA', eyebrow: 'Best Seller', desc: 'Hand-cut meat, crisp veg, melty cheese & house sauces. Choose size, protein and toppings — made to order.', leftImgKey: 'hero-shawarma-large', rightImgKey: 'thumb-shawarma', badge: null },
+    { key: 'fries', titleTop: 'LOADED', titleBottom: 'FRIES', eyebrow: 'Crunch & Cheese', desc: 'Cheese pulls, crispy bacon and saucy goodness. Customize toppings & spice level.', leftImgKey: 'hero-fries-large', rightImgKey: 'thumb-fries', badge: null },
+    { key: 'angwamo', titleTop: 'LOADED', titleBottom: 'ANGWAMO', eyebrow: 'Hearty Plate', desc: 'Eggs, sides and savory toppings — perfect for a big appetite. Try combo options for value.', leftImgKey: 'hero-angwamo-large', rightImgKey: 'thumb-angwamo', badge: null },
+    { key: 'friedrice', titleTop: 'FLAVOUR', titleBottom: 'FRIED RICE', eyebrow: 'Comfort Plate', desc: 'Served with your choice of protein — great as a plate or combo.', leftImgKey: 'hero-friedrice-large', rightImgKey: 'thumb-rice', badge: null },
+    { key: 'promo', titleTop: 'BUY 2', titleBottom: 'GET 1 FREE', eyebrow: 'Limited Time', desc: 'Promo: Buy 2 Shawarmas — Get 1 Free on Tuesdays. Add two qualifying shawarmas to your cart and the third will be free.', leftImgKey: 'promo-shawarma', rightImgKey: 'promo-fries', badge: { main: '50%', sub: 'OFF' } }
+  ];
 
-  // helpers for catalog/images & DOM fallback
-  const C = window.CATALOG || {};
-  const IMAGES = window.IMAGES || {};
+ const IMAGES = {
+  
+  // hero slides 
+  'promo-shawarma': 'promo-shawarma.jpg',
+  'hero-shawarma-large': 'hero-shawarma-large.jpg',
+  'hero-fries-large':  'hero-fries-large.jpg',
+  'hero-angwamo-large': 'hero-angwamo-large.jpg',
+  'hero-friedrice-large': 'hero-friedrice-large.jpg',
 
-  function lookupDesc(key){
-    // prefer CATALOG? else try .menu-item desc text
-    const cfg = C[key];
-    if (cfg && cfg.name && cfg.sizes) {
-      // try to find a dom desc for the id
-      const el = document.querySelector(`.menu-item[data-category="${key}"], .menu-item[data-id^="${key}"]`);
-      if (el) {
-        const p = el.querySelector('.desc');
-        if (p) return p.textContent.trim();
-      }
-      // fallback generic description using name if available
-      return cfg.name + ' — made fresh daily.';
-    }
-    // fallback: try reading first matching .menu-item text content
-    const el2 = document.querySelector(`.menu-item[data-id^="${key}"], .pick[data-id="${key}"]`);
-    if (el2) {
-      const p = el2.querySelector('.desc');
-      if (p) return p.textContent.trim();
-      const strong = el2.querySelector('strong, h3');
-      if (strong) return strong.textContent.trim();
-    }
-    return '';
+  // thumbnails used for right circle
+  'thumb-shawarma': 'thumb-shawarma.jpg',
+  'thumb-fries': 'thumb-fries.jpg',
+  'thumb-angwamo': 'promo-anwamo.jpg',
+  'thumb-rice': 'hero-friedrice-large.jpg'
+};
+
+  function resolveImage(key) {
+    if (!key) return '';
+    if (IMAGES[key]) return IMAGES[key];
+    // if key looks like a URL (contains / or http), return as-is
+    if (key.indexOf('/') >= 0 || key.indexOf('http') === 0) return key;
+    // fallback generate likely filename
+    return IMAGES[key] || key + '.jpg';
   }
-
-  function lookupImage(key){
-    // try common image keys from your IMAGES map
-    const candidates = [
-      `hero-${key}-large`,
-      `hero-${key}`,
-      `thumb-${key}`,
-      `preview-${key}`,
-      key
-    ];
-    for (const c of candidates){
-      if (IMAGES[c]) return IMAGES[c];
-    }
-    // fall back to empty string (CSS shows placeholder)
-    return IMAGES[key] || '';
-  }
-
-  // Build slides array with name, desc, image and cfg
-  const slides = slideKeys.map(k => {
-    const cfg = C[k] || null;
-    const name = (cfg && cfg.name) ? cfg.name : (k.charAt(0).toUpperCase()+k.slice(1));
-    const desc = lookupDesc(k) || (cfg && cfg.name ? '' : '');
-    const image = lookupImage(k) || '';
-    return { key: k, name, desc, image, cfg };
-  });
 
   // DOM refs
-  const leftImg = hero.querySelector('.vd-circle-left img');
-  const rightImg = hero.querySelector('.vd-circle-right img');
-  const eyebrow = hero.querySelector('#vd-eyebrow');
-  const title = hero.querySelector('#vd-title');
+  const leftImgEl = hero.querySelector('.vd-left-img');
+  const rightImgEl = hero.querySelector('.vd-right-img');
+  const eyebrowEl = hero.querySelector('#vd-eyebrow');
+  const titleTopEl = hero.querySelector('.vd-line-top');
+  const titleBottomEl = hero.querySelector('.vd-line-bottom');
   const descEl = hero.querySelector('#vd-desc');
   const orderBtn = hero.querySelector('#vd-order');
   const seeMenu = hero.querySelector('#vd-see-menu');
   const dots = Array.from(hero.querySelectorAll('.vd-dot'));
+  const offBadgeEl = hero.querySelector('.vd-off-badge');
 
-  // helper: set image safely (uses fallback if empty)
-  function setImg(el, src) {
-    if (!el) return;
-    if (!src) {
-      // keep element blank, but try to use data from menu items (if any)
-      el.src = '';
-      el.alt = '';
-      return;
+  // current index
+  let cur = 0;
+  let timer = null;
+  const AUTO_MS = 4800;
+
+  // render slide i
+  function render(i, instant) {
+    i = (i + slidesData.length) % slidesData.length;
+    const s = slidesData[i];
+
+    // images
+    const leftSrc = resolveImage(s.leftImgKey);
+    const rightSrc = resolveImage(s.rightImgKey);
+    if (leftImgEl) leftImgEl.src = leftSrc || '';
+    if (rightImgEl) rightImgEl.src = rightSrc || '';
+
+    // eyebrow
+    if (eyebrowEl) eyebrowEl.textContent = s.eyebrow || '';
+
+    // title
+    if (titleTopEl) titleTopEl.textContent = (s.titleTop || '').toUpperCase();
+    if (titleBottomEl) titleBottomEl.textContent = (s.titleBottom || '').toUpperCase();
+
+    // desc
+    if (descEl) descEl.textContent = s.desc || '';
+
+    // badge handling (if slide specifies a badge, show it with content; else hide)
+    if (s.badge && offBadgeEl) {
+      offBadgeEl.style.display = 'flex';
+      offBadgeEl.querySelector('strong').textContent = s.badge.main || '';
+      offBadgeEl.querySelector('small').textContent = s.badge.sub || '';
+    } else if (offBadgeEl) {
+      // only show the badge on the promo slide or keep it for visual parity as in the image
+      // Slide 1 in the image shows a 50% off bubble — show when promo or when first slide uses badge
+      if (i === 0) {
+        // image looked like it had a round badge on right — we hide unless promo wants it
+        offBadgeEl.style.display = 'none';
+      } else {
+        offBadgeEl.style.display = 'none';
+      }
     }
-    // if IMAGES value looks like a filename (no protocol), leave as-is
-    el.src = src;
-  }
 
-  // render slide by index
-  let idx = 0;
-  function render(i, instant){
-    i = (i + slides.length) % slides.length;
-    const s = slides[i];
-    // left and right images: use same item image for left, a slightly different one for right (we'll rotate)
-    // Left: current slide image; Right: next slide image (gives overlapping slideshow effect)
-    const next = slides[(i+1) % slides.length];
-
-    // set images
-    if (s.image) setImg(leftImg, s.image);
-    else setImg(leftImg, IMAGES['promo-shawarma'] || '');
-
-    if (next.image) setImg(rightImg, next.image);
-    else setImg(rightImg, IMAGES['promo-fries'] || '');
-
-    // set eyebrow — prefer a short catalog label if present
-    eyebrow.textContent = (s.cfg && s.cfg.name) ? `${s.cfg.name.toUpperCase()} • MADE FRESH` : (s.name.toUpperCase());
-
-    // stack title — split name into two words if possible to mimic the pictured look.
-    // We keep your original hero words if you had them; otherwise split the item's name.
-    const words = (s.name || '').split(/\s+/);
-    let top = words.slice(0, Math.ceil(words.length/2)).join(' ');
-    let bottom = words.slice(Math.ceil(words.length/2)).join(' ');
-    // if empty, use generic
-    if (!top) top = 'TASTE';
-    if (!bottom) bottom = 'ORGANIC';
-    title.querySelector('.vd-line-top').textContent = top.toUpperCase();
-    title.querySelector('.vd-line-bottom').textContent = bottom.toUpperCase();
-
-    // description: prefer catalog/DOM description
-    descEl.textContent = s.desc || (s.cfg && s.cfg.name ? `Try our ${s.cfg.name} — customize to your taste.` : '');
-
-    // update dots aria
+    // update dots
     dots.forEach(d => {
-      const di = Number(d.dataset.index || d.getAttribute('data-index') || d.dataset.idx || 0);
-      const is = di === i;
-      d.classList.toggle('active', is);
-      d.setAttribute('aria-selected', is ? 'true' : 'false');
+      const idx = Number(d.dataset.index || d.getAttribute('data-index'));
+      const sel = idx === i;
+      d.setAttribute('aria-selected', sel ? 'true' : 'false');
+      d.classList.toggle('active', sel);
     });
 
-    // store current index
-    idx = i;
-
-    // small visual transitions
+    // subtle transition
     if (!instant) {
-      // fade in content slightly
-      hero.querySelector('.vd-card').animate([{ opacity: 0.92, transform: 'translateY(4px)' }, { opacity: 1, transform: 'translateY(0)' }], { duration: 420, easing: 'cubic-bezier(.2,.9,.2,1)' });
+      const card = hero.querySelector('.vd-card');
+      if (card) card.animate([{ opacity: .96, transform: 'translateY(6px)' }, { opacity: 1, transform: 'translateY(0)' }], { duration: 420, easing: 'cubic-bezier(.2,.9,.2,1)' });
     }
+
+    cur = i;
   }
 
-  // click handlers
-  dots.forEach((d, di) => {
+  // dot click
+  dots.forEach(d => {
     d.addEventListener('click', (e) => {
-      render(di);
-      resetTimer();
+      const i = Number(d.dataset.index || d.getAttribute('data-index'));
+      render(i);
+      restartTimer();
     });
   });
 
-  // Order button: open builder if catalog has cfg, else quick add
+  // order click — prefer openBuilder if slide key maps to an item in CATALOG
   orderBtn.addEventListener('click', (e) => {
     e.preventDefault();
-    const s = slides[idx];
+    const s = slidesData[cur];
     if (!s) return;
-    // prefer openBuilder (exists in your script)
-    if (typeof window.openBuilder === 'function' && s.cfg) {
+    if (s.key && typeof window.CATALOG !== 'undefined' && window.CATALOG[s.key] && typeof window.openBuilder === 'function') {
       try { window.openBuilder(s.key); } catch (err) { console.warn(err); }
       return;
     }
-    // fallback: add basic item to cart
-    if (typeof window.addToCartObj === 'function') {
-      const price = (s.cfg && s.cfg.sizes && s.cfg.sizes[0]) ? s.cfg.sizes[0].price : (s.cfg && s.cfg.price) || 0;
-      window.addToCartObj({ id: `${s.key}-${Date.now()}`, name: s.name, qty: 1, unitPrice: Number(price || 0), optionsSummary: 'Default' });
-      // open cart
+    // fallback: add to cart with default size price if possible
+    if (s.key && window.CATALOG && window.CATALOG[s.key] && typeof window.addToCartObj === 'function') {
+      const cfg = window.CATALOG[s.key];
+      const price = (cfg.sizes && cfg.sizes[0]) ? cfg.sizes[0].price : 0;
+      window.addToCartObj({ id: `${s.key}-${Date.now()}`, name: cfg.name || s.titleTop + ' ' + s.titleBottom, qty: 1, unitPrice: Number(price || 0), optionsSummary: 'Default' });
       if (typeof window.openCartDrawer === 'function') window.openCartDrawer();
       return;
     }
-    // last fallback: just alert
-    alert(`Order: ${s.name}`);
+    // ultimate fallback: open builder without item or show toast
+    if (typeof window.toast === 'function') {
+      window.toast('Select your item from the menu.');
+    } else {
+      alert(`Order: ${s.titleTop} ${s.titleBottom}`);
+    }
   });
 
+  // See menu scroll
   seeMenu.addEventListener('click', (e) => {
     e.preventDefault();
     const el = document.querySelector('#menu');
-    if (el) el.scrollIntoView({behavior:'smooth', block:'center'});
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
   });
 
   // keyboard nav
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'ArrowLeft') { render(idx-1); resetTimer(); }
-    if (e.key === 'ArrowRight') { render(idx+1); resetTimer(); }
+    if (e.key === 'ArrowLeft') { prev(); restartTimer(); }
+    if (e.key === 'ArrowRight') { next(); restartTimer(); }
   });
 
-  // auto-advance timer
-  let timer = null;
-  const AUTO_MS = 4800;
-  function startTimer(){
-    if (timer) clearInterval(timer);
-    timer = setInterval(()=> { render(idx+1); }, AUTO_MS);
+  // next / prev
+  function next() { render(cur + 1); }
+  function prev() { render(cur - 1); }
+
+  // timer
+  function startTimer() {
+    stopTimer();
+    timer = setInterval(() => render(cur + 1), AUTO_MS);
   }
-  function resetTimer(){
-    if (timer) { clearInterval(timer); timer = null; }
-    startTimer();
+  function stopTimer() { if (timer) { clearInterval(timer); timer = null; } }
+  function restartTimer() { stopTimer(); startTimer(); }
+
+  // pause on hover
+  const cardWrap = hero.querySelector('.vd-card');
+  if (cardWrap) {
+    cardWrap.addEventListener('mouseenter', stopTimer);
+    cardWrap.addEventListener('mouseleave', startTimer);
+    cardWrap.addEventListener('touchstart', stopTimer, { passive: true });
+    cardWrap.addEventListener('touchend', startTimer, { passive: true });
   }
 
-  // on images load: try to set alt text and fallback if missing
-  function safeSetAlt(imgEl, key){
-    if (!imgEl) return;
-    const k = key || '';
-    imgEl.alt = (k ? (k.replace(/[-_]/g,' ') + ' image') : 'hero image');
-  }
-
-  // initial images may be relative filenames — ensure reasonable path: leave as-is because your IMAGES map likely contains proper URLs
-  // set initial slide, then start timer
+  // initial render
   render(0, true);
   startTimer();
 
-  // responsive tweak: if images were empty, attempt using DOM thumbs
-  slides.forEach((s, i) => {
-    if (!s.image) {
-      const domThumb = document.querySelector(`.pick[data-id="${s.key}"] img, .menu-item[data-id^="${s.key}"] img, .menu-item[data-category="${s.key}"] img`);
-      if (domThumb && domThumb.src) {
-        s.image = domThumb.src;
-        if (i === idx) {
-          render(idx, true);
-        }
-      }
-    }
-  });
+  // expose small API
+  window.VD_HERO = { go: render, next, prev, current: () => cur, slides: slidesData };
 
-  // Expose control in case you want to call from console
-  window.VD_HERO = { render, slides, current: () => idx, next: () => render(idx+1), prev: () => render(idx-1) };
 })();
 </script>
 
