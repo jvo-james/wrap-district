@@ -1746,6 +1746,354 @@ html.mobile-nav-open .overlay-dim { z-index: 4200 !important; }
 }
 </style>
 
+  <!-- Header layout: logo left, cart + hamburger right on small screens -->
+<style>
+/* target your site's small-screen breakpoint (matches existing CSS) */
+@media (max-width: 979px) {
+
+  /* make header inner use full width and space items */
+  .site-header { /* keep existing fixed styling but ensure no centering issues */
+    display: block; /* ensure header uses flow, container handles centering */
+    background-clip: padding-box;
+  }
+
+  .header-inner{
+    display:flex !important;
+    align-items:center;
+    justify-content: space-between !important; /* push logo left, actions right */
+    gap:12px;
+    width:100%;
+    padding: 8px 14px; /* small padding */
+    box-sizing: border-box;
+  }
+
+  /* brand/logo on the left */
+  .brand{
+    order: 0;
+    display:flex;
+    align-items:center;
+    gap:12px;
+    text-decoration:none;
+  }
+  .brand-text{ display:none !important; } /* keep compact on small */
+
+  /* hide the main navigation on small screens (keep for accessibility) */
+  .main-nav{ display:none !important; order: 1; }
+
+  /* header-actions (group at right) */
+  .header-actions{
+    order: 2;
+    margin-left: auto;      /* ensure it's pushed to the far right */
+    display:flex;
+    gap:8px;
+    align-items:center;
+    justify-content:flex-end;
+  }
+
+  /* show only cart + hamburger; hide other action icons on small */
+  .header-actions .search-btn,
+  .header-actions .location-btn,
+  .header-actions .order-cta,
+  .header-actions a[role="link"]{ display:none !important; }
+
+  /* ensure cart button and hamburger remain visible and touch-friendly */
+  .header-actions .cart-btn,
+  .header-actions .hamburger{
+    display:inline-grid !important;
+    width:44px;
+    height:44px;
+    padding:0;
+    border-radius:10px;
+  }
+
+  /* ensure cart badge is visible and doesn't overflow */
+  .cart-badge{ margin-left:-8px; transform: none; }
+
+  /* small adjustment so header doesn't cover content anchors */
+  :root{ --header-h:72px; } /* stays consistent with your other rules */
+}
+
+/* Extra safety: if header-inner ever gets centered by other rules, force spacing */
+@media (max-width: 520px){
+  .header-inner{ padding:8px 10px; }
+  .brand .logo{ width:40px; height:40px; }
+  .header-actions .cart-btn, .header-actions .hamburger{ width:50px; height:50px; }
+}
+</style>
+<!-- HERO: make hero half-height on small screens -->
+<style>
+/* Target small screens (matches your existing breakpoint) */
+@media (max-width: 979px) {
+
+  /* Make the whole hero section occupy half the viewport */
+  .hero-section.hero-viewport {
+    min-height: 50vh !important;
+    max-height: 50vh !important;
+    overflow: hidden !important; /* keep layout tidy */
+    margin-top: var(--header-h); /* keep header offset */
+  }
+
+  /* Ensure the inner container fills the reduced hero height */
+  .hero-viewport-inner {
+    height: 100% !important;
+    align-items: stretch !important;
+    padding: 8px 0 !important;
+    display: flex !important;
+    gap: 12px !important;
+  }
+
+  /* Carousel area should stretch to the hero height */
+  .hero-carousel-wrap {
+    min-height: 100% !important;
+    height: 100% !important;
+    border-radius: 12px !important;
+    overflow: hidden !important;
+  }
+
+  /* Make slides and stage respect the reduced height */
+  .carousel-stage, .hero-slide {
+    height: 100% !important;
+    position: relative !important;
+  }
+
+  /* Artwork should fill the left/top half and scale correctly */
+  .slide-artwork {
+    width: 100% !important;
+    height: 100% !important; /* override earlier 62vh */
+    border-radius: 12px !important;
+    overflow: hidden !important;
+    flex: none !important;
+  }
+  .slide-artwork img.slide-image {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    transform: none !important;
+  }
+
+  /* Slide panel (text overlay) sits comfortably inside the hero,
+     and is limited in height so it won't overflow the half-hero */
+  .slide-panel {
+    position: absolute !important;
+    left: 12px !important;
+    right: 12px !important;
+    bottom: 12px !important;
+    width: auto !important;
+    max-height: 44% !important; /* give enough space for title + CTAs */
+    overflow-y: auto !important;
+    padding: 12px !important;
+    border-radius: 12px !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Keep carousel controls compact and visible inside half-hero */
+  .carousel-controls {
+    left: 12px !important;
+    bottom: 10px !important;
+    gap: 8px !important;
+  }
+
+  /* Stickers should not push layout: tuck them inside hero safely */
+  .hero-stickers { top: calc(var(--header-h) + 8px) !important; right: 12px !important; }
+
+  /* Hide right quick-picks on small screens (keeps hero tidy) */
+  .hero-right.quick-picks-section { display: none !important; }
+
+  /* Ensure no other rule forces hero to full-screen */
+  .hero-section[ data-fullscreen="true" ] { height: auto !important; min-height: 50vh !important; max-height: 50vh !important; }
+
+  
+}
+</style>
+
+  <style>
+/* Stylish menu filter pills + animated indicator */
+.menu-filters{
+  position: relative;
+  display:flex;
+  gap:10px;
+  align-items:center;
+  padding:8px;
+  overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width: none;
+}
+.menu-filters::-webkit-scrollbar{ display:none; }
+
+/* Pill buttons */
+.menu-filters .filter{
+  appearance: none;
+  border: 0;
+  background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(250,250,250,0.96));
+  color: #222;
+  font-weight: 800;
+  border-radius: 999px;
+  padding: 8px 14px;
+  display:inline-flex;
+  gap:8px;
+  align-items:center;
+  cursor: pointer;
+  transition: transform .18s cubic-bezier(.2,.9,.2,1), box-shadow .18s, color .18s, background .18s;
+  box-shadow: 0 8px 20px rgba(12,12,12,0.04);
+}
+
+/* icon spacing */
+.menu-filters .filter i{ opacity:0.96; font-size:0.95rem; }
+
+/* hover / active micro-interactions */
+.menu-filters .filter:hover{ transform: translateY(-3px); box-shadow: 0 18px 48px rgba(12,12,12,0.07); }
+.menu-filters .filter:active{ transform: translateY(-1px) scale(.995); }
+
+/* Selected state (uses your --accent tokens) */
+.menu-filters .filter.active{
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  color: #111;
+  box-shadow: 0 22px 70px rgba(255,107,61,0.10);
+  transform: translateY(-4px);
+}
+
+/* Focus ring for keyboard users */
+.menu-filters .filter:focus{
+  outline: 3px solid rgba(99,102,241,0.12);
+  outline-offset: 6px;
+  border-radius: 999px;
+}
+
+/* Sliding indicator (underline that moves to active filter) */
+.menu-filters .filter-indicator{
+  position: absolute;
+  height: 6px;
+  border-radius:6px;
+  bottom: 2px;
+  left: 0;
+  width: 0;
+  background: linear-gradient(90deg, var(--accent-2), var(--accent-3));
+  box-shadow: 0 10px 30px rgba(255,107,61,0.10);
+  transition: left .28s cubic-bezier(.2,.9,.2,1), width .28s cubic-bezier(.2,.9,.2,1), opacity .18s;
+  pointer-events: none;
+  opacity: 0.98;
+  will-change: left, width;
+}
+
+/* Responsive: let filters wrap on larger small screens */
+@media (min-width:720px){
+  .menu-filters{ gap:12px; padding:6px 0; }
+}
+
+/* When indicator isn't ready */
+.menu-filters .filter-indicator.hidden{ opacity: 0; transform: translateY(4px); }
+
+/* compact pills for very small view */
+@media (max-width:420px){
+  .menu-filters .filter{ padding:8px 10px; font-size:0.95rem; }
+  .menu-filters .filter-indicator{ height:4px; bottom:1px; }
+}
+</style>
+<style>
+/* ===========================
+Hero readability & slideshow polish (overrides)
+Paste AFTER existing hero styles
+=========================== */
+
+/* 1) Add a consistent dark overlay on slide artwork for readable text */
+.slide-artwork {
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+/* overlay layer (keeps image visible but darkens for contrast) */
+.slide-artwork::after{
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(0,0,0,0.44) 0%, rgba(0,0,0,0.48) 40%, rgba(0,0,0,0.56) 100%);
+  mix-blend-mode: normal;
+  z-index: 8;
+  transition: background .36s ease;
+}
+
+/* On large screens, a lighter overlay so artwork still reads as image */
+@media (min-width:980px){
+  .slide-artwork::after{
+    background: linear-gradient(180deg, rgba(0,0,0,0.32), rgba(0,0,0,0.42));
+  }
+}
+
+/* 2) Make slide text panel clearly elevated and readable */
+.slide-panel {
+  z-index: 20 !important;
+  color: #fff !important; /* always white text on top of overlay */
+  background: linear-gradient(180deg, rgba(0,0,0,0.44), rgba(0,0,0,0.22)) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 18px 50px rgba(0,0,0,0.45) !important;
+  backdrop-filter: blur(6px) saturate(120%) !important;
+  -webkit-backdrop-filter: blur(6px) saturate(120%) !important;
+  border: 1px solid rgba(255,255,255,0.04) !important;
+}
+
+/* ensure inner text uses high contrast colors */
+.slide-panel .eyebrow, .slide-panel .hero-features li { color: rgba(255,255,255,0.92) !important; }
+.slide-panel .hero-sub { color: rgba(255,255,255,0.92) !important; }
+
+/* 3) stronger title styling for legibility (with subtle shadow) */
+.hero-title {
+  color: #fff !important;
+  text-shadow: 0 6px 18px rgba(0,0,0,0.6), 0 1px 0 rgba(0,0,0,0.25) !important;
+  z-index: 22 !important;
+}
+
+/* 4) CTA buttons contrast on top of overlay */
+.hero-ctas .btn {
+  box-shadow: 0 12px 36px rgba(0,0,0,0.45) !important;
+}
+.btn-cta { color: #111 !important; } /* already bright background */
+.btn-outline { background: rgba(255,255,255,0.06) !important; color: #fff !important; border-color: rgba(255,255,255,0.12) !important; }
+
+/* 5) badges — ensure readable pill backgrounds & size */
+.badge {
+  background: linear-gradient(90deg, rgba(0,0,0,0.56), rgba(0,0,0,0.42)) !important;
+  color: #fff !important;
+  font-size: 0.82rem !important;
+  z-index: 30 !important;
+  border: 1px solid rgba(255,255,255,0.06) !important;
+}
+
+/* 6) ensure dots/controls are visible above overlay */
+.carousel-controls, .carousel-controls * { z-index: 60 !important; position: relative !important; }
+
+/* 7) fix potential pointer-events blocking on slides (allow buttons inside slide-panel) */
+.hero-slide { pointer-events: none; } /* non-active slides ignore pointer events */
+.hero-slide.active { pointer-events: auto; } /* active slide allows interactions */
+
+/* ensure slide-panel and its buttons are always interactive */
+.slide-panel, .slide-panel button, .slide-panel a { pointer-events: auto !important; }
+
+/* 8) small visual for when text would still be low-contrast: add subtle inner-glow */
+.slide-panel .hero-title::after{
+  content: "";
+  display:block;
+  width: 100%;
+  height: 8px;
+  margin-top: 6px;
+  background: linear-gradient(90deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+  border-radius: 6px;
+}
+
+/* 9) responsive: make slide-panel use lighter overlay on very small screens for legibility */
+@media (max-width:520px){
+  .slide-panel{ background: linear-gradient(180deg, rgba(0,0,0,0.62), rgba(0,0,0,0.42)) !important; max-height: 48% !important; }
+  .hero-title{ font-size: clamp(1.25rem, 5.8vw, 1.9rem) !important; }
+}
+
+/* End hero readability overrides */
+</style>
+<style>
+.hero-slide { transition: opacity .5s ease, transform .6s cubic-bezier(.2,.9,.2,1); transform-origin: center; }
+.hero-slide.active { transform: translateZ(0) scale(1); opacity: 1; }
+.hero-slide:not(.active) { opacity: 0; transform: scale(.995); pointer-events: none; }
+</style>
+
 </head>
 <body>
 
@@ -3585,5 +3933,168 @@ console.info('Wrap District script loaded — images will use local files when p
   }
 })();
 </script>
+<script>
+(function(){
+  const container = document.querySelector('.menu-filters');
+  if(!container) return;
 
+  // Build button array
+  const buttons = Array.from(container.querySelectorAll('.filter'));
+  if(!buttons.length) return;
+
+  // Ensure container role
+  container.setAttribute('role','tablist');
+
+  // Create & append indicator element
+  let indicator = container.querySelector('.filter-indicator');
+  if(!indicator){
+    indicator = document.createElement('div');
+    indicator.className = 'filter-indicator hidden';
+    container.appendChild(indicator);
+  }
+
+  // Helper: activate a button visually + aria + performs filtering
+  function activateButton(btn, focus=false, suppressFilterRun=false){
+    buttons.forEach(b=>{
+      const is = (b === btn);
+      b.classList.toggle('active', is);
+      b.setAttribute('aria-selected', is ? 'true' : 'false');
+      b.setAttribute('tabindex', is ? '0' : '-1');
+    });
+    updateIndicator();
+
+    // if we shouldn't run filter logic here (because original click will), return
+    if(suppressFilterRun) return;
+
+    // Run same filtering logic as original site for compatibility:
+    const key = btn.dataset.filter;
+    const items = Array.from(document.querySelectorAll('.menu-item'));
+    items.forEach(it => {
+      const cat = it.dataset.category || 'all';
+      const show = (key === 'all') ? true : (cat === key);
+      it.style.display = show ? '' : 'none';
+    });
+
+    if(focus) btn.focus();
+  }
+
+  // Position the indicator under active button
+  function updateIndicator(){
+    const active = container.querySelector('.filter.active') || buttons[0];
+    if(!active) { indicator.classList.add('hidden'); return; }
+    const rect = active.getBoundingClientRect();
+    const parentRect = container.getBoundingClientRect();
+    const left = rect.left - parentRect.left + container.scrollLeft;
+    indicator.style.left = (left) + 'px';
+    indicator.style.width = rect.width + 'px';
+    indicator.classList.remove('hidden');
+  }
+
+  // Attach events
+  buttons.forEach((btn, idx) => {
+    // set roles and initial aria/tabindex
+    btn.setAttribute('role','tab');
+    const isActive = btn.classList.contains('active');
+    btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
+    btn.setAttribute('tabindex', isActive ? '0' : '-1');
+
+    // click -> activate (suppress duplicate filter run if original click listener also runs)
+    btn.addEventListener('click', (ev) => {
+      // original page code may handle filtering on click; we still sync aria + indicator.
+      activateButton(btn, false, true);
+      // then trigger original handler by dispatching a click event that allows other listeners to run:
+      // (but don't cause infinite loops — dispatch only if current event wasn't synthetic)
+      // We'll call filter behavior directly to avoid double toggling
+      const key = btn.dataset.filter;
+      const items = Array.from(document.querySelectorAll('.menu-item'));
+      items.forEach(it => {
+        const cat = it.dataset.category || 'all';
+        const show = (key === 'all') ? true : (cat === key);
+        it.style.display = show ? '' : 'none';
+      });
+    });
+
+    // keyboard accessibility: left/right move focus, Enter/Space activate
+    btn.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === 'Right') {
+        e.preventDefault();
+        const next = buttons[(idx + 1) % buttons.length];
+        next.focus();
+      } else if (e.key === 'ArrowLeft' || e.key === 'Left') {
+        e.preventDefault();
+        const prev = buttons[(idx - 1 + buttons.length) % buttons.length];
+        prev.focus();
+      } else if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        btn.click();
+      }
+    });
+
+    // keep indicator updated if user focuses with tab
+    btn.addEventListener('focus', () => {
+      updateIndicator();
+    });
+  });
+
+  // reposition on resize or scroll (container might be scrollable)
+  window.addEventListener('resize', () => requestAnimationFrame(updateIndicator));
+  container.addEventListener('scroll', () => requestAnimationFrame(updateIndicator));
+
+  // initial indicator placement
+  setTimeout(updateIndicator, 80);
+})();
+</script>
+<script>
+  // Carousel sanity/restart helper
+(function(){
+  const stage = document.querySelector('[data-carousel]');
+  if (!stage) { console.warn('No carousel stage found'); return; }
+
+  const slides = Array.from(stage.querySelectorAll('.hero-slide'));
+  console.log('Carousel found, slides count =', slides.length);
+
+  // Make sure one slide is active and aria-hidden is set consistently
+  let activeIndex = slides.findIndex(s => s.classList.contains('active') || s.getAttribute('aria-hidden') === 'false');
+  if (activeIndex < 0) activeIndex = 0;
+
+  slides.forEach((s, idx) => {
+    const isActive = idx === activeIndex;
+    s.classList.toggle('active', isActive);
+    s.setAttribute('aria-hidden', isActive ? 'false' : 'true');
+    s.style.opacity = isActive ? '1' : '0';
+  });
+  console.log('Set active slide to index', activeIndex);
+
+  // Try to re-init carousel timer if needed (simple safe auto-advance)
+  if (window._wrapdistrict_carousel_timer) {
+    clearInterval(window._wrapdistrict_carousel_timer);
+    window._wrapdistrict_carousel_timer = null;
+  }
+  const AUTO_MS = 4500;
+  window._wrapdistrict_carousel_timer = setInterval(()=>{
+    const current = slides.findIndex(s => s.classList.contains('active'));
+    const next = (current + 1) % slides.length;
+    slides.forEach((s, i) => {
+      const show = (i === next);
+      s.classList.toggle('active', show);
+      s.setAttribute('aria-hidden', show ? 'false' : 'true');
+      s.style.opacity = show ? '1' : '0';
+    });
+  }, AUTO_MS);
+  console.log('Carousel auto-advance (safe) started with', AUTO_MS,'ms');
+})();
+
+  // check controls
+(function(){
+  const prev = document.querySelector('[data-carousel-prev]');
+  const next = document.querySelector('[data-carousel-next]');
+  const dots = Array.from(document.querySelectorAll('[data-carousel-dots] .dot'));
+  console.log('prev exists?', !!prev, 'next exists?', !!next, 'dots count', dots.length);
+  // simulate clicks safely (no-op if element not found)
+  if(prev) { console.log('prev bounding rect:', prev.getBoundingClientRect()); }
+  if(next) { console.log('next bounding rect:', next.getBoundingClientRect()); }
+  dots.forEach((d,i)=> console.log('dot', i, 'rect', d.getBoundingClientRect(), 'aria-selected', d.getAttribute('aria-selected')));
+})();
+
+</script>
 </html>
