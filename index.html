@@ -520,6 +520,366 @@ a:focus, button:focus { outline: 3px solid rgba(99,102,241,0.12); outline-offset
 /* end of header & hero styling */
 </style>
 
+  
+<style>
+/* ================================
+   Wrap District — Cart, Modals & Chat
+   Beautiful, accessible, responsive, animated
+   ================================ */
+
+/* ---------------------
+   Shared modal/drawer tokens
+   --------------------- */
+:root{
+  --modal-bg: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(255,255,255,0.96));
+  --modal-glass: rgba(255,255,255,0.6);
+  --modal-radius:18px;
+  --drawer-width:420px;
+  --chat-width:340px;
+  --chat-expanded-width:360px;
+}
+
+/* ============================
+   OVERLAY (dim layer) - used by modals/drawers
+   ============================ */
+.overlay-dim{
+  position:fixed;
+  inset:0;
+  background: linear-gradient(180deg, rgba(2,6,23,0.48), rgba(2,6,23,0.36));
+  z-index:1100;
+  opacity:0;
+  pointer-events:none;
+  transition: opacity .28s ease;
+  backdrop-filter: blur(6px) saturate(110%);
+}
+.overlay-dim.active{
+  opacity:1;
+  pointer-events:auto;
+}
+
+/* ============================
+   CART DRAWER (desktop & mobile)
+   ============================ */
+.drawer{
+  position:fixed;
+  z-index:1150;
+  right:0;
+  top:0;
+  height:100vh;
+  display:flex;
+  flex-direction:column;
+  background: transparent;
+  pointer-events:none; /* wrapper - inner shell will receive pointer events */
+  transition: transform .36s cubic-bezier(.22,.9,.18,1), opacity .26s;
+  opacity:0;
+}
+.drawer[hidden]{ transform: translateX(8px); opacity:0; pointer-events:none; }
+.drawer:not([hidden]){ transform: translateX(0); opacity:1; pointer-events:auto; }
+
+/* inner shell */
+.drawer-shell{
+  width: min(var(--drawer-width), 94vw);
+  max-width: var(--drawer-width);
+  height:100%;
+  background: var(--modal-bg);
+  border-radius: 18px 0 0 18px;
+  box-shadow: 0 40px 120px rgba(8,8,8,0.2);
+  padding:18px;
+  box-sizing:border-box;
+  margin-left: auto;
+  overflow-y:auto;
+  pointer-events:auto;
+  border-left: 1px solid rgba(16,16,16,0.04);
+}
+
+/* drawer header */
+.drawer-head{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  justify-content:space-between;
+  padding-bottom:6px;
+  border-bottom: 1px dashed rgba(16,16,16,0.04);
+}
+.drawer-head h3{ margin:0; font-size:1.06rem; display:flex; gap:10px; align-items:center; }
+.drawer-close{ background:transparent; border:0; font-size:1.05rem; width:44px; height:44px; border-radius:10px; }
+
+/* cart items list */
+.cart-items{ list-style:none; margin:12px 0 8px 0; padding:0; display:flex; flex-direction:column; gap:12px; }
+.cart-item{
+  display:flex; gap:10px; align-items:center;
+  background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(255,255,255,0.96));
+  border-radius:12px; padding:12px;
+  box-shadow: 0 10px 30px rgba(12,12,12,0.05);
+  border: 1px solid rgba(16,16,16,0.03);
+}
+.cart-item img{ width:72px; height:72px; border-radius:12px; object-fit:cover; flex-shrink:0; }
+.cart-item strong{ display:block; font-size:0.98rem; }
+.cart-item .muted.small{ color:var(--muted); font-size:0.82rem; margin-top:6px; }
+
+/* qty & price pane */
+.cart-item .qty-box{
+  margin-left:auto; text-align:right; display:flex; flex-direction:column; gap:8px; align-items:flex-end;
+}
+.qty-controls{ display:inline-flex; gap:6px; align-items:center; }
+.qty-controls .icon-btn{ width:36px; height:36px; border-radius:9px; background:transparent; border:1px solid rgba(16,16,16,0.04); }
+.cart-item .price{ font-weight:800; font-size:1rem; }
+
+/* remove button */
+.cart-item .remove-item{ background: linear-gradient(90deg, rgba(255,107,61,0.06), rgba(255,61,110,0.03)); border-radius:10px; padding:8px 10px; font-weight:700; }
+
+/* cart summary */
+.cart-summary{
+  margin-top:12px;
+  padding-top:12px; border-top:1px dashed rgba(16,16,16,0.04);
+  display:flex; flex-direction:column; gap:12px;
+}
+.cart-row{ display:flex; justify-content:space-between; align-items:center; gap:8px; font-weight:600; }
+.cart-row.total{ font-size:1.1rem; font-weight:900; }
+
+/* cart actions */
+.cart-actions{ display:flex; gap:10px; align-items:center; margin-top:6px; }
+.cart-actions .checkout{ flex:1; padding:12px 14px; border-radius:12px; font-weight:900; }
+.cart-actions .clear-cart{ padding:10px 12px; border-radius:10px; }
+
+/* empty-cart state */
+.drawer .empty-state{
+  display:flex; flex-direction:column; gap:10px; align-items:center; justify-content:center; padding:36px 6px; text-align:center;
+  color:var(--muted);
+}
+
+/* responsive: mobile drawer slides from bottom and becomes full-screen panel */
+@media (max-width:720px){
+  .drawer{ left:0; right:0; top:auto; bottom:0; height:auto; transform: translateY(18px); }
+  .drawer-shell{ width:100%; max-width:100%; height: min(70vh, 86vh); border-radius:12px 12px 0 0; margin:0 auto; padding:14px; }
+}
+
+/* ============================
+   GENERIC MODAL (builder-modal and other modals)
+   ============================ */
+.modal{
+  position:fixed;
+  inset:0;
+  z-index:1200;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  pointer-events:none;
+  opacity:0;
+  transition: opacity .26s ease;
+}
+.modal[hidden]{ opacity:0; pointer-events:none; transform: scale(.998); }
+.modal:not([hidden]){ opacity:1; pointer-events:auto; }
+
+/* modal shell (centered card) */
+.modal-shell{
+  width: min(1100px, calc(100vw - 36px));
+  max-height: calc(100vh - 110px);
+  background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(255,255,255,0.96));
+  border-radius: var(--modal-radius);
+  box-shadow: 0 40px 140px rgba(8,8,8,0.22);
+  padding:18px;
+  display:grid;
+  grid-template-columns: 1fr 380px;
+  gap:18px;
+  overflow:hidden;
+  pointer-events:auto;
+  border:1px solid rgba(16,16,16,0.04);
+}
+
+/* modal header */
+.modal-header{
+  display:flex; justify-content:space-between; align-items:center; gap:12px;
+  padding-bottom:6px; border-bottom:1px dashed rgba(16,16,16,0.04);
+}
+.modal-header h3{ margin:0; font-size:1.12rem; }
+
+/* left column of builder : content */
+.modal-left{
+  overflow:auto;
+  padding-right:6px;
+}
+
+/* right column : preview */
+.modal-right{
+  background: linear-gradient(180deg, rgba(250,250,250,0.96), rgba(245,245,245,0.96));
+  border-radius: 14px;
+  padding:14px;
+  box-shadow: inset 0 2px 6px rgba(255,255,255,0.85), 0 12px 40px rgba(12,12,12,0.06);
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  min-width:260px;
+  max-height: calc(100vh - 180px);
+  overflow:auto;
+}
+
+/* live preview image */
+.preview-image img{ width:100%; height:220px; object-fit:cover; border-radius:12px; }
+
+/* builder stepper and options */
+.builder-stepper{ display:flex; gap:8px; flex-wrap:wrap; margin:12px 0; }
+.builder-stepper .step{
+  background: rgba(16,16,16,0.02); border-radius:12px; padding:8px 12px; border:1px solid rgba(16,16,16,0.03);
+  cursor:pointer; font-weight:800; display:inline-flex; gap:8px; align-items:center;
+}
+.builder-stepper .step.active{ background: linear-gradient(90deg, var(--accent), var(--accent-2)); color:#111; box-shadow: 0 12px 30px rgba(255,107,61,0.08); }
+
+/* options grid */
+.options-grid{ display:grid; grid-template-columns: repeat(2,1fr); gap:10px; }
+.option{
+  background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(255,255,255,0.96));
+  border-radius:12px;
+  padding:10px;
+  text-align:left;
+  border:1px solid rgba(16,16,16,0.03);
+  cursor:pointer;
+  box-shadow: 0 10px 26px rgba(12,12,12,0.04);
+  display:flex; flex-direction:column; gap:8px;
+}
+.option.selected{ border: 2px solid rgba(255,107,61,0.16); box-shadow: 0 12px 36px rgba(255,107,61,0.06); transform: translateY(-4px); }
+.option strong{ font-weight:900; }
+
+/* step panel layout */
+.builder-step-panel{ padding:8px 0; }
+.builder-steps{ min-height:220px; }
+
+/* modal footer actions inside preview */
+.preview-actions .btn{ width:100%; }
+
+/* modal responsiveness */
+@media (max-width:980px){
+  .modal-shell{ grid-template-columns: 1fr; padding:12px; width: calc(100vw - 20px); max-height: calc(100vh - 40px); border-radius:12px; }
+  .modal-right{ order:2; }
+  .modal-left{ order:1; }
+  .preview-image img{ height:180px; }
+}
+
+/* keyboard focus visual for modal elements */
+.modal-shell :focus{ outline:3px solid rgba(99,102,241,0.12); outline-offset:4px; border-radius:10px; }
+
+/* subtle entrance animation */
+.modal:not([hidden]) .modal-shell{ transform: translateY(6px); transition: transform .36s cubic-bezier(.2,.9,.2,1); }
+
+/* ============================
+   GENERIC SMALL MODAL (confirmation/toasts)
+   ============================ */
+.small-modal{
+  width:fit-content;
+  max-width:92vw;
+  padding:12px 16px;
+  border-radius:12px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(250,250,250,0.96));
+  box-shadow: 0 20px 60px rgba(8,8,8,0.14);
+}
+
+/* ============================
+   TOASTER (already used by JS) — polished
+   ============================ */
+.wrap-toaster{
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  background: linear-gradient(90deg, rgba(16,16,16,0.9), rgba(36,36,36,0.95));
+  color: #fff;
+  padding: 12px 16px;
+  border-radius: 12px;
+  font-weight:800;
+  z-index:1300;
+  transform-origin: bottom right;
+  opacity:0;
+  transition: opacity .22s ease, transform .24s cubic-bezier(.2,.9,.2,1);
+  pointer-events:none;
+}
+.wrap-toaster.visible{ opacity:1; pointer-events:auto; transform: translateY(-6px); }
+
+/* ============================
+   MANEF CHATBOT — floating assistant
+   ============================ */
+#manef-chat{
+  position:fixed;
+  right:18px;
+  bottom:18px;
+  z-index:1250;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  align-items:flex-end;
+}
+
+/* chat toggle bubble */
+.chat-toggle{
+  width:62px; height:62px; border-radius:999px; display:inline-grid; place-items:center;
+  background: linear-gradient(135deg, var(--accent-2), var(--accent));
+  color:white; box-shadow: 0 18px 48px rgba(255,107,61,0.12);
+  border:0;
+  cursor:pointer;
+  transition: transform .22s ease, box-shadow .22s;
+}
+.chat-toggle:active{ transform: scale(.96); }
+
+/* chat panel (hidden by default) */
+.chat-panel{
+  width: var(--chat-width);
+  max-width: calc(100vw - 36px);
+  background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(250,250,250,0.96));
+  border-radius: 14px;
+  box-shadow: 0 40px 120px rgba(8,8,8,0.18);
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+  pointer-events:auto;
+  transform-origin: bottom right;
+  transition: transform .28s cubic-bezier(.22,.9,.18,1), opacity .22s;
+  opacity:0;
+  transform: translateY(6px) scale(.98);
+  border:1px solid rgba(16,16,16,0.04);
+}
+
+/* when visible — JS toggles hidden attribute, but we style both states generically */
+.chat-panel[hidden]{ opacity:0; transform: translateY(6px) scale(.98); pointer-events:none; }
+.chat-panel:not([hidden]){ opacity:1; transform: translateY(0) scale(1); pointer-events:auto; }
+
+/* chat header */
+.chat-head{
+  display:flex; gap:12px; align-items:center; padding:12px 12px; border-bottom:1px dashed rgba(16,16,16,0.04);
+  background: linear-gradient(90deg, rgba(255,255,255,0.98), rgba(255,255,255,0.96));
+}
+.chat-avatar{ width:42px; height:42px; border-radius:10px; display:grid; place-items:center; background: linear-gradient(135deg,#ffd8a8,#ff6b3d); color:#111; font-weight:900; }
+.chat-head strong{ font-size:1rem; }
+.chat-head .muted.tiny{ font-size:0.78rem; color:var(--muted); }
+
+/* chat body messages area */
+.chat-body{ padding:12px; display:flex; flex-direction:column; gap:8px; max-height:360px; overflow:auto; background: linear-gradient(180deg, rgba(250,250,250,0.98), rgba(245,245,245,0.98)); }
+.chat-body .bot-message, .chat-body .chat-msg.bot{ align-self:flex-start; background: linear-gradient(90deg, rgba(240,240,245,0.98), rgba(245,245,250,0.98)); color:#111; padding:10px 12px; border-radius:12px; box-shadow: 0 8px 20px rgba(12,12,12,0.04); max-width:86%; }
+.chat-body .chat-msg.user{ align-self:flex-end; background: linear-gradient(90deg, rgba(255,107,61,0.98), rgba(255,61,110,0.98)); color:white; padding:10px 12px; border-radius:12px; max-width:86%; box-shadow: 0 12px 30px rgba(255,107,61,0.08); }
+
+/* chat footer */
+.chat-foot{ display:flex; gap:8px; padding:10px; border-top:1px dashed rgba(16,16,16,0.04); background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(250,250,250,0.98)); }
+.chat-input{ flex:1; padding:10px 12px; border-radius:10px; border:1px solid rgba(16,16,16,0.04); font-size:0.95rem; }
+.send-chat{ width:44px; height:44px; border-radius:10px; background: linear-gradient(90deg,#3b82f6,#06b6d4); color:white; border:0; }
+
+/* compact mobile chat: remove large shadows and make full-width panel */
+@media (max-width:520px){
+  #manef-chat{ right:12px; bottom:12px; left:12px; align-items:center; }
+  .chat-panel{ width: 100%; border-radius:12px; max-height: 78vh; }
+  .chat-body{ max-height: 52vh; }
+  .chat-toggle{ width:56px; height:56px; }
+}
+
+/* accessibility: prefer-reduced-motion for chat animations */
+@media (prefers-reduced-motion: reduce){
+  .modal-shell, .drawer-shell, .chat-panel, .hero-slide { transition: none !important; animation: none !important; }
+}
+
+/* small niceties: focus and hover states for buttons in cart/modal/chat */
+.btn:focus, .icon-btn:focus { box-shadow: 0 10px 26px rgba(99,102,241,0.08); transform: translateY(-1px); }
+.button-glow{ box-shadow: 0 16px 48px rgba(255,107,61,0.12); transform: translateZ(0); }
+
+/* ============================
+   END styling for cart, modals & chat
+   ============================ */
+</style>
 
 </head>
 <body>
