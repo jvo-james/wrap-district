@@ -24,224 +24,378 @@
 <!-- ----- OPTIONAL: Favicons (replace with your files) ----- -->
 <link rel="icon" href="/favicon.ico" />
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-
 <style>
+/* =========================
+  WRAP DISTRICT — COMPLETE REPLACEMENT STYLES
+  (Drop-in <style> block — replaces existing styles)
+  Goals addressed:
+  1) Fix clickability (no invisible overlays / pointer-events issues)
+  2) Chatbot pinned bottom-right
+  3) Provide easy CSS-based image replacements (use --img-* variables)
+  4) Small-screen header: logo left, cart+hamburger right
+  5) Small-screen hero = ~50vh
+  6) Stylish "all / shawarma / fries / angwamo / rice" toggles
+  7) Mobile-specific, override full-menu layout (new card style)
+  8) Hero slideshow contrast and working controls
+  -------------------------
+  NOTE: This file intentionally contains full, self-contained tokens
+  and mobile overrides so you can delete your old CSS and paste this.
+========================= */
 
-
+/* --- Design tokens --- */
 :root{
   --bg: #0b0b0b;
-  --card: #ffffff;
-  --muted: #9aa0a6;
+  --panel: #ffffff;
+  --muted: #8b9096;
   --accent: #ff6b3d;
   --accent-2: #ffc857;
   --accent-3: #ff3d6e;
   --glass: rgba(255,255,255,0.06);
-  --overlay-strong: rgba(0,0,0,0.48);
+  --overlay: rgba(0,0,0,0.45);
   --max-width: 1200px;
   --radius: 14px;
-  --header-h: 64px;
+  --header-h: 72px;
   --text-hero: 'Playfair Display', serif;
   --text-ui: 'Montserrat', sans-serif;
+  --img-hero-shawarma: url('hero-shawarma-large.jpg');
+  --img-hero-fries: url('hero-fries-large.jpg');
+  --img-hero-angwamo: url('hero-angwamo-large.jpg');
+  --img-thumb-shawarma: url('thumb-shawarma.jpg');
+  --img-thumb-fries: url('thumb-fries.jpg');
+  --img-thumb-angwamo: url('thumb-angwamo.jpg');
+  --img-promo-shawarma: url('promo-shawarma.jpg');
+  --img-promo-fries: url('promo-fries.jpg');
+  --img-about: url('about-kitchen.jpg');
+  --z-header: 1200;
+  --z-chat: 1400;
+  --z-drawer: 1300;
+  --z-overlay: 1350;
+  --transition-fast: 180ms;
+  --transition-mid: 360ms;
 }
 
-/* ---------------------------------------
-   SAFETY: ensure nothing globally blocks clicks
-   --------------------------------------- */
-*{ -webkit-tap-highlight-color: transparent; }
-html,body{ height:100%; }
+/* --- Base reset / utilities --- */
+* { box-sizing: border-box; -webkit-tap-highlight-color: rgba(0,0,0,0); }
+html,body{ height:100%; margin:0; padding:0; font-family:var(--text-ui); background: #fff; color:#111; -webkit-font-smoothing:antialiased; }
+.container{ width:100%; max-width:var(--max-width); margin:0 auto; padding:0 18px; }
 
-/* Remove accidental pointer blocking from wrapper elements */
-.overlay-dim{ pointer-events: none; }
-.overlay-dim.active{ pointer-events: auto; }
+/* ensure anchors & buttons are clickable and show pointer */
+a, button { cursor: pointer; -webkit-appearance:none; -moz-appearance:none; appearance:none; }
+a, button, input, select, textarea { touch-action: manipulation; }
 
-/* Make sure interactive controls are always clickable and above overlays */
-a, button, input, label, select, textarea { pointer-events: auto !important; cursor: pointer !important; -webkit-user-select: none; }
+/* remove accidental page-covering elements
+   some previous styles used pointer-events: none on wrappers; we make interactive elements always reachable */
+.overlay-dim{ display:none; opacity:0; pointer-events:none; transition: opacity .24s ease; position:fixed; inset:0; background: rgba(0,0,0,0.48); z-index:var(--z-overlay); }
+.overlay-dim.active{ display:block; opacity:1; pointer-events:auto; }
 
-/* Important z-index reset for interactive areas */
-.site-header{ z-index: 2200 !important; position: fixed !important; top:0; left:0; right:0; }
-.header-inner{ align-items:center; }
-
-/* Ensure top header never blocks inner page focus targets */
-.site-header, .site-header *{ pointer-events:auto; }
-
-/* A safety net: if something had pointer-events:none on a large element (blocking clicks),
-   this makes the primary interactive containers accept pointer-events explicitly. */
-.hero-carousel-wrap, .hero-slide, .slide-panel, .carousel-controls, .menu-grid, .menu-item, .menu-filters, .header-actions { pointer-events: auto !important; }
-
-/* ---------------------------------------
-   TYPOS + BASE
-   --------------------------------------- */
-body{ font-family:var(--text-ui); background:#fff; color:#111; margin:0; -webkit-font-smoothing:antialiased; }
-.container{ width:100%; max-width:var(--max-width); margin:0 auto; padding:0 18px; box-sizing:border-box; }
-
-/* ---------------------------------------
-   HEADER (mobile-first) — logo left, actions right on small
-   --------------------------------------- */
-.site-header{ height:var(--header-h); display:flex; align-items:center; justify-content:center; background: linear-gradient(180deg, rgba(255,255,255,0.94), rgba(255,255,255,0.9)); box-shadow: 0 6px 18px rgba(15,15,15,0.06); }
+/* --- Header --- */
+.site-header{
+  position:fixed; inset:0 0 auto 0; height:var(--header-h);
+  display:flex; align-items:center; justify-content:center;
+  z-index:var(--z-header); background: rgba(255,255,255,0.96);
+  border-bottom:1px solid rgba(16,16,16,0.04); box-shadow: 0 6px 18px rgba(15,15,15,0.06);
+  backdrop-filter: blur(6px);
+}
 .header-inner{ display:flex; align-items:center; gap:12px; width:100%; padding:8px 0; }
-.brand{ display:flex; align-items:center; gap:10px; text-decoration:none; color:inherit; }
-.logo{ width:44px; height:44px; border-radius:10px; display:grid; place-items:center; background: linear-gradient(135deg,var(--accent),var(--accent-2)); color:#fff; }
-.brand-text{ display:block; }
 
-/* header actions grouped on right */
-.header-actions{ display:flex; gap:8px; align-items:center; margin-left:auto; }
-.icon-btn{ display:inline-grid; place-items:center; width:44px; height:44px; border-radius:10px; background:transparent; border:0; }
-.btn{ border-radius:12px; padding:10px 14px; font-weight:700; border:0; }
-.btn-cta{ background: linear-gradient(90deg,var(--accent),var(--accent-2)); color:#111; }
+/* brand left / actions right layout - mobile-first */
+.brand{ display:flex; gap:12px; align-items:center; text-decoration:none; color:inherit; flex:0 0 auto; }
+.logo{ width:44px; height:44px; border-radius:10px; display:grid; place-items:center;
+  background: linear-gradient(135deg,var(--accent),var(--accent-2)); color:#111; font-weight:900; font-size:18px; box-shadow: 0 8px 20px rgba(255,107,61,0.12); }
+.brand-text{ display:none; line-height:1; }
+.header-actions{ margin-left:auto; display:flex; gap:8px; align-items:center; }
 
-/* MOBILE: logo left, cart + hamburger right */
-@media (max-width:979px){
-  .header-inner{ justify-content:space-between; }
-  .brand{ order:1; }
-  .brand-text{ display:none; }
-  .header-actions{ order:2; }
-  .hamburger{ display:inline-grid; }
+/* main nav desktop */
+.main-nav{ display:none; margin-left:16px; flex:1; }
+.nav-list{ list-style:none; display:flex; gap:14px; margin:0; padding:0; align-items:center; }
+.nav-link{ text-decoration:none; color:#222; padding:8px 12px; border-radius:12px; font-weight:600; display:inline-flex; gap:8px; align-items:center; transition: transform var(--transition-fast), box-shadow var(--transition-fast); }
+.nav-link:focus, .nav-link:hover{ transform:translateY(-4px); box-shadow: 0 12px 36px rgba(16,16,16,0.06); }
+
+/* header icon button */
+.icon-btn{ display:inline-grid; place-items:center; width:44px; height:44px; border-radius:10px; border:0; background:transparent; font-size:1.02rem; color:inherit; }
+.icon-btn:focus{ outline:3px solid rgba(99,102,241,0.12); outline-offset:4px; border-radius:10px; }
+
+/* CTA */
+.btn{ display:inline-flex; align-items:center; gap:8px; border:0; border-radius:12px; padding:10px 14px; font-weight:800; }
+.btn-cta{ background: linear-gradient(90deg,var(--accent),var(--accent-2)); color:#111; box-shadow: 0 12px 36px rgba(255,107,61,0.08); }
+.btn-outline{ background:transparent; border:1px solid rgba(16,16,16,0.06); color:#222; }
+.hamburger{ display:inline-grid; }
+
+/* --- Hero --- */
+/* default: hero occupies full available area minus header on large screens;
+   on small screens we override to ~50vh (user request #5) */
+.hero-section.hero-viewport{
+  position:relative; margin-top:var(--header-h); overflow:visible;
+  min-height: calc(100vh - var(--header-h));
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.01));
+  display:block; padding:18px 0;
+}
+.hero-viewport-inner{ display:flex; gap:22px; align-items:stretch; width:100%; }
+
+/* carousel container */
+.hero-carousel-wrap{
+  position:relative; flex:1 1 720px; min-height: calc(100vh - var(--header-h) - 56px);
+  border-radius:20px; overflow:hidden; box-shadow: 0 24px 70px rgba(15,15,15,0.06);
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
 }
 
-/* DESKTOP header: show full nav */
-@media (min-width:980px){
-  .main-nav{ display:block; margin-left:16px; }
-  .header-actions{ margin-left:auto; }
-  .brand-text{ display:block; }
-}
-
-/* ---------------------------------------
-   HERO — compact on small screens, improved contrast & slideshow visibility
-   --------------------------------------- */
-.hero-section.hero-viewport{ position:relative; margin-top:var(--header-h); min-height: calc(100vh - var(--header-h)); overflow:hidden; background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.02)); }
-.hero-viewport-inner{ display:flex; gap:22px; align-items:stretch; padding:28px 0; }
-.hero-carousel-wrap{ position:relative; flex:1 1 720px; border-radius:20px; overflow:hidden; box-shadow: 0 24px 70px rgba(15,15,15,0.08); }
+/* stage & slides */
 .carousel-stage{ position:relative; width:100%; height:100%; }
-.hero-slide{ position:absolute; inset:0; display:flex; align-items:center; justify-content:flex-start; gap:28px; padding:36px; box-sizing:border-box; transition: opacity .45s ease, transform .45s ease; opacity:0; pointer-events:none; }
-.hero-slide.active{ opacity:1; pointer-events:auto; transform: none !important; }
+.hero-slide{
+  position:absolute; inset:0; display:flex; gap:28px; align-items:center;
+  padding:28px; transition: opacity .45s ease, transform .45s cubic-bezier(.2,.9,.2,1);
+  opacity:0; pointer-events:none; transform: translateY(6px);
+  will-change: opacity, transform;
+}
+.hero-slide.active{ opacity:1; pointer-events:auto; transform: translateY(0); z-index:2; }
 
-/* slide artwork: add dark overlay so text is readable */
-.slide-artwork{ position:relative; width:60%; height:100%; border-radius:18px; overflow:hidden; background:linear-gradient(160deg, rgba(0,0,0,0.15), rgba(0,0,0,0.06)); }
-.slide-artwork::after{ content:""; position:absolute; inset:0; background: linear-gradient(180deg, rgba(0,0,0,0.36), rgba(0,0,0,0.14)); pointer-events:none; }
-.slide-artwork img.slide-image{ width:100%; height:100%; object-fit:cover; display:block; filter: contrast(1.02) saturate(1.06) brightness(.84); transition: transform .9s cubic-bezier(.22,.9,.18,1), filter .45s ease; }
-.slide-panel{ width:40%; min-width:260px; display:flex; flex-direction:column; gap:14px; padding:28px; border-radius:14px; background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.02)); backdrop-filter: blur(6px); box-shadow: 0 12px 30px rgba(12,12,12,0.06); color:#111; }
+/* slide artwork: provide CSS fallback backgrounds so images always visible */
+.slide-artwork{
+  flex-shrink:0; width:60%; height:100%; border-radius:18px; overflow:hidden; position:relative;
+  background: linear-gradient(160deg, rgba(0,0,0,0.18), rgba(0,0,0,0.06));
+}
+.slide-artwork img.slide-image{ width:100%; height:100%; object-fit:cover; display:block; transition: transform .9s ease, filter .6s ease; filter: saturate(1.03) contrast(1.02); }
 
-/* Ensure text is legible on image-heavy slides */
-.hero-slide .hero-title{ color:inherit; }
-.hero-sub{ color: #333; }
+/* CSS image fallback: if <img> src empty, use CSS var image */
+.slide-artwork[data-img]{
+  background-image: linear-gradient(120deg, rgba(0,0,0,0.18), rgba(0,0,0,0.08));
+  background-size: cover; background-position:center;
+}
+/* allow author to set --img-hero-* variables on :root or override per element */
+.slide-artwork[data-img="hero-shawarma-large"]{ background-image: linear-gradient(120deg, rgba(0,0,0,0.18), rgba(0,0,0,0.06)), var(--img-hero-shawarma); }
+.slide-artwork[data-img="hero-fries-large"]{ background-image: linear-gradient(120deg, rgba(0,0,0,0.18), rgba(0,0,0,0.06)), var(--img-hero-fries); }
+.slide-artwork[data-img="hero-angwamo-large"]{ background-image: linear-gradient(120deg, rgba(0,0,0,0.18), rgba(0,0,0,0.06)), var(--img-hero-angwamo); }
 
-/* CTA row improvements */
-.hero-ctas{ display:flex; gap:10px; flex-wrap:wrap; }
-.btn-cta{ padding:12px 16px; border-radius:12px; }
-.btn-outline{ padding:10px 14px; border:1px solid rgba(16,16,16,0.06); background:transparent; }
+/* slide panel (text) — make it readable with strong overlay */
+.slide-panel{
+  width:38%; min-width:260px; padding:22px; border-radius:14px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(255,255,255,0.96));
+  box-shadow: 0 12px 36px rgba(12,12,12,0.06); color:#111; transform: translateY(8px);
+}
+.hero-slide:not(.active) .slide-panel{ opacity:0; transform:translateY(18px); pointer-events:none; }
 
-/* carousel controls visibility */
-.carousel-controls{ position:absolute; bottom:18px; left:18px; display:flex; align-items:center; gap:10px; z-index:60; }
-.carousel-prev, .carousel-next{ width:44px; height:44px; border-radius:10px; display:inline-grid; place-items:center; border:0; background: rgba(255,255,255,0.92); box-shadow: 0 10px 26px rgba(16,16,16,0.08); }
-.carousel-dots{ display:flex; gap:8px; align-items:center; padding:4px; background: rgba(255,255,255,0.84); border-radius:999px; }
-
-/* On smaller screens, make hero half the viewport height as requested */
+/* small screens: slide panel overlays image with dark glass for contrast */
 @media (max-width:979px){
-  .hero-section.hero-viewport{ min-height: 50vh !important; margin-top: var(--header-h); }
-  .hero-viewport-inner{ padding:18px 0; }
-  .hero-carousel-wrap{ min-height: calc(50vh - 32px); border-radius:14px; }
-  .slide-artwork{ width:100%; height:50vh; border-radius:12px; }
-  .slide-panel{ position:absolute; left:14px; right:14px; bottom:18px; width:auto; background: linear-gradient(180deg, rgba(0,0,0,0.44), rgba(0,0,0,0.22)); color:white; padding:14px; }
-  .slide-panel .eyebrow, .slide-panel .hero-features, .hero-sub{ color: rgba(255,255,255,0.92); }
-  .hero-title{ color:#fff; font-size: clamp(1.4rem, 6.5vw, 2.2rem); }
-  .carousel-controls{ left:12px; bottom:12px; }
-  .hero-stickers{ right:12px; top:calc(var(--header-h) + 8px); }
+  .hero-section.hero-viewport{ min-height:50vh; } /* user-requested: hero becomes half screen */
+  .hero-viewport-inner{ padding:12px 0; }
+  .hero-carousel-wrap{ border-radius:14px; min-height: calc(50vh - 12px); }
+  .slide-artwork{ width:100%; height:62vh; border-radius:14px; }
+  .slide-panel{
+    position:absolute; left:14px; right:14px; bottom:18px; width:auto;
+    background: linear-gradient(180deg, rgba(0,0,0,0.62), rgba(0,0,0,0.44)); color:white; backdrop-filter: blur(8px);
+  }
+  .slide-panel .eyebrow, .slide-panel .hero-features, .slide-panel .hero-sub{ color: rgba(255,255,255,0.9); }
+  .hero-title{ color:white; }
 }
 
-/* ---------------------------------------
-   MENU FILTER TOGGLES — stylised
-   --------------------------------------- */
-.menu-filters{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-bottom:12px; }
-.menu-filters .filter{ appearance:none; border:0; padding:10px 14px; border-radius:999px; font-weight:800; background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(250,250,250,0.96)); box-shadow: 0 10px 30px rgba(12,12,12,0.04); transition: transform .18s ease, box-shadow .18s ease, background .18s ease; }
-.menu-filters .filter i{ margin-right:8px; opacity:0.9; }
-.menu-filters .filter:hover{ transform: translateY(-3px); box-shadow: 0 20px 60px rgba(12,12,12,0.06); }
-.menu-filters .filter.active{ background: linear-gradient(90deg, var(--accent), var(--accent-2)); color:#111; box-shadow: 0 18px 50px rgba(255,107,61,0.08); }
+/* slide badges / stickers */
+.slide-badges{ position:absolute; left:16px; top:16px; display:flex; gap:8px; z-index:4; }
+.badge{ display:inline-flex; gap:8px; align-items:center; padding:8px 10px; border-radius:999px; background: rgba(0,0,0,0.48); color:white; font-weight:700; }
 
-/* Make filters horizontally scrollable on narrow devices with snapping */
-@media (max-width:520px){
-  .menu-filters{ overflow-x:auto; -webkit-overflow-scrolling:touch; scroll-snap-type:x mandatory; gap:12px; padding-bottom:8px; }
-  .menu-filters .filter{ min-width:110px; scroll-snap-align:center; flex:0 0 auto; }
+/* CTA row inside panel */
+.hero-ctas{ display:flex; gap:10px; flex-wrap:wrap; margin-top:6px; }
+
+/* carousel controls — ensure clickable by setting high z-index and pointer-events */
+.carousel-controls{
+  position:absolute; bottom:18px; left:18px; display:flex; gap:10px; align-items:center; z-index:60;
+  pointer-events:auto;
 }
-
-/* ---------------------------------------
-   FULL MENU — mobile redesign override
-   - On small screens we show large swipeable cards
-   --------------------------------------- */
-.menu-grid{ display:grid; grid-template-columns: repeat(2,1fr); gap:16px; margin-top:8px; }
-.menu-item{ background: linear-gradient(180deg, rgba(255,255,255,0.99), rgba(250,250,250,0.98)); border-radius:14px; overflow:hidden; display:flex; flex-direction:column; gap:10px; box-shadow: 0 18px 56px rgba(12,12,12,0.06); border:1px solid rgba(16,16,16,0.04); }
-.menu-item .thumb{ width:100%; aspect-ratio:16/11; display:block; background:#f6f6f6; }
-.menu-item .thumb img{ width:100%; height:100%; object-fit:cover; display:block; }
-.menu-item .meta{ padding:12px 14px; }
-
-@media (max-width:979px){
-  /* Entirely different design for menu on small screens */
-  .menu-grid{ display:flex; gap:12px; overflow-x:auto; padding-bottom:12px; -webkit-overflow-scrolling:touch; scroll-snap-type:x mandatory; }
-  .menu-item{ min-width: 78%; flex: 0 0 auto; scroll-snap-align:center; border-radius:12px; }
-  .menu-item .thumb{ aspect-ratio: 16/9; }
-  .menu-item .meta{ padding:14px; background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(250,250,250,0.96)); }
-  .menu-item .meta-line{ margin-top:12px; display:flex; align-items:center; gap:8px; }
+.carousel-prev, .carousel-next{
+  width:44px; height:44px; border-radius:10px; display:inline-grid; place-items:center; border:0;
+  background: rgba(255,255,255,0.9); box-shadow: 0 10px 26px rgba(16,16,16,0.08);
 }
+.carousel-dots{ display:flex; gap:8px; align-items:center; padding:6px; background: rgba(255,255,255,0.86); border-radius:999px; }
 
-/* Desktop grid: 3 columns */
+/* ensure dots are recognizable */
+.dot{ width:10px; height:10px; border-radius:999px; display:inline-grid; place-items:center; background: rgba(0,0,0,0.12); padding:6px; }
+.dot.active{ background: var(--accent); transform:scale(1.15); box-shadow: 0 6px 18px rgba(255,107,61,0.12); }
+
+/* ensure carousel is accessible and interactive */
+.hero-carousel-wrap, .carousel-controls, .carousel-dots, .hero-slide.active { pointer-events: auto; }
+
+/* ensure floating stickers do not capture pointer events */
+.hero-stickers{ position:absolute; right:18px; top:18px; display:flex; flex-direction:column; gap:12px; z-index:30; pointer-events:none; }
+
+/* right quick-picks aside (desktop) */
+.hero-right.quick-picks-section{ width:320px; display:none; }
 @media (min-width:980px){
-  .menu-grid{ grid-template-columns: repeat(3, 1fr); gap:20px; }
+  .main-nav{ display:block; }
+  .brand-text{ display:block; }
+  .hero-right.quick-picks-section{ display:block; }
+  .hero-carousel-wrap{ flex-basis:68%; min-height: calc(100vh - var(--header-h) - 40px); }
+  .slide-artwork{ width:62%; }
+  .slide-panel{ width:36%; }
 }
 
-/* ---------------------------------------
-   HERO SLIDES: make sure the text contrast works
-   and slideshow controls are easy to reach
-   --------------------------------------- */
-.hero-slide .slide-panel{ z-index:40; }
-.slide-badges .badge{ background: rgba(0,0,0,0.48); color:white; }
-.hero-slide .hero-title{ font-family:var(--text-hero); }
+/* --- Drawer, Modal & Overlay fixes (clickability) --- */
+/* ensure drawer wrapper doesn't block clicks when closed; when open it should receive pointer events */
+.drawer{ position:fixed; z-index:var(--z-drawer); right:0; top:0; height:100vh; display:flex; flex-direction:column; pointer-events:none; transition: transform .32s ease, opacity .28s ease; opacity:0; transform: translateX(8px); }
+.drawer:not([hidden]){ pointer-events:auto; opacity:1; transform: translateX(0); }
+.drawer-shell{ width:min(420px, 94vw); max-width:420px; height:100%; background: linear-gradient(180deg, #fff, #fbfbfb); border-radius:18px 0 0 18px; box-shadow: 0 40px 120px rgba(8,8,8,0.12); padding:18px; overflow:auto; pointer-events:auto; }
 
-/* Ensure the slideshow is interactive (pointer events) */
-.hero-slide, .hero-slide *{ pointer-events:auto !important; }
+/* modal */
+.modal{ position:fixed; inset:0; display:flex; align-items:center; justify-content:center; z-index:var(--z-drawer); pointer-events:none; opacity:0; transition: opacity .26s ease; }
+.modal:not([hidden]){ pointer-events:auto; opacity:1; }
+.modal-shell{ width:min(1100px, calc(100vw - 36px)); background:#fff; border-radius:16px; box-shadow: 0 40px 140px rgba(8,8,8,0.22); padding:18px; }
 
-/* Slight improvement to slide active transitions */
-.hero-slide{ transition: opacity .42s cubic-bezier(.2,.9,.2,1), transform .42s cubic-bezier(.2,.9,.2,1); }
+/* toasts */
+.wrap-toaster{ position:fixed; right:18px; bottom:18px; z-index:1500; background: rgba(16,16,16,0.92); color:#fff; padding:12px 16px; border-radius:12px; opacity:0; transform: translateY(6px); transition: opacity .22s ease, transform .24s ease; pointer-events:none; }
+.wrap-toaster.visible{ opacity:1; transform: translateY(0); pointer-events:auto; }
 
-/* ---------------------------------------
-   CHATBOT — bottom-right and always clickable
-   --------------------------------------- */
-#manef-chat{ position: fixed !important; right:18px; bottom:18px; z-index: 3000 !important; display:flex; flex-direction:column; gap:8px; align-items:flex-end; }
-.chat-toggle{ width:62px; height:62px; border-radius:999px; display:inline-grid; place-items:center; background: linear-gradient(135deg, var(--accent-2), var(--accent)); color:white; box-shadow: 0 18px 48px rgba(255,107,61,0.12); border:0; cursor:pointer; }
-.chat-panel{ width:var(--chat-width, 340px); max-width: calc(100vw - 36px); border-radius:14px; box-shadow: 0 40px 120px rgba(8,8,8,0.18); overflow:hidden; display:flex; flex-direction:column; pointer-events:auto; }
-.chat-panel[hidden]{ display:none !important; }
+/* --- Chatbot pinned bottom-right (user request #2) --- */
+#manef-chat{ position:fixed; right:18px; bottom:18px; z-index:var(--z-chat); display:flex; flex-direction:column; gap:8px; align-items:flex-end; pointer-events:auto; }
+.chat-toggle{ width:62px; height:62px; border-radius:999px; display:inline-grid; place-items:center; background: linear-gradient(135deg,var(--accent-2),var(--accent)); color:#111; border:0; box-shadow: 0 18px 48px rgba(255,107,61,0.12); }
+.chat-panel{ width: var(--chat-width, 360px); max-width: calc(100vw - 36px); background:#fff; border-radius:14px; box-shadow: 0 40px 120px rgba(8,8,8,0.18); overflow:hidden; display:flex; flex-direction:column; pointer-events:auto; transition: transform .28s ease, opacity .22s; }
+.chat-panel[hidden]{ opacity:0; transform: translateY(6px) scale(.98); pointer-events:none; }
+@media (max-width:520px){ #manef-chat{ right:12px; bottom:12px; left:auto; } .chat-panel{ width:100%; border-radius:12px; } }
 
+/* --- Fast Picks & Promo images via CSS variables (3) --- */
+#fast-picks .featured-card, .promo-collage .collage-item, .about-media{
+  background-size:cover;background-position:center;background-repeat:no-repeat;
+}
+.promo-collage .collage-item.big{ background-image: var(--img-promo-shawarma); }
+.promo-collage .collage-item.medium{ background-image: var(--img-promo-fries); }
+.about-media{ background-image: var(--img-about); }
+
+/* also ensure <img> elements with empty src do not occupy space (so CSS backgrounds show through) */
+img.slide-image[src=""], img[data-artwork][src=""]{ display:block; visibility:hidden; width:100%; height:100%; }
+
+/* --- Menu filters toggles (stylish) --- */
+.menu-filters{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-bottom:14px; }
+.menu-filters .filter{
+  appearance:none; border:0; background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(250,250,250,0.96));
+  padding:8px 12px; border-radius:999px; font-weight:800; box-shadow: 0 10px 30px rgba(12,12,12,0.04);
+  display:inline-flex; gap:8px; align-items:center; transition: transform .18s ease, box-shadow .18s ease;
+}
+.menu-filters .filter:hover{ transform: translateY(-4px); box-shadow: 0 20px 60px rgba(12,12,12,0.06); }
+.menu-filters .filter.active{
+  background: linear-gradient(90deg, var(--accent), var(--accent-2)); color:#111; box-shadow: 0 18px 60px rgba(255,107,61,0.12);
+  position:relative;
+}
+.menu-filters{ -webkit-overflow-scrolling: touch; }
+
+/* small-screen menu filters: make it a scrollable segmented control */
 @media (max-width:520px){
-  #manef-chat{ right:12px; left:12px; bottom:12px; align-items:center; }
-  .chat-panel{ width:100%; max-height:78vh; border-radius:12px; }
+  .menu-filters{ overflow-x:auto; gap:10px; padding:6px 2px; scrollbar-width:none; -ms-overflow-style:none; }
+  .menu-filters::-webkit-scrollbar{ display:none; }
 }
 
-/* ---------------------------------------
-   FOCUS / ACCESSIBILITY small niceties
-   --------------------------------------- */
-a:focus, button:focus, input:focus, .icon-btn:focus{ outline: 3px solid rgba(99,102,241,0.12); outline-offset:3px; border-radius:8px; }
+/* --- Menu grid & items --- */
+/* Desktop: grid columns set at 3 (below we override for mobile) */
+.menu-section{ padding:28px 0; }
+.menu-grid{
+  display:grid; grid-template-columns: repeat(2,1fr); gap:16px; margin-top:8px; align-items:start;
+}
+.menu-item{
+  background: linear-gradient(180deg, rgba(255,255,255,0.99), rgba(250,250,250,0.98));
+  border-radius:14px; overflow:hidden; display:flex; flex-direction:column; gap:10px; box-shadow: 0 18px 56px rgba(12,12,12,0.06);
+  border:1px solid rgba(16,16,16,0.04); transition: transform .28s cubic-bezier(.2,.9,.2,1), box-shadow .28s;
+}
+.menu-item:hover{ transform: translateY(-8px); box-shadow: 0 36px 120px rgba(12,12,12,0.10); }
 
-/* Ensure links and buttons are visible as interactive elements */
-a, button{ -webkit-tap-highlight-color: rgba(0,0,0,0.04); }
+/* thumb area: use CSS var fallback if <img> missing */
+.menu-item .thumb{ width:100%; aspect-ratio:16/11; background:#f6f6f6; position:relative; display:block; overflow:hidden; }
+.menu-item .thumb img{ width:100%; height:100%; object-fit:cover; display:block; transition: transform 8s ease; }
+.menu-item .thumb[data-thumb="thumb-shawarma"]{ background-image: var(--img-thumb-shawarma); }
+.menu-item .thumb[data-thumb="thumb-fries"]{ background-image: var(--img-thumb-fries); }
+.menu-item .thumb[data-thumb="thumb-angwamo"]{ background-image: var(--img-thumb-angwamo); }
 
-/* ---------------------------------------
-   CAROUSEL FALLBACK: if JS didn't initialize, make first slide visible
-   (this helps when slideshow "doesn't work")
-   --------------------------------------- */
-.carousel-stage .hero-slide{ position:relative; opacity:0; pointer-events:none; transform: translateY(6px); }
-.carousel-stage .hero-slide:first-of-type{ opacity:1; pointer-events:auto; transform:none; }
+/* price badge overlay */
+.menu-item .thumb::after{
+  content: attr(data-price) "";
+  position:absolute; right:10px; top:10px; padding:8px 12px; border-radius:999px; font-weight:900; font-size:0.95rem;
+  background: linear-gradient(90deg,var(--accent-2),var(--accent)); color:#111; box-shadow: 0 10px 30px rgba(255,107,61,0.10);
+}
 
-/* Make the dots & controls highly visible on top of images */
-.carousel-controls{ z-index:80; }
-.carousel-prev, .carousel-next{ z-index:82; }
-.carousel-dots{ z-index:82; }
+/* Card meta */
+.menu-item .meta{ padding:12px 14px 16px; display:flex; flex-direction:column; gap:8px; }
+.menu-item .name{ font-family:var(--text-hero); font-size:1.02rem; margin:0; display:flex; gap:8px; align-items:center; }
+.menu-item .desc{ margin:0; color:var(--muted); font-size:0.92rem; }
 
+/* action row */
+.menu-item .meta-line{ display:flex; align-items:center; gap:8px; margin-top:6px; }
+.menu-item .price{ font-weight:900; font-size:1rem; color:#111; display:inline-flex; gap:8px; align-items:center; }
 
-:focus{ outline-offset:3px; }
+/* mobile-first: make buttons big and touch-friendly */
+.menu-item .btn.small, .menu-item .btn.btn-pay.small{ padding:10px 14px; border-radius:10px; font-weight:800; font-size:0.96rem; }
 
-/* make sure the header target anchor offset still works */
-:target::before{ content: ""; display:block; height: calc(var(--header-h) + 12px); margin-top: calc(-1 * (var(--header-h) + 12px)); }
+/* Desktop layout */
+@media (min-width:980px){
+  .menu-grid{ grid-template-columns: repeat(3,1fr); gap:20px; }
+  .menu-item{ border-radius:16px; }
+  .menu-item .meta{ padding:14px; }
+}
 
+/* --- MOBILE: Entirely different style for full menu (user request #7) --- */
+@media (max-width:520px){
+  /* menu filters already made scrollable above */
+  /* menu-grid becomes a single-column, edge-to-edge card stack with large imagery */
+  .menu-grid{ grid-template-columns: 1fr; gap:12px; margin:8px 0; }
+  .menu-item{
+    display:grid; grid-template-columns: 40% 1fr; gap:10px; align-items:center; padding:10px; border-radius:12px;
+    background: linear-gradient(180deg, #fff, #fff); box-shadow: 0 18px 48px rgba(12,12,12,0.06);
+  }
+  .menu-item .thumb{ width:100%; aspect-ratio: 3/4; border-radius:10px; flex:0 0 auto; background-size:cover; background-position:center; }
+  .menu-item .thumb img{ display:none; } /* prefer CSS backgrounds to simplify image swapping */
+  .menu-item .meta{ padding:0; }
+  .menu-item .meta-line{ margin-top:8px; align-items:center; }
+  .menu-item .btn.small{ padding:10px 12px; font-size:0.95rem; }
+  /* make the 'Add' button sticky full-width in each card */
+  .menu-item .meta .meta-actions{ display:flex; gap:8px; margin-left:auto; }
+}
 
+/* --- About / Promo / Fast Picks styling --- */
+#promo.promo-radiant{ margin:28px auto; padding:22px; border-radius:20px; position:relative; background: linear-gradient(135deg, rgba(255,240,230,0.98), rgba(255,250,242,0.96)); box-shadow: 0 40px 140px rgba(255,133,88,0.06); border:1px solid rgba(255,120,66,0.06); }
+.promo-collage .collage-item{ position:absolute; border-radius:16px; box-shadow: 0 20px 60px rgba(12,12,12,0.08); outline: 4px solid rgba(255,255,255,0.12); }
+.promo-collage .collage-item.big{ width:260px;height:260px; left:40px; top:10px; transform:rotate(-6deg); }
+.promo-collage .collage-item.medium{ width:160px;height:160px; right:18px; top:40px; transform:rotate(4deg); }
+.promo-collage .collage-item.small{ width:120px;height:120px; right:-8px; bottom:-6px; transform:rotate(-4deg); }
+
+/* ensure featured-card background / images show */
+#fast-picks .featured-card{ position:relative; padding:18px; border-radius:16px; }
+
+/* --- Testimonials / About / Footer --- */
+.about-media{ height:240px; border-radius:14px; overflow:hidden; display:grid; place-items:center; background-size:cover; background-position:center; box-shadow: 0 22px 60px rgba(12,12,12,0.06); border:1px solid rgba(16,16,16,0.04); }
+@media (min-width:980px){ .about-media{ height:360px; border-radius:18px; } }
+
+/* footer */
+.site-footer{ padding:24px 0 36px; background: linear-gradient(180deg, rgba(7,7,7,0.96), rgba(12,12,12,0.98)); color:#f2f3f5; border-top:1px solid rgba(255,255,255,0.02); }
+.footer-inner{ max-width:var(--max-width); margin:0 auto; padding:8px 18px; display:grid; gap:18px; }
+@media (min-width:980px){ .footer-inner{ grid-template-columns: 1fr 1fr 320px; } }
+
+/* --- Accessibility / focus styles --- */
+:focus{ outline-offset:4px; }
+a:focus, button:focus, input:focus, textarea:focus { outline: 3px solid rgba(99,102,241,0.12); border-radius:8px; }
+
+/* --- small niceties (shadows, transitions) --- */
+.btn, .icon-btn, .filter, .menu-item{ transition: box-shadow var(--transition-fast), transform var(--transition-fast); }
+
+/* --- defensive fixes for click blocking issues many devs accidentally add ---
+   Ensure no full-screen invisible elements capture clicks unless explicitly active.
+   Common culprits: elements with high z-index + pointer-events:auto but zero opacity. We'll hide pointer events by default. */
+[role="presentation"], .invisible-cover, .cover-block { pointer-events:none; }
+.cover-block.active, .overlay-dim.active { pointer-events:auto; }
+
+/* --- Helpers for replacing images quickly ---
+   You can modify the :root --img-* variables to point to your images (eg: --img-thumb-fries: url('/images/my-fries.jpg'); )
+   Elements with data-img or data-thumb attributes will use the CSS backgrounds above as fallback.
+*/
+[data-img][data-img] { background-size: cover; background-position:center; background-repeat:no-repeat; }
+[data-img="hero-shawarma-large"]{ background-image: var(--img-hero-shawarma); }
+[data-img="hero-fries-large"]{ background-image: var(--img-hero-fries); }
+[data-img="hero-angwamo-large"]{ background-image: var(--img-hero-angwamo); }
+
+/* --- Reduced motion --- */
+@media (prefers-reduced-motion: reduce){ * { transition: none !important; animation: none !important; } }
+
+/* --- Final guard: ensure clickable elements are above decorative layers --- */
+button, a, .btn, .icon-btn, .carousel-controls, .menu-filters, .chat-toggle { position: relative; z-index: 9999; }
+
+/* END OF STYLE BLOCK - paste this entire <style>...</style> into your <head> and adjust --img-* variables at the top
+   to point to your image filenames. This CSS intentionally prefers CSS-backgrounds for flexibility so you can quickly
+   swap images by setting --img-xxx variables without editing HTML. */
 </style>
+
 
 </head>
 <body>
