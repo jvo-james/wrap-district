@@ -2704,6 +2704,208 @@ Breakpoint: <= 720px (phones) and finer at 420px
 @media (max-width:520px){
   .vd-dots{ justify-content:center; }
 }
+/* ---------- Premium Cart Drawer — Add after your existing cart styles ---------- */
+
+/* Make the drawer inner behave like a column so header stays visible and items can scroll */
+.drawer-shell {
+  display: flex;
+  flex-direction: column;
+  padding: 12px 16px;
+  gap: 12px;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+/* Keep header visible (already outside cart-body in your markup) */
+.drawer-head {
+  position: relative; /* keep in flow but above items */
+  z-index: 12;
+  background: transparent;
+  padding: 10px 6px;
+}
+
+/* cart-body becomes the flexible pane with scrollable items */
+.cart-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1 1 auto;          /* grows to fill available vertical space */
+  min-height: 0;           /* important for children overflow to work */
+  overflow: hidden;
+  padding-right: 6px;
+}
+
+/* Only the items list scrolls (header & summary stay visible) */
+.cart-items {
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 12px 6px;
+}
+
+/* Style for each cart item to match the image */
+.cart-item {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  background: #fff;
+  border-radius: 14px;
+  padding: 14px 16px;
+  box-shadow: 0 18px 40px rgba(12,12,12,0.06);
+  border: 1px solid rgba(16,16,16,0.03);
+  min-height: 96px;
+  align-items: center;
+}
+
+/* left circular thumbnail */
+.cart-item img {
+  width: 96px;
+  height: 96px;
+  border-radius: 999px;
+  object-fit: cover;
+  box-shadow: 0 12px 34px rgba(12,12,12,0.06);
+  flex-shrink: 0;
+}
+
+/* optional radio indicator on very left (like the mock) */
+.cart-item::before {
+  content: '';
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 3px solid rgba(255,100,140,0.12); /* unselected */
+  margin-right: 8px;
+  flex-shrink: 0;
+}
+.cart-item.selected::before {
+  background: #ff6b8a;
+  border-color: #ff6b8a;
+  box-shadow: 0 8px 26px rgba(255,107,140,0.12);
+}
+
+/* details block */
+.cart-item .details {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+.cart-item .details .name {
+  font-weight: 800;
+  font-size: 1rem;
+  color: #111;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.cart-item .details .desc {
+  font-size: 0.88rem;
+  color: var(--muted, #9aa0a6);
+}
+
+/* price & controls pane (right side of item) */
+.cart-item .meta {
+  margin-left: auto;
+  display:flex;
+  align-items:center;
+  gap: 18px;
+  min-width: 160px;
+}
+
+/* price style */
+.cart-item .price {
+  font-weight:900;
+  font-size:1.02rem;
+  color: #111;
+  margin-right: 6px;
+}
+
+/* quantity pill (pink rounded) */
+.qty-controls {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: linear-gradient(90deg,#ff9aa8,#ff6b8a);
+  padding: 8px 12px;
+  border-radius: 999px;
+  box-shadow: 0 18px 50px rgba(255,107,140,0.12);
+  color: white;
+  font-weight: 800;
+}
+.qty-controls button {
+  width: 30px; height: 30px; border-radius: 8px; border: 0; background: transparent; color: #fff; font-weight: 900;
+  cursor: pointer;
+}
+.qty-controls .qty-value { min-width: 18px; text-align:center; display:inline-block; }
+
+/* remove button on very right (icon inside small white card) */
+.cart-item .remove-item {
+  background: #fff;
+  border-radius: 10px;
+  border: 1px solid rgba(16,16,16,0.04);
+  width:46px; height:46px;
+  display:grid; place-items:center;
+  color: #ff6b8a;
+  box-shadow: 0 12px 36px rgba(255,107,140,0.06);
+  cursor:pointer;
+}
+
+/* cart summary (stays at bottom of the drawer) */
+.cart-summary {
+  flex: 0 0 auto;
+  padding: 14px;
+  background: linear-gradient(180deg,#fff,#fcfcfc);
+  border-radius: 14px;
+  box-shadow: 0 24px 70px rgba(12,12,12,0.06);
+  border: 1px solid rgba(16,16,16,0.04);
+}
+
+/* summary rows + CTA */
+.cart-summary .cart-row { display:flex; justify-content:space-between; align-items:center; padding:6px 0; font-weight:700; color:#222; }
+.cart-summary .cart-row.total { font-size:1.06rem; font-weight:900; margin-top:6px; }
+
+/* big pink checkout */
+.cart-summary .checkout {
+  width:100%;
+  margin-top:12px;
+  padding:12px 14px;
+  border-radius:12px;
+  background: linear-gradient(90deg,#ff9aa8,#ff6b8a);
+  color:#fff;
+  font-weight:900;
+  border:none;
+  box-shadow: 0 26px 80px rgba(255,107,140,0.12);
+}
+
+/* coupon row style (if you show coupon fields) */
+.cart-footer-row {
+  display:flex;
+  gap:12px;
+  align-items:center;
+  margin-top:12px;
+}
+.cart-footer-row input[type="text"] {
+  flex:1;
+  padding:10px 12px;
+  border-radius:10px;
+  border:1px solid rgba(16,16,16,0.04);
+}
+
+/* mobile: full-width panel, summary sticky overlay at bottom */
+@media (max-width:720px) {
+  .drawer-shell { padding:12px; }
+  .drawer-shell { border-radius: 12px 12px 0 0; }
+  .cart-summary {
+    position: sticky;
+    bottom: 12px;
+    margin-bottom: 6px;
+  }
+  .cart-item img { width:78px; height:78px; }
+  .qty-controls { padding:6px 10px; }
+}
 
   </style>
 </head>
@@ -3509,21 +3711,22 @@ const li = document.createElement('li');
 li.className = 'cart-item';
 li.dataset.index = idx;
 li.innerHTML = `
-<div style="display:flex;justify-content:space-between;gap:10px;align-items:center">
-<div>
-<strong>${esc(it.name)}</strong>
-<div class="muted small">${esc(it.optionsSummary || '')}</div>
-<div class="muted small">Unit: ${fmt(it.unitPrice)}</div>
-</div>
-<div style="text-align:right">
-<div>Qty: <strong>${it.qty}</strong></div>
-<div>${fmt(it.unitPrice * it.qty)}</div>
-<div style="margin-top:8px">
-<button class="icon-btn remove-item" data-index="${idx}" aria-label="Remove item"><i class="fa fa-trash"></i> Remove</button>
-</div>
-</div>
-</div>
+  <img src="${esc(it.image || '')}" alt="${esc(it.name)}" onerror="this.src='${IMAGES['thumb-shawarma'] || ''}'" />
+  <div class="details">
+    <strong class="name">${esc(it.name)}</strong>
+    <div class="desc">${esc(it.optionsSummary || '')}</div>
+  </div>
+  <div class="meta">
+    <div class="price">${fmt(it.unitPrice)}</div>
+    <div class="qty-controls" role="group" aria-label="Quantity controls">
+      <button type="button" data-action="qty-dec">−</button>
+      <div class="qty-value">${it.qty}</div>
+      <button type="button" data-action="qty-inc">+</button>
+    </div>
+    <button class="remove-item" data-index="${idx}" aria-label="Remove item"><i class="fa fa-trash"></i></button>
+  </div>
 `;
+
 list.appendChild(li);
 });
 
@@ -5276,5 +5479,56 @@ console.info('Wrap District script loaded — images will use local files when p
 
 })();
 </script>
+<script>
+  // --- Cart scroll / sizing helpers (add near your existing enhanceCart/bootstrap) ---
+(function cartLayoutHelpers(){
+  const drawer = document.querySelector('#cart-drawer');
+  if (!drawer) return;
+  const shell = drawer.querySelector('.drawer-shell');
+  const itemsList = drawer.querySelector('.cart-items');
+  const summary = drawer.querySelector('.cart-summary');
 
+  function setShellMaxHeight(){
+    const vh = Math.min(window.innerHeight, document.documentElement.clientHeight || Infinity);
+    shell.style.maxHeight = (vh) + 'px';
+  }
+  setShellMaxHeight();
+  window.addEventListener('resize', setShellMaxHeight);
+
+  // ensure items list is scrollable and summary always visible
+  if (itemsList) {
+    // when drawer opens, scroll to top and focus checkout for keyboard
+    document.querySelectorAll('[data-action="open-cart"], .cart-btn, .mini-cart .btn[data-action="view-cart"]').forEach(b => {
+      b.addEventListener('click', (e) => {
+        setTimeout(()=> {
+          itemsList.scrollTop = 0;
+          const checkout = drawer.querySelector('.checkout');
+          if (checkout) checkout.focus();
+        }, 120);
+      });
+    });
+
+    // delegate clicks for qty + / - buttons and remove
+    itemsList.addEventListener('click', (e) => {
+      const inc = e.target.closest('[data-action="qty-inc"]');
+      const dec = e.target.closest('[data-action="qty-dec"]');
+      const rem = e.target.closest('.remove-item');
+      if (inc || dec) {
+        const li = (inc || dec).closest('.cart-item');
+        if (!li) return;
+        const idx = Number(li.dataset.index);
+        if (isNaN(idx)) return;
+        // update model (your add/remove logic persists); adapt to your existing functions:
+        if (inc) { cart[idx].qty = (cart[idx].qty || 1) + 1; }
+        if (dec) { cart[idx].qty = Math.max(1, (cart[idx].qty || 1) - 1); }
+        persistCart(); // your existing function updates visuals
+      } else if (rem) {
+        const idx = Number(rem.closest('.cart-item').dataset.index);
+        if (!isNaN(idx)) { removeCartIndex(idx); }
+      }
+    });
+  }
+})();
+
+</script>
 </html>
