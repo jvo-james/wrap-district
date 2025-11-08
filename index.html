@@ -1140,97 +1140,158 @@ button, .icon-btn, .btn{touch-action:manipulation}
   'use strict';
 
   /* =========================
-     Utilities
+     LOCAL IMAGE MAP (update filenames here if different)
+     These point to files in the same folder as your HTML.
+     Use exact filenames (case-sensitive on many hosts).
      ========================= */
-  const $ = (sel, ctx = document) => ctx.querySelector(sel);
-  const $$ = (sel, ctx = document) => Array.from(ctx.querySelectorAll(sel));
-  const on = (el, ev, fn, opts) => el && el.addEventListener(ev, fn, opts);
-  const noop = () => {};
-  const clamp = (n, a, b) => Math.max(a, Math.min(b, n));
-  const now = () => Date.now();
+  const IMAGES = {
+    // hero slides
+    'hero-shawarma-large': './hero-shawarma-large.jpg',
+    'hero-fries-large'  : './hero-fries-large.jpg',
 
-  /* Safe text => HTML escape */
-  const esc = (s = '') => String(s).replace(/[&<>"']/g, c =>
-    ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c] || c)
-  );
+    // promo collage
+    'promo-shawarma'    : './promo-shawarma.jpg',
+    'promo-fries'       : './promo-fries.jpg',
+    'promo-angwamo'     : './promo-angwamo.jpg',
 
-  /* Currency formatter (Ghana Cedi) */
-  const fmt = (n) => `GHC ${Number(n).toFixed(2)}`;
+    // thumbnails used in picks / menu
+    'thumb-shawarma'    : './thumb-shawarma.jpg',
+    'thumb-fries'       : './thumb-fries.jpg',
+    'thumb-angwamo'     : './thumb-angwamo.jpg',
+    'thumb-rice'        : './hero-friedrice-large.jpg',
+
+    // other previews / about / avatar
+    'hero-friedrice-large': './hero-friedrice-large.jpg',
+    'preview-shawarma'  : './hero-shawarma-large.jpg',
+    'about-kitchen'     : './thumb-shawarma.jpg',
+    'manef-avatar'      : './thumb-shawarma.jpg'
+  };
+
+  /* Fallback remote images (used only if local file fails to load) */
+  const FALLBACKS = {
+    'hero-shawarma-large': 'https://images.unsplash.com/photo-1604908554325-1ff3a7b1b0f8?q=80&w=1400&auto=format&fit=crop',
+    'hero-fries-large': 'https://images.unsplash.com/photo-1542444459-db0b8c7dfb3a?q=80&w=1400&auto=format&fit=crop',
+    'hero-angwamo-large': 'https://images.unsplash.com/photo-1627308595229-7830a5c91f9f?q=80&w=1400&auto=format&fit=crop',
+    'promo-shawarma': 'https://images.unsplash.com/photo-1604908554325-1ff3a7b1b0f8?q=80&w=1000&auto=format&fit=crop',
+    'promo-fries': 'https://images.unsplash.com/photo-1542444459-db0b8c7dfb3a?q=80&w=1000&auto=format&fit=crop',
+    'thumb-shawarma': 'https://images.unsplash.com/photo-1604908554325-1ff3a7b1b0f8?q=80&w=600&auto=format&fit=crop',
+    'thumb-fries': 'https://images.unsplash.com/photo-1542444459-db0b8c7dfb3a?q=80&w=600&auto=format&fit=crop',
+    'thumb-angwamo': 'https://images.unsplash.com/photo-1627308595229-7830a5c91f9f?q=80&w=600&auto=format&fit=crop',
+    'thumb-rice': 'https://images.unsplash.com/photo-1604754521116-9c6a1a2bde9a?q=80&w=600&auto=format&fit=crop',
+    'about-kitchen': 'https://images.unsplash.com/photo-1541542684-32e1077b2a3e?q=80&w=1200&auto=format&fit=crop',
+    'preview': 'https://images.unsplash.com/photo-1604908554325-1ff3a7b1b0f8?q=80&w=1200&auto=format&fit=crop',
+    'thumb-dessert': 'https://images.unsplash.com/photo-1505250469679-203ad9ced0cb?q=80&w=600&auto=format&fit=crop',
+    'thumb-drink': 'https://images.unsplash.com/photo-1505576391880-7a6b6d6a6f5d?q=80&w=600&auto=format&fit=crop',
+    'thumb-side': 'https://images.unsplash.com/photo-1498837167922-ddd27525d352?q=80&w=600&auto=format&fit=crop'
+  };
 
   /* =========================
-     Persistent state keys
+     Small utilities
+     ========================= */
+  const $ = (sel, ctx = document) => ctx.querySelector(sel);
+  const $$ = (sel, ctx = document) => Array.from((ctx || document).querySelectorAll(sel));
+  const on = (el, ev, fn, opts) => el && el.addEventListener(ev, fn, opts);
+  const esc = s => String(s || '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const fmt = (n) => `GHC ${Number(n).toFixed(2)}`;
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+  const noop = () => {};
+  const now = () => Date.now();
+
+  /* =========================
+     Image loader:
+     - Try local file from IMAGES map first (path like './file.jpg')
+     - If load fails (404), fallback to remote FALLBACKS
+     - Works for <img> elements and elements that want background-image
+     - Uses onload/onerror to set final value
+     ========================= */
+  function resolveLocalOrFallback(key) {
+    const local = IMAGES[key] || IMAGES[key.replace(/-large$|_large$/,'')] || null;
+    const fallback = FALLBACKS[key] || '';
+    return { local, fallback };
+  }
+
+  function applyImageToElement(el, key) {
+    if (!key || !el) return;
+    const { local, fallback } = resolveLocalOrFallback(key);
+
+    // prefer local; test by trying to load the local path
+    const tryLocal = (path) => {
+      if (!path) return Promise.reject('no-local');
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => resolve(path);
+        img.onerror = () => reject('local-fail');
+        img.src = path;
+      });
+    };
+
+    // pick setter depending on element type
+    const setSrc = (url) => {
+      if (el.tagName && el.tagName.toLowerCase() === 'img') {
+        el.src = url;
+      } else {
+        // background image with subtle overlay for better contrast
+        const overlay = 'linear-gradient(120deg, rgba(0,0,0,0.12), rgba(0,0,0,0.04))';
+        el.style.backgroundImage = `${overlay}, url('${url}')`;
+        el.style.backgroundSize = el.style.backgroundSize || 'cover';
+        el.style.backgroundPosition = el.style.backgroundPosition || 'center';
+      }
+    };
+
+    // Try local then fallback
+    tryLocal(local || '').then(setSrc).catch(() => {
+      if (fallback) setSrc(fallback);
+      else if (local) setSrc(local); // as last resort try setting local directly (maybe server error not caught)
+    });
+  }
+
+  /* Walk document for data attributes and set images */
+  function applyAllArtwork() {
+    // data-img elements (used for background blocks)
+    $$('[data-img]').forEach(el => {
+      const key = el.dataset.img;
+      applyImageToElement(el, key);
+      if (!el.getAttribute('aria-label')) el.setAttribute('aria-label', (key || '').replace(/[-_]/g, ' '));
+    });
+
+    // images with data-artwork or data-thumb
+    $$('img[data-artwork], img[data-thumb]').forEach(img => {
+      const key = img.dataset.artwork || img.dataset.thumb;
+      applyImageToElement(img, key);
+    });
+
+    // non-img elements with data-artwork/data-thumb (background images)
+    $$('[data-artwork], [data-thumb]').filter(el => el.tagName.toLowerCase() !== 'img').forEach(el => {
+      const key = el.dataset.artwork || el.dataset.thumb;
+      applyImageToElement(el, key);
+    });
+  }
+
+  /* =========================
+     Simple localStorage helpers and app state
      ========================= */
   const CART_KEY = 'wrapdistrict_cart_v3';
   const FAV_KEY = 'wrapdistrict_favs_v1';
 
-  /* =========================
-     Catalog (used by builder & quick-add)
-     Keep this in sync with markup. Expand as needed.
-     ========================= */
-  const CATALOG = {
-    shawarma: {
-      id: 'shawarma',
-      name: 'Shawarma',
-      sizes: [{ id: 'regular', label: 'Regular', price: 45 }, { id: 'jumbo', label: 'Jumbo', price: 65 }],
-      proteins: [{ id: 'chicken', label: 'Chicken', price: 0 }, { id: 'beef', label: 'Beef', price: 10 }],
-      fillings: [{ id: 'lettuce', label: 'Lettuce', price: 0 }, { id: 'cheese', label: 'Cheese', price: 5 }, { id: 'egg', label: 'Egg', price: 6 }],
-      sauces: [{ id: 'garlic', label: 'Garlic Mayo' }, { id: 'bbq', label: 'BBQ' }]
-    },
-    fries: {
-      id: 'fries',
-      name: 'Loaded Fries',
-      sizes: [{ id: 'single', label: 'Single', price: 55 }, { id: 'large', label: 'Large', price: 70 }],
-      proteins: [{ id: 'none', label: 'No protein', price: 0 }, { id: 'bacon', label: 'Bacon', price: 12 }],
-      fillings: [{ id: 'cheese', label: 'Cheese', price: 4 }, { id: 'jalapeno', label: 'Jalapeno', price: 3 }],
-      sauces: [{ id: 'cheese', label: 'Cheese Sauce' }, { id: 'mayo', label: 'Garlic Mayo' }]
-    },
-    angwamo: {
-      id: 'angwamo',
-      name: 'Loaded Angwamo',
-      sizes: [{ id: 'plate', label: 'Plate', price: 55 }, { id: 'combo', label: 'Combo', price: 70 }],
-      proteins: [{ id: 'chicken', label: 'Chicken', price: 0 }, { id: 'beef', label: 'Beef', price: 10 }],
-      fillings: [{ id: 'egg', label: 'Egg', price: 0 }, { id: 'coleslaw', label: 'Coleslaw', price: 5 }],
-      sauces: [{ id: 'spicy', label: 'Spicy' }, { id: 'mild', label: 'Mild' }]
-    },
-    rice: {
-      id: 'rice',
-      name: 'Fried Rice',
-      sizes: [{ id: 'regular', label: 'Regular', price: 60 }, { id: 'extra', label: 'Extra', price: 80 }],
-      proteins: [{ id: 'chicken', label: 'Chicken', price: 0 }, { id: 'beef', label: 'Beef', price: 12 }],
-      fillings: [{ id: 'veg', label: 'Veg', price: 0 }],
-      sauces: []
-    },
-    // placeholders
-    dessert: { id: 'dessert', name: 'Dessert', sizes: [{ id: 'std', label: 'Standard', price: 25 }], proteins: [], fillings: [], sauces: [] },
-    drink: { id: 'drink', name: 'Drink', sizes: [{ id: 'bottle', label: 'Bottle', price: 10 }], proteins: [], fillings: [], sauces: [] },
-    side: { id: 'side', name: 'Side', sizes: [{ id: 'single', label: 'Single', price: 8 }], proteins: [], fillings: [], sauces: [] }
-  };
+  function load(key) {
+    try { const raw = localStorage.getItem(key); return raw ? JSON.parse(raw) : null; } catch (e) { return null; }
+  }
+  function save(key, val) {
+    try { localStorage.setItem(key, JSON.stringify(val)); } catch (e) { /* ignore */ }
+  }
 
-  /* =========================
-     Simple in-memory state (persist cart & favs)
-     ========================= */
   let cart = load(CART_KEY) || [];
   let favs = load(FAV_KEY) || {};
 
-  function load(key) {
-    try {
-      const raw = localStorage.getItem(key);
-      return raw ? JSON.parse(raw) : null;
-    } catch (err) {
-      console.warn('localStorage load failed', err);
-      return null;
-    }
-  }
-  function save(key, value) {
-    try {
-      localStorage.setItem(key, JSON.stringify(value));
-    } catch (err) {
-      console.warn('localStorage save failed', err);
-    }
-  }
+  function cartCount() { return cart.reduce((s, it) => s + (it.qty || 0), 0); }
+  function cartSubtotal() { return cart.reduce((s, it) => s + (it.unitPrice * (it.qty || 1)), 0); }
+  function deliveryFee() { return cart.length ? 10 : 0; }
+  function cartTotal() { return cartSubtotal() + deliveryFee(); }
+
+  function persistCart() { save(CART_KEY, cart); updateCartBadge(); renderMiniCartTotal(); renderCartDrawer(); }
 
   /* =========================
-     UI helpers: toast, focus trap, accessible toggles
+     UI: toast
      ========================= */
   let _toastTimer = null;
   function toast(msg, ms = 2200) {
@@ -1238,6 +1299,10 @@ button, .icon-btn, .btn{touch-action:manipulation}
     if (!el) {
       el = document.createElement('div');
       el.className = 'wrap-toaster';
+      Object.assign(el.style, {
+        position: 'fixed', right: '16px', bottom: '20px', zIndex: 9999, background: 'rgba(0,0,0,0.7)',
+        color: '#fff', padding: '10px 14px', borderRadius: '10px', fontWeight: 700, fontSize: '14px'
+      });
       document.body.appendChild(el);
     }
     el.textContent = msg;
@@ -1246,60 +1311,21 @@ button, .icon-btn, .btn{touch-action:manipulation}
     _toastTimer = setTimeout(() => el.classList.remove('visible'), ms);
   }
 
-  function trapFocus(modal) {
-    if (!modal) return;
-    const focusables = modal.querySelectorAll('a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])');
-    const first = focusables[0];
-    const last = focusables[focusables.length - 1];
-    function keyHandler(e) {
-      if (e.key !== 'Tab') return;
-      if (e.shiftKey && document.activeElement === first) {
-        e.preventDefault(); last.focus();
-      } else if (!e.shiftKey && document.activeElement === last) {
-        e.preventDefault(); first.focus();
-      }
-    }
-    modal._trapHandler = keyHandler;
-    modal.addEventListener('keydown', keyHandler);
-    // focus first element
-    setTimeout(() => first && first.focus(), 10);
-  }
-  function releaseFocus(modal) {
-    if (!modal || !modal._trapHandler) return;
-    modal.removeEventListener('keydown', modal._trapHandler);
-    modal._trapHandler = null;
-  }
-
   /* =========================
-     Cart utilities
+     Cart rendering / mini-cart
      ========================= */
-  function cartCount() {
-    return cart.reduce((s, it) => s + (it.qty || 0), 0);
-  }
-  function cartSubtotal() {
-    return cart.reduce((s, it) => s + (it.unitPrice * (it.qty || 1)), 0);
-  }
-  function deliveryFee() {
-    return cart.length ? 10 : 0;
-  }
-  function cartTotal() {
-    return cartSubtotal() + deliveryFee();
-  }
-
   function updateCartBadge() {
     const badge = $('#cart-count');
     if (!badge) return;
     badge.textContent = String(cartCount());
     badge.setAttribute('data-count', String(cartCount()));
-    // visual pulse
     badge.classList.add('pulse');
     setTimeout(() => badge.classList.remove('pulse'), 700);
   }
 
   function renderMiniCartTotal() {
     const el = $('#mini-cart-total');
-    if (!el) return;
-    el.textContent = fmt(cartSubtotal());
+    if (el) el.textContent = fmt(cartSubtotal());
   }
 
   function renderCartDrawer() {
@@ -1336,10 +1362,7 @@ button, .icon-btn, .btn{touch-action:manipulation}
     $('#cart-total').textContent = fmt(cartTotal());
   }
 
-  function persistCart() { save(CART_KEY, cart); updateCartBadge(); renderMiniCartTotal(); renderCartDrawer(); }
-
   function addToCartObj(item) {
-    // merge by id + optionsSummary
     const key = (item.id || '') + '|' + (item.optionsSummary || '');
     const found = cart.find(c => ((c.id || '') + '|' + (c.optionsSummary || '')) === key);
     if (found) found.qty = (found.qty || 0) + (item.qty || 1);
@@ -1362,18 +1385,55 @@ button, .icon-btn, .btn{touch-action:manipulation}
   }
 
   /* =========================
-     Builder modal (populate and wire)
+     CATALOG (same as your original)
+     ========================= */
+  const CATALOG = {
+    shawarma: {
+      id: 'shawarma',
+      name: 'Shawarma',
+      sizes: [{ id: 'regular', label: 'Regular', price: 45 }, { id: 'jumbo', label: 'Jumbo', price: 65 }],
+      proteins: [{ id: 'chicken', label: 'Chicken', price: 0 }, { id: 'beef', label: 'Beef', price: 10 }],
+      fillings: [{ id: 'lettuce', label: 'Lettuce', price: 0 }, { id: 'cheese', label: 'Cheese', price: 5 }, { id: 'egg', label: 'Egg', price: 6 }],
+      sauces: [{ id: 'garlic', label: 'Garlic Mayo' }, { id: 'bbq', label: 'BBQ' }]
+    },
+    fries: {
+      id: 'fries',
+      name: 'Loaded Fries',
+      sizes: [{ id: 'single', label: 'Single', price: 55 }, { id: 'large', label: 'Large', price: 70 }],
+      proteins: [{ id: 'none', label: 'No protein', price: 0 }, { id: 'bacon', label: 'Bacon', price: 12 }],
+      fillings: [{ id: 'cheese', label: 'Cheese', price: 4 }, { id: 'jalapeno', label: 'Jalapeno', price: 3 }],
+      sauces: [{ id: 'cheese', label: 'Cheese Sauce' }, { id: 'mayo', label: 'Garlic Mayo' }]
+    },
+    angwamo: {
+      id: 'angwamo',
+      name: 'Loaded Angwamo',
+      sizes: [{ id: 'plate', label: 'Plate', price: 55 }, { id: 'combo', label: 'Combo', price: 70 }],
+      proteins: [{ id: 'chicken', label: 'Chicken', price: 0 }, { id: 'beef', label: 'Beef', price: 10 }],
+      fillings: [{ id: 'egg', label: 'Egg', price: 0 }, { id: 'coleslaw', label: 'Coleslaw', price: 5 }],
+      sauces: [{ id: 'spicy', label: 'Spicy' }, { id: 'mild', label: 'Mild' }]
+    },
+    rice: {
+      id: 'rice',
+      name: 'Fried Rice',
+      sizes: [{ id: 'regular', label: 'Regular', price: 60 }, { id: 'extra', label: 'Extra', price: 80 }],
+      proteins: [{ id: 'chicken', label: 'Chicken', price: 0 }, { id: 'beef', label: 'Beef', price: 12 }],
+      fillings: [{ id: 'veg', label: 'Veg', price: 0 }],
+      sauces: []
+    },
+    dessert: { id: 'dessert', name: 'Dessert', sizes: [{ id: 'std', label: 'Standard', price: 25 }], proteins: [], fillings: [], sauces: [] },
+    drink: { id: 'drink', name: 'Drink', sizes: [{ id: 'bottle', label: 'Bottle', price: 10 }], proteins: [], fillings: [], sauces: [] },
+    side: { id: 'side', name: 'Side', sizes: [{ id: 'single', label: 'Single', price: 8 }], proteins: [], fillings: [], sauces: [] }
+  };
+
+  /* =========================
+     Builder modal logic
      ========================= */
   const builderModal = $('#builder-modal');
-  let builderState = null; // { itemKey, size, protein, fillings:Set, sauces:Set, qty, delivery }
+  let builderState = null;
 
   function openBuilder(itemKey) {
     const cfg = CATALOG[itemKey];
-    if (!cfg) {
-      toast('Item not available');
-      return;
-    }
-    // create default state
+    if (!cfg) { toast('Item not available'); return; }
     builderState = {
       itemKey,
       size: cfg.sizes[0].id,
@@ -1404,14 +1464,13 @@ button, .icon-btn, .btn{touch-action:manipulation}
   }
 
   function populateBuilder(cfg) {
-    // Title
     const title = $('#builder-title');
     if (title) title.innerHTML = `<i class="fa fa-tools"></i> Build: ${esc(cfg.name)}`;
 
-    // Clear panels
+    // hide panels first
     $$('[data-step-panel]').forEach(panel => panel.hidden = true);
 
-    // Sizes
+    // sizes
     const sizeGrid = $('[data-step-panel="size"] .options-grid');
     if (sizeGrid) {
       sizeGrid.innerHTML = '';
@@ -1434,7 +1493,7 @@ button, .icon-btn, .btn{touch-action:manipulation}
       });
     }
 
-    // Proteins
+    // proteins
     const proteinGrid = $('[data-step-panel="protein"] .options-grid');
     if (proteinGrid) {
       proteinGrid.innerHTML = '';
@@ -1457,7 +1516,7 @@ button, .icon-btn, .btn{touch-action:manipulation}
       });
     }
 
-    // Fillings (multi)
+    // fillings (multi)
     const fillingsGrid = $('[data-step-panel="fillings"] .options-grid');
     if (fillingsGrid) {
       fillingsGrid.innerHTML = '';
@@ -1479,7 +1538,7 @@ button, .icon-btn, .btn{touch-action:manipulation}
       });
     }
 
-    // Sauces (multi)
+    // sauces
     const saucesGrid = $('[data-step-panel="sauces"] .options-grid');
     if (saucesGrid) {
       saucesGrid.innerHTML = '';
@@ -1523,27 +1582,19 @@ button, .icon-btn, .btn{touch-action:manipulation}
       };
     });
 
-    // preview image (if any)
+    // preview image
     const previewImg = $('[data-preview-image] img');
-    if (previewImg) previewImg.src = determinePreviewImage(cfg.name);
-  }
-
-  function determinePreviewImage(name) {
-    // small mapping to unsplash placeholders (will be overridden by your local files if present)
-    const map = {
-      'Shawarma': 'https://images.unsplash.com/photo-1604908554325-1ff3a7b1b0f8?q=80&w=1200&auto=format&fit=crop',
-      'Loaded Fries': 'https://images.unsplash.com/photo-1542444459-db0b8c7dfb3a?q=80&w=1200&auto=format&fit=crop',
-      'Loaded Angwamo': 'https://images.unsplash.com/photo-1627308595229-7830a5c91f9f?q=80&w=1200&auto=format&fit=crop',
-      'Fried Rice': 'https://images.unsplash.com/photo-1604754521116-9c6a1a2bde9a?q=80&w=1200&auto=format&fit=crop'
-    };
-    return map[name] || '';
+    if (previewImg) {
+      // use preview-shawarma if present, else lookup by name
+      const previewKey = 'preview-shawarma';
+      applyImageToElement(previewImg, previewKey);
+    }
   }
 
   function gotoBuilderStep(step) {
     $$('.builder-stepper .step').forEach(s => s.classList.toggle('active', s.dataset.step === step));
     $$('[data-step-panel]').forEach(p => p.hidden = (p.dataset.stepPanel !== step));
   }
-  // wire stepper clicks
   $$('.builder-stepper .step').forEach(s => on(s, 'click', () => gotoBuilderStep(s.dataset.step)));
 
   function updateBuilderPreview() {
@@ -1551,7 +1602,7 @@ button, .icon-btn, .btn{touch-action:manipulation}
     const cfg = CATALOG[builderState.itemKey];
     if (!cfg) return;
     const sizeObj = (cfg.sizes || []).find(s => s.id === builderState.size) || cfg.sizes[0];
-    const proteinObj = (cfg.proteins || []).find(p => p.id === builderState.protein) || (cfg.proteins && cfg.proteins[0]) || { price: 0 };
+    const proteinObj = (cfg.proteins || []).find(p => p.id === builderState.protein) || { price: 0 };
     let unit = (sizeObj ? sizeObj.price : 0) + (proteinObj ? (proteinObj.price || 0) : 0);
     (cfg.fillings || []).forEach(f => { if (builderState.fillings.has(f.id)) unit += (f.price || 0); });
     const total = (unit + (builderState.delivery === 'delivery' ? 10 : 0)) * builderState.qty;
@@ -1560,15 +1611,15 @@ button, .icon-btn, .btn{touch-action:manipulation}
     const qtyEl = $('.qty-value'); if (qtyEl) qtyEl.textContent = String(builderState.qty);
   }
 
-  /* Add item to cart from builder */
-  on(document, 'click', (e) => {
-    const btn = e.target.closest('[data-action="add-to-cart"]');
+  /* Add to cart (from builder or quick add) */
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-action="add-to-cart"], [data-action="add-to-cart"] *');
     if (!btn) return;
-    // if builder open -> add the configured meal; else quick add fallback
+    // If builder open -> use builderState
     if (builderState) {
       const cfg = CATALOG[builderState.itemKey];
       const sizeObj = (cfg.sizes || []).find(s => s.id === builderState.size) || cfg.sizes[0];
-      const proteinObj = (cfg.proteins || []).find(p => p.id === builderState.protein) || (cfg.proteins && cfg.proteins[0]) || { label: '' };
+      const proteinObj = (cfg.proteins || []).find(p => p.id === builderState.protein) || { label: '' };
       let unit = (sizeObj ? sizeObj.price : 0) + (proteinObj ? (proteinObj.price || 0) : 0);
       const fillingsArr = (cfg.fillings || []).filter(f => builderState.fillings.has(f.id)).map(f => f.label);
       const saucesArr = (cfg.sauces || []).filter(s => builderState.sauces.has(s.id)).map(s => s.label);
@@ -1592,18 +1643,12 @@ button, .icon-btn, .btn{touch-action:manipulation}
       return;
     }
 
-    // fallback: add item by data-item / closest menu item
-    const itemKey = btn.dataset.item || btn.closest('.pick')?.dataset.id || btn.closest('.menu-item')?.dataset.category || btn.closest('.menu-item')?.dataset.id;
-    if (!itemKey) {
-      toast('Cannot add item — no item specified.');
-      return;
-    }
+    // fallback: add by data-item or closest menu item
+    const element = e.target.closest('[data-action="add-to-cart"]');
+    const itemKey = element && (element.dataset.item || element.closest('.pick')?.dataset.id || element.closest('.menu-item')?.dataset.category || element.closest('.menu-item')?.dataset.id);
+    if (!itemKey) { toast('Cannot add item — no item specified.'); return; }
     const cfg = CATALOG[itemKey];
-    if (!cfg) {
-      // add generic
-      addToCartObj({ id: `${itemKey}-${now()}`, name: itemKey, qty: 1, unitPrice: Number(btn.dataset.price || 0), optionsSummary: 'Default' });
-      return;
-    }
+    if (!cfg) { addToCartObj({ id: `${itemKey}-${now()}`, name: itemKey, qty: 1, unitPrice: Number(element.dataset.price || 0), optionsSummary: 'Default' }); return; }
     const defaultSize = cfg.sizes[0];
     addToCartObj({ id: `${itemKey}-${now()}`, name: cfg.name, qty: 1, unitPrice: Number(defaultSize.price), optionsSummary: defaultSize.label });
   });
@@ -1611,13 +1656,12 @@ button, .icon-btn, .btn{touch-action:manipulation}
   /* =========================
      Quick actions: quick-order, open-builder, view-cart, clear-cart
      ========================= */
-  on(document, 'click', (e) => {
-    const quick = e.target.closest('[data-action="quick-order"]');
+  document.addEventListener('click', (e) => {
+    const quick = e.target.closest('[data-action="quick-order"], [data-action="quick-order"] *');
     if (quick) {
       e.preventDefault();
       const item = quick.dataset.item || quick.closest('.pick')?.dataset.id;
       if (!item) { toast('No item selected'); return; }
-      // Quick-order = add default item and open cart drawer
       const cfg = CATALOG[item];
       if (!cfg) { toast('Item not available'); return; }
       const size = cfg.sizes[0];
@@ -1626,7 +1670,7 @@ button, .icon-btn, .btn{touch-action:manipulation}
       return;
     }
 
-    const openBuilderBtn = e.target.closest('[data-action="open-builder"]');
+    const openBuilderBtn = e.target.closest('[data-action="open-builder"], [data-action="open-builder"] *');
     if (openBuilderBtn) {
       e.preventDefault();
       const item = openBuilderBtn.dataset.item || openBuilderBtn.closest('.pick')?.dataset.id;
@@ -1635,10 +1679,10 @@ button, .icon-btn, .btn{touch-action:manipulation}
       return;
     }
 
-    const viewCart = e.target.closest('[data-action="view-cart"]');
+    const viewCart = e.target.closest('[data-action="view-cart"], [data-action="view-cart"] *');
     if (viewCart) { e.preventDefault(); openCartDrawer(); return; }
 
-    const clear = e.target.closest('[data-action="clear-cart"], .clear-cart');
+    const clear = e.target.closest('[data-action="clear-cart"], .clear-cart, [data-action="clear-cart"] *');
     if (clear) { e.preventDefault(); if (confirm('Clear your cart?')) clearCart(); return; }
   });
 
@@ -1651,7 +1695,7 @@ button, .icon-btn, .btn{touch-action:manipulation}
   });
 
   /* =========================
-     Cart drawer open / close
+     Cart drawer open / close helpers
      ========================= */
   function openCartDrawer() {
     const drawer = $('#cart-drawer');
@@ -1660,7 +1704,6 @@ button, .icon-btn, .btn{touch-action:manipulation}
     drawer.setAttribute('aria-hidden', 'false');
     document.documentElement.classList.add('no-scroll');
     renderCartDrawer();
-    // focus close button
     const close = drawer.querySelector('.drawer-close'); if (close) close.focus();
   }
   function closeCartDrawer() {
@@ -1670,25 +1713,25 @@ button, .icon-btn, .btn{touch-action:manipulation}
     drawer.setAttribute('aria-hidden', 'true');
     document.documentElement.classList.remove('no-scroll');
   }
-  // wire drawer close buttons
   $$('.drawer-close, [data-action="close-cart"]').forEach(b => on(b, 'click', (ev) => { ev.preventDefault(); closeCartDrawer(); }));
 
   /* =========================
      Favorites
      ========================= */
-  on(document, 'click', (e) => {
-    const favBtn = e.target.closest('[data-action="fav"]');
+  document.addEventListener('click', (e) => {
+    const favBtn = e.target.closest('[data-action="fav"], [data-action="fav"] *');
     if (!favBtn) return;
-    const article = favBtn.closest('.menu-item, .pick');
+    const button = favBtn.closest('[data-action="fav"]') || favBtn;
+    const article = button.closest('.menu-item, .pick');
     const id = article && (article.dataset.id || article.dataset.id || article.dataset.id);
     if (!id) { toast('Cannot favourite this item'); return; }
     favs[id] = !favs[id];
     save(FAV_KEY, favs);
-    favBtn.classList.toggle('favored', !!favs[id]);
+    button.classList.toggle('favored', !!favs[id]);
     toast(favs[id] ? 'Added to favourites' : 'Removed from favourites');
   });
 
-  /* initialize existing fav buttons UI */
+  // init fav buttons
   $$('[data-action="fav"]').forEach(btn => {
     const article = btn.closest('.menu-item, .pick');
     const id = article && (article.dataset.id || article.dataset.id || article.dataset.id);
@@ -1710,7 +1753,7 @@ button, .icon-btn, .btn{touch-action:manipulation}
   }));
 
   /* =========================
-     Search (simple prompt search)
+     Search
      ========================= */
   on($('.search-btn'), 'click', () => {
     const q = prompt('Search menu — enter a word (e.g. shawarma):');
@@ -1770,12 +1813,6 @@ button, .icon-btn, .btn{touch-action:manipulation}
     carousel.addEventListener('touchstart', () => { if (timer) clearInterval(timer); }, { passive: true });
     carousel.addEventListener('touchend', resetTimer);
 
-    function resetTimer() {
-      if (timer) clearInterval(timer);
-      timer = setInterval(() => show(active + 1), AUTO_MS);
-    }
-
-    // pointer parallax per slide media
     slides.forEach(s => {
       const media = s.querySelector('.slide-image') || s.querySelector('.slide-media');
       if (!media) return;
@@ -1789,7 +1826,6 @@ button, .icon-btn, .btn{touch-action:manipulation}
       s.addEventListener('pointerleave', () => { media.style.transform = ''; });
     });
 
-    // keyboard support
     document.addEventListener('keydown', (e) => {
       if (e.key === 'ArrowLeft') prevSlide();
       else if (e.key === 'ArrowRight') nextSlide();
@@ -1797,13 +1833,17 @@ button, .icon-btn, .btn{touch-action:manipulation}
 
     show(active);
     resetTimer();
+
+    function resetTimer() {
+      if (timer) clearInterval(timer);
+      timer = setInterval(() => show(active + 1), AUTO_MS);
+    }
   }
 
   /* =========================
-     Parallax layers & stickers
+     Parallax stickers
      ========================= */
   function initParallaxStickers() {
-    // simple scroll parallax for hero-bg-layer elements
     const hero = $('#hero');
     if (!hero) return;
     const layers = Array.from(hero.querySelectorAll('.hero-bg-layer'));
@@ -1817,7 +1857,6 @@ button, .icon-btn, .btn{touch-action:manipulation}
     window.addEventListener('scroll', throttle(move, 16), { passive: true });
     move();
 
-    // tiny sticker float animation
     $$('.hero-stickers .sticker').forEach((st, idx) => {
       st.animate([
         { transform: 'translateY(0) rotate(0deg)' },
@@ -1844,7 +1883,6 @@ button, .icon-btn, .btn{touch-action:manipulation}
     burger.addEventListener('click', () => {
       const isOpen = document.documentElement.classList.toggle('mobile-nav-open');
       burger.setAttribute('aria-expanded', String(isOpen));
-      // focus first nav link if opening
       if (isOpen) {
         const first = $('.main-nav .nav-link');
         first && first.focus();
@@ -1853,7 +1891,7 @@ button, .icon-btn, .btn{touch-action:manipulation}
   })();
 
   /* =========================
-     Chat (Manef) — simple message handling & builder triggers
+     Chat (Manef) simple handler
      ========================= */
   (function initChat() {
     const toggle = document.querySelector('[data-action="toggle-chat"], .chat-toggle');
@@ -1873,8 +1911,8 @@ button, .icon-btn, .btn{touch-action:manipulation}
 
     function append(who, text) {
       const node = document.createElement('div');
-      node.className = `chat-msg ${who}`;
-      node.innerHTML = esc(text);
+      node.className = `chat-msg ${who === 'user' ? 'user' : 'bot'}`;
+      node.innerHTML = text;
       chatMessages.appendChild(node);
       chatMessages.scrollTop = chatMessages.scrollHeight;
     }
@@ -1883,8 +1921,8 @@ button, .icon-btn, .btn{touch-action:manipulation}
 
     function handleBot(text) {
       const t = (text || '').toLowerCase();
-      if (t.includes('shawarma')) { append('bot', 'Shawarma: GHC 45–80. Type "build shawarma" to customize.'); return; }
-      if (t.includes('fries')) { append('bot', 'Loaded Fries start at GHC 55. Type "build fries" to customize.'); return; }
+      if (t.includes('shawarma')) { append('bot', 'Shawarma: GHC 45–80. Type \"build shawarma\" to customize.'); return; }
+      if (t.includes('fries')) { append('bot', 'Loaded Fries start at GHC 55. Type \"build fries\" to customize.'); return; }
       if (t.includes('build') && t.includes('shawarma')) { append('bot', 'Opening builder for shawarma...'); openBuilder('shawarma'); return; }
       if (t.includes('promo') || t.includes('free') || t.includes('tuesday')) { append('bot', 'Promo: Buy 2 Shawarmas, get 1 free — Tuesdays.'); return; }
       append('bot', "I can help with menu, builders, promos or checkout. Try: 'Build shawarma'.");
@@ -1894,7 +1932,7 @@ button, .icon-btn, .btn{touch-action:manipulation}
       if (e.key === 'Enter') {
         const txt = chatInput.value.trim();
         if (!txt) return;
-        append('user', txt);
+        append('user', esc(txt));
         chatInput.value = '';
         setTimeout(() => handleBot(txt), 400 + Math.random() * 600);
       }
@@ -1902,17 +1940,14 @@ button, .icon-btn, .btn{touch-action:manipulation}
     $$('.send-chat').forEach(b => on(b, 'click', () => {
       const txt = chatInput.value.trim();
       if (!txt) return;
-      append('user', txt);
+      append('user', esc(txt));
       chatInput.value = '';
       setTimeout(() => handleBot(txt), 400 + Math.random() * 600);
     }));
   })();
 
   /* =========================
-     Paystack checkout (basic)
-     - When a button has data-paystack="true" or data-action="checkout-paystack",
-       build a simple order summary and open Paystack "pay" link in a new window.
-     - NOTE: Replace with real Paystack inline integration for production.
+     PAYSTACK stub
      ========================= */
   function buildOrderSummary() {
     if (!cart.length) return 'Cart is empty';
@@ -1923,24 +1958,19 @@ button, .icon-btn, .btn{touch-action:manipulation}
     return `${lines.join('\n')}\n\nSubtotal: ${sub}\nDelivery: ${del}\nTotal: ${tot}`;
   }
 
-  function openPaystackCheckout({ email = '', amountGhc = null, reference = null, metadata = {} } = {}) {
-    // This opens Paystack's "pay" page placeholder.
-    // In production: implement Paystack inline (https://paystack.com/docs/payments/checkout/).
+  function openPaystackCheckout({ email = '', amountGhc = null, reference = null } = {}) {
     const description = encodeURIComponent(buildOrderSummary());
     const url = `https://paystack.com/pay/checkout-placeholder?amount=${amountGhc ? encodeURIComponent(amountGhc) : ''}&ref=${reference || ''}&desc=${description}&email=${encodeURIComponent(email)}`;
     window.open(url, '_blank', 'noopener');
     toast('Opening Paystack checkout...');
   }
 
-  // wire Buy / Checkout with Paystack buttons
-  on(document, 'click', (e) => {
+  document.addEventListener('click', (e) => {
     const payBtn = e.target.closest('[data-paystack], [data-action="checkout-paystack"], [data-action="open-paystack"], .btn-pay');
     if (!payBtn) return;
     e.preventDefault();
 
-    // If clicked inside builder and builderState exists + 'buy-now' -> attempt pay only for builder item
     if (payBtn.dataset.action === 'buy-now' && builderState) {
-      // compute amount for the builder item only
       const cfg = CATALOG[builderState.itemKey];
       if (!cfg) { toast('Builder item not found'); return; }
       const sizeObj = (cfg.sizes || []).find(s => s.id === builderState.size) || cfg.sizes[0];
@@ -1952,21 +1982,19 @@ button, .icon-btn, .btn{touch-action:manipulation}
       return;
     }
 
-    // If checkout all cart
     if (payBtn.dataset.action === 'checkout-paystack' || payBtn.dataset.action === 'open-paystack' || payBtn.classList.contains('btn-pay')) {
       if (!cart.length) { toast('Cart is empty'); return; }
       openPaystackCheckout({ amountGhc: cartTotal(), reference: `cart-${now()}` });
       return;
     }
 
-    // fallback: if element has data-paystack attribute but none of the above, open checkout with cart total
     if (payBtn.dataset.paystack) {
       openPaystackCheckout({ amountGhc: cartTotal(), reference: `pay-${now()}` });
     }
   });
 
   /* =========================
-     Checkout via "checkout" action: builds WA message previously, but now triggers paystack
+     Checkout click
      ========================= */
   on(document, 'click', (e) => {
     const checkout = e.target.closest('[data-action="checkout"], .checkout');
@@ -1977,68 +2005,36 @@ button, .icon-btn, .btn{touch-action:manipulation}
   });
 
   /* =========================
-     Small helpers: mapping data-img / data-artwork -> set src/background
+     Focus trap helpers
      ========================= */
-  function setArtworkFallbacks() {
-    // map keys to placeholder images (these will be overridden by your local IMAGES map script if present)
-    const map = {
-      'hero-shawarma-large': 'https://images.unsplash.com/photo-1604908554325-1ff3a7b1b0f8?q=80&w=1400&auto=format&fit=crop',
-      'hero-fries-large': 'https://images.unsplash.com/photo-1542444459-db0b8c7dfb3a?q=80&w=1400&auto=format&fit=crop',
-      'hero-angwamo-large': 'https://images.unsplash.com/photo-1627308595229-7830a5c91f9f?q=80&w=1400&auto=format&fit=crop',
-      'promo-shawarma': 'https://images.unsplash.com/photo-1604908554325-1ff3a7b1b0f8?q=80&w=1000&auto=format&fit=crop',
-      'promo-fries': 'https://images.unsplash.com/photo-1542444459-db0b8c7dfb3a?q=80&w=1000&auto=format&fit=crop',
-      'thumb-shawarma': 'https://images.unsplash.com/photo-1604908554325-1ff3a7b1b0f8?q=80&w=600&auto=format&fit=crop',
-      'thumb-fries': 'https://images.unsplash.com/photo-1542444459-db0b8c7dfb3a?q=80&w=600&auto=format&fit=crop',
-      'thumb-angwamo': 'https://images.unsplash.com/photo-1627308595229-7830a5c91f9f?q=80&w=600&auto=format&fit=crop',
-      'thumb-rice': 'https://images.unsplash.com/photo-1604754521116-9c6a1a2bde9a?q=80&w=600&auto=format&fit=crop',
-      'about-kitchen': 'https://images.unsplash.com/photo-1541542684-32e1077b2a3e?q=80&w=1200&auto=format&fit=crop',
-      'preview': 'https://images.unsplash.com/photo-1604908554325-1ff3a7b1b0f8?q=80&w=1200&auto=format&fit=crop',
-      'thumb-dessert': 'https://images.unsplash.com/photo-1505250469679-203ad9ced0cb?q=80&w=600&auto=format&fit=crop',
-      'thumb-drink': 'https://images.unsplash.com/photo-1505576391880-7a6b6d6a6f5d?q=80&w=600&auto=format&fit=crop',
-      'thumb-side': 'https://images.unsplash.com/photo-1498837167922-ddd27525d352?q=80&w=600&auto=format&fit=crop'
-    };
-
-    $$('[data-img]').forEach(el => {
-      const key = el.dataset.img;
-      if (!key) return;
-      if (el.tagName.toLowerCase() === 'img') {
-        if (!el.src) el.src = map[key] || '';
-      } else {
-        if (!el.style.backgroundImage) {
-          const url = map[key];
-          if (url) el.style.backgroundImage = `linear-gradient(120deg, rgba(0,0,0,0.12), rgba(0,0,0,0.04)), url('${url}')`;
-        }
-      }
-      if (!el.getAttribute('aria-label')) el.setAttribute('aria-label', (key || '').replace(/[-_]/g, ' '));
-    });
-
-    $$('[data-artwork], [data-thumb]').forEach(el => {
-      const key = el.dataset.artwork || el.dataset.thumb;
-      if (!key) return;
-      if (el.tagName.toLowerCase() === 'img') {
-        if (!el.src) el.src = map[key] || '';
-      } else {
-        if (!el.style.backgroundImage) {
-          const url = map[key];
-          if (url) el.style.backgroundImage = `url('${url}')`;
-        }
-      }
-    });
+  function trapFocus(modal) {
+    if (!modal) return;
+    const focusables = modal.querySelectorAll('a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])');
+    const first = focusables[0];
+    const last = focusables[focusables.length - 1];
+    function keyHandler(e) {
+      if (e.key !== 'Tab') return;
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    }
+    modal._trapHandler = keyHandler;
+    modal.addEventListener('keydown', keyHandler);
+    setTimeout(() => first && first.focus(), 10);
+  }
+  function releaseFocus(modal) {
+    if (!modal || !modal._trapHandler) return;
+    modal.removeEventListener('keydown', modal._trapHandler);
+    modal._trapHandler = null;
   }
 
   /* =========================
-     Misc: hamburger, close buttons, escape handling, set year
+     Misc helpers & keyboard handling
      ========================= */
-  // close modal on escape
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
-      // close builder
       if (builderModal && !builderModal.hidden) closeBuilder();
-      // close cart drawer
       const drawer = $('#cart-drawer'); if (drawer && !drawer.hidden) closeCartDrawer();
-      // close chat panel
       const chat = $('#chat-panel'); if (chat && !chat.hidden) { chat.hidden = true; const tog = document.querySelector('.chat-toggle'); tog && tog.setAttribute('aria-expanded', 'false'); }
-      // close mobile nav
       if (document.documentElement.classList.contains('mobile-nav-open')) {
         document.documentElement.classList.remove('mobile-nav-open');
         const burger = $('.hamburger'); burger && burger.setAttribute('aria-expanded', 'false');
@@ -2046,22 +2042,16 @@ button, .icon-btn, .btn{touch-action:manipulation}
     }
   });
 
-  // close builder modal buttons
   $$('.modal [data-action="close-builder"], .icon-btn[data-action="close-builder"]').forEach(b => on(b, 'click', (ev) => { ev.preventDefault(); closeBuilder(); }));
 
-  // header cart buttons open drawer
   $$('.cart-btn, [data-action="open-cart"]').forEach(b => on(b, 'click', (ev) => { ev.preventDefault(); openCartDrawer(); }));
-
-  // view cart link in mini cart
   $$('.mini-cart .btn[data-action="view-cart"]').forEach(b => on(b, 'click', (ev) => { ev.preventDefault(); openCartDrawer(); }));
 
-  // clear cart wired in earlier listener
-
-  // set year
+  /* set year in footer */
   const yearEl = $('#year'); if (yearEl) yearEl.textContent = new Date().getFullYear();
 
   /* =========================
-     Initialize: render UI, carousel, parallax, artwork fallbacks
+     Bootstrap initialization
      ========================= */
   function bootstrap() {
     updateCartBadge();
@@ -2069,12 +2059,13 @@ button, .icon-btn, .btn{touch-action:manipulation}
     renderCartDrawer();
     initCarousel();
     initParallaxStickers();
-    setArtworkFallbacks();
+    // set images (local-first with fallback)
+    applyAllArtwork();
 
-    // small defensive: ensure all buttons have pointer cursor
+    // ensure click targets show pointer on some elements if missing
     $$('button, a').forEach(el => { if (!el.style.cursor) el.style.cursor = 'pointer'; });
 
-    // ensure modal close handlers (also close when clicking overlay)
+    // overlay click closes modal/drawer
     const overlay = document.querySelector('.overlay-dim');
     if (overlay) {
       overlay.addEventListener('click', () => {
@@ -2083,7 +2074,7 @@ button, .icon-btn, .btn{touch-action:manipulation}
       });
     }
 
-    // animated subtle reveal for hero slides (ensure visible slide aria states are correct)
+    // subtle reveal for slides
     const slides = $$('[data-carousel] .hero-slide');
     if (slides.length) {
       slides.forEach((s, i) => {
@@ -2094,57 +2085,16 @@ button, .icon-btn, .btn{touch-action:manipulation}
     }
   }
 
-  // run bootstrap on DOM ready
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', bootstrap);
-  } else bootstrap();
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', bootstrap);
+  else bootstrap();
 
-  /* =========================
-     Expose some helpers for debugging/console
-     ========================= */
+  /* Expose some helpers in console for debugging */
   window.WrapDistrict = {
-    cart,
-    addToCartObj,
-    removeCartIndex,
-    clearCart,
-    openCartDrawer,
-    closeCartDrawer,
-    openBuilder,
-    closeBuilder,
-    buildOrderSummary,
-    openPaystackCheckout
+    cart, addToCartObj, removeCartIndex, clearCart, openCartDrawer, closeCartDrawer, openBuilder, closeBuilder, buildOrderSummary, openPaystackCheckout, IMAGES
   };
 
-  // tidy log
-  console.info('Wrap District script loaded — interactive features activated.');
+  console.info('Wrap District script loaded — images will use local files when present.');
 })();
-
-  
 </script>
-  <script>
-    // --- IMAGES mapping for files placed in the repo root (no folder) ---
-const IMAGES = {
-  // hero slides
-  'hero-shawarma-large': 'hero-shawarma-large.jpg',
-  'hero-fries-large'  : 'hero-fries-large.jpg',
 
-  // promo collage
-  'promo-shawarma'    : 'promo-shawarma.jpg',
-  'promo-fries'       : 'promo-fries.jpg',
-  'promo-angwamo'     : 'promo-angwamo.jpg',
-
-  // thumbnails used in picks / menu
-  'thumb-shawarma'    : 'thumb-shawarma.jpg',
-  'thumb-fries'       : 'thumb-fries.jpg',
-  'thumb-angwamo'     : 'thumb-angwamo.jpg',
-  'thumb-rice'        : 'hero-friedrice-large.jpg',
-
-  // other previews / about / avatar
-  'hero-friedrice-large': 'hero-friedrice-large.jpg',
-  'preview-shawarma'  : 'hero-shawarma-large.jpg',
-  'about-kitchen'     : 'thumb-shawarma.jpg',
-  'manef-avatar'      : 'thumb-shawarma.jpg'
-};
-
-  </script>
 </html>
