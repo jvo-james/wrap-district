@@ -1180,6 +1180,71 @@ background-position:center;
 
 /* end of fast picks & promo styles */
 </style>
+<script>
+(function(){
+  // Run after page scripts initialize
+  function enhanceCart() {
+    const drawer = document.querySelector('#cart-drawer');
+    const shell = drawer?.querySelector('.drawer-shell');
+    const items = drawer?.querySelector('.cart-items');
+    const summary = drawer?.querySelector('.cart-summary');
+    const checkout = drawer?.querySelector('.checkout');
+
+    if (!drawer || !shell || !items || !summary) return;
+
+    // Ensure shell uses full-safe viewport height on mobile
+    function setShellMaxHeight(){
+      // 100dvh support for modern browsers; fallback to window.innerHeight
+      const vh = Math.min(window.innerHeight, document.documentElement.clientHeight || Infinity);
+      shell.style.maxHeight = (vh) + 'px';
+    }
+    setShellMaxHeight();
+    window.addEventListener('resize', setShellMaxHeight);
+
+    // When cart opens, make items scroll to top and focus checkout
+    const openButtons = document.querySelectorAll('[data-action="open-cart"], .cart-btn, .mini-cart .btn[data-action="view-cart"]');
+    openButtons.forEach(b => b.addEventListener('click', () => {
+      setTimeout(()=> {
+        // small reveal animation
+        shell.animate([{ transform: 'translateY(6px)', opacity: 0 }, { transform: 'translateY(0)', opacity: 1 }], { duration: 420, easing: 'cubic-bezier(.2,.9,.2,1)' });
+
+        // scroll items to top gracefully
+        items && items.scrollTo({ top: 0, behavior: 'smooth' });
+
+        // focus checkout for keyboard users
+        if (checkout) checkout.focus();
+      }, 120);
+    }));
+
+    // If cart drawer is closed via Escape or close button, return focus to cart button
+    const closeButtons = drawer.querySelectorAll('.drawer-close, [data-action="close-cart"]');
+    closeButtons.forEach(b => b.addEventListener('click', ()=>{
+      const cartBtn = document.querySelector('.cart-btn');
+      setTimeout(()=> cartBtn && cartBtn.focus(), 80);
+    }));
+
+    // Make sure remove buttons in items (dynamic) keep behavior and do not cause layout jumps
+    items.addEventListener('click', (e) => {
+      const rm = e.target.closest('.remove-item');
+      if (!rm) return;
+      // after removing, keep summary visible (no jump)
+      setTimeout(()=> {
+        items.style.scrollBehavior = 'auto';
+        items.scrollTop = Math.max(0, rm.closest('.cart-item') ? rm.closest('.cart-item').offsetTop - 8 : 0);
+        setTimeout(()=> items.style.scrollBehavior = '', 50);
+      }, 10);
+    });
+
+    // optional: touch-friendly overscroll bounce prevention on iOS
+    items.addEventListener('touchstart', () => {}, { passive: true });
+  }
+
+  // Run on load
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', enhanceCart);
+  } else enhanceCart();
+})();
+</script>
 
 <style>
 /* =========================
