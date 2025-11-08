@@ -1692,6 +1692,59 @@ html.mobile-nav-open .overlay-dim { z-index: 4200 !important; }
 
 /* End layering rules */
 </style>
+<style>
+/* === Chat: force bottom-right / panel above everything === */
+#manef-chat {
+  position: fixed !important;
+  right: 18px !important;
+  bottom: 18px !important;
+  z-index: 6000 !important;        /* ensure it's above most UI */
+  display: flex !important;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-end;
+  pointer-events: auto !important;
+}
+
+/* bubble */
+#manef-chat .chat-toggle {
+  position: relative;
+  width: 62px;
+  height: 62px;
+  border-radius: 999px;
+  display: inline-grid;
+  place-items: center;
+  cursor: pointer;
+  z-index: 1;
+}
+
+/* panel anchored to bubble (appears above the bubble) */
+#manef-chat .chat-panel {
+  position: absolute !important;
+  right: 0 !important;
+  bottom: calc(100% + 12px) !important; /* sits above bubble */
+  transform-origin: bottom right;
+  width: var(--chat-width, 340px);
+  max-width: calc(100vw - 32px);
+  z-index: 6100 !important; /* slightly above the bubble */
+  pointer-events: auto !important;
+}
+
+/* when hidden, keep it non-interactive */
+#manef-chat .chat-panel[hidden] { pointer-events: none !important; visibility: hidden !important; opacity: 0 !important; }
+
+/* mobile tweak: keep chat bubble visible and panel full-width above bubble */
+@media (max-width:520px){
+  #manef-chat { right: 12px !important; bottom: 12px !important; left: auto !important; align-items: center; }
+  #manef-chat .chat-panel {
+    position: fixed !important;
+    right: 12px !important;
+    bottom: calc(100% + 8px) !important;
+    width: min(96vw, 420px);
+    max-height: 78vh;
+  }
+}
+</style>
 
 </head>
 <body>
@@ -3489,6 +3542,44 @@ console.info('Wrap District script loaded — images will use local files when p
     // also run a micro-task to catch elements added later
     setTimeout(() => selectors.forEach(s => moveToBody(s)), 300);
   });
+})();
+</script>
+<script>
+(function(){
+  // ensure chat element is a direct child of body (prevents stacking-context issues)
+  const chat = document.querySelector('#manef-chat');
+  if (chat && chat.parentElement !== document.body) {
+    document.body.appendChild(chat);
+  }
+
+  // robust toggle behavior: open/close and focus input when opened
+  const toggle = document.querySelector('#manef-chat .chat-toggle');
+  const panel = document.querySelector('#chat-panel') || document.querySelector('#manef-chat .chat-panel');
+  const input = panel?.querySelector('.chat-input');
+
+  function openChat() {
+    if (!panel) return;
+    panel.hidden = false;
+    panel.removeAttribute('hidden');
+    toggle.setAttribute('aria-expanded', 'true');
+    setTimeout(()=> input?.focus(), 80);
+  }
+  function closeChat() {
+    if (!panel) return;
+    panel.hidden = true;
+    panel.setAttribute('hidden', 'true');
+    toggle.setAttribute('aria-expanded', 'false');
+  }
+
+  if (toggle && panel) {
+    toggle.addEventListener('click', () => {
+      if (panel.hidden) openChat(); else closeChat();
+    });
+    // close buttons already exist; ensure they call closeChat
+    document.querySelectorAll('[data-action="close-chat"], .icon-btn[data-action="close-chat"]').forEach(b => {
+      b.addEventListener('click', closeChat);
+    });
+  }
 })();
 </script>
 
