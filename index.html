@@ -1615,6 +1615,84 @@ a:focus, button:focus, input:focus { outline: 3px solid rgba(255,183,130,0.12); 
 End: About / Testimonials / Contact / Footer
 =============================== */
 </style>
+  <style>
+/* =============================
+  Layering & interaction safety for overlays, modals, drawer, header & chat
+  Paste AFTER your main styles so it overrides accidental earlier rules.
+  ============================= */
+
+/* --- z-index scale (higher = on top) --- */
+/* Base content (menu, hero, cards) should remain low */
+main, .container, section, .menu-section, .hero-section { z-index: 0 !important; position: relative; }
+
+/* Header should always be above page content (sticky/fixed) */
+.site-header {
+  position: fixed !important;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 3000 !important;
+  pointer-events: auto !important;
+}
+
+/* Overlay (dimmer) sits above content but below modal/drawer shells */
+.overlay-dim {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 4000 !important;
+  pointer-events: none !important;   /* default: don't intercept clicks when inactive */
+  display: none !important;
+  opacity: 0 !important;
+}
+.overlay-dim.active {
+  display: block !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}
+
+/* Drawer (cart) — above overlay but below modal by default */
+.drawer, .cart-drawer {
+  position: fixed !important;
+  z-index: 4500 !important;
+  pointer-events: auto !important;
+  will-change: transform, opacity;
+}
+
+/* Generic modal shells should appear above everything else */
+.modal, .modal-shell, .modal-builder {
+  position: fixed !important;
+  inset: 0 !important;           /* center/fill area */
+  z-index: 5000 !important;
+  pointer-events: auto !important;
+}
+
+/* Chat widget should float above modals/drawers (if you want it always on top) */
+#manef-chat, .chat-widget, .chat-panel {
+  position: fixed !important;
+  z-index: 6000 !important;
+  pointer-events: auto !important;
+}
+
+/* Toaster / notifications above everything else */
+.wrap-toaster {
+  z-index: 7000 !important;
+  position: fixed !important;
+  pointer-events: auto !important;
+}
+
+/* Accessibility / safety: hide hidden overlays from pointer events */
+[hidden] { pointer-events: none !important; visibility: hidden !important; display: none !important; }
+
+/* If any ancestor has transform or filter (creates stacking context), ensure these elements are direct-body children (see JS). */
+/* Keep this as last-resort override for specific accidental blockers */
+html.mobile-nav-open .overlay-dim { z-index: 4200 !important; }
+
+/* small nicety: ensure interactive elements in header are above header background */
+.site-header * { position: relative; z-index: 3100 !important; }
+
+/* End layering rules */
+</style>
+
 </head>
 <body>
 
@@ -3372,6 +3450,45 @@ cart, addToCartObj, removeCartIndex, clearCart, openCartDrawer, closeCartDrawer,
 };
 
 console.info('Wrap District script loaded — images will use local files when present.');
+})();
+</script>
+<script>
+(function () {
+  // elements we want to ensure are direct children of <body>
+  const selectors = [
+    '.overlay-dim',       // overlay
+    '.drawer',            // cart drawer(s)
+    '#cart-drawer',
+    '.modal',             // builder modal(s)
+    '#builder-modal',
+    '#manef-chat',        // chat widget
+    '.wrap-toaster'       // toaster if present
+  ];
+
+  function moveToBody(sel) {
+    const el = document.querySelector(sel);
+    if (!el) return;
+    // only move when not already direct child of body
+    if (el.parentElement && el.parentElement.tagName.toLowerCase() !== 'body') {
+      try {
+        // preserve next-sibling to maintain visual order if needed
+        document.body.appendChild(el);
+        el.style.willChange = el.style.willChange || 'transform, opacity';
+        // ensure fixed positioning after move
+        el.style.position = el.style.position || 'fixed';
+      } catch (err) {
+        // ignore; not critical
+        console.warn('moveToBody failed for', sel, err);
+      }
+    }
+  }
+
+  // run after small delay to ensure DOM and other scripts finished their initial setup
+  window.addEventListener('load', () => {
+    selectors.forEach(s => moveToBody(s));
+    // also run a micro-task to catch elements added later
+    setTimeout(() => selectors.forEach(s => moveToBody(s)), 300);
+  });
 })();
 </script>
 
