@@ -1158,6 +1158,214 @@ a:focus, button:focus { outline: 3px solid rgba(99,102,241,0.12); outline-offset
 /* end of fast picks & promo styles */
 </style>
 
+  <style>
+/* =========================
+   MENU SECTION — Beautiful, responsive, & conversion-focused
+   - Mobile-first: 2 columns
+   - Desktop >=980px: 3 columns
+   - Prominent CTA buttons and visual price badges
+   ========================= */
+
+/* Grid container */
+.menu-section { padding: 28px 0; }
+.menu-section .section-head { margin-bottom: 12px; }
+.menu-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);  /* mobile-first: 2cols (2x2 when 4 items visible) */
+  gap: 16px;
+  align-items: start;
+  margin-top: 8px;
+  transition: all .32s ease;
+}
+
+/* Menu item card */
+.menu-item{
+  background: linear-gradient(180deg, rgba(255,255,255,0.99), rgba(250,250,250,0.98));
+  border-radius: 14px;
+  overflow: hidden;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  box-shadow: 0 18px 56px rgba(12,12,12,0.06);
+  border: 1px solid rgba(16,16,16,0.04);
+  transition: transform .28s cubic-bezier(.2,.9,.2,1), box-shadow .28s, border-color .28s;
+  will-change: transform;
+}
+
+/* hover / focus lift */
+.menu-item:hover, .menu-item:focus-within{ transform: translateY(-8px); box-shadow: 0 36px 120px rgba(12,12,12,0.10); border-color: rgba(255,107,61,0.06); }
+
+/* Thumbnail area */
+.menu-item .thumb{
+  width:100%;
+  aspect-ratio: 16 / 11; /* nice food ratio */
+  background: #f6f6f6;
+  position:relative;
+  overflow:hidden;
+  display:block;
+}
+.menu-item .thumb img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:block;
+  transition: transform 8s ease; /* slow ken-burns */
+  transform-origin:center center;
+}
+
+/* subtle zoom on hover for sensory effect */
+.menu-item:hover .thumb img{ transform: scale(1.06); }
+
+/* Price badge overlay on image */
+.menu-item .thumb::after{
+  content: attr(data-price) "";
+  position:absolute;
+  right:10px;
+  top:10px;
+  padding:8px 12px;
+  border-radius:999px;
+  font-weight:900;
+  font-size:0.95rem;
+  background: linear-gradient(90deg,var(--accent-2),var(--accent));
+  color:#111;
+  box-shadow: 0 10px 30px rgba(255,107,61,0.10);
+  display:inline-block;
+}
+
+/* Name + meta */
+.menu-item .meta{
+  padding:12px 14px 10px;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+.menu-item .meta .name{
+  font-family: var(--text-hero);
+  font-size:1.02rem;
+  margin:0;
+  display:flex;
+  gap:8px;
+  align-items:center;
+}
+.menu-item .meta .desc{
+  margin:0;
+  color:var(--muted);
+  font-size:0.92rem;
+}
+
+/* row for actions */
+.menu-item .meta-line{
+  display:flex;
+  align-items:center;
+  gap: 8px;
+  margin-top:6px;
+}
+
+/* price and action area */
+.menu-item .price{
+  font-weight:900;
+  font-size:1rem;
+  color:#111;
+  display:inline-flex;
+  gap:8px;
+  align-items:center;
+}
+
+/* meta actions (fav, customize, add) */
+.menu-item .meta-actions{
+  margin-left:auto;
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+/* Favorite icon button */
+.menu-item .icon-btn{
+  width:40px; height:40px; border-radius:10px;
+  display:inline-grid; place-items:center;
+  background: rgba(16,16,16,0.02);
+  transition: background .18s, transform .18s;
+}
+.menu-item .icon-btn.favored{ background: linear-gradient(90deg, #ffd6b3, #ffc28a); box-shadow: 0 10px 30px rgba(255,170,110,0.08); transform: translateY(-2px); }
+.menu-item .icon-btn:active{ transform: scale(.96); }
+
+/* Buttons inside each card — visible & finger-friendly */
+.menu-item .btn.small, .menu-item .btn.btn-pay.small{
+  padding:8px 12px; border-radius:10px; font-weight:800; font-size:0.92rem;
+}
+.menu-item .btn.small{ background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(255,255,255,0.96)); border:1px solid rgba(16,16,16,0.04); }
+.menu-item .btn.btn-pay.small { background: linear-gradient(90deg,#3b82f6,#06b6d4); color:white; }
+
+/* make sure the actions are fully visible even on small screens */
+.menu-item .pick-actions, .menu-item .meta-actions{ display:flex; gap:8px; align-items:center; }
+
+/* price scale on larger screens */
+@media (min-width:720px){
+  .menu-item .thumb{ aspect-ratio: 16/10; }
+  .menu-item .meta{ padding:14px; }
+}
+
+/* Desktop grid: 3 columns for a denser layout */
+@media (min-width:980px){
+  .menu-grid{
+    grid-template-columns: repeat(3, 1fr);
+    gap:20px;
+  }
+  .menu-item .thumb{ aspect-ratio: 16/9; }
+  .menu-item{ border-radius:16px; }
+  .menu-item .name{ font-size:1.06rem; }
+  .menu-item .price{ font-size:1.06rem; }
+}
+
+/* Make CTA cluster sticky at bottom of each card on larger screens */
+@media (min-width:980px){
+  .menu-item{ display:flex; flex-direction:column; }
+  .meta{ flex:1 1 auto; }
+  .meta-line{ margin-top:auto; align-items:center; }
+}
+
+/* accessibility: focus-visible */
+.menu-item a:focus, .menu-item button:focus, .menu-item .icon-btn:focus { outline: 3px solid rgba(99,102,241,0.12); outline-offset:4px; border-radius:10px; }
+
+/* placeholder / low-image state */
+.menu-item.placeholder .thumb{ background: linear-gradient(90deg,#f2f2f4,#fafafa); display:grid; place-items:center; color:var(--muted); font-weight:800; }
+
+/* quick decorative badges inside meta (e.g. spicy, veg) */
+.menu-item .meta .badge{
+  display:inline-flex; gap:8px; align-items:center;
+  padding:6px 8px; border-radius:999px; font-weight:800; font-size:0.82rem;
+  background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(250,250,250,0.96));
+  border: 1px solid rgba(16,16,16,0.03);
+}
+
+/* Make buttons more prominent on hover so they catch attention */
+.menu-item:hover .btn.small{ transform: translateY(-2px); box-shadow: 0 12px 32px rgba(12,12,12,0.06); }
+
+/* small-screen tweaks for touch targets */
+@media (max-width:520px){
+  .menu-grid { gap:12px; }
+  .menu-item .meta { padding:10px; }
+  .menu-item .btn.small{ padding:10px 12px; font-size:0.96rem; }
+  .menu-item .thumb::after{ font-size:0.92rem; padding:7px 10px; }
+}
+
+/* ensure menu filters row remains visible and sticky on scroll on desktop */
+.menu-filters{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-bottom:10px; }
+@media (min-width:980px){
+  .menu-filters{ position: sticky; top: calc(var(--header-h) + 10px); z-index: 900; background: transparent; padding:6px 0; }
+}
+
+/* reduced motion */
+@media (prefers-reduced-motion: reduce){
+  .menu-item, .menu-item .thumb img { transition: none !important; animation: none !important; transform: none !important; }
+}
+
+/* final polish: ensure menu action icons are visible */
+.meta-actions .fa, .pick-icons .fa{ color: rgba(0,0,0,0.64); font-size:0.98rem; }
+
+/* End of menu styling */
+</style>
+
 </head>
 <body>
 
@@ -1233,7 +1441,6 @@ a:focus, button:focus { outline: 3px solid rgba(99,102,241,0.12); outline-offset
       <!-- NOTE: .hero-viewport indicates this section should take full viewport height in CSS -->
       <div class="hero-viewport-inner container">
 
-```
     <!-- left: giant slideshow (take entire hero area) -->
     <div class="hero-carousel-wrap" role="region" aria-label="Hero carousel">
       <div class="carousel-stage" data-carousel aria-roledescription="carousel">
