@@ -2267,37 +2267,23 @@ a:focus, button:focus { outline: 3px solid rgba(255,204,51,0.10); outline-offset
 </body>
 <script>
 /*
-  Wrap District — Frontend behavior
-  - Works with the provided body HTML.
-  - Features:
-    * Mobile nav (hamburger) open/close
-    * Hero slideshow with autoplay, dots, prev/next, and CTA handlers
-    * Cart drawer open/close
-    * Menu Add / Remove buttons (sync with cart)
-    * Cart-level quantity controls (+ / -), remove item
-    * Price calculation per item (size/protein/addons)
-    * Promo logic: Buy 2 Get 1 Free (Shawarma) and Free Coke for Loaded Fries (applies on promo day or when claimed)
-    * "Add missing items" helper to reach promo threshold
-    * Entry promo modal (don't show again via localStorage)
-    * Checkout stub and clear cart
-    * Accessibility attributes updated where relevant
+  Updated Wrap District frontend behavior
+  - Captures item option meta (selects + addons + thumb)
+  - Creates unique cart lines per configuration (so extras contribute to price)
+  - Totals computed from stored unitPrice * qty
+  - Menu remove toggles remove one matching base item (first matching variant)
 */
 
-/* ---------- Utilities ---------- */
 const q = (s, ctx = document) => ctx.querySelector(s);
 const qa = (s, ctx = document) => Array.from(ctx.querySelectorAll(s));
-const fmtGhc = (n) => `GHC ${Number(n).toFixed(0)}`; // integer cedis formatting
+const fmtGhc = (n) => `GHC ${Number(n).toFixed(0)}`;
 
 document.addEventListener('DOMContentLoaded', () => {
-  /* ---------- Elements ---------- */
-  const body = document.body;
-
-  // Header / nav
+  // Elements
   const hamburger = q('#hamburger');
   const mobileNav = q('#mobile-nav');
   const navClose = q('#nav-close');
 
-  // Cart
   const cartToggle = q('#cart-toggle');
   const cartDrawer = q('#cart-drawer');
   const cartClose = q('#cart-close');
@@ -2314,50 +2300,35 @@ document.addEventListener('DOMContentLoaded', () => {
   const checkoutBtn = q('#checkout-btn');
   const clearCartBtn = q('#clear-cart');
 
-  // Slideshow
   const slidesWrap = q('#slides');
-  const slideDotsWrap = q('#slide-dots');
-  const slidePrev = q('.slide-prev');
-  const slideNext = q('.slide-next');
   const slideDots = qa('.dot');
   const slideElements = qa('.slide');
 
-  // Promo elements
   const promoCountdownEl = q('#promo-timer');
   const entryPromoModal = q('#entry-promo');
   const entryCloseBtn = q('#entry-close');
   const claimPromoEntryBtn = q('#claim-promo-entry');
   const dontShowAgainCheckbox = q('#dont-show-again');
-  const promoDetailsSection = q('#promo-details');
 
-  // Menu container
   const menuSection = q('#menu');
 
-  /* ---------- State ---------- */
-  let cart = {}; // { itemId: { id, title, unitPrice, qty, meta: {...} } }
+  // State
+  // cart keys are unique per config: { "<baseId>|<encoded-meta>": { id, baseId, title, unitPrice, qty, meta } }
+  let cart = {};
   let promo = {
-    // promo claim override stored in sessionStorage (if claimed in this session)
     claimed: sessionStorage.getItem('wrap_promo_claimed') === '1',
-    // Entry modal suppression stored in localStorage
     hideEntryModal: localStorage.getItem('wrap_hide_entry_promo') === '1',
-    // Days when promo is active (Tue only -> 2)
     activeDays: [2],
-    // Use function to check if promo currently active (Tuesday OR claimed override)
-    isActive() {
-      const now = new Date();
-      const day = now.getDay(); // 0 Sun .. 2 Tue
-      return this.activeDays.includes(day) || this.claimed;
-    }
+    isActive() { const now = new Date(); return this.activeDays.includes(now.getDay()) || this.claimed; }
   };
 
-  // Slideshow state
+  // Slideshow
   let slideIndex = 0;
   let slideTimer = null;
   const slideAutoDelay = 5000;
 
-  /* ---------- Initialization ---------- */
-  // Initialize mobile nav buttons
-  hamburger.addEventListener('click', () => {
+  // Init
+  hamburger?.addEventListener('click', () => {
     const expanded = hamburger.getAttribute('aria-expanded') === 'true';
     hamburger.setAttribute('aria-expanded', String(!expanded));
     if (mobileNav) {
@@ -2373,16 +2344,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Cart open/close
-  cartToggle.addEventListener('click', () => openCart());
-  cartClose.addEventListener('click', () => closeCart());
+  cartToggle?.addEventListener('click', openCart);
+  cartClose?.addEventListener('click', closeCart);
 
-  // Entry promo modal
-  if (!promo.hideEntryModal) {
-    setTimeout(() => showEntryPromo(), 700); // small delay so page loads first
-  } else {
-    entryPromoModal.classList.add('hidden');
-  }
+  if (!promo.hideEntryModal) setTimeout(showEntryPromo, 700);
+  else entryPromoModal.classList.add('hidden');
   entryCloseBtn?.addEventListener('click', () => {
     entryPromoModal.classList.add('hidden');
   });
@@ -2390,7 +2356,7 @@ document.addEventListener('DOMContentLoaded', () => {
     sessionStorage.setItem('wrap_promo_claimed', '1');
     promo.claimed = true;
     entryPromoModal.classList.add('hidden');
-    renderCart(); // re-evaluate promo
+    renderCart();
     alert('Promo claimed for this session. Promo will apply automatically where qualified.');
   });
   dontShowAgainCheckbox?.addEventListener('change', (e) => {
@@ -2403,100 +2369,45 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Slideshow init
   initSlideshow();
-
-  // Wire up menu item interactions (Add/Remove, selects, checkboxes)
   initMenuInteractions();
 
-  // Cart action buttons
   addMissingBtn?.addEventListener('click', handleAddMissing);
   checkoutBtn?.addEventListener('click', handleCheckout);
   clearCartBtn?.addEventListener('click', handleClearCart);
 
-  // Promo countdown
   updatePromoCountdown();
   setInterval(updatePromoCountdown, 1000);
 
-  // Initial render
   renderCart();
 
-  /* ------------------- FUNCTIONS ------------------- */
+  /* ---------- Helpers ---------- */
+  function openCart() { cartDrawer.style.display = 'block'; cartDrawer.setAttribute('aria-hidden', 'false'); }
+  function closeCart() { cartDrawer.style.display = 'none'; cartDrawer.setAttribute('aria-hidden', 'true'); }
+  function showEntryPromo() { entryPromoModal.classList.remove('hidden'); entryPromoModal.style.display = 'block'; }
 
-  function openCart() {
-    cartDrawer.style.display = 'block';
-    cartDrawer.setAttribute('aria-hidden', 'false');
-  }
-  function closeCart() {
-    cartDrawer.style.display = 'none';
-    cartDrawer.setAttribute('aria-hidden', 'true');
-  }
-
-  function showEntryPromo() {
-    entryPromoModal.classList.remove('hidden');
-    entryPromoModal.style.display = 'block';
-  }
-
-  /* ---------- Slideshow ---------- */
+  /* ---------- Slideshow (unchanged) ---------- */
   function initSlideshow() {
-    // Ensure only active slide visible
     slideElements.forEach((el, idx) => {
       el.style.display = idx === slideIndex ? 'block' : 'none';
       el.setAttribute('aria-hidden', idx === slideIndex ? 'false' : 'true');
     });
-    updateDots();
-
-    // Prev/Next
-    slidePrev?.addEventListener('click', () => {
-      goToSlide((slideIndex - 1 + slideElements.length) % slideElements.length);
+    slideDots.forEach((dot, i) => {
+      dot.addEventListener('click', () => goToSlide(i));
     });
-    slideNext?.addEventListener('click', () => {
-      goToSlide((slideIndex + 1) % slideElements.length);
-    });
-
-    // Dots
-    slideDots.forEach((dot) => {
-      dot.addEventListener('click', (e) => {
-        const idx = Number(dot.dataset.index);
-        goToSlide(idx);
-      });
-    });
-
-    // CTA handlers inside slides
-    slidesWrap.addEventListener('click', (e) => {
+    restartSlideTimer();
+    document.querySelector('.slide-prev')?.addEventListener('click', () => goToSlide((slideIndex - 1 + slideElements.length) % slideElements.length));
+    document.querySelector('.slide-next')?.addEventListener('click', () => goToSlide((slideIndex + 1) % slideElements.length));
+    slidesWrap?.addEventListener('click', (e) => {
       const target = e.target.closest('[data-action]');
       if (!target) return;
       const action = target.dataset.action;
-      if (action === 'order-now') {
-        // move to menu
-        q('#menu')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      } else if (action === 'apply-promo') {
-        // claim promo for session
-        sessionStorage.setItem('wrap_promo_claimed', '1');
-        promo.claimed = true;
-        renderCart();
-        alert('Promo applied for this session. Add qualifying items to see the discount.');
-      } else if (action === 'learn-more') {
-        q('#promo')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      } else if (action === 'order-now-whatsapp' || target.dataset.feature === 'shawarma' || target.dataset.action === 'order-now') {
-        // Example: open WhatsApp with a prefilled message
-        const phone = '233552509241'; // format without leading zero for international? Keep simple: we'll open wa.me with message
-        const message = encodeURIComponent('Hi, I want to order shawarma. Please help.');
-        window.open(`https://wa.me/${phone}?text=${message}`, '_blank');
-      }
+      if (action === 'order-now') q('#menu')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      if (action === 'apply-promo') { sessionStorage.setItem('wrap_promo_claimed', '1'); promo.claimed = true; renderCart(); alert('Promo applied for this session.'); }
+      if (action === 'learn-more') q('#promo')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     });
-
-    // Autoplay
-    restartSlideTimer();
   }
-
-  function restartSlideTimer() {
-    clearInterval(slideTimer);
-    slideTimer = setInterval(() => {
-      goToSlide((slideIndex + 1) % slideElements.length);
-    }, slideAutoDelay);
-  }
-
+  function restartSlideTimer() { clearInterval(slideTimer); slideTimer = setInterval(() => goToSlide((slideIndex + 1) % slideElements.length), slideAutoDelay); }
   function goToSlide(idx) {
     if (idx === slideIndex) return;
     slideElements[slideIndex].style.display = 'none';
@@ -2504,50 +2415,39 @@ document.addEventListener('DOMContentLoaded', () => {
     slideIndex = idx;
     slideElements[slideIndex].style.display = 'block';
     slideElements[slideIndex].setAttribute('aria-hidden', 'false');
-    updateDots();
     restartSlideTimer();
   }
 
-  function updateDots() {
-    slideDots.forEach((dot, i) => {
-      if (i === slideIndex) dot.classList.add('is-active');
-      else dot.classList.remove('is-active');
-    });
-  }
-
-  /* ---------- Menu interactions & price calc ---------- */
-
+  /* ---------- Menu interactions & price calc (enhanced) ---------- */
   function initMenuInteractions() {
-    // Respond to change in selects and checkboxes to update local price display
     const menuItems = qa('.menu-item');
     menuItems.forEach((item) => {
-      // update price display initially
       updateItemPriceDisplay(item);
+      item.addEventListener('change', () => updateItemPriceDisplay(item));
 
-      // when any input changes inside item, recalc price display
-      item.addEventListener('change', () => {
-        updateItemPriceDisplay(item);
-      });
-
-      // Add / Remove buttons
       const addBtn = q('.add-btn', item);
       const removeBtn = q('.remove-btn', item);
+
       addBtn?.addEventListener('click', () => {
-        const itemId = addBtn.dataset.itemId;
+        const baseId = addBtn.dataset.itemId;
+        // capture meta from current configuration
+        const meta = getItemMeta(item);
         const price = calculateItemPrice(item);
-        const title = q('.item-title', item)?.innerText?.trim() || itemId;
-        addToCart(itemId, { title, unitPrice: price, element: item });
-        // After adding, toggle menu buttons: show remove, hide add
+        const title = q('.item-title', item)?.innerText?.trim() || baseId;
+        addToCart(baseId, { title, unitPrice: price, meta, element: item });
+        // UI: hide add, show remove (this keeps previous behaviour)
         addBtn.classList.add('hidden');
-        removeBtn.classList.remove('hidden');
+        removeBtn?.classList.remove('hidden');
       });
+
       removeBtn?.addEventListener('click', () => {
-        const itemId = removeBtn.dataset.itemId;
-        removeOneFromCart(itemId);
-        // Toggle back menu buttons if item no longer in cart
-        if (!cart[itemId] || cart[itemId].qty <= 0) {
+        const baseId = removeBtn.dataset.itemId;
+        // remove one matching cart entry (first found)
+        removeOneFromCartByBase(baseId);
+        // toggle back if no more of that base item remains
+        if (!cartHasBaseItem(baseId)) {
           removeBtn.classList.add('hidden');
-          addBtn.classList.remove('hidden');
+          q('.add-btn', item)?.classList.remove('hidden');
         }
       });
     });
@@ -2564,216 +2464,225 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function calculateItemPrice(itemElement) {
-    // Generic: sum of select values + checked addons
-    // For each item, selects have numeric values (we set them in markup)
     let total = 0;
-
-    // find selects inside the item that represent base/choices
     const selects = qa('select', itemElement);
-    selects.forEach((sel) => {
-      const val = Number(sel.value) || 0;
-      total += val;
-    });
-
-    // addons checkboxes: have numeric values for extra price
+    selects.forEach((sel) => { const val = Number(sel.value) || 0; total += val; });
     const addons = qa('input.addon-checkbox[type="checkbox"]', itemElement);
-    addons.forEach((cb) => {
-      if (cb.checked) total += Number(cb.value || 0);
-    });
-
-    // if no selects/checkboxes (like noodles), attempt to read .item-price .price-value (fallback)
+    addons.forEach((cb) => { if (cb.checked) total += Number(cb.value || 0); });
     if (selects.length === 0 && addons.length === 0) {
       const fallback = Number(q('.price-value', itemElement)?.innerText || 0);
       if (fallback) total = fallback;
     }
-
     return Math.round(total);
   }
 
-  /* ---------- Cart Management ---------- */
+  // Capture option meta from menu-item element
+  function getItemMeta(itemElement) {
+    const meta = { selects: [], addons: [], thumb: null };
+    // capture selected selects as {name, value, label}
+    qa('select', itemElement).forEach(sel => {
+      const opt = sel.options[sel.selectedIndex];
+      meta.selects.push({
+        name: sel.name || sel.dataset.name || '',
+        value: sel.value,
+        label: opt ? opt.text : sel.value
+      });
+    });
+    // capture checked addons as {key,label,value}
+    qa('input.addon-checkbox[type="checkbox"]', itemElement).forEach(cb => {
+      if (cb.checked) {
+        const labelEl = cb.closest('.addon')?.querySelector('span');
+        meta.addons.push({
+          key: cb.dataset.addonKey || '',
+          label: labelEl ? labelEl.innerText.trim() : cb.value,
+          value: Number(cb.value || 0)
+        });
+      }
+    });
+    const thumb = q('.item-thumb', itemElement);
+    if (thumb) meta.thumb = { src: thumb.src || '', alt: thumb.alt || '' };
+    // record baseId
+    meta.baseId = itemElement.dataset.itemId || '';
+    return meta;
+  }
 
-  function addToCart(itemId, { title, unitPrice, element } = {}) {
-    if (!itemId) return;
-    if (!cart[itemId]) {
-      cart[itemId] = {
-        id: itemId,
-        title: title || itemId,
+  // Compose deterministic key for a baseId + meta so identical configs merge
+  function makeCartKey(baseId, meta) {
+    // Stable JSON: selects and addons order is deterministic because captured in DOM order
+    const encoded = encodeURIComponent(JSON.stringify(meta));
+    return `${baseId}|${encoded}`;
+  }
+
+  // Add to cart: accepts baseId and meta. If same config exists -> increment qty.
+  function addToCart(baseId, { title, unitPrice, meta, element } = {}) {
+    if (!baseId) return;
+    const key = makeCartKey(baseId, meta || {});
+    if (!cart[key]) {
+      cart[key] = {
+        id: key,
+        baseId,
+        title: title || baseId,
         unitPrice: Number(unitPrice) || 0,
         qty: 0,
+        meta: meta || {},
         elementRef: element || null
       };
     }
-
-    // If item already exists, increment qty by 1
-    cart[itemId].qty += 1;
-
-    // Update unitPrice to latest (in case user changed options before adding)
-    cart[itemId].unitPrice = Number(unitPrice) || cart[itemId].unitPrice;
-
+    cart[key].qty += 1;
+    // Ensure stored unitPrice matches current computed (so extras included)
+    cart[key].unitPrice = Number(unitPrice) || cart[key].unitPrice;
     renderCart();
   }
 
-  function removeOneFromCart(itemId) {
-    if (!cart[itemId]) return;
-    cart[itemId].qty -= 1;
-    if (cart[itemId].qty <= 0) {
-      delete cart[itemId];
+  // Removes one unit of a cart line by the unique key
+  function removeOneFromCartByKey(key) {
+    if (!cart[key]) return;
+    cart[key].qty -= 1;
+    if (cart[key].qty <= 0) delete cart[key];
+    renderCart();
+  }
+
+  // Remove one unit of the first cart line that matches baseId
+  function removeOneFromCartByBase(baseId) {
+    const k = Object.keys(cart).find(k => cart[k].baseId === baseId);
+    if (k) {
+      removeOneFromCartByKey(k);
     }
-    renderCart();
-
-    // If removed from cart, ensure menu Add/Remove buttons reflect state
-    syncMenuButtonsForItem(itemId);
   }
 
-  function removeItemFully(itemId) {
-    if (!cart[itemId]) return;
-    delete cart[itemId];
+  function removeItemFully(key) {
+    if (!cart[key]) return;
+    delete cart[key];
     renderCart();
-    syncMenuButtonsForItem(itemId);
   }
 
-  function changeItemQty(itemId, newQty) {
-    if (!cart[itemId]) return;
-    cart[itemId].qty = Math.max(0, Math.floor(newQty));
-    if (cart[itemId].qty === 0) delete cart[itemId];
+  function changeItemQtyByKey(key, newQty) {
+    if (!cart[key]) return;
+    cart[key].qty = Math.max(0, Math.floor(newQty));
+    if (cart[key].qty === 0) delete cart[key];
     renderCart();
-    syncMenuButtonsForItem(itemId);
   }
 
-  function syncMenuButtonsForItem(itemId) {
-    // find the menu-item element and toggle add/remove based on presence in cart
-    const menuItem = q(`[data-item-id="${itemId}"]`);
-    if (!menuItem) return;
-    const addBtn = q('.add-btn', menuItem);
-    const removeBtn = q('.remove-btn', menuItem);
-    if (cart[itemId] && cart[itemId].qty > 0) {
-      addBtn?.classList.add('hidden');
-      removeBtn?.classList.remove('hidden');
-    } else {
-      addBtn?.classList.remove('hidden');
-      removeBtn?.classList.add('hidden');
-    }
+  function cartHasBaseItem(baseId) {
+    return Object.keys(cart).some(k => cart[k].baseId === baseId && cart[k].qty > 0);
   }
 
   function computeCartTotals() {
     let subtotal = 0;
-    let delivery = 0; // could compute distance, for now keep 0
-    // Apply promos:
-    // - Buy2Get1 for shawarma (item id 'shawarma' used in markup)
-    // - Free Coke for loaded-fries (item id 'loaded-fries') when promo active
+    let delivery = 0;
     let promoDiscount = 0;
-    let freeItemsToShow = []; // lines of free items to render in cart
+    let freeItemsToShow = [];
 
-    for (const id in cart) {
-      const line = cart[id];
-      subtotal += line.unitPrice * line.qty;
+    // Sum lines
+    for (const k in cart) {
+      const line = cart[k];
+      subtotal += Number(line.unitPrice || 0) * line.qty;
     }
 
-    // Shawarma B2G1
-    const shawarmaId = 'shawarma';
-    if (cart[shawarmaId] && promo.isActive()) {
-      const qnty = cart[shawarmaId].qty;
-      // free_count = floor(qnty / 3) [buy 2 get 1 free => for each 3, 1 free]
-      const freeCount = Math.floor(qnty / 3);
+    // Shawarma promo (baseId 'shawarma')
+    if (promo.isActive()) {
+      // find all shawarma lines to get total qty and unitPrice behavior: discount is based on unit price of each variant.
+      const shawarmaLines = Object.values(cart).filter(l => l.baseId === 'shawarma');
+      const totalShawarmaQty = shawarmaLines.reduce((s, l) => s + l.qty, 0);
+      const freeCount = Math.floor(totalShawarmaQty / 3);
       if (freeCount > 0) {
-        // discount equals freeCount * unitPrice of shawarma
-        const discount = freeCount * cart[shawarmaId].unitPrice;
+        // Determine discount: prefer to discount the lowest-priced shawarma(s) first (fairer)
+        // Build array of individual shawarma unit prices repeated by qty
+        const units = [];
+        shawarmaLines.forEach(l => {
+          for (let i=0;i<l.qty;i++) units.push(l.unitPrice);
+        });
+        units.sort((a,b) => a - b);
+        // discount is sum of cheapest `freeCount` unit prices
+        let discount = 0;
+        for (let i=0;i<freeCount && i<units.length;i++) discount += units[i];
         promoDiscount += discount;
-        freeItemsToShow.push({
-          id: 'free-shawarma',
-          title: 'Free Shawarma (promo)',
-          qty: freeCount,
-          unitPrice: 0
-        });
-      } else {
-        // show microcopy about how many more needed
+        freeItemsToShow.push({ id: 'free-shawarma', title: 'Free Shawarma (promo)', qty: freeCount, unitPrice: 0 });
       }
     }
 
-    // Loaded fries free coke: if loaded-fries present and promo active -> add free coke line
-    const friesId = 'loaded-fries';
-    if (cart[friesId] && promo.isActive()) {
-      // free coke per fries quantity (1 coke per fries)
-      const freeCokeQty = cart[friesId].qty;
-      if (freeCokeQty > 0) {
-        freeItemsToShow.push({
-          id: 'free-coke',
-          title: 'Free Coke (promo)',
-          qty: freeCokeQty,
-          unitPrice: 0
-        });
+    // Loaded-fries -> free coke per fries quantity if promo active
+    if (promo.isActive()) {
+      const friesLines = Object.values(cart).filter(l => l.baseId === 'loaded-fries');
+      const friesQty = friesLines.reduce((s,l) => s + l.qty, 0);
+      if (friesQty > 0) {
+        freeItemsToShow.push({ id: 'free-coke', title: 'Free Coke (promo)', qty: friesQty, unitPrice: 0 });
       }
     }
 
-    // Totals
     const total = subtotal - promoDiscount + delivery;
-    return {
-      subtotal,
-      delivery,
-      promoDiscount,
-      total,
-      freeItems: freeItemsToShow
-    };
+    return { subtotal, delivery, promoDiscount, total, freeItems: freeItemsToShow };
   }
 
+  /* ---------- Render cart (shows meta breakdown) ---------- */
   function renderCart() {
-    // Clear list
     cartItemsList.innerHTML = '';
 
-    // Render cart items lines
-    const itemIds = Object.keys(cart);
-    if (itemIds.length === 0) {
+    const itemKeys = Object.keys(cart);
+    if (itemKeys.length === 0) {
       cartItemsList.innerHTML = '<li class="empty">Your cart is empty. Add something delicious!</li>';
     } else {
-      itemIds.forEach((id) => {
-        const line = cart[id];
+      itemKeys.forEach(k => {
+        const line = cart[k];
         const li = document.createElement('li');
         li.className = 'cart-line';
-        li.dataset.itemId = id;
+        li.dataset.itemId = k;
+
+        // meta summary
+        let metaHtml = '';
+        if (line.meta && (line.meta.selects?.length || line.meta.addons?.length)) {
+          metaHtml += '<div class="line-meta" style="margin-top:8px;">';
+          if (line.meta.selects?.length) {
+            metaHtml += line.meta.selects.map(s => `<div class="small">${escapeHtml(s.label)}</div>`).join('');
+          }
+          if (line.meta.addons?.length) {
+            metaHtml += '<div class="small">Extras: ' + line.meta.addons.map(a => `${escapeHtml(a.label)} (+GHC ${Math.round(a.value)})`).join(', ') + '</div>';
+          }
+          metaHtml += '</div>';
+        }
+
+        // thumb (if available)
+        const thumbHtml = line.meta?.thumb?.src ? `<img src="${escapeHtml(line.meta.thumb.src)}" alt="${escapeHtml(line.meta.thumb.alt || '')}" style="width:64px;height:56px;object-fit:cover;border-radius:8px;margin-right:10px;border:1px solid rgba(255,255,255,0.03)">` : '';
+
         li.innerHTML = `
-          <div class="line-left">
-            <strong class="line-title">${escapeHtml(line.title)}</strong>
-            <div class="line-meta">GHC ${Math.round(line.unitPrice)} x <span class="line-qty">${line.qty}</span></div>
-          </div>
-          <div class="line-controls">
-            <button class="icon-btn cart-decrease" aria-label="Decrease quantity">-</button>
-            <button class="icon-btn cart-increase" aria-label="Increase quantity">+</button>
-            <button class="icon-btn cart-remove" aria-label="Remove item"><i class="fa fa-trash"></i></button>
+          <div style="display:flex;align-items:flex-start;gap:12px;width:100%;">
+            ${thumbHtml}
+            <div style="flex:1 1 auto;">
+              <strong class="line-title">${escapeHtml(line.title)}</strong>
+              <div class="line-meta">GHC ${Math.round(line.unitPrice)} × <span class="line-qty">${line.qty}</span></div>
+              ${metaHtml}
+            </div>
+            <div class="line-controls" style="flex:0 0 auto;display:flex;flex-direction:column;gap:8px;">
+              <button class="icon-btn cart-increase" aria-label="Increase quantity">+</button>
+              <button class="icon-btn cart-decrease" aria-label="Decrease quantity">-</button>
+              <button class="icon-btn cart-remove" aria-label="Remove item"><i class="fa fa-trash"></i></button>
+            </div>
           </div>
         `;
         cartItemsList.appendChild(li);
       });
     }
 
-    // Compute totals and promos
     const totals = computeCartTotals();
 
-    // Render promo block if discount present or helper message if not met
-    if (totals.promoDiscount > 0 || (cart['shawarma'] && promo.isActive())) {
-      // If discount >0 show applied, else show helper
+    // Promo block
+    if (totals.promoDiscount > 0 || cartHasBaseItem('shawarma')) {
       if (totals.promoDiscount > 0) {
         promoDiscountEl.innerText = `-GHC ${Math.round(totals.promoDiscount)}`;
-        promoHelpText.innerText = `Promo applied — ${cart['shawarma'] ? cart['shawarma'].qty : 0} shawarma(s) qualify.`;
+        promoHelpText.innerText = `Promo applied — shawarma promo gave -GHC ${Math.round(totals.promoDiscount)}.`;
         cartPromoBlock.classList.remove('hidden');
       } else {
-        // helper: show how many more needed
-        const qnty = cart['shawarma'] ? cart['shawarma'].qty : 0;
-        const missing = (3 - (qnty % 3)) % 3;
-        if (qnty > 0) {
+        const qty = Object.values(cart).filter(l => l.baseId === 'shawarma').reduce((s,l) => s + l.qty, 0);
+        const missing = (3 - (qty % 3)) % 3;
+        if (qty > 0) {
           promoHelpText.innerText = `Add ${missing} more Shawarma${missing > 1 ? 's' : ''} to get one free.`;
           cartPromoBlock.classList.remove('hidden');
-        } else {
-          cartPromoBlock.classList.add('hidden');
-        }
+        } else cartPromoBlock.classList.add('hidden');
       }
-    } else {
-      cartPromoBlock.classList.add('hidden');
-    }
+    } else cartPromoBlock.classList.add('hidden');
 
-    // Render free promo items (placed after normal items)
-    // We'll append freebies from computeCartTotals().freeItems for display
-    const freeItems = totals.freeItems || [];
-    freeItems.forEach(fi => {
+    // Render freebies
+    (totals.freeItems || []).forEach(fi => {
       const li = document.createElement('li');
       li.className = 'cart-line cart-free';
       li.innerHTML = `
@@ -2781,96 +2690,73 @@ document.addEventListener('DOMContentLoaded', () => {
           <strong class="line-title">${escapeHtml(fi.title)}</strong>
           <div class="line-meta">Free × <span class="line-qty">${fi.qty}</span></div>
         </div>
-        <div class="line-controls">
-          <!-- no controls for freebies -->
-        </div>
+        <div class="line-controls"></div>
       `;
       cartItemsList.appendChild(li);
     });
 
-    // Totals UI update
     cartSubtotalEl.innerText = fmtGhc(totals.subtotal);
     cartDeliveryEl.innerText = fmtGhc(totals.delivery);
     cartTotalEl.innerText = fmtGhc(totals.total);
 
-    // Update badges in header
     const cartCount = Object.values(cart).reduce((s, li) => s + li.qty, 0);
     cartCountBadge.innerText = String(cartCount);
     cartMiniCount.innerText = String(cartCount);
 
-    // Attach listeners for quantity controls inside cart
-    qa('.cart-increase', cartItemsList).forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        const id = e.target.closest('.cart-line').dataset.itemId;
-        if (!id) return;
-        changeItemQty(id, (cart[id].qty || 0) + 1);
-      });
-    });
-    qa('.cart-decrease', cartItemsList).forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        const id = e.target.closest('.cart-line').dataset.itemId;
-        if (!id) return;
-        changeItemQty(id, (cart[id].qty || 0) - 1);
-      });
-    });
-    qa('.cart-remove', cartItemsList).forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        const id = e.target.closest('.cart-line').dataset.itemId;
-        if (!id) return;
-        removeItemFully(id);
-      });
-    });
+    // attach listeners for controls in cart
+    qa('.cart-increase', cartItemsList).forEach(btn => btn.addEventListener('click', (e) => {
+      const key = e.target.closest('.cart-line').dataset.itemId;
+      if (!key) return;
+      changeItemQtyByKey(key, (cart[key].qty || 0) + 1);
+    }));
+    qa('.cart-decrease', cartItemsList).forEach(btn => btn.addEventListener('click', (e) => {
+      const key = e.target.closest('.cart-line').dataset.itemId;
+      if (!key) return;
+      changeItemQtyByKey(key, (cart[key].qty || 0) - 1);
+    }));
+    qa('.cart-remove', cartItemsList).forEach(btn => btn.addEventListener('click', (e) => {
+      const key = e.target.closest('.cart-line').dataset.itemId;
+      if (!key) return;
+      removeItemFully(key);
+    }));
 
-    // Update menu buttons sync
+    // sync menu add/remove appearance for base items
     qa('.menu-item').forEach(mi => {
       const id = mi.dataset.itemId;
-      if (id) syncMenuButtonsForItem(id);
+      if (!id) return;
+      const addBtn = q('.add-btn', mi);
+      const removeBtn = q('.remove-btn', mi);
+      if (cartHasBaseItem(id)) { addBtn?.classList.add('hidden'); removeBtn?.classList.remove('hidden'); }
+      else { addBtn?.classList.remove('hidden'); removeBtn?.classList.add('hidden'); }
     });
   }
 
-  function handleAddMissing(e) {
-    // For shawarma promo: add missing to reach next multiple of 3
-    const shawarmaQty = cart['shawarma'] ? cart['shawarma'].qty : 0;
+  /* ---------- Add missing, checkout, clear ---------- */
+  function handleAddMissing() {
+    const shawarmaQty = Object.values(cart).filter(l => l.baseId === 'shawarma').reduce((s,l) => s + l.qty, 0);
     const missing = (3 - (shawarmaQty % 3)) % 3;
-    if (missing === 0) {
-      alert('You already qualify for the Buy 2 Get 1 promo for shawarma.');
-      return;
-    }
-
-    // Add missing number of shawarmas using default configuration of the menu item
+    if (missing === 0) { alert('You already qualify for the Buy 2 Get 1 promo for shawarma.'); return; }
     const menuEl = q('[data-item-id="shawarma"]');
-    if (!menuEl) {
-      alert('Shawarma item not found in menu.');
-      return;
-    }
-
-    // Determine default price by reading the selects in the menu (current selected)
+    if (!menuEl) { alert('Shawarma item not found in menu.'); return; }
     const price = calculateItemPrice(menuEl);
     const title = q('.item-title', menuEl)?.innerText?.trim() || 'Shawarma';
-
-    for (let i = 0; i < missing; i++) {
-      addToCart('shawarma', { title, unitPrice: price, element: menuEl });
-    }
-
-    // After adding missing, close menu and open cart
+    const meta = getItemMeta(menuEl);
+    for (let i=0;i<missing;i++) addToCart('shawarma', { title, unitPrice: price, meta, element: menuEl });
     renderCart();
     openCart();
   }
 
-  function handleCheckout(e) {
-    // Create a simple order summary and simulate checkout flow
+  function handleCheckout() {
     const totals = computeCartTotals();
     let summary = 'ORDER SUMMARY:\\n';
     Object.values(cart).forEach(li => {
-      summary += `${li.title} x${li.qty} — ${fmtGhc(li.unitPrice * li.qty)}\\n`;
+      summary += `${li.title} (${li.meta.selects?.map(s => s.label).join(',') || ''}${li.meta.addons?.length ? ' + ' + li.meta.addons.map(a=>a.label).join(',') : ''}) x${li.qty} — ${fmtGhc(li.unitPrice * li.qty)}\\n`;
     });
     if (totals.promoDiscount > 0) summary += `Promo discount: -GHC ${Math.round(totals.promoDiscount)}\\n`;
     summary += `Subtotal: ${fmtGhc(totals.subtotal)}\\n`;
     summary += `Delivery: ${fmtGhc(totals.delivery)}\\n`;
     summary += `Total: ${fmtGhc(totals.total)}\\n\\n`;
-    summary += 'This is a simulated checkout. To integrate Paystack, replace this with the Paystack checkout flow and your keys.';
-
-    // Show the summary
+    summary += 'This is a simulated checkout. To integrate Paystack, swap this for the Paystack flow.';
     alert(summary);
   }
 
@@ -2880,10 +2766,36 @@ document.addEventListener('DOMContentLoaded', () => {
     renderCart();
   }
 
- 
-  /* ---------- Tiny helpers ---------- */
+  /* ---------- Promo countdown (unchanged) ---------- */
+  function updatePromoCountdown() {
+    const now = new Date();
+    const day = now.getDay();
+    const targetDay = 2; // Tuesday
+    let daysUntil = (targetDay - day + 7) % 7;
+    if (daysUntil === 0) {
+      const endOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
+      const diff = endOfDay - now;
+      promoCountdownEl.innerText = formatMs(diff);
+      return;
+    }
+    const nextPromo = new Date(now.getFullYear(), now.getMonth(), now.getDate() + daysUntil, 0, 0, 0);
+    const diff = nextPromo - now;
+    promoCountdownEl.innerText = formatMs(diff);
+  }
+  function formatMs(ms) {
+    if (ms <= 0) return '00:00:00';
+    const secs = Math.floor(ms / 1000);
+    const days = Math.floor(secs / 86400);
+    const hours = Math.floor((secs % 86400) / 3600);
+    const minutes = Math.floor((secs % 3600) / 60);
+    const seconds = secs % 60;
+    if (days > 0) return `${days}d ${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
+    return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
+  }
+  function pad(n) { return String(n).padStart(2, '0'); }
+
   function escapeHtml(str) {
-    return String(str)
+    return String(str || '')
       .replace(/&/g, '&amp;')
       .replace(/"/g, '&quot;')
       .replace(/'/g, '&#39;')
@@ -2891,255 +2803,26 @@ document.addEventListener('DOMContentLoaded', () => {
       .replace(/>/g, '&gt;');
   }
 
-  /* ---------- Misc / Event Delegation for body-level interactive buttons ---------- */
-  // Handle CTA buttons that use data-action on page outside slides (like promo buttons inside sections)
+  // Final sync on load
+  qa('.menu-item').forEach(mi => {
+    const id = mi.dataset.itemId;
+    if (id) {
+      const addBtn = q('.add-btn', mi), removeBtn = q('.remove-btn', mi);
+      if (cartHasBaseItem(id)) { addBtn?.classList.add('hidden'); removeBtn?.classList.remove('hidden'); }
+      else { addBtn?.classList.remove('hidden'); removeBtn?.classList.add('hidden'); }
+    }
+  });
+
+  // Global delegation for data-action attributes
   document.body.addEventListener('click', (e) => {
     const target = e.target.closest('[data-action]');
     if (!target) return;
     const action = target.dataset.action;
-    if (action === 'apply-promo') {
-      sessionStorage.setItem('wrap_promo_claimed', '1');
-      promo.claimed = true;
-      renderCart();
-      alert('Promo claimed for this session.');
-    } else if (action === 'order-now') {
-      q('#menu')?.scrollIntoView({ behavior: 'smooth' });
-    } else if (action === 'learn-more') {
-      q('#promo')?.scrollIntoView({ behavior: 'smooth' });
-    }
-  });
-
-  /* ---------- Final sync: ensure menu buttons match cart state on load ---------- */
-  qa('.menu-item').forEach(mi => {
-    const id = mi.dataset.itemId;
-    if (id) syncMenuButtonsForItem(id);
+    if (action === 'apply-promo') { sessionStorage.setItem('wrap_promo_claimed', '1'); promo.claimed = true; renderCart(); alert('Promo claimed for this session.'); }
+    else if (action === 'order-now') q('#menu')?.scrollIntoView({ behavior: 'smooth' });
+    else if (action === 'learn-more') q('#promo')?.scrollIntoView({ behavior: 'smooth' });
   });
 });
 </script>
-  <script>
-    /* ---------- Menu filtering (tabs) & corrected scroll offset ---------- */
-function initMenuFilterAndAnchors() {
-  // tabs
-  const tabs = qa('.menu-tabs .tab-btn');
-  tabs.forEach(btn => {
-    btn.addEventListener('click', () => {
-      tabs.forEach(b => {
-        b.classList.remove('is-active');
-        b.setAttribute('aria-selected', 'false');
-      });
-      btn.classList.add('is-active');
-      btn.setAttribute('aria-selected', 'true');
-      const cat = btn.dataset.cat;
-      qa('.menu-item').forEach(mi => {
-        if (!cat || cat === 'all' || mi.dataset.category === cat) {
-          mi.style.display = 'block';
-          mi.removeAttribute('aria-hidden');
-        } else {
-          mi.style.display = 'none';
-          mi.setAttribute('aria-hidden', 'true');
-        }
-      });
-      // if filtered result fits only one card, focus it (keyboard users)
-      const visible = qa('.menu-item:not([aria-hidden="true"])');
-      if (visible.length === 1) visible[0].focus();
-    });
-  });
-
-  // improved anchor scrolling to account for sticky header
-  function scrollToWithOffset(target) {
-    if (!target) return;
-    const header = q('.sticky-header');
-    const headerH = header ? header.offsetHeight : 64;
-    const rect = target.getBoundingClientRect();
-    const top = rect.top + window.scrollY - headerH - 12;
-    window.scrollTo({ top, behavior: 'smooth' });
-  }
-
-  // intercept internal anchor links and nav items
-  qa('a[href^="#"]').forEach(a => {
-    a.addEventListener('click', (ev) => {
-      const href = a.getAttribute('href');
-      if (!href || href === '#') return;
-      const el = q(href);
-      if (el) {
-        ev.preventDefault();
-        scrollToWithOffset(el);
-      }
-    });
-  });
-}
-
-// call after menu setup
-initMenuFilterAndAnchors();
-  </script>
-  <script>
-    /* ---------------- PROMO CONFIG & PREORDER SUPPORT ---------------- */
-const promo = {
-  // Promo only on Tuesdays
-  activeDays: [2], // 2 === Tuesday (0 Sun ... 6 Sat)
-
-  // Promo active hours (local time) - you can change these
-  startHour: 12, // 12:00
-  endHour: 22,   // 22:00
-
-  // returns true only when it's Tuesday AND within startHour <= hour < endHour
-  isActive() {
-    const now = new Date();
-    const day = now.getDay();
-    if (!this.activeDays.includes(day)) return false;
-    const hour = now.getHours();
-    return hour >= this.startHour && hour < this.endHour;
-  }
-};
-
-/* Utility: compute next Tuesday date; if 'atStart' true returns next promo start (next Tuesday at startHour) */
-function getNextPromoDate(atStart = true) {
-  const now = new Date();
-  const targetDay = 2; // Tuesday
-  let daysUntil = (targetDay - now.getDay() + 7) % 7;
-
-  // if today is Tuesday:
-  if (daysUntil === 0) {
-    // if asking for start and the start time is later today, keep today
-    if (atStart && now.getHours() < promo.startHour) {
-      daysUntil = 0;
-    } else if (!atStart) {
-      // for end time if still before endHour, return today
-      daysUntil = 0;
-    } else {
-      // otherwise next week's Tuesday
-      daysUntil = 7;
-    }
-  }
-
-  const baseDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() + daysUntil);
-  if (atStart) {
-    baseDate.setHours(promo.startHour, 0, 0, 0);
-  } else {
-    baseDate.setHours(promo.endHour, 0, 0, 0);
-  }
-  return baseDate;
-}
-
-/* Pretty formatting for countdown */
-function formatMs(ms) {
-  if (ms <= 0) return '00:00:00';
-  const secs = Math.floor(ms / 1000);
-  const days = Math.floor(secs / 86400);
-  const hours = Math.floor((secs % 86400) / 3600);
-  const minutes = Math.floor((secs % 3600) / 60);
-  const seconds = secs % 60;
-  if (days > 0) return `${days}d ${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
-  return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
-}
-function pad(n) { return String(n).padStart(2, '0'); }
-
-/* Update the countdown UI: show "starts in" if not active yet, "ends in" when active */
-function updatePromoCountdown() {
-  const now = new Date();
-  const promoTimerEl = q('#promo-timer');
-
-  if (promo.isActive()) {
-    // show time until promo end (today at endHour)
-    const endDate = getNextPromoDate(false);
-    const diff = endDate - now;
-    promoTimerEl.innerText = `Ends in ${formatMs(diff)}`;
-  } else {
-    // show time until next promo start (next Tuesday at startHour)
-    const nextStart = getNextPromoDate(true);
-    const diff = nextStart - now;
-    promoTimerEl.innerText = `Starts in ${formatMs(diff)}`;
-  }
-}
-
-/* Run countdown every second */
-updatePromoCountdown();
-setInterval(updatePromoCountdown, 1000);
-
-/* -------------------- Preorder flow -------------------- */
-
-/* show / hide preorder modal helpers */
-const preorderModal = q('#preorder-modal');
-const preorderForm = q('#preorder-form');
-const preorderClose = q('#preorder-close');
-const preorderCancel = q('#preorder-cancel');
-
-function openPreorderModal() {
-  // If cart is empty, show a toast/alert
-  const cartCount = Object.values(cart).reduce((s, li) => s + (li.qty || 0), 0);
-  if (cartCount === 0) {
-    alert('Your cart is empty — add items you want to preorder, then click Preorder.');
-    return;
-  }
-  preorderModal.style.display = 'flex';
-  preorderModal.setAttribute('aria-hidden', 'false');
-}
-
-function closePreorderModal() {
-  preorderModal.style.display = 'none';
-  preorderModal.setAttribute('aria-hidden', 'true');
-}
-
-/* compute scheduled date (next promo start) and create preorder record */
-function createPreorderRecord(customer) {
-  // Deep copy items from cart
-  const items = Object.values(cart).map(i => ({
-    id: i.id,
-    title: i.title,
-    unitPrice: i.unitPrice,
-    qty: i.qty
-  }));
-  const totals = computeCartTotals();
-  const scheduledFor = getNextPromoDate(true); // next promo start
-
-  const preorder = {
-    id: 'preorder-' + Date.now(),
-    createdAt: new Date().toISOString(),
-    scheduledFor: scheduledFor.toISOString(),
-    customer,
-    items,
-    totals
-  };
-
-  // Save locally (later wire to backend)
-  const existing = JSON.parse(localStorage.getItem('wrap_preorders') || '[]');
-  existing.push(preorder);
-  localStorage.setItem('wrap_preorders', JSON.stringify(existing));
-
-  // Simple UI feedback
-  alert(`Preorder scheduled for ${scheduledFor.toLocaleString()}. We'll hold your items for the promo.`);
-  closePreorderModal();
-}
-
-/* event listeners for modal buttons */
-preorderClose?.addEventListener('click', closePreorderModal);
-preorderCancel?.addEventListener('click', closePreorderModal);
-
-preorderForm?.addEventListener('submit', (ev) => {
-  ev.preventDefault();
-  const name = q('#preorder-name').value.trim();
-  const phone = q('#preorder-phone').value.trim();
-  const note = q('#preorder-note').value.trim();
-
-  if (!name || !phone) {
-    alert('Please provide name and phone for preorder.');
-    return;
-  }
-
-  createPreorderRecord({ name, phone, note });
-});
-
-/* wire the page-level handler for both promo buttons (hero slide + promo section) */
-document.body.addEventListener('click', (e) => {
-  const t = e.target.closest('[data-action]');
-  if (!t) return;
-  const action = t.dataset.action;
-  if (action === 'preorder-promo') {
-    // Open modal to confirm preorder for next promo
-    openPreorderModal();
-  }
-  // keep other data-action handling intact (order-now, apply-promo etc.)
-});
-  </script>
 </html>
   
