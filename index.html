@@ -1058,6 +1058,166 @@ body {
 }
 .item-price.updated .price-value { transform: translateY(-4px); }
 
+    /* ===== Menu Container + Card polish (replace or append to your menu styles) ===== */
+
+/* Container separating hero and menu */
+.menu-container{
+  margin: 14px auto 28px;
+  width: 94%;
+  max-width: 420px;
+  border-radius: 18px;
+  padding: 8px;
+  box-sizing: border-box;
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  border: 1px solid rgba(255,255,255,0.035);
+  box-shadow: 0 18px 50px rgba(0,0,0,0.6);
+  overflow: hidden;
+}
+
+/* Sticky-ish filter bar (horiz scroll on small screens) */
+.menu-filter-bar{
+  display:flex;
+  gap:8px;
+  padding: 8px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-bottom: 1px solid rgba(255,255,255,0.02);
+  background: linear-gradient(180deg, rgba(255,255,255,0.00), rgba(255,255,255,0.005));
+}
+.menu-filter-bar::-webkit-scrollbar{ height:6px; }
+.filter-btn{
+  flex: 0 0 auto;
+  padding:8px 10px;
+  border-radius:999px;
+  border: 1px solid rgba(255,255,255,0.03);
+  background: rgba(255,255,255,0.01);
+  color: var(--muted);
+  font-weight:800;
+  font-size:13px;
+}
+.filter-btn.is-active{
+  background: linear-gradient(90deg,var(--accent-1),var(--accent-2));
+  color: #111;
+  box-shadow: 0 10px 28px rgba(255,106,0,0.12);
+}
+
+/* Menu list - make it slightly scrollable within container if needed */
+.menu-list{
+  padding: 12px;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  max-height: calc(100vh - 320px);
+  overflow-y: auto;
+}
+
+/* Card (menu-item) reworked for appetizing look */
+.menu-card{
+  display:flex;
+  gap:12px;
+  align-items:stretch;
+  background: linear-gradient(180deg, rgba(0,0,0,0.25), rgba(255,255,255,0.01));
+  border-radius: 14px;
+  padding: 8px;
+  box-shadow: 0 12px 36px rgba(0,0,0,0.6);
+  border: 1px solid rgba(255,255,255,0.03);
+  transition: transform 210ms cubic-bezier(.2,.9,.3,1), box-shadow 210ms ease;
+}
+
+/* Media left column */
+.card-media{
+  position:relative;
+  flex: 0 0 110px;
+  display:flex;
+  align-items:flex-start;
+  justify-content:center;
+}
+.card-thumb{
+  width:110px;
+  height:86px;
+  object-fit:cover;
+  border-radius:12px;
+  border: 1px solid rgba(255,255,255,0.04);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  transform: rotate(-1deg) scale(1);
+  transition: transform 420ms cubic-bezier(.2,.9,.3,1);
+}
+.menu-card:hover .card-thumb{ transform: rotate(-0.5deg) scale(1.03); }
+
+/* Price chip floating top-right of media */
+.price-chip{
+  position:absolute;
+  right:6px;
+  top:6px;
+  background: linear-gradient(90deg,var(--accent-1),var(--accent-2));
+  color:#111;
+  font-weight:900;
+  padding:6px 8px;
+  border-radius:999px;
+  font-size:12px;
+  box-shadow: 0 10px 30px rgba(255,106,0,0.12);
+  border: 2px solid rgba(255,255,255,0.03);
+}
+
+/* Card body (right column) */
+.card-body{
+  flex: 1 1 auto;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+
+/* Head + sub */
+.card-head { display:flex; flex-direction:column; gap:6px; }
+.card-title{
+  font-size:15px;
+  font-weight:900;
+  margin:0;
+  color:#fff;
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.card-sub{ font-size:13px; color: rgba(255,255,255,0.8); margin:0; }
+
+/* Config area (selects + addons) */
+.card-config{ display:flex; flex-direction:column; gap:8px; margin-top:4px; }
+.card-config .select{ font-size:14px; padding:10px; }
+
+/* Footer (price + actions) */
+.card-footer{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-top:auto;
+}
+.card-footer .price-row .item-price{ font-size:16px; font-weight:900; color:var(--accent-2); }
+.actions{ display:flex; gap:8px; align-items:center; }
+
+/* Make the whole card easier to tap: increase hit area for add button */
+.actions .add-btn{ min-width:120px; }
+.actions .remove-btn{ min-width:48px; }
+
+/* Make category filtering feel snappy */
+.menu-card[aria-hidden="true"]{ display:none !important; }
+
+/* small screens: tighten layout */
+@media (max-width:360px){
+  .card-media{ flex:0 0 94px; }
+  .card-thumb{ width:94px; height:72px; }
+  .price-chip{ font-size:11px; padding:5px 7px; }
+  .card-title{ font-size:14px; }
+}
+
+/* Desktop grid fallback (keeps appetizing layout) */
+@media (min-width:640px){
+  .menu-list{ display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  .menu-card{ flex-direction:column; align-items:flex-start; padding:12px; }
+  .card-media{ width:100%; flex: 0 0 auto; }
+  .card-thumb{ width:100%; height:160px; border-radius:12px; transform:none; }
+  .card-footer{ width:100%; }
+}
 /* End of menu styles */
 </style>
   <style>
@@ -1412,30 +1572,49 @@ a:focus, button:focus { outline: 3px solid rgba(255,204,51,0.10); outline-offset
     </section>
 
     <!-- MENU: mobile-friendly, card-based, not a long table -->
-    <section id="menu" class="menu-section" aria-labelledby="menu-heading">
-      <div class="container-small">
-        <h2 id="menu-heading" class="section-title"><i class="fa fa-utensils"></i> Menu</h2>
-        <p class="section-sub">Tap an item to configure size, protein and add-ons. Promo badges show eligibility.</p>
+<section id="menu" class="menu-section" aria-labelledby="menu-heading">
+  <div class="container-small">
+    <h2 id="menu-heading" class="section-title"><i class="fa fa-utensils"></i> Menu</h2>
+    <p class="section-sub">Tap an item to configure size, protein and add-ons. Promo badges are shown when eligible.</p>
+  </div>
 
-        <!-- Shawarma (structured pricing tiers) -->
-        <article class="menu-item" id="item-shawarma" data-item-id="shawarma" data-promo="buy2get1">
-          <div class="item-top">
-            <img class="item-thumb" src="thumb-shawarma.jpg" alt="Shawarma thumbnail">
-            <div class="item-meta">
-              <h3 class="item-title">Shawarma <span class="badge promo-badge">Buy 2 → 1 Free</span></h3>
-              <p class="item-desc">Choose size, then protein. Clear pricing tiers.</p>
-            </div>
+  <!-- NICE CONTAINER that separates the hero from the menu -->
+  <div class="menu-container glass-card" role="region" aria-label="Menu container">
+
+    <!-- Sticky filter bar (mobile friendly) -->
+    <div class="menu-filter-bar" role="tablist" aria-label="Menu categories">
+      <button class="filter-btn is-active" data-filter="all" role="tab" aria-selected="true">All</button>
+      <button class="filter-btn" data-filter="wraps" role="tab">Wraps</button>
+      <button class="filter-btn" data-filter="fries" role="tab">Fries</button>
+      <button class="filter-btn" data-filter="rice" role="tab">Rice</button>
+      <button class="filter-btn" data-filter="angwamo" role="tab">Angwamo</button>
+      <button class="filter-btn" data-filter="noodles" role="tab">Noodles</button>
+    </div>
+
+    <!-- Menu list (vertical scrollable region inside container) -->
+    <div class="menu-list" id="menu-list" tabindex="0">
+      <!-- Shawarma (Wraps category) -->
+      <article class="menu-card" data-category="wraps" id="item-shawarma" data-item-id="shawarma" data-promo="buy2get1">
+        <div class="card-media">
+          <img class="card-thumb" src="thumb-shawarma.jpg" alt="Shawarma">
+          <span class="price-chip">GHC <span class="chip-value">45–85</span></span>
+        </div>
+
+        <div class="card-body">
+          <div class="card-head">
+            <h3 class="card-title">Shawarma <span class="badge promo-badge">Buy 2 → 1 Free</span></h3>
+            <p class="card-sub">Lite • Classic • District Max — choose protein and extras</p>
           </div>
 
-          <div class="item-config">
-            <label class="label">Size</label>
+          <div class="card-config">
+            <label class="label visually-hidden">Size</label>
             <select class="select size-select" name="shawarma-size" aria-label="Shawarma size" data-item="shawarma">
               <option value="45" data-size-key="lite">Lite — GHC 45</option>
               <option value="55" data-size-key="classic">Classic — GHC 55</option>
               <option value="70" data-size-key="district-max">District Max — GHC 70</option>
             </select>
 
-            <label class="label">Protein</label>
+            <label class="label visually-hidden">Protein</label>
             <select class="select protein-select" name="shawarma-protein" aria-label="Shawarma protein" data-item="shawarma">
               <option value="0" data-protein="none">No meat (Veg) — +GHC 0</option>
               <option value="5" data-protein="chicken">Chicken — +GHC 5</option>
@@ -1443,56 +1622,51 @@ a:focus, button:focus { outline: 3px solid rgba(255,204,51,0.10); outline-offset
               <option value="15" data-protein="mixed">Mixed — +GHC 15</option>
             </select>
 
-            <div class="item-addons">
-              <label class="label">Extras</label>
-              <div class="addons-row">
-                <label class="addon">
-                  <input type="checkbox" class="addon-checkbox" value="5" data-addon-key="extra-sauce" />
-                  <span>Extra Sauce (+GHC 5)</span>
-                </label>
-                <label class="addon">
-                  <input type="checkbox" class="addon-checkbox" value="10" data-addon-key="cheese" />
-                  <span>Extra Cheese (+GHC 10)</span>
-                </label>
-              </div>
-            </div>
-
-            <div class="item-actions">
-              <div class="price-row">
-                <span class="price-label">Total</span>
-                <strong class="item-price" data-price-display>GHC <span class="price-value">45</span></strong>
-              </div>
-
-              <div class="action-row">
-                <button class="btn small add-btn" data-action="add" data-item-id="shawarma">
-                  <i class="fa fa-plus-circle"></i> Add
-                </button>
-                <button class="btn small remove-btn hidden" data-action="remove" data-item-id="shawarma">
-                  <i class="fa fa-minus-circle"></i> Remove
-                </button>
-              </div>
-            </div>
-          </div>
-        </article>
-
-        <!-- Loaded Fries -->
-        <article class="menu-item" id="item-fries" data-item-id="loaded-fries" data-promo="freecoke">
-          <div class="item-top">
-            <img class="item-thumb" src="thumb-fries.jpg" alt="Loaded fries thumbnail">
-            <div class="item-meta">
-              <h3 class="item-title">Loaded Fries <span class="badge promo-badge-small">Free Coke</span></h3>
-              <p class="item-desc">Choose portion & add protein/cheese.</p>
+            <div class="addons-row">
+              <label class="addon">
+                <input type="checkbox" class="addon-checkbox" value="5" data-addon-key="extra-sauce" />
+                <span>Extra Sauce (+GHC 5)</span>
+              </label>
+              <label class="addon">
+                <input type="checkbox" class="addon-checkbox" value="10" data-addon-key="cheese" />
+                <span>Extra Cheese (+GHC 10)</span>
+              </label>
             </div>
           </div>
 
-          <div class="item-config">
-            <label class="label">Portion</label>
+          <div class="card-footer">
+            <div class="price-row">
+              <span class="price-label">Total</span>
+              <strong class="item-price">GHC <span class="price-value">45</span></strong>
+            </div>
+
+            <div class="actions">
+              <button class="btn small add-btn" data-action="add" data-item-id="shawarma"><i class="fa fa-plus-circle"></i> Add</button>
+              <button class="btn small remove-btn hidden" data-action="remove" data-item-id="shawarma"><i class="fa fa-minus-circle"></i> Remove</button>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- Loaded Fries (Fries category) -->
+      <article class="menu-card" data-category="fries" id="item-fries" data-item-id="loaded-fries" data-promo="freecoke">
+        <div class="card-media">
+          <img class="card-thumb" src="thumb-fries.jpg" alt="Loaded Fries">
+          <span class="price-chip">GHC <span class="chip-value">55–85</span></span>
+        </div>
+
+        <div class="card-body">
+          <div class="card-head">
+            <h3 class="card-title">Loaded Fries <span class="promo-badge-small">Free Coke</span></h3>
+            <p class="card-sub">Regular or Large — add chicken, cheese & more</p>
+          </div>
+
+          <div class="card-config">
             <select class="select portion-select" name="fries-portion" aria-label="Fries portion" data-item="loaded-fries">
               <option value="55" data-size="regular">Regular — GHC 55</option>
               <option value="65" data-size="large">Large — GHC 65</option>
             </select>
 
-            <label class="label">Toppings</label>
             <div class="addons-row">
               <label class="addon">
                 <input type="checkbox" class="addon-checkbox" value="15" data-addon-key="extra-chicken" />
@@ -1503,127 +1677,122 @@ a:focus, button:focus { outline: 3px solid rgba(255,204,51,0.10); outline-offset
                 <span>Extra Cheese (+GHC 10)</span>
               </label>
             </div>
-
-            <div class="item-actions">
-              <div class="price-row">
-                <span class="price-label">Total</span>
-                <strong class="item-price" data-price-display>GHC <span class="price-value">55</span></strong>
-              </div>
-
-              <div class="action-row">
-                <button class="btn small add-btn" data-action="add" data-item-id="loaded-fries">
-                  <i class="fa fa-plus-circle"></i> Add
-                </button>
-                <button class="btn small remove-btn hidden" data-action="remove" data-item-id="loaded-fries">
-                  <i class="fa fa-minus-circle"></i> Remove
-                </button>
-              </div>
-            </div>
-          </div>
-        </article>
-
-        <!-- Fried Rice -->
-        <article class="menu-item" id="item-fried-rice" data-item-id="fried-rice">
-          <div class="item-top">
-            <img class="item-thumb" src="hero-friedrice-large.jpg" alt="Fried rice thumbnail">
-            <div class="item-meta">
-              <h3 class="item-title">Fried Rice</h3>
-              <p class="item-desc">Classic spiced fried rice — choose protein.</p>
-            </div>
           </div>
 
-          <div class="item-config">
-            <label class="label">Choice</label>
+          <div class="card-footer">
+            <div class="price-row">
+              <span class="price-label">Total</span>
+              <strong class="item-price">GHC <span class="price-value">55</span></strong>
+            </div>
+
+            <div class="actions">
+              <button class="btn small add-btn" data-action="add" data-item-id="loaded-fries"><i class="fa fa-plus-circle"></i> Add</button>
+              <button class="btn small remove-btn hidden" data-action="remove" data-item-id="loaded-fries"><i class="fa fa-minus-circle"></i> Remove</button>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- Fried Rice (Rice category) -->
+      <article class="menu-card" data-category="rice" id="item-fried-rice" data-item-id="fried-rice">
+        <div class="card-media">
+          <img class="card-thumb" src="hero-friedrice-large.jpg" alt="Fried Rice">
+          <span class="price-chip">GHC <span class="chip-value">60</span></span>
+        </div>
+
+        <div class="card-body">
+          <div class="card-head">
+            <h3 class="card-title">Fried Rice</h3>
+            <p class="card-sub">Classic spiced fried rice — choose protein</p>
+          </div>
+
+          <div class="card-config">
             <select class="select protein-select" name="rice-protein" aria-label="Fried rice protein" data-item="fried-rice">
-              <option value="60" data-protein="chicken">Classic (+Chicken) — GHC 60</option>
-              <option value="60" data-protein="beef">Beef (+Beef) — GHC 60</option>
-              <option value="60" data-protein="gizzard">Gizzard (+Gizzard) — GHC 60</option>
+              <option value="60" data-protein="chicken">Chicken — GHC 60</option>
+              <option value="60" data-protein="beef">Beef — GHC 60</option>
+              <option value="60" data-protein="gizzard">Gizzard — GHC 60</option>
             </select>
-
-            <div class="item-actions">
-              <div class="price-row">
-                <span class="price-label">Total</span>
-                <strong class="item-price" data-price-display>GHC <span class="price-value">60</span></strong>
-              </div>
-
-              <div class="action-row">
-                <button class="btn small add-btn" data-action="add" data-item-id="fried-rice">
-                  <i class="fa fa-plus-circle"></i> Add
-                </button>
-                <button class="btn small remove-btn hidden" data-action="remove" data-item-id="fried-rice">
-                  <i class="fa fa-minus-circle"></i> Remove
-                </button>
-              </div>
-            </div>
-          </div>
-        </article>
-
-        <!-- Loaded Angwamo -->
-        <article class="menu-item" id="item-angwamo" data-item-id="loaded-angwamo">
-          <div class="item-top">
-            <img class="item-thumb" src="hero-angwamo-large.jpg" alt="Angwamo thumbnail">
-            <div class="item-meta">
-              <h3 class="item-title">Loaded Angwamo</h3>
-              <p class="item-desc">Tiered: Basic / Classic / Max</p>
-            </div>
           </div>
 
-          <div class="item-config">
-            <label class="label">Tier</label>
+          <div class="card-footer">
+            <div class="price-row">
+              <span class="price-label">Total</span>
+              <strong class="item-price">GHC <span class="price-value">60</span></strong>
+            </div>
+
+            <div class="actions">
+              <button class="btn small add-btn" data-action="add" data-item-id="fried-rice"><i class="fa fa-plus-circle"></i> Add</button>
+              <button class="btn small remove-btn hidden" data-action="remove" data-item-id="fried-rice"><i class="fa fa-minus-circle"></i> Remove</button>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- Angwamo -->
+      <article class="menu-card" data-category="angwamo" id="item-angwamo" data-item-id="loaded-angwamo">
+        <div class="card-media">
+          <img class="card-thumb" src="hero-angwamo-large.jpg" alt="Angwamo">
+          <span class="price-chip">GHC <span class="chip-value">55–70</span></span>
+        </div>
+
+        <div class="card-body">
+          <div class="card-head">
+            <h3 class="card-title">Loaded Angwamo</h3>
+            <p class="card-sub">Basic • Classic • Max — choose your tier</p>
+          </div>
+
+          <div class="card-config">
             <select class="select tier-select" name="angwamo-tier" aria-label="Angwamo tier" data-item="loaded-angwamo">
               <option value="55" data-tier="basic">Basic — GHC 55</option>
               <option value="60" data-tier="classic">Classic — GHC 60</option>
               <option value="70" data-tier="max">Max — GHC 70</option>
             </select>
-
-            <div class="item-actions">
-              <div class="price-row">
-                <span class="price-label">Total</span>
-                <strong class="item-price" data-price-display>GHC <span class="price-value">55</span></strong>
-              </div>
-
-              <div class="action-row">
-                <button class="btn small add-btn" data-action="add" data-item-id="loaded-angwamo">
-                  <i class="fa fa-plus-circle"></i> Add
-                </button>
-                <button class="btn small remove-btn hidden" data-action="remove" data-item-id="loaded-angwamo">
-                  <i class="fa fa-minus-circle"></i> Remove
-                </button>
-              </div>
-            </div>
-          </div>
-        </article>
-
-        <!-- Noodles (single price) -->
-        <article class="menu-item" id="item-noodles" data-item-id="noodles">
-          <div class="item-top">
-            <img class="item-thumb" src="thumb-noodle.jpg" alt="Noodles thumbnail">
-            <div class="item-meta">
-              <h3 class="item-title">Noodles</h3>
-              <p class="item-desc">Assorted proteins available — GHC 50</p>
-            </div>
           </div>
 
-          <div class="item-config">
-            <div class="item-actions">
-              <div class="price-row">
-                <span class="price-label">Price</span>
-                <strong class="item-price" data-price-display>GHC <span class="price-value">50</span></strong>
-              </div>
+          <div class="card-footer">
+            <div class="price-row">
+              <span class="price-label">Total</span>
+              <strong class="item-price">GHC <span class="price-value">55</span></strong>
+            </div>
 
-              <div class="action-row">
-                <button class="btn small add-btn" data-action="add" data-item-id="noodles">
-                  <i class="fa fa-plus-circle"></i> Add
-                </button>
-                <button class="btn small remove-btn hidden" data-action="remove" data-item-id="noodles">
-                  <i class="fa fa-minus-circle"></i> Remove
-                </button>
-              </div>
+            <div class="actions">
+              <button class="btn small add-btn" data-action="add" data-item-id="loaded-angwamo"><i class="fa fa-plus-circle"></i> Add</button>
+              <button class="btn small remove-btn hidden" data-action="remove" data-item-id="loaded-angwamo"><i class="fa fa-minus-circle"></i> Remove</button>
             </div>
           </div>
-        </article>
-      </div>
-    </section>
+        </div>
+      </article>
+
+      <!-- Noodles -->
+      <article class="menu-card" data-category="noodles" id="item-noodles" data-item-id="noodles">
+        <div class="card-media">
+          <img class="card-thumb" src="thumb-noodle.jpg" alt="Noodles">
+          <span class="price-chip">GHC <span class="chip-value">50</span></span>
+        </div>
+
+        <div class="card-body">
+          <div class="card-head">
+            <h3 class="card-title">Noodles</h3>
+            <p class="card-sub">Assorted proteins — single clear price</p>
+          </div>
+
+          <div class="card-footer">
+            <div class="price-row">
+              <span class="price-label">Price</span>
+              <strong class="item-price">GHC <span class="price-value">50</span></strong>
+            </div>
+
+            <div class="actions">
+              <button class="btn small add-btn" data-action="add" data-item-id="noodles"><i class="fa fa-plus-circle"></i> Add</button>
+              <button class="btn small remove-btn hidden" data-action="remove" data-item-id="noodles"><i class="fa fa-minus-circle"></i> Remove</button>
+            </div>
+          </div>
+        </div>
+      </article>
+
+    </div> <!-- .menu-list -->
+  </div> <!-- .menu-container -->
+</section>
 
     <!-- PROMO DETAILS (collapsible region referenced by the slide CTA) -->
     <section id="promo" class="promo-detail" aria-labelledby="promo-heading">
@@ -2417,5 +2586,29 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 </script>
+  <script>
+    // Menu category filters (add to your DOMContentLoaded code)
+(function initMenuFilter(){
+  const filterBtns = Array.from(document.querySelectorAll('.menu-filter-bar .filter-btn'));
+  const cards = Array.from(document.querySelectorAll('.menu-card'));
+
+  filterBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      filterBtns.forEach(b => b.classList.remove('is-active'));
+      btn.classList.add('is-active');
+      const filter = btn.dataset.filter;
+      cards.forEach(c => {
+        if (filter === 'all') c.removeAttribute('aria-hidden');
+        else {
+          if (c.dataset.category === filter) c.removeAttribute('aria-hidden');
+          else c.setAttribute('aria-hidden', 'true');
+        }
+      });
+      // keep focus on menu list for keyboard scrolling
+      document.getElementById('menu-list')?.focus();
+    });
+  });
+})();
+  </script>
 </html>
   
