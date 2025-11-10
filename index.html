@@ -883,6 +883,89 @@ a { color: var(--accent-2); text-decoration: none; }
   gap:14px;
 }
 
+    /* ------- Menu container & tabs polish (add after menu styles) ------- */
+.menu-container {
+  padding: 12px;
+  border-radius: 14px;
+  background: linear-gradient(180deg, rgba(6,6,6,0.92), rgba(12,12,12,0.95));
+  border: 1px solid rgba(255,255,255,0.03);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.55);
+}
+
+/* tabs */
+.menu-tabs {
+  display:flex;
+  gap:8px;
+  overflow-x:auto;
+  padding: 8px 4px 12px;
+  -webkit-overflow-scrolling: touch;
+}
+.menu-tabs .tab-btn {
+  white-space:nowrap;
+  flex:0 0 auto;
+  border:0;
+  padding:8px 12px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.02);
+  color: var(--muted);
+  font-weight:900;
+  font-size:13px;
+  cursor:pointer;
+  outline: none;
+  border: 1px solid rgba(255,255,255,0.02);
+}
+.menu-tabs .tab-btn.is-active {
+  background: linear-gradient(90deg, var(--accent-1), var(--accent-2));
+  color: #111;
+  box-shadow: 0 12px 36px rgba(255,106,0,0.10);
+}
+
+/* visually distinct card: left accent + stronger contrast */
+.menu-item {
+  position: relative;
+  padding: 12px;
+  border-radius: 12px;
+  display:block;
+  transition: transform 220ms cubic-bezier(.2,.9,.3,1), box-shadow 220ms ease;
+  border-left: 6px solid transparent;
+  background: linear-gradient(180deg, rgba(255,255,255,0.015), rgba(255,255,255,0.01));
+}
+.menu-item:focus,
+.menu-item:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 36px 80px rgba(0,0,0,0.6);
+  border-left-color: rgba(255,106,0,0.95);
+  outline: none;
+}
+
+/* larger, rounder thumbnail so items are easier to distinguish */
+.item-thumb {
+  width:110px;
+  height:86px;
+  border-radius:12px;
+  flex:0 0 110px;
+  object-fit: cover;
+  border: 1px solid rgba(255,255,255,0.04);
+  box-shadow: 0 8px 28px rgba(0,0,0,0.45);
+}
+
+/* stronger title contrast */
+.item-title { font-size:16px; color:#fff; }
+
+/* small spacing improvements */
+.menu-grid { display:flex; flex-direction:column; gap:14px; }
+
+/* On larger widths show two-column grid */
+@media (min-width: 540px) {
+  .menu-grid { display:grid; grid-template-columns: 1fr 1fr; gap:16px; }
+}
+
+/* increase hit-target for add/remove on mobile */
+.action-row .btn { min-width:48px; padding:10px 14px; }
+
+/* small focus ring for keyboard users */
+.menu-item:focus { box-shadow: 0 8px 30px rgba(0,0,0,0.55), 0 0 0 3px rgba(255,204,51,0.06); }
+    
 /* Each menu card */
 .menu-item{
   background: var(--card-bg);
@@ -1512,13 +1595,28 @@ a:focus, button:focus { outline: 3px solid rgba(255,204,51,0.10); outline-offset
     </section>
 
     <!-- MENU: mobile-friendly, card-based, not a long table -->
-    <section id="menu" class="menu-section" aria-labelledby="menu-heading">
-      <div class="container-small">
-        <h2 id="menu-heading" class="section-title"><i class="fa fa-utensils"></i> Menu</h2>
-        <p class="section-sub">Tap an item to configure size, protein and add-ons. Promo badges show eligibility.</p>
+<!-- MENU: mobile-friendly, card-based, improved -->
+<section id="menu" class="menu-section" aria-labelledby="menu-heading">
+  <div class="container-small">
+    <h2 id="menu-heading" class="section-title"><i class="fa fa-utensils"></i> Menu</h2>
+    <p class="section-sub">Tap an item to configure size, protein and add-ons. Use the tabs to filter quickly.</p>
 
+    <!-- Category tabs (mobile horizontal scroll) -->
+    <div class="menu-tabs" role="tablist" aria-label="Menu categories">
+      <button class="tab-btn is-active" data-cat="all" role="tab" aria-selected="true">All</button>
+      <button class="tab-btn" data-cat="wraps" role="tab">Wraps</button>
+      <button class="tab-btn" data-cat="fries" role="tab">Fries</button>
+      <button class="tab-btn" data-cat="rice" role="tab">Rice</button>
+      <button class="tab-btn" data-cat="angwamo" role="tab">Angwamo</button>
+      <button class="tab-btn" data-cat="noodles" role="tab">Noodles</button>
+    </div>
+
+    <!-- visual container for menu items -->
+    <div class="menu-container glass-card">
+      <div class="menu-grid" id="menu-grid">
         <!-- Shawarma (structured pricing tiers) -->
-        <article class="menu-item" id="item-shawarma" data-item-id="shawarma" data-promo="buy2get1">
+        <article class="menu-item" id="item-shawarma" data-item-id="shawarma" data-category="wraps" data-promo="buy2get1" tabindex="0">
+          <!-- ...same inner markup as before (keeps selects/addons) ... -->
           <div class="item-top">
             <img class="item-thumb" src="thumb-shawarma.jpg" alt="Shawarma thumbnail">
             <div class="item-meta">
@@ -1576,7 +1674,7 @@ a:focus, button:focus { outline: 3px solid rgba(255,204,51,0.10); outline-offset
         </article>
 
         <!-- Loaded Fries -->
-        <article class="menu-item" id="item-fries" data-item-id="loaded-fries" data-promo="freecoke">
+        <article class="menu-item" id="item-fries" data-item-id="loaded-fries" data-category="fries" data-promo="freecoke" tabindex="0">
           <div class="item-top">
             <img class="item-thumb" src="thumb-fries.jpg" alt="Loaded fries thumbnail">
             <div class="item-meta">
@@ -1623,7 +1721,7 @@ a:focus, button:focus { outline: 3px solid rgba(255,204,51,0.10); outline-offset
         </article>
 
         <!-- Fried Rice -->
-        <article class="menu-item" id="item-fried-rice" data-item-id="fried-rice">
+        <article class="menu-item" id="item-fried-rice" data-item-id="fried-rice" data-category="rice" tabindex="0">
           <div class="item-top">
             <img class="item-thumb" src="hero-friedrice-large.jpg" alt="Fried rice thumbnail">
             <div class="item-meta">
@@ -1659,7 +1757,7 @@ a:focus, button:focus { outline: 3px solid rgba(255,204,51,0.10); outline-offset
         </article>
 
         <!-- Loaded Angwamo -->
-        <article class="menu-item" id="item-angwamo" data-item-id="loaded-angwamo">
+        <article class="menu-item" id="item-angwamo" data-item-id="loaded-angwamo" data-category="angwamo" tabindex="0">
           <div class="item-top">
             <img class="item-thumb" src="hero-angwamo-large.jpg" alt="Angwamo thumbnail">
             <div class="item-meta">
@@ -1694,8 +1792,8 @@ a:focus, button:focus { outline: 3px solid rgba(255,204,51,0.10); outline-offset
           </div>
         </article>
 
-        <!-- Noodles (single price) -->
-        <article class="menu-item" id="item-noodles" data-item-id="noodles">
+        <!-- Noodles -->
+        <article class="menu-item" id="item-noodles" data-item-id="noodles" data-category="noodles" tabindex="0">
           <div class="item-top">
             <img class="item-thumb" src="thumb-noodle.jpg" alt="Noodles thumbnail">
             <div class="item-meta">
@@ -1722,8 +1820,11 @@ a:focus, button:focus { outline: 3px solid rgba(255,204,51,0.10); outline-offset
             </div>
           </div>
         </article>
-      </div>
-    </section>
+
+      </div> <!-- .menu-grid -->
+    </div> <!-- .menu-container -->
+  </div>
+</section>
 
     <!-- PROMO DETAILS (collapsible region referenced by the slide CTA) -->
     <section id="promo" class="promo-detail" aria-labelledby="promo-heading">
@@ -2517,5 +2618,61 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 </script>
+  <script>
+    /* ---------- Menu filtering (tabs) & corrected scroll offset ---------- */
+function initMenuFilterAndAnchors() {
+  // tabs
+  const tabs = qa('.menu-tabs .tab-btn');
+  tabs.forEach(btn => {
+    btn.addEventListener('click', () => {
+      tabs.forEach(b => {
+        b.classList.remove('is-active');
+        b.setAttribute('aria-selected', 'false');
+      });
+      btn.classList.add('is-active');
+      btn.setAttribute('aria-selected', 'true');
+      const cat = btn.dataset.cat;
+      qa('.menu-item').forEach(mi => {
+        if (!cat || cat === 'all' || mi.dataset.category === cat) {
+          mi.style.display = 'block';
+          mi.removeAttribute('aria-hidden');
+        } else {
+          mi.style.display = 'none';
+          mi.setAttribute('aria-hidden', 'true');
+        }
+      });
+      // if filtered result fits only one card, focus it (keyboard users)
+      const visible = qa('.menu-item:not([aria-hidden="true"])');
+      if (visible.length === 1) visible[0].focus();
+    });
+  });
+
+  // improved anchor scrolling to account for sticky header
+  function scrollToWithOffset(target) {
+    if (!target) return;
+    const header = q('.sticky-header');
+    const headerH = header ? header.offsetHeight : 64;
+    const rect = target.getBoundingClientRect();
+    const top = rect.top + window.scrollY - headerH - 12;
+    window.scrollTo({ top, behavior: 'smooth' });
+  }
+
+  // intercept internal anchor links and nav items
+  qa('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', (ev) => {
+      const href = a.getAttribute('href');
+      if (!href || href === '#') return;
+      const el = q(href);
+      if (el) {
+        ev.preventDefault();
+        scrollToWithOffset(el);
+      }
+    });
+  });
+}
+
+// call after menu setup
+initMenuFilterAndAnchors();
+  </script>
 </html>
   
