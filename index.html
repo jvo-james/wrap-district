@@ -2377,9 +2377,772 @@ a:focus, button:focus { outline: 3px solid rgba(255,204,51,0.10); outline-offset
   </div>
 </div>
   </main>
+<!-- Product detail modal (Task 2) -->
+<style>
+/* Basic modal sizing tweaks (uses existing .modal/.modal-inner from your CSS) */
+#product-modal .modal-inner { max-width:520px; width:100%; padding:0; border-radius:14px; overflow:hidden; }
+#product-modal .pm-header{ display:flex; gap:12px; padding:12px; align-items:center; background:linear-gradient(180deg, rgba(10,10,10,0.98), rgba(6,6,6,0.98)); border-bottom:1px solid rgba(255,255,255,0.03);}
+#product-modal .pm-thumb{ width:110px; height:86px; object-fit:cover; border-radius:10px; flex: 0 0 110px; border:1px solid rgba(255,255,255,0.04); }
+#product-modal .pm-title{ font-weight:900; color:#fff; font-size:16px; margin:0; }
+#product-modal .pm-body{ padding:12px; max-height:60vh; overflow:auto; background: linear-gradient(180deg, rgba(12,12,12,0.98), rgba(8,8,8,0.98)); }
+#product-modal .pm-footer{ display:flex; gap:8px; align-items:center; justify-content:space-between; padding:12px; border-top:1px solid rgba(255,255,255,0.03); background: linear-gradient(180deg, rgba(8,8,8,0.98), rgba(6,6,6,0.98)); }
+#product-modal .pm-price{ font-weight:900; color:var(--accent-2); font-size:18px; }
+#product-modal .pm-actions .btn{ min-width:120px; }
+</style>
 
+<!-- modal skeleton -->
+<div id="product-modal" class="modal" role="dialog" aria-modal="true" aria-hidden="true" style="display:none;">
+  <div class="modal-inner">
+    <button class="icon-btn modal-close" id="pm-close" aria-label="Close"><i class="fa fa-times"></i></button>
+    <div class="pm-header">
+      <img src="" alt="" class="pm-thumb" id="pm-thumb">
+      <div style="flex:1; min-width:0">
+        <h3 class="pm-title" id="pm-title"></h3>
+        <div class="small muted" id="pm-desc"></div>
+      </div>
+    </div>
+    <div class="pm-body" id="pm-body">
+      <!-- cloned .item-config will be inserted here -->
+    </div>
+    <div class="pm-footer">
+      <div class="pm-price" id="pm-price">GHC 0</div>
+      <div class="pm-actions">
+        <button id="pm-add" class="btn primary"><i class="fa fa-plus-circle"></i> Add to cart</button>
+        <button id="pm-cancel" class="btn ghost">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* Product modal behavior (Task 2)
+   - Opens when user clicks .item-thumb OR .item-title inside a .menu-item
+   - Clones the .item-config into modal and keeps live price updates
+   - On Add, copies selections back into original item's controls and triggers original add-btn
+*/
+(function(){
+  document.addEventListener('DOMContentLoaded', () => {
+    const modal = document.getElementById('product-modal');
+    const pmThumb = document.getElementById('pm-thumb');
+    const pmTitle = document.getElementById('pm-title');
+    const pmDesc = document.getElementById('pm-desc');
+    const pmBody = document.getElementById('pm-body');
+    const pmPrice = document.getElementById('pm-price');
+    const pmAdd = document.getElementById('pm-add');
+    const pmCancel = document.getElementById('pm-cancel');
+    const pmClose = document.getElementById('pm-close');
+
+    let activeMenuItem = null;     // original menu-item element
+    let clonedConfig = null;       // clone of .item-config to show inside modal
+
+    // helper: format as GHC
+    const fmtGhc = (n) => `GHC ${Number(n||0).toFixed(0)}`;
+
+    // local price calculation (mirrors your calculateItemPrice)
+    function calculatePriceFromContainer(container){
+      let total = 0;
+      // selects
+      const selects = container.querySelectorAll('select');
+      selects.forEach(s => { total += Number(s.value) || 0; });
+      // addons (checkboxes with class addon-checkbox inside input)
+      const addons = container.querySelectorAll('input.addon-checkbox, input[type="checkbox"]');
+      addons.forEach(cb => { if (cb.checked) total += Number(cb.value) || 0; });
+      // fallback: if no select found, try price-value span
+      if (selects.length === 0) {
+        const fallback = Number(container.querySelector('.price-value')?.innerText || 0);
+        if (fallback) total = fallback;
+      }
+      return Math.round(total);
+    }
+
+    // update modal price display based on clonedConfig
+    function updateModalPrice(){
+      if (!clonedConfig) return;
+      const p = calculatePriceFromContainer(clonedConfig);
+      pmPrice.innerText = fmtGhc(p);
+    }
+
+    // open modal for a given menu-item element
+    function openProductModal(menuItem){
+      if (!menuItem) return;
+      activeMenuItem = menuItem;
+
+      // set image + title + desc
+      const thumb = menuItem.querySelector('.item-thumb');
+      const title = menuItem.querySelector('.item-title')?.innerText || 'Item';
+      const desc = menuItem.querySelector('.item-desc')?.innerText || '';
+
+      pmThumb.src = thumb?.src || '';
+      pmThumb.alt = title;
+      pmTitle.innerText = title;
+      pmDesc.innerText = desc;
+
+      // clone the .item-config if exists, else create a basic view
+      const config = menuItem.querySelector('.item-config');
+      pmBody.innerHTML = ''; // clear previous
+      clonedConfig = config ? config.cloneNode(true) : null;
+
+      if (clonedConfig) {
+        // ensure cloned controls are interactive
+        // Remove any ids that may conflict
+        Array.from(clonedConfig.querySelectorAll('[id]')).forEach(el => el.removeAttribute('id'));
+        pmBody.appendChild(clonedConfig);
+
+        // add listeners to cloned controls to update price live
+        clonedConfig.querySelectorAll('select, input[type="checkbox"]').forEach(inp => {
+          inp.addEventListener('change', updateModalPrice);
+        });
+      } else {
+        // fallback: create a summary
+        const fallback = document.createElement('div');
+        fallback.className = 'glass-card small';
+        fallback.innerText = 'No configurable options for this item.';
+        pmBody.appendChild(fallback);
+      }
+
+      // initial price update
+      updateModalPrice();
+
+      // show modal
+      modal.style.display = 'flex';
+      modal.setAttribute('aria-hidden','false');
+      document.body.style.overflow = 'hidden';
+      setTimeout(()=> pmClose && pmClose.focus(), 80);
+    }
+
+    // close modal and cleanup
+    function closeProductModal(){
+      // clear cloned config
+      pmBody.innerHTML = '';
+      clonedConfig = null;
+      activeMenuItem = null;
+      modal.style.display = 'none';
+      modal.setAttribute('aria-hidden','true');
+      document.body.style.overflow = '';
+    }
+
+    // Wire clicks on image and title to open modal
+    function attachOpeners(){
+      // find all menu items
+      const menuItems = Array.from(document.querySelectorAll('.menu-item'));
+      menuItems.forEach(mi => {
+        const thumb = mi.querySelector('.item-thumb');
+        const titleEl = mi.querySelector('.item-title');
+        [thumb, titleEl].forEach(openEl => {
+          if (!openEl) return;
+          openEl.style.cursor = 'pointer';
+          openEl.addEventListener('click', (e) => {
+            e.stopPropagation();
+            openProductModal(mi);
+          });
+        });
+      });
+    }
+
+    // On Add in modal: copy cloned selections back to the original menu-item controls, then trigger original add-btn
+    pmAdd.addEventListener('click', () => {
+      if (!activeMenuItem) return;
+      if (!clonedConfig) {
+        // no config -> just click original add button
+        const origAdd = activeMenuItem.querySelector('.add-btn');
+        origAdd && origAdd.click();
+        closeProductModal();
+        return;
+      }
+
+      // copy selects by name (or position) and checkboxes by data-addon-key / label text
+      try {
+        // Selects
+        const clonedSelects = Array.from(clonedConfig.querySelectorAll('select'));
+        clonedSelects.forEach(cs => {
+          const name = cs.name;
+          if (!name) return;
+          const orig = activeMenuItem.querySelector(`select[name="${name}"]`);
+          if (orig) orig.value = cs.value;
+          // trigger change event on orig so price update listeners run
+          if (orig) orig.dispatchEvent(new Event('change', { bubbles: true }));
+        });
+
+        // Checkboxes (addons)
+        const clonedCbs = Array.from(clonedConfig.querySelectorAll('input[type="checkbox"]'));
+        clonedCbs.forEach(ccb => {
+          const key = ccb.dataset.addonKey;
+          // try matching by data-addon-key first
+          let origCb = key ? activeMenuItem.querySelector(`input.addon-checkbox[data-addon-key="${key}"]`) : null;
+          // fallback: match by label text (span)
+          if (!origCb) {
+            const labelText = ccb.closest('.addon')?.querySelector('span')?.innerText?.trim();
+            if (labelText) {
+              origCb = Array.from(activeMenuItem.querySelectorAll('.addon')).map(a=>({el:a, txt:a.querySelector('span')?.innerText?.trim()})).find(x=>x.txt===labelText)?.el?.querySelector('input[type="checkbox"]') || null;
+            }
+          }
+          if (origCb) {
+            origCb.checked = !!ccb.checked;
+            origCb.dispatchEvent(new Event('change', { bubbles: true }));
+          }
+        });
+
+        // After copying inputs back to original, click the original add button to use existing cart logic
+        const origAddBtn = activeMenuItem.querySelector('.add-btn');
+        if (origAddBtn) {
+          origAddBtn.click();
+          // close modal shortly after
+          setTimeout(() => closeProductModal(), 260);
+        } else {
+          // fallback: just close and show toast
+          closeProductModal();
+          console.warn('Original add button not found for item', activeMenuItem);
+        }
+      } catch (err) {
+        console.error('Error copying modal selections back to original item:', err);
+        closeProductModal();
+      }
+    });
+
+    // cancel/close handlers
+    pmCancel.addEventListener('click', closeProductModal);
+    pmClose.addEventListener('click', closeProductModal);
+    modal.addEventListener('click', (e) => { if (e.target === modal) closeProductModal(); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && modal.style.display === 'flex') closeProductModal(); });
+
+    // Attach openers initially and whenever new menu items might be added later (MutationObserver)
+    attachOpeners();
+    const menuGrid = document.getElementById('menu-grid');
+    if (menuGrid) {
+      const mo = new MutationObserver(() => attachOpeners());
+      mo.observe(menuGrid, { childList: true, subtree: true });
+    }
+  });
+})();
+</script>
+  <!-- Task 3: Promo slideshow (paste after your scripts, before </body>) -->
+<style>
+/* Promo slideshow styles — mobile-first, uses your accent variables */
+.promo-carousel {
+  width:100%;
+  max-width: var(--max-width,420px);
+  margin: 8px auto 18px;
+  position: relative;
+  box-sizing: border-box;
+  overflow: visible;
+}
+.promo-carousel .pc-slides { position: relative; width:100%; height: 42vh; min-height:220px; border-radius:14px; overflow: clip; box-shadow: var(--card-shadow); }
+.promo-carousel .pc-slide {
+  position: absolute; inset:0;
+  display: none;
+  will-change: transform, opacity;
+  transition: opacity 520ms cubic-bezier(.2,.9,.3,1), transform 520ms cubic-bezier(.2,.9,.3,1);
+  background-size: cover;
+  background-position: center;
+}
+.promo-carousel .pc-slide.is-active { display:block; opacity:1; transform: none; }
+.promo-carousel .pc-slide .overlay {
+  position:absolute; inset:0;
+  background: linear-gradient(180deg, rgba(0,0,0,0.18) 0%, rgba(0,0,0,0.55) 70%);
+  display:flex; align-items:flex-end; padding:14px; box-sizing:border-box;
+}
+.promo-card {
+  width:100%;
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  border-radius: 12px;
+  padding: 12px;
+  box-sizing:border-box;
+  backdrop-filter: blur(6px) saturate(120%);
+  display:flex; gap:10px; align-items:center;
+}
+.promo-left { flex:0 0 72px; display:flex; align-items:center; justify-content:center; }
+.promo-left .pc-ico { font-size:34px; color: #fff; opacity:0.98; text-shadow: 0 6px 20px rgba(0,0,0,0.6); }
+.promo-right { flex:1 1 auto; min-width:0; display:flex; flex-direction:column; gap:6px; }
+.promo-eyebrow { font-size:12px; color:var(--accent-2); font-weight:900; text-transform:uppercase; letter-spacing:0.8px; }
+.promo-title { font-size:16px; font-weight:900; color:#fff; margin:0; line-height:1.05; }
+.promo-desc { font-size:13px; color: rgba(255,255,255,0.9); }
+.promo-cta-row { display:flex; gap:8px; margin-top:8px; align-items:center; }
+.promo-cta-row .btn { min-height:40px; padding:8px 12px; font-weight:900; border-radius:10px; }
+
+.promo-controls { position:absolute; left:12px; right:12px; bottom:12px; display:flex; align-items:center; justify-content:space-between; gap:8px; pointer-events:none; }
+.pc-dots { display:flex; gap:8px; align-items:center; pointer-events:auto; }
+.pc-dot { width:8px; height:8px; border-radius:999px; background: rgba(255,255,255,0.18); border:1px solid rgba(255,255,255,0.04); padding:0; }
+.pc-dot.is-active { width:34px; background: linear-gradient(90deg,var(--accent-1),var(--accent-2)); box-shadow: 0 8px 20px rgba(255,106,0,0.14); border-radius:999px; }
+
+.pc-nav { display:flex; gap:8px; pointer-events:auto; }
+.pc-nav .icon-btn { background: rgba(0,0,0,0.45); color:#fff; border-radius:10px; padding:8px; }
+
+@media (max-width:360px){
+  .promo-left { flex:0 0 56px; }
+  .promo-left .pc-ico { font-size:28px; }
+  .promo-title { font-size:15px; }
+  .promo-card { padding:10px; border-radius:10px; }
+}
+</style>
+
+<script>
+(function(){
+  document.addEventListener('DOMContentLoaded', () => {
+    const promoContainer = document.getElementById('promo-details');
+    if (!promoContainer) return;
+
+    // Build carousel markup (2 slides)
+    promoContainer.innerHTML = `
+      <div class="promo-carousel" aria-roledescription="carousel" aria-label="Promotions carousel">
+        <div class="pc-slides" id="pc-slides">
+          <section class="pc-slide" data-index="0" id="pc-slide-0" role="group" aria-roledescription="slide" aria-label="Shawarma Promo" style="background-image: url('promo-shawarma.jpg');">
+            <div class="overlay">
+              <div class="promo-card">
+                <div class="promo-left"><i class="fa fa-fire pc-ico" aria-hidden="true"></i></div>
+                <div class="promo-right">
+                  <div class="promo-eyebrow">Limited • Tuesday</div>
+                  <h3 class="promo-title">Buy 2 Shawarmas — Get 1 Free</h3>
+                  <div class="promo-desc">Add 2 qualifying shawarmas at checkout on Tuesdays and the third becomes free automatically. Applies per 3 items.</div>
+                  <div class="promo-cta-row">
+                    <button class="btn primary" data-action="apply-promo" data-promo-code="TUES-B2G1" aria-label="Claim Shawarma promo"><i class="fa fa-tag"></i> Claim Promo</button>
+                    <button class="btn ghost" data-action="promo-details" data-target="shawarma" aria-expanded="false"><i class="fa fa-info-circle"></i> Details</button>
+                    <button class="btn primary" data-action="preorder-promo"><i class="fa fa-calendar-check"></i> Preorder</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="pc-slide" data-index="1" id="pc-slide-1" role="group" aria-roledescription="slide" aria-label="Loaded Fries Promo" style="background-image: url('promo-fries.jpg');">
+            <div class="overlay">
+              <div class="promo-card">
+                <div class="promo-left"><i class="fa fa-bolt pc-ico" aria-hidden="true"></i></div>
+                <div class="promo-right">
+                  <div class="promo-eyebrow">Freebie • All Days (promo hours)</div>
+                  <h3 class="promo-title">Loaded Fries → Free Coke</h3>
+                  <div class="promo-desc">Buy qualifying Loaded Fries during promo hours and get a free Coke added to your cart automatically.</div>
+                  <div class="promo-cta-row">
+                    <button class="btn primary" data-action="apply-promo" data-promo-code="FRIES-FCOKE" aria-label="Claim Fries promo"><i class="fa fa-tag"></i> Claim Promo</button>
+                    <button class="btn ghost" data-action="promo-details" data-target="fries" aria-expanded="false"><i class="fa fa-info-circle"></i> Details</button>
+                    <button class="btn primary" data-action="preorder-promo"><i class="fa fa-calendar-check"></i> Preorder</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <div class="promo-controls" aria-hidden="false">
+          <div class="pc-nav">
+            <button class="slide-prev icon-btn" aria-label="Previous promo"><i class="fa fa-chevron-left"></i></button>
+          </div>
+
+          <div class="pc-dots" role="tablist" aria-label="Promo slides">
+            <button class="pc-dot is-active" data-index="0" aria-label="Slide 1"></button>
+            <button class="pc-dot" data-index="1" aria-label="Slide 2"></button>
+          </div>
+
+          <div class="pc-nav">
+            <button class="slide-next icon-btn" aria-label="Next promo"><i class="fa fa-chevron-right"></i></button>
+          </div>
+        </div>
+      </div>
+
+      <!-- hidden area for details text toggling -->
+      <div id="promo-more" class="promo-help hidden" style="margin-top:10px;">
+        <div class="glass-card">
+          <div id="promo-more-content" class="small muted"></div>
+        </div>
+      </div>
+    `;
+
+    // Slide behavior
+    const slides = Array.from(document.querySelectorAll('.pc-slide'));
+    const dots = Array.from(document.querySelectorAll('.pc-dot'));
+    const prevBtn = document.querySelector('.slide-prev');
+    const nextBtn = document.querySelector('.slide-next');
+    let current = 0;
+    let autoTimer = null;
+    const AUTO_DELAY = 6000;
+
+    function showSlide(idx) {
+      idx = (idx + slides.length) % slides.length;
+      slides.forEach((s,i) => {
+        s.classList.toggle('is-active', i===idx);
+        s.setAttribute('aria-hidden', i===idx ? 'false' : 'true');
+      });
+      dots.forEach((d,i) => d.classList.toggle('is-active', i===idx));
+      current = idx;
+    }
+
+    function nextSlide() { showSlide(current+1); }
+    function prevSlide() { showSlide(current-1); }
+
+    // auto-rotate
+    function startAuto() { stopAuto(); autoTimer = setInterval(() => nextSlide(), AUTO_DELAY); }
+    function stopAuto() { if (autoTimer) { clearInterval(autoTimer); autoTimer = null; } }
+
+    // event listeners
+    nextBtn?.addEventListener('click', (e) => { e.preventDefault(); nextSlide(); startAuto(); });
+    prevBtn?.addEventListener('click', (e) => { e.preventDefault(); prevSlide(); startAuto(); });
+    dots.forEach(d => d.addEventListener('click', () => { showSlide(Number(d.dataset.index)); startAuto(); }));
+
+    // pause on hover / touchstart
+    const carouselEl = document.querySelector('.promo-carousel');
+    carouselEl?.addEventListener('mouseenter', stopAuto);
+    carouselEl?.addEventListener('mouseleave', startAuto);
+    carouselEl?.addEventListener('touchstart', stopAuto, {passive:true});
+    carouselEl?.addEventListener('touchend', startAuto, {passive:true});
+
+    // init
+    showSlide(0);
+    startAuto();
+
+    // Promo CTA handlers: Claim Promo, Details, Preorder
+    function showToast(msg, t = 2200) {
+      let tEl = document.querySelector('.wrap-toast');
+      if (!tEl) { tEl = document.createElement('div'); tEl.className = 'toast wrap-toast'; document.body.appendChild(tEl); }
+      tEl.textContent = msg;
+      tEl.classList.add('show');
+      setTimeout(()=> tEl.classList.remove('show'), t);
+    }
+
+    // Claim buttons: record in localStorage and show quick feedback
+    promoContainer.querySelectorAll('button[data-action="apply-promo"]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const code = btn.dataset.promoCode || 'UNKNOWN';
+        // store claim flag (not tied to cart logic yet)
+        try { localStorage.setItem('wrap_claimed_promo_'+code, JSON.stringify({ ts: Date.now() })); } catch (err) {}
+        showToast('Promo claimed: ' + code + '. Add qualifying items at checkout.');
+        btn.classList.add('is-claimed');
+      });
+    });
+
+    // Details toggles: show more copy in #promo-more-content
+    const detailsMap = {
+      'shawarma': `<strong>Shawarma Promo (Buy 2 Get 1 Free)</strong><br>
+                   Promo works per 3 Shawarmas. On Tuesdays, the cheapest of each group of 3 will be discounted to free automatically at checkout. Add 2 qualifying shawarmas to your cart and the third will appear as a free line.`,
+      'fries': `<strong>Loaded Fries (Free Coke)</strong><br>
+                Buy a qualifying Loaded Fries during promo hours and we will add a free Coke to your cart. If not auto-added, use the "Add missing items" helper inside the cart.`
+    };
+    promoContainer.querySelectorAll('button[data-action="promo-details"]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const t = btn.dataset.target;
+        const content = detailsMap[t] || 'More promo details coming soon.';
+        const more = document.getElementById('promo-more');
+        const moreContent = document.getElementById('promo-more-content');
+        moreContent.innerHTML = content;
+        more.classList.toggle('hidden');
+        const expanded = btn.getAttribute('aria-expanded') === 'true';
+        btn.setAttribute('aria-expanded', String(!expanded));
+      });
+    });
+
+    // Preorder buttons: reuse your existing `data-action="preorder-promo"` behavior by triggering click on any matching element (your earlier script opened preorder modal for these)
+    promoContainer.querySelectorAll('[data-action="preorder-promo"]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        // Try to find existing preorder openers; trigger their click if present, else open #preorder-modal directly
+        const opener = document.querySelector('[data-action="preorder-promo"], #promo-preorder-btn');
+        if (opener && opener !== btn) opener.click(); // your other script listens on those and will open modal
+        else {
+          const pm = document.getElementById('preorder-modal');
+          if (pm) { pm.style.display = 'flex'; pm.setAttribute('aria-hidden','false'); document.body.style.overflow='hidden'; }
+        }
+      });
+    });
+
+    // keyboard navigation for dots (left/right)
+    document.addEventListener('keydown', (e) => {
+      if (document.activeElement && document.activeElement.tagName === 'INPUT') return; // don't interfere with typing
+      if (e.key === 'ArrowRight') { nextSlide(); startAuto(); }
+      if (e.key === 'ArrowLeft') { prevSlide(); startAuto(); }
+    });
+  });
+})();
+</script>
   <!-- END BODY -->
 </body>
+  <script>
+/* Preorder wiring: add this AFTER your main script (place before </body>) */
+(function(){
+  document.addEventListener('DOMContentLoaded', () => {
+    const preorderModal = document.getElementById('preorder-modal');
+    const preorderClose = document.getElementById('preorder-close');
+    const preorderCancel = document.getElementById('preorder-cancel');
+    const preorderForm = document.getElementById('preorder-form');
+    const preorderName = document.getElementById('preorder-name');
+    const preorderPhone = document.getElementById('preorder-phone');
+    const preorderNote = document.getElementById('preorder-note');
+    const promoPreorderBtns = Array.from(document.querySelectorAll('[data-action="preorder-promo"], #promo-preorder-btn'));
+
+    // small toast helper (injects a toast if not present)
+    function showToast(msg, timeout = 2500) {
+      let t = document.querySelector('.wrap-toast');
+      if (!t) {
+        t = document.createElement('div');
+        t.className = 'toast wrap-toast';
+        document.body.appendChild(t);
+      }
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(()=> t.classList.remove('show'), timeout);
+    }
+
+    function openPreorder() {
+      if (!preorderModal) return;
+      preorderModal.style.display = 'block';
+      preorderModal.setAttribute('aria-hidden', 'false');
+      // prefills
+      const savedPhone = localStorage.getItem('wrap_user_phone');
+      const savedName = localStorage.getItem('wrap_user_name');
+      if (savedPhone) preorderPhone.value = savedPhone;
+      if (savedName) preorderName.value = savedName;
+      // focus first field
+      setTimeout(()=> preorderName && preorderName.focus(), 120);
+      // prevent page behind from scrolling (small helper)
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closePreorder() {
+      if (!preorderModal) return;
+      preorderModal.style.display = 'none';
+      preorderModal.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+    }
+
+    // open handlers
+    promoPreorderBtns.forEach(btn => {
+      if (!btn) return;
+      btn.addEventListener('click', (ev) => {
+        ev.preventDefault();
+        openPreorder();
+      });
+    });
+
+    // close handlers
+    preorderClose && preorderClose.addEventListener('click', () => closePreorder());
+    preorderCancel && preorderCancel.addEventListener('click', () => closePreorder());
+
+    // close when clicking outside modal-inner
+    if (preorderModal) {
+      preorderModal.addEventListener('click', (e) => {
+        if (e.target === preorderModal) closePreorder();
+      });
+    }
+
+    // ESC to close
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && preorderModal && preorderModal.style.display === 'block') closePreorder();
+    });
+
+    // small helper to read cart summary from rendered DOM (doesn't depend on your internal cart variable)
+    function buildCartSummaryFromDom() {
+      const rows = Array.from(document.querySelectorAll('#cart-items li.cart-line'));
+      const items = [];
+      rows.forEach(li => {
+        // skip promo/free-lines that visually use .cart-free
+        if (li.classList.contains('cart-free')) return;
+        const title = (li.querySelector('.line-title')?.innerText || '').trim();
+        // qty may be in .line-qty inside this line-meta or top-level
+        const qtyElem = li.querySelector('.line-qty');
+        const qty = qtyElem ? Number(qtyElem.innerText.trim()) || 1 : 1;
+        const priceText = li.querySelector('.line-meta strong')?.innerText?.trim() || '';
+        items.push({ title, qty, priceText });
+      });
+      return items;
+    }
+
+    // submit handler
+    if (preorderForm) {
+      preorderForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const name = (preorderName.value || '').trim();
+        const phone = (preorderPhone.value || '').trim();
+        const note = (preorderNote.value || '').trim();
+
+        if (!name || !phone) {
+          alert('Please enter your name and phone number to confirm preorder.');
+          return;
+        }
+
+        // Save for convenience next time
+        try {
+          localStorage.setItem('wrap_user_name', name);
+          localStorage.setItem('wrap_user_phone', phone);
+        } catch (err) { /* ignore storage errors */ }
+
+        const cartSummary = buildCartSummaryFromDom();
+        // Build a simple payload you can inspect / forward to backend later
+        const payload = {
+          name,
+          phone,
+          note,
+          timestamp: new Date().toISOString(),
+          cart: cartSummary
+        };
+
+        // For now: log & show friendly message. You will integrate real server / payment / notifications next.
+        console.log('Preorder submitted:', payload);
+
+        // show confirmation to user
+        showToast('Preorder confirmed — we will reserve your items for the next promo window.');
+
+        // close modal after a short delay
+        setTimeout(() => {
+          closePreorder();
+        }, 900);
+      });
+    }
+
+    // Accessibility: ensure modal-inner is focusable if keyboard user tabs in
+    const inner = preorderModal && preorderModal.querySelector('.modal-inner');
+    if (inner) inner.setAttribute('tabindex', '-1');
+  });
+})();
+</script>
+  <!-- Cart footer enhancement: paste after your main script and before </body> -->
+<style>
+/* Override / enhancement for cart drawer footer behavior */
+.cart-drawer {
+  /* make the drawer a column flex container so footer stays pinned */
+  display: flex !important;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100vh;          /* fill viewport so footer anchors to bottom */
+  overflow: hidden;       /* inner scrolling happens in .cart-body */
+}
+
+/* .cart-body becomes the scrollable area */
+.cart-body {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  /* ensure content never gets hidden under footer */
+  padding-bottom: calc(var(--cart-footer-h, 96px) + 18px);
+}
+
+/* footer pinned inside flex layout */
+.cart-footer {
+  position: relative;     /* keep it in flow but pinned to bottom via flex */
+  z-index: 60;
+  flex: 0 0 var(--cart-footer-h, 96px);
+  height: var(--cart-footer-h, 96px);
+  box-shadow: 0 -10px 36px rgba(0,0,0,0.55);
+  border-top: 1px solid rgba(255,255,255,0.03);
+  background: linear-gradient(180deg, rgba(6,6,6,0.98), rgba(8,8,8,0.98));
+  box-sizing: border-box;
+}
+
+/* compact the footer on very small screens to avoid being too tall */
+@media (max-width: 380px) {
+  :root { --cart-footer-h: 84px; }
+  .cart-footer { height: var(--cart-footer-h); }
+  .footer-summary .total-label { font-size: 12px; }
+  .footer-summary .total-value { font-size: 14px; }
+}
+
+/* ensure checkout button remains visible & tappable */
+.cart-footer .footer-actions { align-items: center; gap: 8px; }
+.cart-footer .btn.primary { min-width: 120px; }
+
+/* small improvement: when drawer is open, slightly dim body (applies when JS adds class) */
+body.cart-open::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.28);
+  z-index: 1350; /* behind the drawer (drawer 1400) */
+  pointer-events: none;
+}
+</style>
+
+<script>
+/* Cart footer behavior + totals sync
+   Place after your main script. Non-invasive: doesn't rewrite your cart logic.
+*/
+(function () {
+  document.addEventListener('DOMContentLoaded', () => {
+    const cartDrawer = document.getElementById('cart-drawer');
+    const cartToggle = document.getElementById('cart-toggle');
+    const cartClose = document.getElementById('cart-close');
+    const cartMiniCount = document.getElementById('cart-mini-count');
+    const cartSubtotal = document.getElementById('cart-subtotal');
+    const cartTotal = document.getElementById('cart-total');
+    const footerSubtotal = document.getElementById('footer-subtotal');
+    const footerTotal = document.getElementById('footer-total');
+
+    if (!cartDrawer) return;
+
+    // Ensure drawer is flex-column (in case some earlier CSS is applied late)
+    cartDrawer.style.display = cartDrawer.style.display || 'block';
+
+    // When the drawer opens/closes, toggle body scroll and add subtle dim
+    function setDrawerOpen(open) {
+      if (open) {
+        cartDrawer.style.display = 'block';
+        cartDrawer.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';     // prevent background scroll
+        document.body.classList.add('cart-open');    // small dim overlay via CSS
+        // ensure drawer gets focus for keyboard navigation
+        cartDrawer.setAttribute('tabindex','-1');
+        cartDrawer.focus && cartDrawer.focus();
+      } else {
+        cartDrawer.style.display = 'none';
+        cartDrawer.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+        document.body.classList.remove('cart-open');
+      }
+    }
+
+    // Attach to existing buttons (we add handlers in addition to your existing ones)
+    cartToggle && cartToggle.addEventListener('click', (e) => {
+      // If it's already open (aria-hidden false) then close, else open.
+      const isOpen = cartDrawer.getAttribute('aria-hidden') === 'false' || cartDrawer.style.transform === 'translateX(0)';
+      setDrawerOpen(!isOpen);
+    });
+    cartClose && cartClose.addEventListener('click', () => setDrawerOpen(false));
+
+    // Also close drawer on Escape
+    document.addEventListener('keydown', (ev) => {
+      if (ev.key === 'Escape' && cartDrawer.getAttribute('aria-hidden') === 'false') {
+        setDrawerOpen(false);
+      }
+    });
+
+    // Small helper: sync the small footer totals with the main totals
+    function syncFooterTotals(){
+      try {
+        if (cartSubtotal && footerSubtotal) footerSubtotal.innerText = cartSubtotal.innerText || footerSubtotal.innerText;
+        if (cartTotal && footerTotal) footerTotal.innerText = footerTotal.innerText && cartTotal.innerText ? cartTotal.innerText : footerTotal.innerText;
+      } catch (err) { /* ignore */ }
+    }
+
+    // Run once on start
+    syncFooterTotals();
+
+    // Watch for changes to the main totals and sync them to the footer
+    const watchTargets = [];
+    if (cartSubtotal) watchTargets.push(cartSubtotal);
+    if (cartTotal) watchTargets.push(cartTotal);
+
+    if (watchTargets.length) {
+      const observer = new MutationObserver(() => { syncFooterTotals(); });
+      watchTargets.forEach(el => {
+        try {
+          observer.observe(el, { characterData: true, childList: true, subtree: true });
+        } catch (err) { /* fallback: periodic sync */ }
+      });
+      // fallback periodic sync in case mutationobserver couldn't attach
+      setInterval(syncFooterTotals, 700);
+    } else {
+      // If those elements don't exist, still try to sync periodically
+      setInterval(syncFooterTotals, 700);
+    }
+
+    // Also ensure cart-body scroll area is sized properly on orientation/resize
+    function adjustCartBodyPadding() {
+      const bodyEl = cartDrawer.querySelector('.cart-body');
+      const footerEl = cartDrawer.querySelector('.cart-footer');
+      if (!bodyEl || !footerEl) return;
+      const footerH = footerEl.getBoundingClientRect().height || 96;
+      // ensure bottom padding is at least footer height + 12px
+      bodyEl.style.paddingBottom = (footerH + 18) + 'px';
+    }
+    window.addEventListener('resize', adjustCartBodyPadding);
+    setTimeout(adjustCartBodyPadding, 120);
+  });
+})();
+</script>
 <script>
 /* Updated script — supports option/addon accumulation into cart and B2G1 only on Tuesdays */
 const q = (s, ctx = document) => ctx.querySelector(s);
