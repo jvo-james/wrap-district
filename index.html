@@ -1241,6 +1241,299 @@ a { color: var(--accent-2); text-decoration: none; }
 }
 .item-price.updated .price-value { transform: translateY(-4px); }
 
+    /* ==========================
+   Preorder Modal Styles
+   Matches site variables (uses --accent-1 / --accent-2)
+   Mobile-first, accessible, animated, with sticky CTA bar
+   ========================== */
+
+.preorder-modal { /* overlay wrapper */
+  position: fixed;
+  inset: 0;
+  display: none; /* JS toggles display / aria-modal */
+  align-items: flex-end; /* slide-up from bottom on mobile */
+  justify-content: center;
+  z-index: 2200;
+  background: rgba(6,6,6,0.6);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  padding: 12px;
+  box-sizing: border-box;
+}
+
+/* show when aria-modal true */
+.preorder-modal[aria-modal="true"] {
+  display: flex;
+  animation: preorder-overlay-in 260ms cubic-bezier(.2,.9,.3,1);
+}
+
+/* inner card */
+.preorder-modal .modal-inner-preorder {
+  width: 100%;
+  max-width: 420px;
+  border-radius: 14px 14px 8px 8px;
+  background: linear-gradient(180deg, rgba(12,12,12,0.98), rgba(8,8,8,0.98));
+  border: 1px solid rgba(255,255,255,0.03);
+  box-shadow: 0 30px 80px rgba(0,0,0,0.7);
+  transform: translateY(18px);
+  animation: preorder-card-in 360ms cubic-bezier(.2,.9,.3,1) forwards;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* header row */
+.preorder-modal .preorder-header {
+  display:flex;
+  gap:12px;
+  align-items:center;
+  padding: 14px;
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+  background: linear-gradient(90deg, rgba(255,255,255,0.01), rgba(255,255,255,0.00));
+}
+.preorder-modal .preorder-header .thumb {
+  width:72px;
+  height:64px;
+  border-radius:10px;
+  object-fit:cover;
+  flex: 0 0 72px;
+  border:1px solid rgba(255,255,255,0.04);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.45);
+}
+.preorder-modal .preorder-header .meta {
+  flex: 1 1 auto;
+  min-width:0;
+}
+.preorder-modal .preorder-header .meta .title {
+  font-size:16px;
+  font-weight:900;
+  color:#fff;
+  margin:0 0 4px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.preorder-modal .preorder-header .meta .subtitle {
+  font-size:13px;
+  color: rgba(255,255,255,0.82);
+  margin:0;
+}
+
+/* countdown / weekday chip */
+.preorder-modal .preorder-when {
+  display:flex;
+  gap:8px;
+  align-items:center;
+  padding: 12px 14px;
+  border-bottom: 1px dashed rgba(255,255,255,0.02);
+  background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.00));
+}
+.preorder-modal .countdown-chip {
+  display:inline-flex;
+  gap:8px;
+  align-items:center;
+  padding:8px 10px;
+  border-radius:999px;
+  font-weight:900;
+  background: linear-gradient(90deg, var(--accent-1), var(--accent-2));
+  color:#111;
+  box-shadow: 0 12px 30px rgba(255,106,0,0.12);
+  font-size:13px;
+}
+
+/* form area */
+.preorder-modal .preorder-body {
+  padding: 12px 14px 84px; /* bottom padding to allow for sticky CTA bar */
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  max-height: calc(100vh - 220px);
+  overflow:auto;
+}
+
+/* qty + extras row */
+.preorder-modal .row {
+  display:flex;
+  gap:10px;
+  align-items:center;
+  justify-content:space-between;
+}
+
+/* quantity control */
+.preorder-modal .qty-control {
+  display:flex;
+  gap:8px;
+  align-items:center;
+}
+.preorder-modal .qty-control button {
+  width:40px;
+  height:40px;
+  border-radius:10px;
+  border:0;
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  color:var(--muted);
+  font-weight:900;
+  font-size:18px;
+}
+.preorder-modal .qty-control .qty-value {
+  min-width:36px;
+  text-align:center;
+  font-weight:900;
+  color: var(--accent-2);
+}
+
+/* date/time picker row */
+.preorder-modal .datetime {
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+}
+.preorder-modal .datetime input[type="date"],
+.preorder-modal .datetime input[type="time"],
+.preorder-modal .datetime select,
+.preorder-modal .datetime .prefetch-select {
+  padding:10px 12px;
+  border-radius:10px;
+  border: 1px solid rgba(255,255,255,0.04);
+  background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.00));
+  color:#fff;
+  font-weight:800;
+  font-size:14px;
+  box-sizing:border-box;
+}
+
+/* extras list */
+.preorder-modal .extras {
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+.preorder-modal .extras label {
+  display:flex;
+  gap:10px;
+  align-items:center;
+  padding:8px 10px;
+  border-radius:10px;
+  border:1px solid rgba(255,255,255,0.03);
+  background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.00));
+  cursor:pointer;
+  font-weight:800;
+  color: var(--muted);
+}
+.preorder-modal .extras input[type="checkbox"] {
+  width:18px;
+  height:18px;
+  border-radius:6px;
+  border:2px solid rgba(255,255,255,0.06);
+  appearance:none;
+  -webkit-appearance:none;
+}
+.preorder-modal .extras input[type="checkbox"]:checked {
+  background: linear-gradient(90deg, var(--accent-1), var(--accent-2));
+  border-color: rgba(255,255,255,0.02);
+}
+
+/* contact inputs */
+.preorder-modal .contact-row {
+  display:flex;
+  gap:8px;
+  flex-direction:column;
+}
+.preorder-modal .contact-row input[type="text"],
+.preorder-modal .contact-row input[type="tel"],
+.preorder-modal .contact-row input[type="email"] {
+  padding:10px 12px;
+  border-radius:10px;
+  border:1px solid rgba(255,255,255,0.04);
+  background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.00));
+  color:#fff;
+  font-weight:800;
+  font-size:14px;
+  box-sizing:border-box;
+}
+
+/* small helper text */
+.preorder-modal .helper {
+  font-size:13px;
+  color: rgba(255,255,255,0.75);
+  margin-top:2px;
+}
+
+/* sticky CTA bar (fixed to modal bottom) */
+.preorder-modal .preorder-cta {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 12px;
+  box-sizing: border-box;
+  background: linear-gradient(180deg, rgba(8,8,8,0.00), rgba(0,0,0,0.6));
+  border-top: 1px solid rgba(255,255,255,0.03);
+  display:flex;
+  gap:8px;
+  align-items:center;
+  justify-content:space-between;
+}
+.preorder-modal .preorder-cta .price {
+  font-weight:900;
+  font-size:16px;
+  color: var(--accent-2);
+  min-width:120px;
+  text-align:left;
+}
+.preorder-modal .preorder-cta .btn {
+  min-width: 140px;
+  padding:12px 14px;
+  border-radius:12px;
+  font-weight:900;
+}
+
+/* disabled state for submit */
+.preorder-modal .btn[disabled] {
+  opacity: 0.4;
+  transform: none;
+  pointer-events: none;
+}
+
+/* small close button top-right */
+.preorder-modal .preorder-close {
+  position:absolute;
+  right: 10px;
+  top: 8px;
+  background: transparent;
+  border: 0;
+  color: var(--muted);
+  font-size:18px;
+  padding:8px;
+  z-index: 10;
+}
+
+/* success state/shimmer for confirmation */
+.preorder-modal .success {
+  display:none;
+  padding:18px;
+  text-align:center;
+  color: var(--accent-2);
+  font-weight:900;
+}
+.preorder-modal.success-visible .success { display:block; }
+.preorder-modal.success-visible .modal-inner-preorder { opacity: 0.2; pointer-events: none; }
+
+/* Animations */
+@keyframes preorder-overlay-in {
+  from { opacity: 0; } to { opacity: 1; }
+}
+@keyframes preorder-card-in {
+  from { transform: translateY(22px); opacity: 0; } to { transform: translateY(0); opacity: 1; }
+}
+
+/* Responsive tweaks for larger screens */
+@media (min-width: 640px) {
+  .preorder-modal { align-items: center; padding: 30px; }
+  .preorder-modal .modal-inner-preorder { width: 560px; border-radius: 12px; }
+  .preorder-modal .preorder-body { padding-bottom: 16px; max-height: calc(100vh - 160px); }
+  .preorder-modal .preorder-cta { position: relative; background: transparent; border-top: none; }
+}
 /* End of menu styles */
 </style>
   <style>
@@ -1564,14 +1857,21 @@ a:focus, button:focus { outline: 3px solid rgba(255,204,51,0.10); outline-offset
               <h2 class="slide-title">Tuesday Promo — Buy 2 Shawarmas, Get 1 Free</h2>
               <p class="slide-sub">Loaded Fries come with a free Coke when ordered during promo hours.</p>
 
-              <div class="promo-cta-row">
-                <button class="btn primary" data-action="apply-promo" data-promo-code="TUES-B2G1">
-                  <i class="fa fa-tag"></i> Claim Promo
-                </button>
-                <button class="btn ghost" data-action="learn-more" aria-controls="promo-details">
-                  <i class="fa fa-info-circle"></i> Details
-                </button>
-              </div>
+           <!-- inside your Slide 3 slide-content where promo-cta-row exists -->
+<div class="promo-cta-row">
+  <button class="btn primary" data-action="apply-promo" data-promo-code="TUES-B2G1">
+    <i class="fa fa-tag"></i> Claim Promo
+  </button>
+
+  <button class="btn ghost" data-action="learn-more" aria-controls="promo-details">
+    <i class="fa fa-info-circle"></i> Details
+  </button>
+
+  <!-- NEW: Preorder button for the upcoming promo -->
+  <button class="btn primary" data-action="preorder-promo" id="promo-preorder-btn">
+    <i class="fa fa-calendar-check"></i> Preorder for next promo
+  </button>
+</div>
 
               <div class="promo-urgency">
                 <span class="promo-countdown" id="promo-countdown" aria-live="polite">Promo ends in: <strong id="promo-timer">—</strong></span>
@@ -1833,6 +2133,10 @@ a:focus, button:focus { outline: 3px solid rgba(255,204,51,0.10); outline-offset
         <div id="promo-details" class="promo-copy">
           <p><strong>Buy 2 Shawarmas, Get 1 Free (Tuesdays)</strong> — Promo applies automatically at checkout. Add two qualifying shawarmas and the third will be discounted to free.</p>
           <p><strong>Loaded Fries</strong> — Get a free Coke when purchasing during promo hours. Free item will appear in cart once qualifying product is added.</p>
+         <!-- somewhere inside #promo-details (promo-copy) -->
+<div style="margin-top:10px;">
+  <button class="btn primary" data-action="preorder-promo">Preorder for next Tuesday Promo</button>
+</div>
           <div class="promo-help">
             <small id="promo-helper" class="muted">Tip: use the "Add missing items" button in cart to reach a promo threshold instantly.</small>
           </div>
@@ -1931,6 +2235,32 @@ a:focus, button:focus { outline: 3px solid rgba(255,204,51,0.10); outline-offset
         </div>
       </div>
     </footer>
+    <!-- PREORDER MODAL -->
+<div id="preorder-modal" class="modal" role="dialog" aria-modal="true" aria-hidden="true">
+  <div class="modal-inner">
+    <button class="icon-btn modal-close" id="preorder-close" aria-label="Close"><i class="fa fa-times"></i></button>
+    <div class="modal-body">
+      <h3><i class="fa fa-calendar-plus"></i> Preorder for next Promo</h3>
+      <p class="lead">We will reserve your current cart items for the next Tuesday promo window.</p>
+
+      <form id="preorder-form">
+        <label class="label">Name</label>
+        <input id="preorder-name" class="input" type="text" placeholder="Your name" required>
+
+        <label class="label">Phone</label>
+        <input id="preorder-phone" class="input" type="tel" placeholder="0550xxxxxx" required>
+
+        <label class="label">Note (optional)</label>
+        <input id="preorder-note" class="input" type="text" placeholder="Delivery/pickup notes">
+
+        <div style="display:flex; gap:8px; margin-top:10px;">
+          <button type="submit" class="btn primary" id="preorder-confirm"><i class="fa fa-check"></i> Confirm Preorder</button>
+          <button type="button" class="btn ghost" id="preorder-cancel">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
   </main>
 
   <!-- END BODY -->
@@ -2550,39 +2880,7 @@ document.addEventListener('DOMContentLoaded', () => {
     renderCart();
   }
 
-  /* ---------- Promo countdown ---------- */
-  function updatePromoCountdown() {
-    // Compute time until next promo day (Tuesday)
-    const now = new Date();
-    const day = now.getDay(); // 0..6
-    // Determine next Tuesday
-    const targetDay = 2; // Tuesday
-    let daysUntil = (targetDay - day + 7) % 7;
-    if (daysUntil === 0) {
-      // If today is promo day, compute time until promo ends (end of day)
-      const endOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
-      const diff = endOfDay - now;
-      promoCountdownEl.innerText = formatMs(diff);
-      return;
-    }
-    // next promo at next occurrence (start of the day at 00:00)
-    const nextPromo = new Date(now.getFullYear(), now.getMonth(), now.getDate() + daysUntil, 0, 0, 0);
-    const diff = nextPromo - now;
-    promoCountdownEl.innerText = formatMs(diff);
-  }
-
-  function formatMs(ms) {
-    if (ms <= 0) return '00:00:00';
-    const secs = Math.floor(ms / 1000);
-    const days = Math.floor(secs / 86400);
-    const hours = Math.floor((secs % 86400) / 3600);
-    const minutes = Math.floor((secs % 3600) / 60);
-    const seconds = secs % 60;
-    if (days > 0) return `${days}d ${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
-    return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
-  }
-  function pad(n) { return String(n).padStart(2, '0'); }
-
+ 
   /* ---------- Tiny helpers ---------- */
   function escapeHtml(str) {
     return String(str)
@@ -2673,6 +2971,175 @@ function initMenuFilterAndAnchors() {
 
 // call after menu setup
 initMenuFilterAndAnchors();
+  </script>
+  <script>
+    /* ---------------- PROMO CONFIG & PREORDER SUPPORT ---------------- */
+const promo = {
+  // Promo only on Tuesdays
+  activeDays: [2], // 2 === Tuesday (0 Sun ... 6 Sat)
+
+  // Promo active hours (local time) - you can change these
+  startHour: 12, // 12:00
+  endHour: 22,   // 22:00
+
+  // returns true only when it's Tuesday AND within startHour <= hour < endHour
+  isActive() {
+    const now = new Date();
+    const day = now.getDay();
+    if (!this.activeDays.includes(day)) return false;
+    const hour = now.getHours();
+    return hour >= this.startHour && hour < this.endHour;
+  }
+};
+
+/* Utility: compute next Tuesday date; if 'atStart' true returns next promo start (next Tuesday at startHour) */
+function getNextPromoDate(atStart = true) {
+  const now = new Date();
+  const targetDay = 2; // Tuesday
+  let daysUntil = (targetDay - now.getDay() + 7) % 7;
+
+  // if today is Tuesday:
+  if (daysUntil === 0) {
+    // if asking for start and the start time is later today, keep today
+    if (atStart && now.getHours() < promo.startHour) {
+      daysUntil = 0;
+    } else if (!atStart) {
+      // for end time if still before endHour, return today
+      daysUntil = 0;
+    } else {
+      // otherwise next week's Tuesday
+      daysUntil = 7;
+    }
+  }
+
+  const baseDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() + daysUntil);
+  if (atStart) {
+    baseDate.setHours(promo.startHour, 0, 0, 0);
+  } else {
+    baseDate.setHours(promo.endHour, 0, 0, 0);
+  }
+  return baseDate;
+}
+
+/* Pretty formatting for countdown */
+function formatMs(ms) {
+  if (ms <= 0) return '00:00:00';
+  const secs = Math.floor(ms / 1000);
+  const days = Math.floor(secs / 86400);
+  const hours = Math.floor((secs % 86400) / 3600);
+  const minutes = Math.floor((secs % 3600) / 60);
+  const seconds = secs % 60;
+  if (days > 0) return `${days}d ${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
+  return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
+}
+function pad(n) { return String(n).padStart(2, '0'); }
+
+/* Update the countdown UI: show "starts in" if not active yet, "ends in" when active */
+function updatePromoCountdown() {
+  const now = new Date();
+  const promoTimerEl = q('#promo-timer');
+
+  if (promo.isActive()) {
+    // show time until promo end (today at endHour)
+    const endDate = getNextPromoDate(false);
+    const diff = endDate - now;
+    promoTimerEl.innerText = `Ends in ${formatMs(diff)}`;
+  } else {
+    // show time until next promo start (next Tuesday at startHour)
+    const nextStart = getNextPromoDate(true);
+    const diff = nextStart - now;
+    promoTimerEl.innerText = `Starts in ${formatMs(diff)}`;
+  }
+}
+
+/* Run countdown every second */
+updatePromoCountdown();
+setInterval(updatePromoCountdown, 1000);
+
+/* -------------------- Preorder flow -------------------- */
+
+/* show / hide preorder modal helpers */
+const preorderModal = q('#preorder-modal');
+const preorderForm = q('#preorder-form');
+const preorderClose = q('#preorder-close');
+const preorderCancel = q('#preorder-cancel');
+
+function openPreorderModal() {
+  // If cart is empty, show a toast/alert
+  const cartCount = Object.values(cart).reduce((s, li) => s + (li.qty || 0), 0);
+  if (cartCount === 0) {
+    alert('Your cart is empty — add items you want to preorder, then click Preorder.');
+    return;
+  }
+  preorderModal.style.display = 'flex';
+  preorderModal.setAttribute('aria-hidden', 'false');
+}
+
+function closePreorderModal() {
+  preorderModal.style.display = 'none';
+  preorderModal.setAttribute('aria-hidden', 'true');
+}
+
+/* compute scheduled date (next promo start) and create preorder record */
+function createPreorderRecord(customer) {
+  // Deep copy items from cart
+  const items = Object.values(cart).map(i => ({
+    id: i.id,
+    title: i.title,
+    unitPrice: i.unitPrice,
+    qty: i.qty
+  }));
+  const totals = computeCartTotals();
+  const scheduledFor = getNextPromoDate(true); // next promo start
+
+  const preorder = {
+    id: 'preorder-' + Date.now(),
+    createdAt: new Date().toISOString(),
+    scheduledFor: scheduledFor.toISOString(),
+    customer,
+    items,
+    totals
+  };
+
+  // Save locally (later wire to backend)
+  const existing = JSON.parse(localStorage.getItem('wrap_preorders') || '[]');
+  existing.push(preorder);
+  localStorage.setItem('wrap_preorders', JSON.stringify(existing));
+
+  // Simple UI feedback
+  alert(`Preorder scheduled for ${scheduledFor.toLocaleString()}. We'll hold your items for the promo.`);
+  closePreorderModal();
+}
+
+/* event listeners for modal buttons */
+preorderClose?.addEventListener('click', closePreorderModal);
+preorderCancel?.addEventListener('click', closePreorderModal);
+
+preorderForm?.addEventListener('submit', (ev) => {
+  ev.preventDefault();
+  const name = q('#preorder-name').value.trim();
+  const phone = q('#preorder-phone').value.trim();
+  const note = q('#preorder-note').value.trim();
+
+  if (!name || !phone) {
+    alert('Please provide name and phone for preorder.');
+    return;
+  }
+
+  createPreorderRecord({ name, phone, note });
+});
+
+/* wire the page-level handler for both promo buttons (hero slide + promo section) */
+document.body.addEventListener('click', (e) => {
+  const t = e.target.closest('[data-action]');
+  if (!t) return;
+  const action = t.dataset.action;
+  if (action === 'preorder-promo') {
+    // Open modal to confirm preorder for next promo
+    openPreorderModal();
+  }
+  // keep other data-action handling intact (order-now, apply-promo etc.)
+});
   </script>
 </html>
   
