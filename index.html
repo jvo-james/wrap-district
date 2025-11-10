@@ -9,39 +9,140 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
-/* =========================
-   Wrap District — Header + Hero (Mobile-first)
-   Extremely polished, phone-first styling.
-   Drop this into the page <head> or alongside your other styles.
-   ========================= */
-
-/* ---------- Theme variables ---------- */
+/* ----------------------------
+  APPETIZING COLOR THEME — Food-focused
+  Replace the original :root and body background rules with this block.
+  ---------------------------- */
 :root{
-  --bg:#080808;
-  --glass: rgba(255,255,255,0.06);
-  --glass-2: rgba(255,255,255,0.04);
-  --accent-1: #ff6a00;      /* orange */
-  --accent-2: #ffcc33;      /* warm yellow */
-  --muted: #d7d7d7;
-  --glass-border: rgba(255,255,255,0.06);
-  --card-shadow: 0 10px 30px rgba(0,0,0,0.6);
-  --radius-lg: 16px;
+  /* Primary palette — warm & appetizing */
+  --accent-1: #FF6A00;        /* vibrant orange - primary CTA */
+  --accent-2: #FFD166;        /* warm golden yellow - highlight */
+  --accent-3: #78C267;        /* fresh green - freshness / success */
+  --accent-4: #D96A2B;        /* secondary orange (for subtle contrast) */
+
+  /* Neutral / text */
+  --bg-start: #0b0b0b;        /* deep charcoal for dramatic food photography */
+  --bg-end:   #20140d;        /* warm deep brown tint */
+  --muted:    #E6E1DC;        /* off-white for readable small text */
+  --muted-2:  rgba(230,225,220,0.78);
+  --text:     #FFF9F6;        /* main content text */
+
+  /* Glass / cards */
+  --glass: rgba(255,255,255,0.03);
+  --glass-2: rgba(255,255,255,0.02);
+  --glass-border: rgba(255,255,255,0.04);
+
+  /* Shadows / radii */
+  --card-shadow: 0 12px 40px rgba(0,0,0,0.65);
+  --accent-shadow: 0 10px 30px rgba(255,106,0,0.12);
+  --radius-lg: 14px;
   --radius-sm: 10px;
+
   --max-width: 420px;
   --safe-top: env(safe-area-inset-top, 12px);
 }
 
-/* ---------- Base resets for this area only ---------- */
-.hero-slideshow, .sticky-header, .header-inner, .slide, .slide-img { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
-
-/* ---------- Page container limits (mobile-first) ---------- */
+/* Page background — warm, slightly textured gradient to make food photos pop */
 body {
-  background: linear-gradient(180deg, #050505 0%, #0f0f0f 100%);
-  color: #fff;
+  background: linear-gradient(180deg, var(--bg-start) 0%, var(--bg-end) 100%);
+  color: var(--text);
   font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
   margin: 0;
   -webkit-text-size-adjust: 100%;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
+
+/* Small tweaks to key UI pieces to match the palette */
+.logo-mark{
+  background: linear-gradient(135deg, var(--accent-1), var(--accent-4));
+  color: #111; /* dark text on bright badge gives premium stamp look */
+  font-weight:900;
+  padding:6px 10px;
+  border-radius:8px;
+  font-size:16px;
+  letter-spacing:1px;
+  box-shadow: 0 8px 26px rgba(217,106,43,0.10), inset 0 -2px 0 rgba(0,0,0,0.06);
+}
+
+.logo-name{
+  color: var(--accent-2);
+  font-weight:700;
+  font-size:13px;
+  text-transform:uppercase;
+  letter-spacing:1px;
+}
+
+/* CTAs — primary and ghost tuned for better contrast */
+.btn.primary{
+  background: linear-gradient(90deg, var(--accent-1), var(--accent-2));
+  color: #111;
+  box-shadow: var(--accent-shadow);
+  border: 0;
+}
+.btn.ghost{
+  background: rgba(255,255,255,0.03);
+  color: var(--muted);
+  border: 1px solid rgba(255,255,255,0.04);
+}
+
+/* Slide eyebrow & titles tuned */
+.eyebrow{ color: var(--accent-2); font-weight: 800; }
+.slide-title{ color: var(--text); text-shadow: 0 10px 30px rgba(0,0,0,0.6); }
+.slide-sub{ color: var(--muted-2); }
+
+/* Accent icon colors used around slides */
+.art-icon{ color: rgba(255,230,200,0.95); }
+
+/* Cart badge uses the same appetizing gradient */
+.cart-count, .cart-mini-count {
+  background: linear-gradient(90deg, var(--accent-1), var(--accent-2));
+  color: #111;
+  font-weight:800;
+  box-shadow: var(--accent-shadow);
+}
+
+/* Menu cards: slightly warmer surfaces to read as food cards */
+.menu-item{
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  border-radius: var(--radius-lg);
+  padding: 10px;
+  box-shadow: var(--card-shadow);
+  border: 1px solid var(--glass-border);
+}
+
+/* Price chips: make them pop without feeling loud */
+.menu-item::after{
+  background: linear-gradient(90deg, var(--accent-1), var(--accent-2));
+  color: #111;
+  padding:6px 10px;
+  border-radius:999px;
+}
+
+/* Promo badges */
+.badge, .promo-badge, .promo-badge-small{
+  background: linear-gradient(90deg, var(--accent-1), var(--accent-2));
+  color: #111;
+  font-weight:900;
+}
+
+/* Cart lines warm accent for quantities */
+.line-qty{ color: var(--accent-2); font-weight:900; }
+
+/* Promo countdown chip tuned */
+.promo-countdown-chip{ background: linear-gradient(90deg, var(--accent-1), var(--accent-2)); color:#111; }
+
+/* Modal inner highlight for promo */
+.entry-promo .modal-inner{
+  background: linear-gradient(90deg, rgba(255,106,0,0.07), rgba(255,255,255,0.02));
+  border: 1px solid rgba(255,204,51,0.08);
+}
+
+/* Small accessibility improvement: ensure links on dark backgrounds are readable */
+a { color: var(--accent-2); text-decoration: none; }
+
+/* Keep all other styles intact; these variable swaps will propagate to the rest of your file */
+
 
 /* ---------- STICKY HEADER ---------- */
 .sticky-header {
