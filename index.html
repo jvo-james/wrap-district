@@ -3300,7 +3300,586 @@ img, picture, video { max-width: 100%; height: auto; display: block; object-fit:
   .hero .item .thumb,
   .product-card .thumb { height: calc(var(--hero-item-size) * 0.6); }
 
-  
+  .btn-add.added { background: #fff1ef; color: #b71c1c; border: 1px solid rgba(183,28,28,0.08); box-shadow:none; }
+.btn-add.added i { margin-right:6px; }
+
+  /* ====== Mobile nav responsive styling ====== */
+@media (max-width: 920px) {
+  /* hide desktop nav list and brand text to save space */
+  .brand-text { display: none !important; }
+  .main-nav { display: none !important; } /* hide original nav on small screens */
+  .hamburger { display: inline-grid; }     /* ensure hamburger is visible */
+
+  /* Mobile overlay */
+  .mobile-overlay {
+    position: fixed; inset: 0; z-index: 1400;
+    background: rgba(10,10,10,0.48);
+    backdrop-filter: blur(6px);
+    transition: opacity .28s ease;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .mobile-overlay[aria-hidden="false"], .mobile-overlay.show { opacity: 1; pointer-events: auto; }
+
+  /* Panel */
+  .mobile-panel {
+    position: fixed;
+    top: 0; right: 0;
+    height: 100vh;
+    width: 88%;
+    max-width: 420px;
+    z-index: 1500;
+    transform: translateX(110%);
+    transition: transform .36s cubic-bezier(.22,.95,.32,1);
+    background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(250,250,250,0.98));
+    box-shadow: -24px 40px 80px rgba(12,12,12,0.16);
+    display: flex;
+    flex-direction: column;
+    border-left: 1px solid rgba(16,16,16,0.04);
+    padding: 12px;
+    overflow-y: auto;
+  }
+  .mobile-panel[aria-hidden="false"] { transform: translateX(0); }
+
+  .mobile-panel-inner { display:flex; flex-direction:column; min-height:100%; }
+
+  .mobile-panel-head { display:flex; align-items:center; justify-content:space-between; gap:8px; padding:8px 6px; }
+  .mobile-brand { display:flex; align-items:center; gap:10px; text-decoration:none; color:inherit; }
+  .mobile-brand .logo { width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--accent-2)); color:white; display:flex; align-items:center; justify-content:center; }
+  .mobile-brand .brand-text { display:block; font-size:0.9rem; line-height:1; }
+  .mobile-close { width:44px;height:44px; }
+
+  .mobile-panel-body { padding: 6px; display:flex; flex-direction:column; gap:12px; }
+
+  .mobile-nav-container .nav-list {
+    display:flex; flex-direction:column; gap:6px; padding:6px 4px; margin:0;
+  }
+  .mobile-nav-container .nav-list .nav-link {
+    display:flex; align-items:center; gap:12px;
+    padding:14px 12px; border-radius:12px;
+    font-size:1.05rem; font-weight:700;
+    background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(255,255,255,0.96));
+    border: 1px solid rgba(16,16,16,0.04);
+    box-shadow: 0 8px 26px rgba(16,16,16,0.04);
+    color:#111;
+  }
+
+  .mobile-cta { display:flex; gap:10px; flex-direction:column; padding:8px 4px; margin-top:6px; }
+  .mobile-cta .btn { width:100%; padding:14px; font-size:1rem; border-radius:12px; }
+
+  .mobile-panel-foot { margin-top:auto; padding: 12px 6px; text-align:center; color:var(--muted); }
+
+  /* subtle states */
+  .mobile-panel .nav-link:active, .mobile-panel .nav-link:focus { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(16,16,16,0.06); }
+
+  /* hamburger -> X transform (we swap icons via JS but keep some visual feedback) */
+  .hamburger.open { background: linear-gradient(90deg, rgba(0,0,0,0.04), rgba(0,0,0,0.02)); transform: rotate(0.001deg); }
+
+  /* make sure header is above overlay stacking contexts */
+  .site-header { z-index: 1600; }
+}
+  /* ===== Builder option tiles (premium) ===== */
+.options-grid.option-tiles-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+  align-items: start;
+  padding: 6px;
+}
+
+/* option card */
+.option-card {
+  display: block;
+  background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(250,250,250,0.98));
+  border-radius: 12px;
+  border: 1px solid rgba(16,16,16,0.04);
+  box-shadow: 0 10px 30px rgba(14,14,14,0.06);
+  overflow: hidden;
+  text-align: left;
+  cursor: pointer;
+  padding: 0;
+  transition: transform .22s cubic-bezier(.2,.9,.2,1), box-shadow .22s ease;
+  min-height: 160px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* image area keeps aspect ratio and is cover */
+.option-card .option-media {
+  flex: 0 0 110px;
+  min-height: 110px;
+  background-size: cover;
+  background-position: center;
+  display:block;
+}
+
+/* meta area */
+.option-card .option-meta {
+  padding: 10px 12px;
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+.option-card .option-title { font-weight:700; font-size:0.96rem; color:#111; }
+.option-card .option-sub { font-size:0.85rem; color:var(--muted); }
+
+/* hover */
+.option-card:hover { transform: translateY(-6px); box-shadow: 0 20px 40px rgba(12,12,12,0.08); }
+
+/* selected state */
+.option-card.selected {
+  outline: 3px solid rgba(255,107,61,0.12);
+  border-color: rgba(255,107,61,0.12);
+  box-shadow: 0 24px 60px rgba(255,107,61,0.06);
+  transform: translateY(-4px);
+}
+.option-card[aria-pressed="true"] { box-shadow: 0 22px 50px rgba(0,0,0,0.08); }
+
+/* multi-select visual (checkbox-like chip) */
+.option-card.selected::after {
+  content: "\f00c"; /* FontAwesome check mark */
+  font-family: "Font Awesome 6 Free";
+  font-weight: 900;
+  position: absolute;
+  right: 10px; top: 10px;
+  background: rgba(0,0,0,0.6); color: #fff;
+  width: 34px; height: 34px; border-radius: 10px;
+  display:flex; align-items:center; justify-content:center;
+}
+
+/* make small screens horizontally scrollable for quick selection */
+@media (max-width: 720px) {
+  .options-grid.option-tiles-grid {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    padding-bottom: 8px;
+    -webkit-overflow-scrolling: touch;
+  }
+  .option-card { min-width: 220px; flex: 0 0 auto; }
+  .modal-right { order: 2; } /* keep preview below on small screens */
+}
+
+/* preview gallery styling (right column) */
+.preview-gallery {
+  display: flex; gap:8px; margin-top:8px; flex-wrap:wrap;
+}
+.preview-thumb { width:54px; height:54px; padding:0; border-radius:8px; overflow:hidden; border:1px solid rgba(16,16,16,0.04); background:#fff; }
+.preview-thumb .thumb-img { width:100%; height:100%; background-size:cover; background-position:center; }
+  /* ===== micro pop animation + price badge ===== */
+
+/* pop animation uses transform + scale + subtle bounce */
+@keyframes tilePop {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.06); }
+  70%  { transform: scale(0.995); }
+  100% { transform: scale(1); }
+}
+
+/* apply small pop when .pop added */
+.option-card.pop {
+  animation: tilePop 320ms cubic-bezier(.2,.85,.2,1);
+}
+
+/* subtle pulse shadow on select */
+.option-card.selected {
+  box-shadow: 0 26px 68px rgba(255,107,61,0.10);
+  transform: translateY(-4px);
+}
+
+/* price-badge: small rounded pill over image */
+.price-badge {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  background: linear-gradient(90deg,#ff6b3d,#ffc857);
+  color: white;
+  font-weight: 800;
+  font-size: 0.8rem;
+  padding: 6px 8px;
+  border-radius: 999px;
+  box-shadow: 0 8px 20px rgba(16,16,16,0.12);
+  z-index: 4;
+  pointer-events: none;
+}
+
+/* darken the price-badge slightly for better contrast on very bright images */
+.option-card .option-media::after {
+  content: "";
+  position: absolute; inset: 0;
+  mix-blend-mode: multiply;
+  opacity: 0.02;
+  pointer-events: none;
+}
+
+/* smaller badge on narrow widths */
+@media (max-width: 520px) {
+  .price-badge { font-size: 0.76rem; padding: 5px 7px; right:8px; top:8px; }
+}
+  /* ===== Builder Summary — premium styling ===== */
+.order-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 12px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(250,250,250,0.98));
+  border-radius: 12px;
+  border: 1px solid rgba(16,16,16,0.04);
+  box-shadow: 0 12px 36px rgba(16,16,16,0.06);
+}
+
+/* selected chips */
+.selected-chips {
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  padding:4px 0;
+}
+.summary-title { margin:0 0 6px 0; font-weight:800; color:#111; }
+
+/* chip */
+.chip {
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:8px 10px;
+  border-radius:999px;
+  background:linear-gradient(180deg,rgba(255,255,255,0.94),rgba(250,250,250,0.94));
+  border:1px solid rgba(16,16,16,0.04);
+  box-shadow:0 6px 18px rgba(16,16,16,0.04);
+  cursor:pointer;
+  font-weight:700;
+}
+.chip .remove { opacity:0.9; color:#b71c1c; background:transparent; border:0; font-size:0.92rem; }
+
+/* price lines */
+.summary-breakdown .line { display:flex; align-items:center; justify-content:space-between; padding:8px 4px; border-radius:8px; }
+.summary-breakdown .line:not(.total-line):hover { background: rgba(0,0,0,0.02); }
+.summary-breakdown .label { color:var(--muted); font-weight:700; font-size:0.95rem; }
+.summary-breakdown .value { font-weight:800; color:#111; }
+
+/* qty controls */
+.qty-controls { display:inline-flex; align-items:center; gap:8px; }
+.qty-controls .icon-btn { width:36px; height:36px; font-size:1rem; border-radius:8px; }
+
+/* total line standout */
+.total-line { background: linear-gradient(90deg, rgba(255,107,61,0.06), rgba(255,200,120,0.03)); padding:12px; border-radius:12px; }
+.total-val { font-size:1.12rem; color:#111; }
+
+/* promo */
+.summary-promo { display:flex; gap:8px; align-items:center; }
+.summary-promo input { flex:1; padding:10px 12px; border-radius:10px; border:1px solid rgba(16,16,16,0.06); }
+
+/* actions */
+.summary-actions { display:flex; gap:10px; align-items:center; }
+#summary-add { flex:1; }
+#summary-close { flex:0 0 auto; }
+
+/* small screens: stack nicely */
+@media (max-width:720px) {
+  .order-summary { padding:10px; }
+  .chip { padding:8px 10px; font-size:0.95rem; }
+  .summary-breakdown .label { font-size:0.9rem; }
+  .summary-breakdown .value { font-size:0.95rem; }
+}
+  /* summary add pulse */
+#summary-add.added { transform: scale(0.98); box-shadow: 0 10px 30px rgba(16,16,16,0.06); transition: all 160ms ease; }
+  /* ===== Premium Build Modal — Visual & Responsive Enhancements ===== */
+
+/* container adjustments */
+.modal.modal-builder,
+#build-modal,
+#builder-modal {
+  --modal-radius: 18px;
+  --modal-gap: 20px;
+  --modal-bg: linear-gradient(180deg,#fff,#fbfbfb);
+  --muted-2: rgba(16,16,16,0.36);
+}
+
+/* shell layout (desktop) */
+.modal-shell.container,
+#builder-modal .modal-shell.container {
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  gap: var(--modal-gap);
+  align-items: start;
+  padding: 22px;
+  background: transparent;
+}
+
+/* left column (options) */
+.modal-left {
+  background: var(--modal-bg);
+  border-radius: var(--modal-radius);
+  padding: 18px;
+  box-shadow: 0 20px 50px rgba(9, 10, 10, 0.06);
+  border: 1px solid rgba(16,16,16,0.04);
+  min-height: 320px;
+  overflow: visible;
+}
+
+/* builder header */
+.modal-header {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:12px;
+}
+.modal-header h3 { margin:0; font-size:1.05rem; letter-spacing:0.02em; }
+
+/* stepper (pill style) */
+.builder-stepper {
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-bottom:12px;
+}
+.builder-stepper .step {
+  background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(255,255,255,0.92));
+  border:1px solid rgba(16,16,16,0.04);
+  padding:8px 12px;
+  border-radius:999px;
+  font-weight:700;
+  cursor:pointer;
+  transition: all .22s cubic-bezier(.2,.9,.2,1);
+  box-shadow: 0 6px 18px rgba(16,16,16,0.03);
+}
+.builder-stepper .step.active {
+  background: linear-gradient(90deg,var(--accent),var(--accent-2));
+  color: #111;
+  transform: translateY(-4px) scale(1.01);
+  box-shadow: 0 22px 50px rgba(255,107,61,0.12);
+}
+
+/* options grid */
+.options-grid {
+  display:grid;
+  grid-template-columns: repeat(auto-fill,minmax(120px,1fr));
+  gap:12px;
+  align-items:start;
+  margin-top:8px;
+}
+
+/* option-card (polished) */
+.option-card {
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  border-radius:12px;
+  overflow:hidden;
+  background: linear-gradient(180deg, #fff, #fff);
+  border:1px solid rgba(16,16,16,0.04);
+  padding:10px;
+  min-height:128px;
+  cursor:pointer;
+  transition: transform .28s cubic-bezier(.2,.9,.2,1), box-shadow .28s ease, border-color .2s;
+  will-change: transform;
+}
+
+/* media area */
+.option-card .option-media {
+  width:100%;
+  height:86px;
+  border-radius:10px;
+  background-size:cover;
+  background-position:center;
+  box-shadow: inset 0 -12px 40px rgba(0,0,0,0.06);
+  overflow:hidden;
+}
+
+/* content area (title/price) */
+.option-card .option-meta { display:flex; align-items:center; justify-content:space-between; gap:8px; }
+.option-card .option-title { font-weight:800; font-size:0.95rem; color:#111; }
+.option-card .option-sub { font-size:0.82rem; color:var(--muted); font-weight:700; }
+
+/* selected state */
+.option-card.selected {
+  transform: translateY(-8px);
+  box-shadow: 0 28px 70px rgba(16,16,16,0.08);
+  border-color: rgba(255,107,61,0.12);
+  outline: none;
+}
+
+/* pop animation (short) */
+@keyframes tileMicroPop { 0%{ transform: scale(1) } 45%{ transform: scale(1.06) } 80%{ transform: scale(.995) } 100%{ transform: scale(1) } }
+.option-card.pop { animation: tileMicroPop .36s cubic-bezier(.2,.9,.2,1); }
+
+/* price badge (if present) — refined look */
+.option-card .price-badge {
+  right: 10px;
+  top: 8px;
+  padding:6px 8px;
+  font-weight:900;
+  font-size:0.78rem;
+  border-radius:999px;
+  box-shadow: 0 10px 30px rgba(16,16,16,0.08);
+  display:inline-flex;
+  gap:6px;
+  align-items:center;
+}
+
+/* ------ right preview column (sticky on desktop) ------ */
+.modal-right {
+  position:relative;
+}
+.modal-right[hidden] { display:none; }
+
+/* glossy preview card */
+.live-preview {
+  position:sticky;
+  top: 84px;
+  background: linear-gradient(180deg,#ffffff, #fffdfb);
+  border-radius: 16px;
+  padding: 16px;
+  border:1px solid rgba(16,16,16,0.04);
+  box-shadow: 0 28px 80px rgba(16,16,16,0.08);
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+
+/* preview image */
+.preview-image {
+  width:100%;
+  height:200px;
+  border-radius:12px;
+  overflow:hidden;
+  background-size:cover;
+  background-position:center;
+  display:flex;
+  align-items:flex-end;
+  justify-content:flex-start;
+}
+.preview-image img { width:100%; height:100%; object-fit:cover; display:block; }
+
+/* preview meta */
+.preview-info { display:flex; flex-direction:column; gap:10px; }
+.preview-title { margin:0; font-weight:900; font-size:1.05rem; }
+.preview-price { font-weight:900; font-size:1.08rem; }
+
+/* qty controls in preview */
+.preview-qty .icon-btn { width:40px; height:40px; border-radius:10px; }
+
+/* preview actions */
+.preview-actions { display:flex; gap:8px; }
+.preview-actions .btn { flex:1; padding:12px 14px; border-radius:12px; font-weight:800; }
+
+/* delivery toggle compact */
+.delivery-toggle label { display:inline-flex; gap:8px; align-items:center; padding:8px 10px; border-radius:10px; background: rgba(0,0,0,0.02); cursor:pointer; }
+.delivery-address { margin-top:8px; }
+
+/* tiny micro animations for preview price */
+.preview-price.pulse { animation: tileMicroPop .36s cubic-bezier(.2,.9,.2,1); }
+
+/* ===== Mobile / narrow (sheet-style) ===== */
+@media (max-width: 880px) {
+  .modal-shell.container { grid-template-columns: 1fr; padding:14px; gap:12px; }
+  .modal-right { order:-1; } /* show preview first */
+  .modal-right .live-preview { position: relative; top: 0; box-shadow: 0 12px 36px rgba(16,16,16,0.06); }
+  .modal-left { padding:14px; border-radius: 14px; }
+  .options-grid { grid-template-columns: repeat(auto-fit, minmax(140px,1fr)); gap:10px; }
+
+  /* fullscreen modal look (bottom-sheet) */
+  #builder-modal[aria-hidden="false"], .modal.modal-builder[aria-hidden="false"] {
+    position:fixed; left:0; right:0; top:8vh; bottom:0; z-index: 1400;
+    padding:8px 12px; border-radius: 18px 18px 0 0;
+    background: linear-gradient(180deg,#fff,#fffbf8); overflow:auto;
+  }
+
+  /* make action buttons larger for touch */
+  .preview-actions .btn { padding:14px 16px; font-size:1rem; border-radius:12px; }
+  .option-card { min-height:140px; padding:12px; }
+  .option-card .option-media { height:110px; }
+}
+
+/* tiny polish: transition on modal show */
+.modal.modal-builder, #builder-modal { transition: transform .28s cubic-bezier(.2,.9,.2,1), opacity .28s ease; transform-origin:center; }
+
+/* ensure focus visible */
+.option-card:focus, .option-card:active { outline: 3px solid rgba(255,107,61,0.12); outline-offset:3px; }
+
+/* accessibility: high contrast fallback */
+@media (prefers-contrast: more) {
+  .option-card { border:1px solid rgba(0,0,0,0.12); }
+}
+  /* =========================
+Hero — Mobile-first polish & fixes
+========================= */
+
+/* Make hero less tall on small screens and keep layout compact */
+.vd-hero-wrap.container { padding: 18px; }
+.vd-card { border-radius: 18px; overflow: visible; }
+
+/* mobile baseline: compact font sizes and stacking */
+#hero.vd-hero .vd-hero-body { display:flex; flex-direction:column; align-items:center; gap:14px; padding:18px 12px; }
+.vd-hero .vd-circle { display:block; width:120px; height:120px; border-radius:999px; overflow:hidden; flex:0 0 auto; }
+.vd-left-img, .vd-right-img { width:100%; height:100%; object-fit:cover; display:block; }
+
+/* headline & description sizing */
+.vd-title .vd-line { display:block; line-height:1; font-weight:800; font-size:1.6rem; letter-spacing:0.02em; }
+#vd-desc { font-size:0.92rem; color:var(--muted); max-width:520px; text-align:center; margin:6px auto 0; }
+
+/* CTAs — mobile friendly full width */
+.vd-ctas { display:flex; gap:10px; width:100%; justify-content:center; margin-top:8px; }
+.vd-ctas .btn { flex:1 1 auto; min-height:44px; font-size:1rem; border-radius:12px; }
+.vd-ctas .vd-btn-primary { padding:12px 14px; }
+.vd-ctas .vd-btn-ghost { padding:12px 14px; background:transparent; border:1px solid rgba(16,16,16,0.06); }
+
+/* dots/tap targets */
+.vd-dots { display:flex; gap:8px; margin-top:8px; }
+.vd-dot { width:12px; height:12px; border-radius:999px; background:rgba(0,0,0,0.12); border:0; padding:0; }
+.vd-dot.active, .vd-dot[aria-selected="true"] { background: linear-gradient(90deg,var(--accent),var(--accent-2)); transform: scale(1.12); }
+
+/* subtle micro-anim for CTA */
+.vd-btn-primary:active, .vd-btn-primary.pressed { transform: translateY(2px) scale(.996); transition: transform .12s; }
+
+/* hero min height — keep it compact on phones */
+#hero.vd-hero { min-height: calc(60vh - var(--header-h)); display:block; }
+
+/* hide large decorative blobs to reduce clutter on small screens */
+.vd-art-blob, .vd-blob-a, .vd-blob-b, .vd-blob-c { display:none !important; }
+
+/* ensure hero images don't overflow and keep z-index above overlays */
+.vd-card, .vd-hero-wrap { position:relative; z-index:1200; }
+
+/* responsive: tablets & up */
+@media (min-width: 720px) {
+  /* two-column layout restored on bigger screens */
+  #hero.vd-hero .vd-hero-body { flex-direction:row; align-items:center; justify-content:space-between; gap:24px; padding:28px; }
+  .vd-left-img, .vd-right-img { width:160px; height:160px; border-radius:50%; }
+  .vd-title .vd-line { font-size:2.2rem; }
+  #hero.vd-hero { min-height: calc(80vh - var(--header-h)); }
+}
+
+/* desktop: keep original large feel but ensure content isn't cut off */
+@media (min-width: 1100px) {
+  .vd-title .vd-line { font-size:2.8rem; }
+  .vd-left-img, .vd-right-img { width:220px; height:220px; }
+}
+
+/* accessibility: focus outlines */
+.vd-ctas .btn:focus { outline:3px solid rgba(255,107,61,0.12); outline-offset:4px; }
+
+/* small helper to ensure hero doesn't overflow on very tiny screens */
+@media (max-height:520px) {
+  #hero.vd-hero { min-height: calc(48vh - var(--header-h)); }
+}
+  /* Manef chat — minimal positioning & safe stacking */
+#manef-chat { position: fixed; right: 18px; bottom: 18px; z-index: 14000; font-family: var(--text-ui, Arial, sans-serif); }
+#manef-chat .chat-toggle { width:56px;height:56px;border-radius:999px; display:inline-grid; place-items:center; box-shadow:0 10px 34px rgba(2,6,23,0.18); background:linear-gradient(180deg,#fff,#fff); border:0; cursor:pointer; }
+#manef-chat .chat-panel { width: 340px; max-width: 92vw; border-radius:14px; overflow:hidden; box-shadow:0 28px 80px rgba(2,6,23,0.14); background:#fff; display:flex; flex-direction:column; }
+#manef-chat .chat-head { display:flex; align-items:center; gap:10px; padding:12px 12px; border-bottom:1px solid rgba(0,0,0,0.06); }
+#manef-chat .chat-body { padding:12px; max-height: 44vh; overflow:auto; background: linear-gradient(180deg,#fff,#f9f9fb); }
+#manef-chat .chat-foot { display:flex; gap:8px; padding:10px; border-top:1px solid rgba(0,0,0,0.04); }
+#manef-chat .chat-input { flex:1; padding:10px; border-radius:10px; border:1px solid rgba(0,0,0,0.06); }
+#manef-chat .chat-messages .chat-msg { margin-bottom:10px; }
+#manef-chat .chat-msg.bot .chat-bubble { background:#fff; border:1px solid rgba(0,0,0,0.04); padding:10px; border-radius:10px; }
+#manef-chat .chat-msg.user { text-align:right; }
+#manef-chat .chat-msg.user .chat-bubble { background: linear-gradient(90deg,var(--accent),var(--accent-2)); color:#111; padding:10px; border-radius:10px; display:inline-block; }
+#manef-chat .chat-typing .dot { display:inline-block; width:6px;height:6px;border-radius:50%;background:#ccc;margin:0 3px; animation:manef-dot .9s infinite; }
+@keyframes manef-dot { 0%{ transform:translateY(0) } 50%{ transform:translateY(-4px) } 100%{ transform:translateY(0) } }
+#manef-chat .chat-panel[hidden] { display:none !important; }
   </style>
 </head>
 <body>
@@ -3485,7 +4064,7 @@ Order Now
 
 <button class="btn small" data-action="open-builder" data-item="shawarma"><i class="fa fa-wrench"></i> Customize</button>
 
-<button class="btn btn-pay small" data-action="add-to-cart" data-item="shawarma" data-paystack="true" aria-label="Add shawarma to cart">
+<button class="btn btn-pay small" data-action="add-to-cart" data-item="shawarma" aria-label="Add shawarma to cart">
 <i class="fa fa-plus-circle"></i> Add
 </button>
 </div>
@@ -3509,7 +4088,7 @@ Order Now
 <div class="meta-actions">
 <button class="icon-btn" data-action="fav" aria-label="Add fries to favourites"><i class="fa fa-heart"></i></button>
 <button class="btn small" data-action="open-builder" data-item="fries"><i class="fa fa-wrench"></i> Customize</button>
-<button class="btn btn-pay small" data-action="add-to-cart" data-item="fries" data-paystack="true"><i class="fa fa-plus-circle"></i> Add</button>
+<button class="btn btn-pay small" data-action="add-to-cart" data-item="fries"><i class="fa fa-plus-circle"></i> Add</button>
 </div>
 </div>
 </div>
@@ -3530,7 +4109,7 @@ Order Now
 <div class="meta-actions">
 <button class="icon-btn" data-action="fav" aria-label="Add angwamo to favourites"><i class="fa fa-heart"></i></button>
 <button class="btn small" data-action="open-builder" data-item="angwamo"><i class="fa fa-wrench"></i> Customize</button>
-<button class="btn btn-pay small" data-action="add-to-cart" data-item="angwamo" data-paystack="true"><i class="fa fa-plus-circle"></i> Add</button>
+<button class="btn btn-pay small" data-action="add-to-cart" data-item="angwamo"><i class="fa fa-plus-circle"></i> Add</button>
 </div>
 </div>
 </div>
@@ -3551,7 +4130,7 @@ Order Now
 <div class="meta-actions">
 <button class="icon-btn" data-action="fav" aria-label="Add fried rice to favourites"><i class="fa fa-heart"></i></button>
 <button class="btn small" data-action="open-builder" data-item="rice"><i class="fa fa-wrench"></i> Customize</button>
-<button class="btn btn-pay small" data-action="add-to-cart" data-item="rice" data-paystack="true"><i class="fa fa-plus-circle"></i> Add</button>
+<button class="btn btn-pay small" data-action="add-to-cart" data-item="rice"><i class="fa fa-plus-circle"></i> Add</button>
 </div>
 </div>
 </div>
@@ -3567,7 +4146,7 @@ Order Now
 <span class="price"><i class="fa fa-money-bill-wave"></i> GHC 25</span>
 <div class="meta-actions">
 <button class="btn small" data-action="open-builder" data-item="dessert"><i class="fa fa-wrench"></i> Customize</button>
-<button class="btn btn-pay small" data-action="add-to-cart" data-item="dessert" data-paystack="true"><i class="fa fa-plus-circle"></i> Add</button>
+<button class="btn btn-pay small" data-action="add-to-cart" data-item="dessert"><i class="fa fa-plus-circle"></i> Add</button>
 </div>
 </div>
 </div>
@@ -3581,7 +4160,7 @@ Order Now
 <div class="meta-line">
 <span class="price"><i class="fa fa-money-bill-wave"></i> GHC 10</span>
 <div class="meta-actions">
-<button class="btn small" data-action="add-to-cart" data-item="drink" data-paystack="true"><i class="fa fa-plus-circle"></i> Add</button>
+<button class="btn small" data-action="add-to-cart" data-item="drink"><i class="fa fa-plus-circle"></i> Add</button>
 </div>
 </div>
 </div>
@@ -3595,7 +4174,7 @@ Order Now
 <div class="meta-line">
 <span class="price"><i class="fa fa-money-bill-wave"></i> GHC 8</span>
 <div class="meta-actions">
-<button class="btn small" data-action="add-to-cart" data-item="side" data-paystack="true"><i class="fa fa-plus-circle"></i> Add</button>
+<button class="btn small" data-action="add-to-cart" data-item="side"><i class="fa fa-plus-circle"></i> Add</button>
 </div>
 </div>
 </div>
@@ -3644,7 +4223,58 @@ Order Now
 </section>
 
 <section class="builder-step-panel" data-step-panel="summary" hidden>
-<div class="order-summary" aria-live="polite"></div>
+  <div class="order-summary" aria-live="polite" aria-atomic="true">
+
+    <!-- top: selected options chips -->
+    <div class="summary-selected">
+      <h4 class="summary-title">Your choices</h4>
+      <div class="selected-chips" role="list" aria-label="Selected options">
+        <!-- chips appended by JS -->
+      </div>
+    </div>
+
+    <!-- mid: price breakdown -->
+    <div class="summary-breakdown" aria-label="Price breakdown">
+      <div class="line">
+        <div class="label">Base price</div>
+        <div class="value" id="summary-base">GHC 0</div>
+      </div>
+      <div class="line">
+        <div class="label">Extras</div>
+        <div class="value" id="summary-extras">GHC 0</div>
+      </div>
+      <div class="line">
+        <div class="label">Delivery</div>
+        <div class="value" id="summary-delivery">GHC 0</div>
+      </div>
+      <div class="line qty-line">
+        <div class="label">Quantity</div>
+        <div class="value qty-controls">
+          <button class="icon-btn summary-dec" aria-label="Decrease quantity" type="button">−</button>
+          <span id="summary-qty" aria-live="polite" aria-atomic="true">1</span>
+          <button class="icon-btn summary-inc" aria-label="Increase quantity" type="button">+</button>
+        </div>
+      </div>
+      <div class="line total-line">
+        <div class="label">Total</div>
+        <div class="value total-val" id="summary-total">GHC 0</div>
+      </div>
+    </div>
+
+    <!-- promo + validation (optional) -->
+    <div class="summary-promo">
+      <input id="summary-promo" type="text" placeholder="Promo code (optional)" aria-label="Promo code" />
+      <button id="summary-apply-promo" class="btn ghost" type="button">Apply</button>
+      <div id="summary-promo-msg" class="muted tiny" role="status" aria-live="polite"></div>
+    </div>
+
+    <!-- footer: Add to cart / Cancel -->
+    <div class="summary-actions">
+      <button id="summary-add" class="btn btn-cta summary-add" type="button" aria-label="Add built item to cart"><i class="fa fa-shopping-cart"></i> Add to Cart</button>
+      <button id="summary-close" class="btn btn-outline" type="button" data-action="close-builder">Cancel</button>
+    </div>
+
+  </div>
 </section>
 </div>
 </div>
@@ -3657,7 +4287,13 @@ Order Now
 
 <div class="preview-info">
 <h4 class="preview-title"><i class="fa fa-hamburger"></i> Your Meal</h4>
-
+<!-- Preview gallery (insert inside modal-right .preview-info) -->
+<div class="preview-main">
+  <div class="preview-image" data-preview-image="placeholder" role="img" aria-label="Preview image">
+    <img src="" alt="Preview" data-artwork="preview" loading="lazy" />
+  </div>
+  <div class="preview-gallery" aria-label="Selected option images"></div>
+</div>
 <div class="preview-meta">
 <div>
 <div class="preview-price" aria-live="polite"><i class="fa fa-money-bill-wave"></i> GHC 0</div>
@@ -4008,8 +4644,246 @@ OVERLAY (used by modal/drawer JS)
 <button class="open-build" data-product='{"id":"p1","name":"Fufu Maker","basePrice":45,"variants":[{"name":"Small","priceDelta":0},{"name":"Large","priceDelta":12}], "image":" /path/to/default.jpg"}'>
   Build
 </button>
+<!-- MOBILE NAV + OVERLAY (paste once near end of <body>) -->
+<div id="mobile-overlay" class="mobile-overlay" hidden aria-hidden="true"></div>
 
+<!-- Mobile nav panel (appended by JS if not present) -->
+<nav id="mobile-panel" class="mobile-panel" role="dialog" aria-modal="true" aria-label="Mobile menu" hidden>
+  <div class="mobile-panel-inner">
+    <header class="mobile-panel-head">
+      <a class="brand mobile-brand" href="/" aria-label="Home">
+        <div class="logo" aria-hidden="true"><i class="fa fa-utensils"></i></div>
+        <div class="brand-text"><strong>WRAP DISTRICT</strong><small>Fresh • Loaded • Fast</small></div>
+      </a>
+      <button class="icon-btn mobile-close" aria-label="Close menu" type="button"><i class="fa fa-times"></i></button>
+    </header>
+
+    <div class="mobile-panel-body">
+      <!-- nav-list is cloned here by JS -->
+      <div class="mobile-nav-container"></div>
+
+      <div class="mobile-cta">
+        <button class="btn btn-cta" data-action="open-cart"><i class="fa fa-shopping-cart"></i> View cart</button>
+        <button class="btn btn-outline" data-action="open-paystack"><i class="fa fa-wallet"></i> Order & Pay</button>
+      </div>
+
+      <footer class="mobile-panel-foot">
+        <small class="muted">© <span id="year-mobile">2025</span> Wrap District</small>
+      </footer>
+    </div>
+  </div>
+</nav>
 </body>
+  <script> 
+  /* ===== Manef chat — robust single initializer ===== */
+(function(){
+  if (window._manef_chat_fixed) return;
+  window._manef_chat_fixed = true;
+
+  const LS_KEY = 'manef_chat_history_v2';
+  const MAX_HISTORY = 40;
+
+  // ensure widget exists (create if missing)
+  let widget = document.getElementById('manef-chat');
+  if (!widget) {
+    widget = document.createElement('div');
+    widget.id = 'manef-chat';
+    widget.innerHTML = `
+      <button class="chat-toggle" data-action="toggle-chat" aria-expanded="false" aria-label="Open chat">
+        <i class="fa fa-robot" aria-hidden="true"></i>
+      </button>
+      <div id="chat-panel" class="chat-panel" role="dialog" aria-label="Manef chat assistant" hidden>
+        <header class="chat-head">
+          <div class="chat-avatar" aria-hidden="true"><i class="fa fa-user-chef"></i></div>
+          <div style="flex:1">
+            <strong>Manef — Virtual Chef</strong>
+            <div class="muted tiny">Ask about menu, promos or type "build shawarma"</div>
+          </div>
+          <button class="icon-btn" data-action="close-chat" aria-label="Close chat"><i class="fa fa-times"></i></button>
+        </header>
+        <div class="chat-body">
+          <div class="chat-messages" role="log" aria-live="polite"></div>
+          <div class="chat-suggestions" aria-hidden="false" style="margin-top:6px; display:flex; gap:8px; flex-wrap:wrap;">
+            <button class="chip btn small">Build Shawarma</button>
+            <button class="chip btn small">Promos</button>
+            <button class="chip btn small">Menu</button>
+          </div>
+        </div>
+        <footer class="chat-foot">
+          <input class="chat-input" type="text" aria-label="Message Manef" placeholder="How can I help? e.g. 'build shawarma'"/>
+          <button class="icon-btn send-chat" data-action="send-chat" aria-label="Send"><i class="fa fa-paper-plane"></i></button>
+        </footer>
+      </div>
+    `;
+    document.body.appendChild(widget);
+  } else {
+    // make sure it's direct child of body (avoid stacking issues)
+    if (widget.parentElement !== document.body) document.body.appendChild(widget);
+  }
+
+  // DOM refs
+  const toggle = widget.querySelector('[data-action="toggle-chat"]');
+  const panel = widget.querySelector('#chat-panel');
+  const chatMessages = panel.querySelector('.chat-messages');
+  const chatInput = panel.querySelector('.chat-input');
+  const sendBtn = panel.querySelector('[data-action="send-chat"]');
+  const closeBtn = panel.querySelector('[data-action="close-chat"]');
+  const suggestions = panel.querySelector('.chat-suggestions');
+
+  // remove old listeners safely by cloning elements that might have had handlers
+  function replaceNode(el) { if (!el || !el.parentNode) return el; const clone = el.cloneNode(true); el.parentNode.replaceChild(clone, el); return clone; }
+  if (toggle) toggle = replaceNode(toggle);
+  if (closeBtn) closeBtn = replaceNode(closeBtn);
+  if (sendBtn) sendBtn = replaceNode(sendBtn);
+
+  // load history
+  function loadHistory(){ try { return JSON.parse(localStorage.getItem(LS_KEY) || '[]'); } catch(e){ return []; } }
+  function saveHistory(arr){ try { localStorage.setItem(LS_KEY, JSON.stringify((arr||[]).slice(-MAX_HISTORY))); } catch(e){} }
+
+  // append message to DOM + persist
+  function appendMessage(who, html) {
+    if (!chatMessages) return;
+    const node = document.createElement('div');
+    node.className = `chat-msg ${who === 'user' ? 'user' : 'bot'}`;
+    node.innerHTML = `<div class="chat-bubble">${html}</div><div class="chat-meta tiny muted" style="margin-top:6px;font-size:11px">${new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}</div>`;
+    chatMessages.appendChild(node);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+    const h = loadHistory(); h.push({ who, text: html, t: Date.now() }); saveHistory(h);
+  }
+
+  function appendPlain(who, text) { appendMessage(who, escapeHtml(text)); }
+
+  // typing indicator
+  function showTyping(){ const el = document.createElement('div'); el.className = 'chat-typing bot'; el.innerHTML = `<div class="chat-bubble"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>`; chatMessages.appendChild(el); chatMessages.scrollTop = chatMessages.scrollHeight; return ()=> el.remove(); }
+
+  // escape
+  function escapeHtml(s){ if (!s) return ''; return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+  // simple rule-based bot handler
+  function handleBotQuery(raw) {
+    const text = (raw||'').trim().toLowerCase();
+    if (!text) return "Tell me what you'd like — e.g., 'build shawarma' or 'how much is fries?'.";
+    if (text.includes('menu')) return 'We have Shawarma, Loaded Fries, Angwamo, Fried Rice, Sides & Drinks.';
+    if (text.includes('prom')) return 'Promo: Buy 2 Shawarmas, get 1 free — Tuesdays.';
+    if (text.includes('shawarma')) {
+      if (text.startsWith('build') || text.includes('build')) return { action: 'openBuilder', item: 'shawarma', text: 'Opening builder for Shawarma...' };
+      return 'Shawarma: GHC 45 (Regular). Type "build shawarma" to customize.';
+    }
+    if (text.includes('fries')) {
+      if (text.includes('build')) return { action: 'openBuilder', item: 'fries', text: 'Opening builder for Loaded Fries...' };
+      return 'Loaded Fries start from GHC 55.';
+    }
+    if (text.includes('angwamo') || text.includes('angwamo')) {
+      if (text.includes('build')) return { action: 'openBuilder', item: 'angwamo', text: 'Opening builder for Angwamo...' };
+      return 'Angwamo: Hearty plate — choose combo or plate.';
+    }
+    if (/how much|price|cost/.test(text)) {
+      if (text.includes('shawarma')) return 'Shawarma: GHC 45 — GHC 65 depending on size.';
+      if (text.includes('fries')) return 'Loaded Fries: GHC 55 (Single) — GHC 70 (Large).';
+      return 'Prices range GHC 8 — GHC 80. Ask for a specific item.';
+    }
+    // fallback
+    return "I can help with building meals, promos, or prices. Try: 'Build shawarma' or 'How much is fries?'.";
+  }
+
+  // send user message flow
+  function sendUserMessage(txt) {
+    if (!txt || !txt.trim()) return;
+    const content = escapeHtml(txt);
+    appendMessage('user', content);
+    chatInput.value = '';
+    const stopTyping = showTyping();
+    setTimeout(()=> {
+      try {
+        const result = handleBotQuery(txt);
+        stopTyping();
+        if (!result) { appendPlain('bot', "Sorry — I didn't get that."); return; }
+        if (typeof result === 'string') appendPlain('bot', result);
+        else if (typeof result === 'object') {
+          appendPlain('bot', result.text || 'Okay...');
+          if (result.action === 'openBuilder' && result.item && typeof window.openBuilder === 'function') {
+            setTimeout(()=> {
+              try { window.openBuilder(result.item); } catch(e){ console.warn('openBuilder failed', e); }
+            }, 300);
+          }
+        }
+      } catch (err) {
+        stopTyping();
+        appendPlain('bot', 'Oops — something went wrong.');
+        console.error(err);
+      }
+    }, 450 + Math.random()*450);
+  }
+
+  // restore history
+  (function restore(){
+    try {
+      const h = loadHistory();
+      if (!h || !h.length) { appendPlain('bot', "Hi — I'm Manef. Ask me about menu, promos, or type 'build shawarma'."); return; }
+      h.forEach(m => {
+        // show last 40
+        appendMessage(m.who, escapeHtml(m.text));
+      });
+      // small re-greeting if last message older than 24h
+      const last = h[h.length-1];
+      if (last && (Date.now() - (last.t || 0) > 1000*60*60*24)) appendPlain('bot', "Welcome back! Ask about today's promos or 'build shawarma'.");
+    } catch(e) { appendPlain('bot', "Hi — I'm Manef. Ask me about menu, promos, or type 'build shawarma'."); }
+  })();
+
+  // event wiring
+  toggle.addEventListener('click', (ev) => {
+    ev.preventDefault();
+    const isOpen = !(panel.hidden || panel.getAttribute('hidden') === 'true' || panel.style.display === 'none');
+    if (isOpen) {
+      panel.hidden = true;
+      toggle.setAttribute('aria-expanded','false');
+    } else {
+      panel.hidden = false;
+      toggle.setAttribute('aria-expanded','true');
+      setTimeout(()=> (chatInput && chatInput.focus()), 60);
+    }
+  });
+
+  closeBtn && closeBtn.addEventListener('click', (ev) => {
+    ev.preventDefault();
+    panel.hidden = true;
+    toggle.setAttribute('aria-expanded','false');
+    toggle.focus();
+  });
+
+  // send button
+  sendBtn && sendBtn.addEventListener('click', (ev) => {
+    ev.preventDefault();
+    const v = chatInput.value || '';
+    if (!v.trim()) return;
+    sendUserMessage(v);
+  });
+
+  // enter key on input (no shift)
+  chatInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); const v = chatInput.value || ''; if (!v.trim()) return; sendUserMessage(v); }
+    if (e.key === 'Escape') { panel.hidden = true; toggle.setAttribute('aria-expanded','false'); toggle.focus(); }
+  });
+
+  // chips / suggestions
+  suggestions.addEventListener('click', (e) => {
+    const chip = e.target.closest('.chip');
+    if (!chip) return;
+    const txt = chip.textContent.trim();
+    if (/build shawarma/i.test(txt)) { appendMessage('user', 'Build shawarma'); if (typeof window.openBuilder === 'function') { appendPlain('bot','Opening builder for Shawarma...'); setTimeout(()=> window.openBuilder('shawarma'), 200); } return; }
+    if (/promos/i.test(txt)) { appendMessage('user', 'Promos'); appendPlain('bot','Promo: Buy 2 Shawarmas get 1 free — Tuesdays.'); return; }
+    if (/menu/i.test(txt)) { appendMessage('user','Menu'); appendPlain('bot','Menu: Shawarma, Loaded Fries, Angwamo, Fried Rice, Sides & Drinks.'); return; }
+  });
+
+  // expose helpers
+  window.ManefChat = {
+    sendUserMessage, appendMessage, open: ()=>{ panel.hidden = false; toggle.setAttribute('aria-expanded','true'); chatInput.focus(); }, close: ()=>{ panel.hidden = true; toggle.setAttribute('aria-expanded','false'); },
+    clearHistory: ()=>{ saveHistory([]); chatMessages.innerHTML=''; appendPlain('bot', "Hi — I'm Manef. Ask me about menu, promos, or type 'build shawarma'."); }
+  };
+
+  console.info('Manef chat fixed & initialized.');
+})();
+  </script>
 <script>
 (function () {
 'use strict';
@@ -4267,43 +5141,110 @@ toast('Cart cleared');
 CATALOG (same as your original)
 ========================= */
 const CATALOG = {
-shawarma: {
-id: 'shawarma',
-name: 'Shawarma',
-sizes: [{ id: 'regular', label: 'Regular', price: 45 }, { id: 'jumbo', label: 'Jumbo', price: 65 }],
-proteins: [{ id: 'chicken', label: 'Chicken', price: 0 }, { id: 'beef', label: 'Beef', price: 10 }],
-fillings: [{ id: 'lettuce', label: 'Lettuce', price: 0 }, { id: 'cheese', label: 'Cheese', price: 5 }, { id: 'egg', label: 'Egg', price: 6 }],
-sauces: [{ id: 'garlic', label: 'Garlic Mayo' }, { id: 'bbq', label: 'BBQ' }]
-},
-fries: {
-id: 'fries',
-name: 'Loaded Fries',
-sizes: [{ id: 'single', label: 'Single', price: 55 }, { id: 'large', label: 'Large', price: 70 }],
-proteins: [{ id: 'none', label: 'No protein', price: 0 }, { id: 'bacon', label: 'Bacon', price: 12 }],
-fillings: [{ id: 'cheese', label: 'Cheese', price: 4 }, { id: 'jalapeno', label: 'Jalapeno', price: 3 }],
-sauces: [{ id: 'cheese', label: 'Cheese Sauce' }, { id: 'mayo', label: 'Garlic Mayo' }]
-},
-angwamo: {
-id: 'angwamo',
-name: 'Loaded Angwamo',
-sizes: [{ id: 'plate', label: 'Plate', price: 55 }, { id: 'combo', label: 'Combo', price: 70 }],
-proteins: [{ id: 'chicken', label: 'Chicken', price: 0 }, { id: 'beef', label: 'Beef', price: 10 }],
-fillings: [{ id: 'egg', label: 'Egg', price: 0 }, { id: 'coleslaw', label: 'Coleslaw', price: 5 }],
-sauces: [{ id: 'spicy', label: 'Spicy' }, { id: 'mild', label: 'Mild' }]
-},
-rice: {
-id: 'rice',
-name: 'Fried Rice',
-sizes: [{ id: 'regular', label: 'Regular', price: 60 }, { id: 'extra', label: 'Extra', price: 80 }],
-proteins: [{ id: 'chicken', label: 'Chicken', price: 0 }, { id: 'beef', label: 'Beef', price: 12 }],
-fillings: [{ id: 'veg', label: 'Veg', price: 0 }],
-sauces: []
-},
 dessert: { id: 'dessert', name: 'Dessert', sizes: [{ id: 'std', label: 'Standard', price: 25 }], proteins: [], fillings: [], sauces: [] },
 drink: { id: 'drink', name: 'Drink', sizes: [{ id: 'bottle', label: 'Bottle', price: 10 }], proteins: [], fillings: [], sauces: [] },
 side: { id: 'side', name: 'Side', sizes: [{ id: 'single', label: 'Single', price: 8 }], proteins: [], fillings: [], sauces: [] }
 };
 
+  /* ===== Enhanced CATALOG entries (paste after your original CATALOG to override) ===== */
+
+CATALOG.shawarma = {
+  id: 'shawarma',
+  name: 'Shawarma',
+  previewImageKey: 'preview-shawarma',
+  sizes: [
+    { id: 'regular', label: 'Regular', price: 45, imageKey: 'thumb-shawarma' },
+    { id: 'jumbo',   label: 'Jumbo',   price: 65, imageKey: 'hero-shawarma-large' }
+  ],
+  proteins: [
+    { id: 'chicken', label: 'Chicken', price: 0,  imageKey: 'thumb-chicken' },
+    { id: 'beef',    label: 'Beef',    price: 10, imageKey: 'thumb-beef' },
+    { id: 'turkey',  label: 'Turkey',  price: 8,  imageKey: 'thumb-turkey' }
+  ],
+  fillings: [
+    { id: 'lettuce',  label: 'Lettuce',     price: 0, imageKey: 'opt-lettuce' },
+    { id: 'cheese',   label: 'Cheese',      price: 5, imageKey: 'opt-cheese' },
+    { id: 'egg',      label: 'Egg',         price: 6, imageKey: 'opt-egg' },
+    { id: 'baconbits',label: 'Bacon Bits',  price: 6, imageKey: 'opt-bacon-bits' },
+    { id: 'extra-cheese', label: 'Extra Cheese', price: 5, imageKey: 'opt-extra-cheese' }
+  ],
+  sauces: [
+    { id: 'garlic', label: 'Garlic Mayo', imageKey: 'opt-mayo' },
+    { id: 'bbq',    label: 'BBQ Sauce',   imageKey: 'opt-bbq' },
+    { id: 'peri',   label: 'Peri-Peri',   imageKey: 'opt-peri' }
+  ]
+};
+
+CATALOG.fries = {
+  id: 'fries',
+  name: 'Loaded Fries',
+  previewImageKey: 'promo-fries',
+  sizes: [
+    { id: 'single', label: 'Single', price: 55, imageKey: 'thumb-fries' },
+    { id: 'large',  label: 'Large',  price: 70, imageKey: 'hero-fries-large' }
+  ],
+  proteins: [
+    { id: 'none',    label: 'No protein', price: 0,  imageKey: 'thumb-fries' },
+    { id: 'bacon',   label: 'Bacon',      price: 12, imageKey: 'thumb-bacon' },
+    { id: 'chicken', label: 'Chicken',    price: 10, imageKey: 'thumb-chicken' }
+  ],
+  fillings: [
+    { id: 'cheese',   label: 'Cheese',   price: 4, imageKey: 'opt-cheese' },
+    { id: 'jalapeno', label: 'Jalapeño', price: 3, imageKey: 'opt-jalapeno' },
+    { id: 'garlic',   label: 'Garlic Mayo', price: 0, imageKey: 'opt-mayo' },
+    { id: 'baconbits',label: 'Bacon Bits', price: 6, imageKey: 'opt-bacon-bits' },
+    { id: 'extra-cheese', label: 'Extra Cheese', price: 5, imageKey: 'opt-extra-cheese' }
+  ],
+  sauces: [
+    { id: 'cheese-sauce', label: 'Cheese Sauce', imageKey: 'opt-cheese-sauce' },
+    { id: 'garlic-mayo',  label: 'Garlic Mayo',  imageKey: 'opt-mayo' }
+  ]
+};
+
+CATALOG.angwamo = {
+  id: 'angwamo',
+  name: 'Loaded Angwamo',
+  previewImageKey: 'hero-angwamo-large',
+  sizes: [
+    { id: 'plate', label: 'Plate', price: 55, imageKey: 'thumb-angwamo' },
+    { id: 'combo', label: 'Combo', price: 70, imageKey: 'hero-angwamo-large' }
+  ],
+  proteins: [
+    { id: 'chicken', label: 'Chicken', price: 0,  imageKey: 'thumb-chicken' },
+    { id: 'beef',    label: 'Beef',    price: 10, imageKey: 'thumb-beef' }
+  ],
+  fillings: [
+    { id: 'egg',      label: 'Egg',     price: 0, imageKey: 'opt-egg' },
+    { id: 'coleslaw', label: 'Coleslaw',price: 5, imageKey: 'opt-coleslaw' },
+    { id: 'plantain', label: 'Plantain',price: 4, imageKey: 'opt-plantain' }
+  ],
+  sauces: [
+    { id: 'spicy', label: 'Spicy', imageKey: 'opt-spicy' },
+    { id: 'mild',  label: 'Mild',  imageKey: 'opt-mild' }
+  ]
+};
+
+CATALOG.rice = {
+  id: 'rice',
+  name: 'Fried Rice',
+  previewImageKey: 'hero-friedrice-large',
+  sizes: [
+    { id: 'regular', label: 'Regular', price: 60, imageKey: 'thumb-rice' },
+    { id: 'extra',   label: 'Extra',   price: 80, imageKey: 'hero-friedrice-large' }
+  ],
+  proteins: [
+    { id: 'chicken', label: 'Chicken', price: 0,  imageKey: 'thumb-chicken' },
+    { id: 'beef',    label: 'Beef',    price: 12, imageKey: 'thumb-beef' }
+  ],
+  fillings: [
+    { id: 'veg',   label: 'Veg',   price: 0, imageKey: 'opt-veg' },
+    { id: 'peas',  label: 'Peas',  price: 0, imageKey: 'opt-peas' }
+  ],
+  sauces: [
+    { id: 'soy',       label: 'Soya',       imageKey: 'opt-soy' },
+    { id: 'sweet-chili', label: 'Sweet Chili', imageKey: 'opt-s-chili' }
+  ]
+};
 /* =========================
 Builder modal logic
 ========================= */
@@ -4322,15 +5263,91 @@ sauces: new Set(),
 qty: 1,
 delivery: 'pickup'
 };
-populateBuilder(cfg);
-if (builderModal) {
-builderModal.hidden = false;
-builderModal.setAttribute('aria-hidden', 'false');
-document.documentElement.classList.add('no-scroll');
-trapFocus(builderModal);
-}
-gotoBuilderStep('size');
-updateBuilderPreview();
+/* ===== Enhanced option tiles (with price badge + pop animation) ===== */
+function renderOptionTiles(panelName, optionsArray, singleSelect = true) {
+  const grid = document.querySelector(`[data-step-panel="${panelName}"] .options-grid`);
+  if (!grid) return;
+  grid.innerHTML = '';
+  grid.classList.add('option-tiles-grid');
+
+  optionsArray.forEach(opt => {
+    const card = document.createElement('button');
+    card.type = 'button';
+    card.className = 'option-card';
+    card.dataset.optType = panelName;
+    card.dataset.optId = opt.id;
+    if (opt.price) card.dataset.optPrice = opt.price;
+    if (opt.imageKey) card.dataset.imageKey = opt.imageKey;
+    card.setAttribute('role', 'button');
+    card.setAttribute('aria-pressed', 'false');
+
+    // Build inner markup: media container + badge + meta
+    card.innerHTML = `
+      <div class="option-media-wrap" style="position:relative;">
+        <div class="option-media" aria-hidden="true"></div>
+      </div>
+      <div class="option-meta">
+        <div class="option-title">${esc(opt.label)}</div>
+        <div class="option-sub">${opt.price ? '+ ' + fmt(opt.price) : (opt.price === 0 ? 'Included' : '')}</div>
+      </div>
+    `;
+
+    // Price badge (absolute, over image) if price > 0
+    if (opt.price && Number(opt.price) > 0) {
+      const badge = document.createElement('div');
+      badge.className = 'price-badge';
+      badge.innerText = `+GHC ${Number(opt.price).toFixed(0)}`;
+      card.querySelector('.option-media-wrap').appendChild(badge);
+    }
+
+    // image insertion (use your helper so fallback logic works)
+    const mediaEl = card.querySelector('.option-media');
+    applyImageToElement(mediaEl, opt.imageKey || '');
+
+    /* Selection logic */
+    card.addEventListener('click', (e) => {
+      e.preventDefault();
+
+      if (singleSelect) {
+        // deselect siblings
+        Array.from(grid.querySelectorAll('.option-card')).forEach(c => {
+          c.classList.remove('selected', 'pop');
+          c.setAttribute('aria-pressed', 'false');
+        });
+        // select this
+        card.classList.add('selected', 'pop');
+        card.setAttribute('aria-pressed', 'true');
+
+        // update builder state
+        if (panelName === 'size') builderState.size = opt.id;
+        else if (panelName === 'protein') builderState.protein = opt.id;
+
+      } else {
+        // multi-select toggle
+        const nowSel = card.classList.toggle('selected');
+        // restart pop animation
+        card.classList.remove('pop');
+        void card.offsetWidth;
+        card.classList.add('pop');
+        card.setAttribute('aria-pressed', String(nowSel));
+
+        if (!builderState[panelName]) builderState[panelName] = new Set();
+        if (nowSel) builderState[panelName].add(opt.id);
+        else builderState[panelName].delete(opt.id);
+      }
+
+      // update preview and gallery
+      updateBuilderPreview();
+      updatePreviewGallery(opt);
+    });
+
+    // keyboard activation
+    card.addEventListener('keydown', (ev) => {
+      if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); card.click(); }
+    });
+
+    grid.appendChild(card);
+  });
 }
 
 function closeBuilder() {
@@ -6821,5 +7838,1022 @@ console.info('Wrap District script loaded — images will use local files when p
 
 })();
 
+  /* ===== Menu 'Add' toggle behavior (put after your cart helpers) ===== */
+(function(){
+  const doc = document;
+  const toBtnHtml = (added) => added
+    ? '<i class="fa fa-trash"></i> Remove'
+    : '<i class="fa fa-plus-circle"></i> Add';
+
+  function getItemKeyFromButton(btn){
+    return btn.dataset.item || btn.closest('.menu-item')?.dataset.category || btn.closest('.menu-item')?.dataset.id || null;
+  }
+
+  // Remove all items added by quick add for a given itemKey
+  function removeItemsByKey(itemKey){
+    if (!itemKey) return;
+    // match by product name (fallback) if available in CATALOG
+    const cfgName = (window.CATALOG && window.CATALOG[itemKey] && window.CATALOG[itemKey].name) || null;
+    // remove matching cart entries
+    window.cart = (window.cart || []).filter(it => {
+      if (cfgName) return it.name !== cfgName;
+      return !(it.productId === itemKey || (it.id || '').startsWith(itemKey + '-'));
+    });
+    if (typeof persistCart === 'function') persistCart();
+    if (typeof renderCartDrawer === 'function') renderCartDrawer();
+  }
+
+  // Sync buttons on load (if user has items in cart from previous session)
+  function syncAddButtons(){
+    const buttons = doc.querySelectorAll('[data-action="add-to-cart"]');
+    buttons.forEach(btn => {
+      const key = getItemKeyFromButton(btn);
+      const cfgName = (window.CATALOG && window.CATALOG[key] && window.CATALOG[key].name) || key;
+      const exists = (window.cart || []).some(it => it.name === cfgName || it.productId === key || (it.id || '').startsWith((key||'') + '-'));
+      if (exists) {
+        btn.dataset.added = 'true';
+        btn.classList.add('added');
+        btn.innerHTML = toBtnHtml(true);
+      } else {
+        btn.dataset.added = 'false';
+        btn.classList.remove('added');
+        btn.innerHTML = toBtnHtml(false);
+      }
+    });
+  }
+
+  // Capture-phase listener — prevents other click handlers (Paystack) from firing for these Add buttons.
+  doc.addEventListener('click', function(ev){
+    const btn = ev.target.closest('[data-action="add-to-cart"]');
+    if (!btn) return;
+    // intercept
+    ev.preventDefault();
+    ev.stopImmediatePropagation && ev.stopImmediatePropagation();
+    ev.stopPropagation();
+
+    const key = getItemKeyFromButton(btn);
+    // If it's already added -> remove matching items
+    if (btn.dataset.added === 'true') {
+      removeItemsByKey(key);
+      btn.dataset.added = 'false';
+      btn.classList.remove('added');
+      btn.innerHTML = toBtnHtml(false);
+      if (typeof toast === 'function') toast('Removed from cart');
+      return;
+    }
+
+    // Otherwise, add default item (same behaviour your quick add used)
+    const cfg = (window.CATALOG && window.CATALOG[key]) ? window.CATALOG[key] : null;
+    if (!cfg) {
+      // Fallback: add a basic item using button data-price if present
+      const price = Number(btn.dataset.price || 0);
+      const item = { id: `${key || 'item'}-${Date.now()}`, name: key || 'Item', qty: 1, unitPrice: price, optionsSummary: 'Default' };
+      if (typeof addToCartObj === 'function') addToCartObj(item);
+      else {
+        window.cart = window.cart || []; window.cart.push(item);
+        persistCart();
+        renderCartDrawer();
+      }
+      btn.dataset.added = 'true';
+      btn.classList.add('added');
+      btn.innerHTML = toBtnHtml(true);
+      if (typeof toast === 'function') toast('Added to cart');
+      return;
+    }
+
+    // add using catalog default size
+    const size = (cfg.sizes && cfg.sizes[0]) ? cfg.sizes[0] : { price: 0, label: 'Default' };
+    const cartItem = {
+      id: `${key}-${Date.now()}`,
+      productId: cfg.id || key,
+      name: cfg.name || key,
+      qty: 1,
+      unitPrice: Number(size.price || 0),
+      optionsSummary: size.label || 'Default'
+    };
+    if (typeof addToCartObj === 'function') addToCartObj(cartItem);
+    else {
+      window.cart = window.cart || []; window.cart.push(cartItem);
+      persistCart();
+      renderCartDrawer();
+    }
+
+    btn.dataset.added = 'true';
+    btn.classList.add('added');
+    btn.innerHTML = toBtnHtml(true);
+    if (typeof toast === 'function') toast('Added to cart');
+  }, true); // use capture to intercept before other handlers
+
+  // run sync once on DOM ready (and whenever cart persists)
+  document.addEventListener('DOMContentLoaded', syncAddButtons);
+  // also sync after cart persistence if your persistCart is called globally
+  const origPersist = window.persistCart;
+  window.persistCart = function wrappedPersist(){
+    try { if (typeof origPersist === 'function') origPersist(); } catch(e){}
+    syncAddButtons();
+  };
+})();
+
+  /* ===== Robust mobile nav toggle & panel (paste near end of body) ===== */
+(function(){
+  const doc = document;
+  const hamburger = doc.querySelector('.hamburger');
+  if (!hamburger) return;
+
+  // create overlay / panel references (use existing elements if present)
+  let overlay = doc.getElementById('mobile-overlay');
+  if (!overlay) {
+    overlay = doc.createElement('div'); overlay.id = 'mobile-overlay'; overlay.className = 'mobile-overlay'; overlay.hidden = true;
+    doc.body.appendChild(overlay);
+  }
+
+  let panel = doc.getElementById('mobile-panel');
+  if (!panel) {
+    // mobile-panel markup should exist per instructions; if not, create minimal
+    panel = doc.createElement('nav');
+    panel.id = 'mobile-panel';
+    panel.className = 'mobile-panel';
+    panel.setAttribute('role','dialog');
+    panel.setAttribute('aria-modal','true');
+    panel.setAttribute('aria-label','Mobile menu');
+    panel.hidden = true;
+    panel.innerHTML = '<div class="mobile-panel-inner"><header class="mobile-panel-head"><a class="brand mobile-brand" href="/"><div class="logo"><i class="fa fa-utensils"></i></div><div class="brand-text"><strong>WRAP DISTRICT</strong><small>Fresh</small></div></a><button class="icon-btn mobile-close" aria-label="Close menu"><i class="fa fa-times"></i></button></header><div class="mobile-panel-body"><div class="mobile-nav-container"></div></div></div>';
+    doc.body.appendChild(panel);
+  }
+
+
+
+  // container that will hold mobile nav links
+  const mobileNavContainer = panel.querySelector('.mobile-nav-container');
+
+  // clone main nav-list into mobile panel, but avoid duplicating if already present
+  function cloneNav() {
+    const mainNav = doc.querySelector('.main-nav .nav-list');
+    if (!mainNav) return;
+    // clone only once
+    if (mobileNavContainer.querySelector('.nav-list')) return;
+    const clone = mainNav.cloneNode(true);
+    // remove roles that don't fit here (keep semantics simple)
+    clone.querySelectorAll('[role]').forEach(n => n.removeAttribute('role'));
+    mobileNavContainer.appendChild(clone);
+    // ensure links close panel on click
+    clone.querySelectorAll('a').forEach(a => a.addEventListener('click', (ev) => {
+      // let anchor work normally (in-page anchors will scroll). Close panel afterwards.
+      closeMobileNav();
+    }));
+  }
+
+  // focus trap helpers
+  let previousActive = null;
+  function trapFocus(root) {
+    previousActive = document.activeElement;
+    const focusables = Array.from(root.querySelectorAll('a[href], button:not([disabled]), input, textarea, select, [tabindex]:not([tabindex="-1"])'))
+      .filter(n => n.offsetParent !== null);
+    if (focusables.length) focusables[0].focus();
+    root._focusHandler = function(e){
+      if (e.key !== 'Tab') return;
+      const first = focusables[0], last = focusables[focusables.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    };
+    root.addEventListener('keydown', root._focusHandler);
+  }
+  function releaseFocus(root){
+    if (!root || !root._focusHandler) return;
+    root.removeEventListener('keydown', root._focusHandler);
+    root._focusHandler = null;
+    if (previousActive) previousActive.focus();
+    previousActive = null;
+  }
+
+  // open / close
+  function openMobileNav() {
+    cloneNav();
+    overlay.hidden = false; overlay.setAttribute('aria-hidden', 'false'); overlay.classList.add('show');
+    panel.hidden = false; panel.setAttribute('aria-hidden', 'false');
+    document.documentElement.classList.add('mobile-nav-open', 'no-scroll');
+    hamburger.classList.add('open');
+    // swap hamburger icon to X (we replace innerHTML for simplicity)
+    const icon = hamburger.querySelector('i');
+    if (icon) icon.className = 'fa fa-times';
+    trapFocus(panel);
+  }
+  function closeMobileNav() {
+    overlay.hidden = true; overlay.setAttribute('aria-hidden', 'true'); overlay.classList.remove('show');
+    panel.hidden = true; panel.setAttribute('aria-hidden', 'true');
+    document.documentElement.classList.remove('mobile-nav-open', 'no-scroll');
+    hamburger.classList.remove('open');
+    const icon = hamburger.querySelector('i');
+    if (icon) icon.className = 'fa fa-bars';
+    releaseFocus(panel);
+  }
+
+  // event wiring
+  hamburger.addEventListener('click', (e) => {
+    const isOpen = document.documentElement.classList.contains('mobile-nav-open');
+    if (isOpen) closeMobileNav(); else openMobileNav();
+  });
+
+  // close button inside panel
+  panel.querySelectorAll('.mobile-close').forEach(b => b.addEventListener('click', closeMobileNav));
+
+  // overlay click closes
+  overlay.addEventListener('click', closeMobileNav);
+
+  // ESC closes
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && document.documentElement.classList.contains('mobile-nav-open')) closeMobileNav(); });
+
+  // if window resizes to desktop, ensure panel closed
+  window.addEventListener('resize', () => { if (window.matchMedia('(min-width: 921px)').matches) closeMobileNav(); });
+
+  // initial clone on load
+  document.addEventListener('DOMContentLoaded', cloneNav);
+})();
+
+
+ 
 </script>
+  <script>
+     /* ===== Builder Summary wiring ===== */
+(function(){
+  const modal = document.getElementById('builder-modal');
+  if (!modal) return;
+
+  // Elements inside summary
+  const summaryPanel = modal.querySelector('[data-step-panel="summary"]');
+  if (!summaryPanel) return;
+  const chipsWrap = summaryPanel.querySelector('.selected-chips');
+  const baseEl = summaryPanel.querySelector('#summary-base');
+  const extrasEl = summaryPanel.querySelector('#summary-extras');
+  const deliveryEl = summaryPanel.querySelector('#summary-delivery');
+  const qtyEl = summaryPanel.querySelector('#summary-qty');
+  const decBtn = summaryPanel.querySelector('.summary-dec');
+  const incBtn = summaryPanel.querySelector('.summary-inc');
+  const totalEl = summaryPanel.querySelector('#summary-total');
+  const addBtn = summaryPanel.querySelector('#summary-add');
+  const promoInput = summaryPanel.querySelector('#summary-promo');
+  const applyPromo = summaryPanel.querySelector('#summary-apply-promo');
+  const promoMsg = summaryPanel.querySelector('#summary-promo-msg');
+
+  // Promo examples (simple)
+  const SUMMARY_PROMOS = {
+    'TD10': { type:'percentage', value:10, label:'10% off' },
+    'GHC5': { type:'fixed', value:5, label:'GHC 5 off' }
+  };
+  let activePromo = null;
+
+  // helper to format price (reuse existing fmt if present)
+  const _fmt = (n) => (typeof fmt === 'function') ? fmt(n) : `GHC ${Number(n).toFixed(2)}`;
+
+  // compute breakdown from builderState & CATALOG (same logic used elsewhere)
+  function computeSummary() {
+    if (!window.builderState || !window.CATALOG) return { base:0, extras:0, delivery:0, qty:1, total:0, unit:0, details:[] };
+    const st = window.builderState;
+    const cfg = window.CATALOG[st.itemKey];
+    if (!cfg) return { base:0, extras:0, delivery:0, qty:1, total:0, unit:0, details:[] };
+
+    const sizeObj = (cfg.sizes || []).find(s => s.id === st.size) || cfg.sizes[0] || { price:0 };
+    const proteinObj = (cfg.proteins || []).find(p => p.id === st.protein) || { price:0, label: '' };
+
+    let base = Number(sizeObj.price || 0) + Number(proteinObj.price || 0);
+    let extras = 0;
+    const details = [];
+
+    // fillings (builderState.fillings might be a Set or array)
+    const fillingsSet = st.fillings instanceof Set ? st.fillings : new Set(st.fillings || []);
+    (cfg.fillings || []).forEach(f => {
+      if (fillingsSet.has(f.id)) {
+        extras += Number(f.price || 0);
+        details.push({ type:'filling', id:f.id, label:f.label, price: Number(f.price || 0) });
+      }
+    });
+
+    // sauces
+    const saucesSet = st.sauces instanceof Set ? st.sauces : new Set(st.sauces || []);
+    (cfg.sauces || []).forEach(s => {
+      if (saucesSet.has(s.id)) {
+        // sauces often free but include if price present
+        extras += Number(s.price || 0);
+        details.push({ type:'sauce', id:s.id, label:s.label, price: Number(s.price || 0) });
+      }
+    });
+
+    const deliveryFee = (st.delivery === 'delivery') ? 10 : 0;
+    const qty = st.qty || 1;
+
+    const unit = base + extras;
+    let subtotal = (unit + deliveryFee) * qty;
+    let discount = 0;
+    if (activePromo) {
+      if (activePromo.type === 'percentage') discount = subtotal * (activePromo.value/100);
+      else if (activePromo.type === 'fixed') discount = activePromo.value;
+      discount = Math.min(discount, subtotal);
+    }
+    const total = subtotal - discount;
+
+    // options summary list (for chips)
+    const opts = [
+      { label: `Size: ${sizeObj.label}`, key: 'size' },
+      proteinObj.label ? { label: `Protein: ${proteinObj.label}`, key: 'protein' } : null
+    ].filter(Boolean);
+
+    // include fillings & sauces as separate entries
+    details.forEach(d => opts.push({ label: `${d.label}${d.price ? ` (+${d.price})` : ''}`, key: `${d.type}:${d.id}` }));
+
+    return { base, extras, delivery: deliveryFee, qty, unit, total, subtotal, discount, details, opts };
+  }
+
+  // render the summary UI from builderState
+  function renderSummary() {
+    if (!summaryPanel) return;
+    const st = window.builderState;
+    if (!st) {
+      // blank state
+      chipsWrap.innerHTML = `<div class="muted">No selection</div>`;
+      baseEl.textContent = _fmt(0); extrasEl.textContent = _fmt(0); deliveryEl.textContent = _fmt(0); qtyEl.textContent = '1'; totalEl.textContent = _fmt(0);
+      addBtn.disabled = true;
+      return;
+    }
+
+    const out = computeSummary();
+    // chips
+    chipsWrap.innerHTML = '';
+    out.opts.forEach(opt => {
+      const c = document.createElement('button');
+      c.type = 'button';
+      c.className = 'chip';
+      c.setAttribute('role','button');
+      c.setAttribute('aria-pressed','false');
+      c.dataset.optKey = opt.key;
+      c.innerHTML = `<span class="chip-label">${esc(opt.label)}</span><span class="remove" aria-hidden="true">&times;</span>`;
+      // clicking chip removes the option when possible
+      c.addEventListener('click', (ev) => {
+        ev.preventDefault();
+        // parse key — size/protein cannot be removed via chips (we'll prevent that)
+        if (opt.key === 'size' || opt.key === 'protein') {
+          // focus the stepper to let user change size/protein
+          const stepBtn = modal.querySelector('.builder-stepper .step[data-step="size"]');
+          if (stepBtn) stepBtn.click();
+          return;
+        }
+        // for details like filling:something or sauce:something, remove from builderState
+        if (opt.key && opt.key.indexOf(':') > -1) {
+          const [type, id] = opt.key.split(':');
+          if (type === 'filling' || type === 'fillings') {
+            if (st.fillings && st.fillings.delete) { st.fillings.delete(id); }
+            else if (Array.isArray(st.fillings)) st.fillings = st.fillings.filter(x => x !== id);
+          } else if (type === 'sauce' || type === 'sauces') {
+            if (st.sauces && st.sauces.delete) { st.sauces.delete(id); }
+            else if (Array.isArray(st.sauces)) st.sauces = st.sauces.filter(x => x !== id);
+          }
+          // update visual selection in tiles (if present)
+          const tile = modal.querySelector(`[data-step-panel] .option-card[data-opt-id="${id}"]`);
+          if (tile) tile.classList.remove('selected');
+          // recalc & re-render
+          if (typeof updateBuilderPreview === 'function') updateBuilderPreview();
+          renderSummary();
+        }
+      });
+      chipsWrap.appendChild(c);
+    });
+
+    // numbers
+    baseEl.textContent = _fmt(out.base * out.qty);
+    extrasEl.textContent = _fmt(out.extras * out.qty);
+    deliveryEl.textContent = _fmt(out.delivery * out.qty);
+    qtyEl.textContent = String(out.qty);
+    totalEl.textContent = _fmt(out.total);
+
+    addBtn.disabled = false;
+  }
+
+  // wire qty controls
+  decBtn?.addEventListener('click', (e) => {
+    if (!window.builderState) return;
+    window.builderState.qty = Math.max(1, (window.builderState.qty || 1) - 1);
+    if (typeof updateBuilderPreview === 'function') updateBuilderPreview();
+    renderSummary();
+  });
+  incBtn?.addEventListener('click', (e) => {
+    if (!window.builderState) return;
+    window.builderState.qty = Math.min(99, (window.builderState.qty || 1) + 1);
+    if (typeof updateBuilderPreview === 'function') updateBuilderPreview();
+    renderSummary();
+  });
+
+  // promo apply
+  applyPromo?.addEventListener('click', (e) => {
+    const code = (promoInput.value || '').trim().toUpperCase();
+    if (!code) { promoMsg.textContent = 'Enter a code'; promoMsg.style.color = '#B71C1C'; return; }
+    const p = SUMMARY_PROMOS[code];
+    if (!p) { promoMsg.textContent = 'Invalid code'; promoMsg.style.color = '#B71C1C'; return; }
+    activePromo = p;
+    promoMsg.textContent = `Applied: ${p.label}`;
+    promoMsg.style.color = '';
+    renderSummary();
+  });
+
+  // Add to cart from summary: prefer to reuse existing preview add button
+  addBtn?.addEventListener('click', (e) => {
+    e.preventDefault();
+    // try to trigger preview add-to-cart button (reuse existing logic)
+    const previewAdd = modal.querySelector('.preview-actions [data-action="add-to-cart"], .preview-actions .btn.btn-cta');
+    if (previewAdd) {
+      previewAdd.click();
+      // brief feedback on summary add button
+      addBtn.classList.add('added');
+      addBtn.innerHTML = '<i class="fa fa-check"></i> Added';
+      setTimeout(()=> { addBtn.classList.remove('added'); addBtn.innerHTML = '<i class="fa fa-shopping-cart"></i> Add to Cart'; }, 900);
+      return;
+    }
+
+    // fallback: build item & call addToCartObj
+    try {
+      const st = window.builderState;
+      const cfg = window.CATALOG && window.CATALOG[st.itemKey];
+      if (!cfg) { toast && toast('Item not available'); return; }
+      const sizeObj = (cfg.sizes || []).find(s => s.id === st.size) || cfg.sizes[0];
+      const proteinObj = (cfg.proteins || []).find(p => p.id === st.protein) || { label: '' };
+
+      let unit = (sizeObj ? Number(sizeObj.price || 0) : 0) + (proteinObj ? Number(proteinObj.price || 0) : 0);
+      (cfg.fillings || []).forEach(f => { if ((st.fillings && st.fillings.has && st.fillings.has(f.id)) || (Array.isArray(st.fillings) && st.fillings.includes(f.id))) unit += Number(f.price || 0); });
+      (cfg.sauces || []).forEach(s => { if ((st.sauces && st.sauces.has && st.sauces.has(s.id)) || (Array.isArray(st.sauces) && st.sauces.includes(s.id))) unit += Number(s.price || 0); });
+
+      const fillingsArr = (cfg.fillings || []).filter(f => (st.fillings && st.fillings.has && st.fillings.has(f.id)) || (Array.isArray(st.fillings) && st.fillings.includes(f.id))).map(f => f.label);
+      const saucesArr = (cfg.sauces || []).filter(s => (st.sauces && st.sauces.has && st.sauces.has(s.id)) || (Array.isArray(st.sauces) && st.sauces.includes(s.id))).map(s => s.label);
+
+      const optionsSummary = [
+        `Size: ${sizeObj.label}`,
+        proteinObj.label ? `Protein: ${proteinObj.label}` : null,
+        fillingsArr.length ? `Fillings: ${fillingsArr.join(', ')}` : null,
+        saucesArr.length ? `Sauces: ${saucesArr.join(', ')}` : null,
+        st.delivery === 'delivery' ? 'Delivery' : 'Pickup'
+      ].filter(Boolean).join(' • ');
+
+      const item = {
+        id: `${st.itemKey}-${Date.now()}`,
+        name: cfg.name,
+        qty: st.qty || 1,
+        unitPrice: Number(unit.toFixed(2)),
+        optionsSummary,
+        image: cfg.previewImageKey ? ( (window.IMAGES && window.IMAGES[cfg.previewImageKey]) || '' ) : ''
+      };
+
+      if (typeof addToCartObj === 'function') addToCartObj(item);
+      else {
+        window.cart = window.cart || [];
+        window.cart.push(item);
+        persistCart && persistCart();
+        renderCartDrawer && renderCartDrawer();
+      }
+
+      // UX: confirm & close builder
+      toast && toast('Added to cart');
+      setTimeout(()=> { if (typeof closeBuilder === 'function') closeBuilder(); }, 260);
+
+    } catch (err) {
+      console.warn('summary add failed', err);
+      toast && toast('Could not add item');
+    }
+  });
+
+  // ensure summary re-renders when the builder preview updates
+  const origUpdate = window.updateBuilderPreview;
+  window.updateBuilderPreview = function() {
+    try { origUpdate && origUpdate(); } catch (e) { console.warn('origUpdate error', e); }
+    try { renderSummary(); } catch (e) { console.warn('renderSummary error', e); }
+  };
+
+  // render when summary step shows (in case user navigates manually)
+  (function wireStepper() {
+    modal.querySelectorAll('.builder-stepper .step').forEach(s => {
+      s.addEventListener('click', () => {
+        const step = s.dataset.step;
+        if (step === 'summary') setTimeout(renderSummary, 40);
+      });
+    });
+    // also render on open if summary is visible
+    document.addEventListener('click', (e) => {
+      const openBuilderBtn = e.target.closest('[data-action="open-builder"], [data-action="open-builder"] *');
+      if (openBuilderBtn) setTimeout(renderSummary, 120);
+    });
+  })();
+
+  // initial render
+  setTimeout(renderSummary, 120);
+})();
+
+    /* ===== Builder modal UX enhancements ===== */
+(function(){
+  const modal = document.getElementById('builder-modal') || document.getElementById('build-modal');
+  if (!modal) return;
+
+  // DOM refs (support both modal variants)
+  const previewImgWrap = modal.querySelector('.preview-image') || modal.querySelector('[data-preview-image]') || null;
+  const previewImg = previewImgWrap ? previewImgWrap.querySelector('img') : null;
+  const previewTitle = modal.querySelector('.preview-title');
+  const previewPrice = modal.querySelector('.preview-price');
+  const previewActions = modal.querySelector('.preview-actions');
+  const optionsGridSelector = '[data-step-panel] .options-grid';
+  const isMobile = () => window.matchMedia('(max-width:880px)').matches;
+
+  // small helper: set preview image by key or url
+  function setPreviewImage(keyOrUrl) {
+    if (!previewImg && !previewImgWrap) return;
+    if (previewImg) {
+      // if key provided, use applyImageToElement (existing)
+      if (keyOrUrl && applyImageToElement) {
+        applyImageToElement(previewImg, keyOrUrl);
+      } else {
+        previewImg.src = keyOrUrl || previewImg.src || '';
+      }
+    } else if (previewImgWrap && applyImageToElement) {
+      applyImageToElement(previewImgWrap, keyOrUrl);
+    }
+  }
+
+  // wire option-card clicks to update preview image/title
+  modal.addEventListener('click', (e) => {
+    const card = e.target.closest('.option-card');
+    if (!card) return;
+    // card may have data-imageKey
+    const key = card.dataset.imageKey || card.dataset.optId || '';
+    // set preview image if key looks usable
+    if (key && typeof applyImageToElement === 'function') setPreviewImage(key);
+    // gently emphasize preview price when selection changes
+    const priceEl = modal.querySelector('.preview-price');
+    if (priceEl) {
+      priceEl.classList.add('pulse');
+      setTimeout(()=> priceEl.classList.remove('pulse'), 420);
+    }
+  });
+
+  // on builder open, seed preview image from product config if available
+  document.addEventListener('click', (e) => {
+    const openBtn = e.target.closest('[data-action="open-builder"], .open-build');
+    if (!openBtn) return;
+    // try to get product key
+    const item = openBtn.dataset.item || (openBtn.getAttribute('data-product') && (() => {
+      try { return JSON.parse(openBtn.getAttribute('data-product') || '{}').id; } catch(e){ return null; }
+    })());
+    setTimeout(() => {
+      // try to set preview from builderState or catalog
+      if (window.builderState && window.CATALOG) {
+        const cfg = window.CATALOG[window.builderState.itemKey || item];
+        if (cfg && cfg.previewImageKey) setPreviewImage(cfg.previewImageKey);
+      }
+    }, 90);
+  });
+
+  // On narrow screens: add a "Preview" toggle to collapse/expand preview quickly
+  function addPreviewToggle() {
+    if (!isMobile()) return;
+    if (!modal) return;
+    if (modal.querySelector('.preview-toggle')) return;
+    const toggle = document.createElement('button');
+    toggle.className = 'preview-toggle btn btn-outline';
+    toggle.type = 'button';
+    toggle.innerHTML = '<i class="fa fa-eye"></i> Preview';
+    toggle.style.marginBottom = '8px';
+    const leftCol = modal.querySelector('.modal-left') || modal.querySelector('.modal-shell');
+    if (leftCol) leftCol.insertBefore(toggle, leftCol.firstChild);
+    toggle.addEventListener('click', () => {
+      const pr = modal.querySelector('.modal-right');
+      if (!pr) return;
+      const isHidden = pr.hidden || window.getComputedStyle(pr).display === 'none';
+      pr.hidden = !isHidden;
+      toggle.classList.toggle('active', !isHidden);
+      if (!isHidden) toggle.innerHTML = '<i class="fa fa-eye-slash"></i> Hide preview';
+      else toggle.innerHTML = '<i class="fa fa-eye"></i> Preview';
+    });
+  }
+
+  // run initially
+  addPreviewToggle();
+
+  // re-run on resize (debounced)
+  let _rto = null;
+  window.addEventListener('resize', () => {
+    if (_rto) clearTimeout(_rto);
+    _rto = setTimeout(() => {
+      addPreviewToggle();
+    }, 120);
+  });
+
+  // small a11y: ensure preview-actions Add to Cart is visible on mobile by cloning into footer when needed
+  function ensureMobileCTA() {
+    if (!isMobile()) return;
+    const mobileFooter = modal.querySelector('.modal-foot');
+    const existingClone = modal.querySelector('.mobile-cta-clone');
+    if (!existingClone && previewActions && mobileFooter) {
+      const clone = previewActions.cloneNode(true);
+      clone.classList.add('mobile-cta-clone');
+      clone.style.display = 'flex';
+      clone.style.gap = '8px';
+      clone.style.marginTop = '8px';
+      clone.querySelectorAll('button').forEach(b => b.addEventListener('click', (ev) => {
+        // forward clicks to original actions (match by data-action or class)
+        const action = b.getAttribute('data-action') || '';
+        if (action === 'add-to-cart') {
+          const orig = modal.querySelector('.preview-actions [data-action="add-to-cart"], .preview-actions .btn.btn-cta');
+          if (orig) orig.click();
+        } else {
+          // fallback: try to click the original button with same class/text
+          const label = b.textContent.trim();
+          const orig = Array.from(modal.querySelectorAll('.preview-actions .btn')).find(o => o.textContent.trim() === label);
+          if (orig) orig.click();
+        }
+      }));
+      mobileFooter.appendChild(clone);
+    }
+  }
+  ensureMobileCTA();
+  window.addEventListener('resize', () => setTimeout(ensureMobileCTA, 120));
+
+  // expose small API for debug
+  window._builder_preview = { setPreviewImage, ensureMobileCTA };
+})();
+
+    /* ======= Cart repair & robust binding (paste near end of scripts) ======= */
+(function(){
+  'use strict';
+
+  const STORAGE_KEY = 'wrapdistrict_cart_v3'; // match existing key if you used another, change here
+  // Find an actual cart drawer element robustly (support duplicate IDs or different class names)
+  function findCartDrawer() {
+    // prefer an element with id cart-drawer that is in the document body and visible
+    const byIdAll = Array.from(document.querySelectorAll('#cart-drawer, .cart-drawer'));
+    if (!byIdAll.length) return null;
+    // prefer the last appended to body (likely the intended one)
+    for (let i = byIdAll.length - 1; i >= 0; i--) {
+      const el = byIdAll[i];
+      if (document.body.contains(el)) return el;
+    }
+    return byIdAll[0];
+  }
+
+  const drawer = findCartDrawer();
+  if (!drawer) { console.warn('Cart repair: no cart drawer found'); return; }
+
+  // canonical selectors inside drawer (support multiple variants)
+  const itemsListSelector = '.cart-items, #cart-items, .cart-items-list';
+  const emptyBlockSelector = '.cart-empty, #cart-empty';
+  const subtotalSel = '#cart-subtotal, .cart-subtotal';
+  const deliverySel = '#cart-delivery, .cart-delivery';
+  const totalSel = '#cart-total, .cart-total';
+  const badgeSelectors = ['#cart-count','#cart-badge','.cart-badge'];
+
+  // load/save
+  function loadCartFromStorage() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      return raw ? JSON.parse(raw) : [];
+    } catch (e) { return []; }
+  }
+  function saveCartToStorage(c) {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(c)); } catch(e){ console.warn('persist err', e); }
+  }
+
+  // in-memory cart
+  let cart = window.WrapDistrict && Array.isArray(window.WrapDistrict.cart) ? window.WrapDistrict.cart : (window.cart || loadCartFromStorage() || []);
+  // ensure we sync to window for other scripts
+  window.cart = cart;
+  window.WrapDistrict = window.WrapDistrict || {};
+  window.WrapDistrict.cart = cart;
+
+  // small format
+  const fmt = (n) => `GHC ${Number(n || 0).toFixed(2)}`;
+
+  // compute totals (subtotal, delivery, total). Delivery default 0 (can be changed via radio)
+  let activeDeliveryFee = (cart.length ? 10 : 0);
+
+  function computeTotals() {
+    const subtotal = cart.reduce((s,it) => s + (Number(it.unitPrice || 0) * Number(it.qty || 1)), 0);
+    const delivery = cart.length ? activeDeliveryFee : 0;
+    const total = subtotal + delivery;
+    return { subtotal: round2(subtotal), delivery: round2(delivery), total: round2(total) };
+  }
+  function round2(n){ return Math.round(Number(n || 0) * 100) / 100; }
+
+  // DOM refs
+  const itemsList = drawer.querySelector(itemsListSelector);
+  const emptyBlock = drawer.querySelector(emptyBlockSelector);
+  const subtotalEl = drawer.querySelector(subtotalSel);
+  const deliveryEl = drawer.querySelector(deliverySel);
+  const totalEl = drawer.querySelector(totalSel);
+
+  // update cart badges (header)
+  function updateCartBadges() {
+    const count = cart.reduce((s,it) => s + Number(it.qty||0), 0);
+    badgeSelectors.forEach(sel => {
+      const el = document.querySelector(sel);
+      if (!el) return;
+      el.textContent = String(count);
+      el.setAttribute('data-count', String(count));
+      // small pulse
+      el.classList && el.classList.add('pulse');
+      setTimeout(()=> el.classList && el.classList.remove('pulse'), 700);
+    });
+  }
+
+  // Render the cart drawer contents (stable ids)
+  function renderCartUI() {
+    // update items list
+    if (itemsList) {
+      itemsList.innerHTML = '';
+      if (!cart.length) {
+        if (emptyBlock) emptyBlock.style.display = '';
+      } else {
+        if (emptyBlock) emptyBlock.style.display = 'none';
+        cart.forEach(item => {
+          const li = document.createElement('li');
+          li.className = 'cart-item';
+          li.dataset.itemId = item.id || item.productId || (`item-${Date.now()}`);
+          li.innerHTML = `
+            <img src="${escapeHtml(item.image || '')}" alt="${escapeHtml(item.name || '')}" onerror="this.src='${(window.IMAGES && window.IMAGES['thumb-shawarma'])||''}'" />
+            <div class="details">
+              <strong class="name">${escapeHtml(item.name || '')}</strong>
+              <div class="desc">${escapeHtml(item.optionsSummary || (item.variant || ''))}</div>
+            </div>
+            <div class="meta">
+              <div class="price">${fmt(Number(item.unitPrice || 0) * Number(item.qty || 1))}</div>
+              <div class="qty-controls" role="group" aria-label="Quantity controls">
+                <button type="button" class="qty-dec" aria-label="Decrease quantity">−</button>
+                <div class="qty-value" aria-live="polite">${Number(item.qty || 1)}</div>
+                <button type="button" class="qty-inc" aria-label="Increase quantity">+</button>
+              </div>
+              <button class="remove-item" aria-label="Remove item"><i class="fa fa-trash"></i></button>
+            </div>
+          `;
+          itemsList.appendChild(li);
+        });
+      }
+    }
+
+    // update totals
+    const t = computeTotals();
+    if (subtotalEl) subtotalEl.textContent = fmt(t.subtotal);
+    if (deliveryEl) deliveryEl.textContent = fmt(t.delivery);
+    if (totalEl) totalEl.textContent = fmt(t.total);
+
+    // ensure global expose
+    window.cart = cart;
+    window.WrapDistrict.cart = cart;
+  }
+
+  // safe escape
+  function escapeHtml(s) { return String(s || '').replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c])); }
+
+  // helper to find item index by id
+  function findIndexById(id) {
+    return cart.findIndex(x => (String(x.id || x.productId || '') === String(id)));
+  }
+
+  // persist + UI refresh wrapper
+  function persistAndRender() {
+    saveCartToStorage(cart);
+    updateCartBadges();
+    renderCartUI();
+  }
+
+  // wrap existing addToCartObj if it exists, otherwise provide one
+  const _existingAdd = window.addToCartObj;
+  window.addToCartObj = function addToCartOverride(item) {
+    try {
+      if (typeof _existingAdd === 'function') {
+        // call existing implementation (keeps other code paths working)
+        _existingAdd(item);
+        // try to reload from storage (in case existing add persisted)
+        cart = loadCartFromStorage();
+      } else {
+        // conservative add: merge by productId+variant+extras
+        const matchIndex = cart.findIndex(ci => ci.productId === item.productId
+          && ci.variant === item.variant
+          && JSON.stringify(ci.extras || {}) === JSON.stringify(item.extras || {}));
+        if (matchIndex > -1) {
+          cart[matchIndex].qty = Math.min(999, (cart[matchIndex].qty || 0) + (item.qty || 1));
+        } else {
+          cart.push(Object.assign({}, item, { qty: item.qty || 1 }));
+        }
+      }
+    } catch (err) {
+      console.warn('addToCartOverride error', err);
+      // fallback: push raw item
+      try { cart.push(Object.assign({}, item, { qty: item.qty || 1 })); } catch(e){}
+    }
+    // persist & render
+    persistAndRender();
+  };
+
+  // open/close drawer helpers
+  function openCartDrawer() {
+    // prefer method on page if exists
+    if (typeof window.openCartDrawer === 'function') try { window.openCartDrawer(); return; } catch(e){}
+    // otherwise toggle drawer visibility
+    drawer.hidden = false;
+    drawer.setAttribute('aria-hidden','false');
+    document.documentElement.classList.add('no-scroll');
+    // focus first interactive element for keyboard users
+    const focusable = drawer.querySelector('button, [href], input, [tabindex]:not([tabindex="-1"])');
+    focusable && focusable.focus();
+    renderCartUI();
+  }
+  function closeCartDrawer() {
+    if (typeof window.closeCartDrawer === 'function') try { window.closeCartDrawer(); return; } catch(e){}
+    drawer.hidden = true;
+    drawer.setAttribute('aria-hidden','true');
+    document.documentElement.classList.remove('no-scroll');
+  }
+
+  // delegate clicks inside itemsList for qty and remove
+  if (itemsList) {
+    itemsList.addEventListener('click', (ev) => {
+      const inc = ev.target.closest('.qty-inc');
+      const dec = ev.target.closest('.qty-dec');
+      const rem = ev.target.closest('.remove-item');
+      const li = (inc || dec || rem) ? (inc || dec || rem).closest('.cart-item') : null;
+      if (!li) return;
+      const id = li.dataset.itemId;
+      const idx = findIndexById(id);
+      if (idx === -1) return;
+      ev.preventDefault();
+
+      if (inc) {
+        cart[idx].qty = Math.min(999, Number(cart[idx].qty || 0) + 1);
+        persistAndRender();
+        return;
+      }
+      if (dec) {
+        cart[idx].qty = Math.max(1, Number(cart[idx].qty || 0) - 1);
+        persistAndRender();
+        return;
+      }
+      if (rem) {
+        // animate removal if you have CSS for .removing
+        const el = li;
+        el.classList.add('removing');
+        setTimeout(() => {
+          cart.splice(idx, 1);
+          persistAndRender();
+        }, 220);
+        return;
+      }
+    });
+
+    // keyboard support for qty (Enter triggers the clicked control)
+    itemsList.addEventListener('keydown', (ev) => {
+      if (ev.key !== 'Enter') return;
+      const btn = ev.target.closest('.qty-dec, .qty-inc, .remove-item');
+      btn && btn.click();
+    });
+  }
+
+  // bind open/close triggers globally (handles buttons in header etc)
+  document.addEventListener('click', (ev) => {
+    const open = ev.target.closest('[data-action="open-cart"], .cart-btn, #cart-toggle, .cart-toggle, .icon-btn.cart-btn');
+    if (open) { ev.preventDefault(); openCartDrawer(); return; }
+    const close = ev.target.closest('[data-action="close-cart"], .drawer-close, .cart-close, #cart-drawer .cart-close, .close-cart');
+    if (close) { ev.preventDefault(); closeCartDrawer(); return; }
+  });
+
+  // wire delivery radio inputs inside drawer (if present)
+  function bindDeliveryInputs() {
+    try {
+      const radios = drawer.querySelectorAll('input[type="radio"][name="delivery"], input[type="radio"][name="delivery-type"]');
+      if (!radios || !radios.length) return;
+      radios.forEach(r => {
+        r.addEventListener('change', (e) => {
+          const val = e.target.value;
+          // if value is numeric treat as fee, if 'delivery' apply GHC10
+          if (!isNaN(Number(val))) activeDeliveryFee = Number(val);
+          else activeDeliveryFee = (String(val).toLowerCase().includes('delivery') ? 10 : 0);
+          persistAndRender();
+        });
+      });
+      // set initial from checked input if present
+      const checked = Array.from(radios).find(r => r.checked);
+      if (checked) {
+        const v = checked.value;
+        activeDeliveryFee = (!isNaN(Number(v))) ? Number(v) : (String(v).toLowerCase().includes('delivery') ? 10 : 0);
+      }
+    } catch (e) { console.warn('bindDeliveryInputs err', e); }
+  }
+  bindDeliveryInputs();
+
+  // wire apply promo / clear cart / checkout inside drawer (if present)
+  (function bindDrawerActions(){
+    const clear = drawer.querySelector('[data-action="clear-cart"], .clear-cart');
+    if (clear) {
+      clear.addEventListener('click', (e) => {
+        e.preventDefault();
+        if (!cart.length) return;
+        if (!confirm('Clear your cart?')) return;
+        cart = []; persistAndRender();
+      });
+    }
+    const checkout = drawer.querySelector('[data-action="checkout-paystack"], .checkout, #checkout-btn, .btn.checkout');
+    if (checkout) {
+      checkout.addEventListener('click', (e) => {
+        e.preventDefault();
+        if (!cart.length) { window.toast && window.toast('Cart is empty'); return; }
+        // keep original flow if available
+        if (typeof window.openPaystackCheckout === 'function') {
+          window.openPaystackCheckout({ amountGhc: cart.reduce((s,it)=>s + Number(it.unitPrice || 0) * Number(it.qty || 1), 0), reference: `cart-${Date.now()}` });
+          return;
+        }
+        // fallback: show totals
+        const t = computeTotals();
+        alert(`Checkout — total ${fmt(t.total)} (this is a stub; wire your checkout).`);
+      });
+    }
+  })();
+
+  // initial render
+  persistAndRender();
+
+  // expose debug API
+  window.CartAPI = {
+    open: openCartDrawer,
+    close: closeCartDrawer,
+    cart: cart,
+    persist: () => { saveCartToStorage(cart); renderCartUI(); },
+    add: (it) => { window.addToCartObj(it); }
+  };
+
+  console.info('Cart repair module initialized — drawer:', drawer);
+})();
+
+    /* ===== Hero behavior: reliable ORDER & SEE MENU on mobile + responsive height tweak ===== */
+(function(){
+  const orderBtn = document.getElementById('vd-order');
+  const seeMenuBtn = document.getElementById('vd-see-menu');
+  const hero = document.getElementById('hero');
+  const headerHeight = (() => {
+    const h = document.querySelector('.site-header');
+    return (h && parseInt(window.getComputedStyle(h).height || 64, 10)) || 64;
+  })();
+
+  function safeScrollToMenu() {
+    const el = document.querySelector('#menu') || document.querySelector('.menu-section');
+    if (!el) return;
+    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  // behavior for ORDER button:
+  // If VD_HERO (your hero helper) has a current slide with a key that maps to CATALOG -> openBuilder
+  // fallback: scroll to menu and quick-add default item if catalog exists
+  function orderHandler(e) {
+    e && e.preventDefault();
+    try {
+      const cur = (window.VD_HERO && window.VD_HERO.current && window.VD_HERO.current()) || 0;
+      const slides = (window.VD_HERO && window.VD_HERO.slides) || window.slidesData || [];
+      const slide = slides[cur] || {};
+      const key = slide.key || slide.id || null;
+      if (key && window.CATALOG && window.CATALOG[key] && typeof window.openBuilder === 'function') {
+        window.openBuilder(key);
+        return;
+      }
+      // fallback: if catalog has any item, open its builder or quick-add the first
+      if (window.CATALOG) {
+        const first = Object.keys(window.CATALOG)[0];
+        if (first && typeof window.openBuilder === 'function') { window.openBuilder(first); return; }
+      }
+      // otherwise scroll to menu
+      safeScrollToMenu();
+    } catch (err) {
+      console.warn('orderHandler error', err);
+      safeScrollToMenu();
+    }
+  }
+
+  // SEE MENU always scrolls to menu
+  function seeMenuHandler(e) { e && e.preventDefault(); safeScrollToMenu(); }
+
+  if (orderBtn) { orderBtn.removeEventListener && orderBtn.removeEventListener('click', orderHandler); orderBtn.addEventListener('click', orderHandler); }
+  if (seeMenuBtn) { seeMenuBtn.removeEventListener && seeMenuBtn.removeEventListener('click', seeMenuHandler); seeMenuBtn.addEventListener('click', seeMenuHandler); }
+
+  // make dots touch-friendly: increase tap area by adding pointer cursor + larger hitbox
+  document.querySelectorAll('.vd-dot').forEach(d => {
+    d.style.touchAction = 'manipulation';
+    d.style.cursor = 'pointer';
+    d.setAttribute('aria-role','button');
+  });
+
+  // Keep hero min-height tuned after header height (useful for small phones with varying header)
+  function adjustHeroHeight() {
+    if (!hero) return;
+    const vw = window.innerHeight || document.documentElement.clientHeight;
+    // target about 60vh on small screens, 80vh on larger
+    const isSmall = window.matchMedia('(max-width:720px)').matches;
+    const targetVH = isSmall ? 0.60 : 0.80;
+    const minPx = Math.max(320, Math.floor(vw * targetVH) - headerHeight);
+    hero.style.minHeight = `calc(${minPx}px)`;
+  }
+  window.addEventListener('resize', adjustHeroHeight);
+  window.addEventListener('orientationchange', adjustHeroHeight);
+  setTimeout(adjustHeroHeight, 80);
+})();
+
+    
+  </script>
 </html>
