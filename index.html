@@ -336,7 +336,44 @@ a { color: var(--accent-2); text-decoration: none; }
   transform: translateY(8px);
   transition: transform 420ms cubic-bezier(.2,.9,.3,1), opacity 420ms ease;
 }
+/* ===== Header: larger cart icon, smaller badge ===== */
+.cart-btn{
+  position: relative;
+  margin-right: 6px;
+  color: var(--accent-2);
+  /* made the icon visually larger and a bit more tappable */
+  font-size: 26px;        /* was 20px */
+  min-width:52px;        /* increased tap area */
+  min-height:52px;
+  display:inline-grid;
+  place-items:center;
+  border-radius:12px;
+}
 
+/* cart count badge — smaller, tighter, and repositioned */
+.cart-count{
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  transform: translate(35%, -35%); /* nudged so it sits nicely on a bigger icon */
+  background: linear-gradient(180deg, var(--accent-1), var(--accent-2));
+  color: #111;
+  font-weight:800;
+  font-size:10px;        /* reduced from 12px */
+  padding:3px 5px;       /* reduced padding for compactness */
+  border-radius:999px;
+  box-shadow: 0 6px 16px rgba(255,106,0,0.14);
+  border: 2px solid rgba(255,255,255,0.05);
+  min-width: 18px;       /* slightly smaller */
+  text-align:center;
+  line-height:1;
+}
+
+/* Keep the badge readable on very small screens */
+@media (max-width:360px){
+  .cart-btn{ font-size:24px; min-width:48px; min-height:48px; }
+  .cart-count{ font-size:9px; padding:2px 5px; min-width:16px; transform: translate(35%, -40%); }
+}
 /* When slide is active, lift the card a bit */
 .slide[style*="display: block"] .slide-content {
   transform: translateY(0);
@@ -609,6 +646,71 @@ a { color: var(--accent-2); text-decoration: none; }
   scroll-behavior: smooth;
 }
 
+    /* ---------- Cart: thumbnails + sticky footer polish (add after your cart styles) ---------- */
+
+/* thumbnail inside cart line */
+.cart-thumb{
+  width:64px;
+  height:56px;
+  object-fit: cover;
+  border-radius:8px;
+  flex: 0 0 64px;
+  margin-right:12px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.45);
+  border: 1px solid rgba(255,255,255,0.03);
+}
+
+/* adjust cart-line left area to align image + text nicely */
+.cart-line .line-left{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+/* make footer sticky and slightly elevated */
+.cart-footer{
+  position: sticky;
+  bottom: 0;
+  z-index: 60;
+  height: var(--cart-footer-h);
+  padding: 12px;
+  border-top: 1px solid rgba(255,255,255,0.04);
+  background: linear-gradient(180deg, rgba(6,6,6,0.96), rgba(8,8,8,0.98));
+  backdrop-filter: blur(6px) saturate(120%);
+  box-shadow: 0 -8px 28px rgba(0,0,0,0.6);
+  box-sizing: border-box;
+}
+
+/* give cart-body bottom padding so content never hides under sticky footer */
+.cart-body{
+  padding-bottom: calc(var(--cart-footer-h) + 18px);
+}
+
+/* small condensed summary inside footer for immediate totals */
+.cart-footer .footer-summary{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+.cart-footer .footer-summary .total-label{ color: rgba(255,255,255,0.85); font-weight:800; font-size:13px; }
+.cart-footer .footer-summary .total-value{ font-weight:900; font-size:16px; color: var(--accent-2); }
+
+/* make checkout/clear buttons share space nicely on small screens */
+.cart-footer .footer-actions{
+  display:flex;
+  gap:8px;
+  width: 48%;
+  min-width: 160px;
+  justify-content: flex-end;
+}
+
+/* ensure cart-drawer content height calculation still works on larger screens */
+@media (min-width: 640px) {
+  .cart-body{ height: calc(100vh - var(--cart-header-h) - var(--cart-footer-h)); }
+}
+    
 /* Nice custom scrollbar (WebKit) */
 .cart-body::-webkit-scrollbar{ width:8px; }
 .cart-body::-webkit-scrollbar-thumb{
@@ -2184,13 +2286,26 @@ a:focus, button:focus { outline: 3px solid rgba(255,204,51,0.10); outline-offset
       </div>
 
       <div class="cart-footer">
-        <button id="checkout-btn" class="btn primary fullwidth" data-action="checkout">
-          <i class="fa fa-credit-card"></i> Checkout — Pay with Paystack
-        </button>
-        <button id="clear-cart" class="btn ghost fullwidth" data-action="clear">
-          <i class="fa fa-trash"></i> Clear cart
-        </button>
-      </div>
+  <div class="footer-summary">
+    <div>
+      <div class="small">Subtotal</div>
+      <div class="total-label">Total</div>
+    </div>
+    <div style="margin-left:auto; text-align:right;">
+      <div id="footer-subtotal" class="small">GHC 0</div>
+      <div id="footer-total" class="total-value">GHC 0</div>
+    </div>
+  </div>
+
+  <div class="footer-actions" style="margin-left:12px;">
+    <button id="checkout-btn" class="btn primary" data-action="checkout" style="min-width:120px;">
+      <i class="fa fa-credit-card"></i> Pay
+    </button>
+    <button id="clear-cart" class="btn ghost" data-action="clear" style="min-width:80px;">
+      <i class="fa fa-trash"></i>
+    </button>
+  </div>
+</div>
     </aside>
 
     <!-- ENTRY PROMO MODAL / SLIDE-IN for new visitors -->
