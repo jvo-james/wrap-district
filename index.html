@@ -2440,7 +2440,7 @@ a:focus, button:focus { outline: 3px solid rgba(255,204,51,0.10); outline-offset
       </div>
 
       <div class="cart-footer">
-  <div class="footer-summary">
+  <div class="footer-summary" style=display: none">
     <div>
       <div class="small">Subtotal</div>
       <div class="total-label">Total</div>
@@ -2969,14 +2969,166 @@ a:focus, button:focus { outline: 3px solid rgba(255,204,51,0.10); outline-offset
 
 </style>
 
-<!-- Checkout full modal -->
-<div id="checkout-full-modal" aria-hidden="true" role="dialog" aria-label="Complete your order">
-  <div class="checkout-full-inner" role="document">
+
+
+  <script>
+(function(){
+  document.addEventListener('DOMContentLoaded', () => {
+    // find cart header
+    const cartHeader = document.querySelector('.cart-header');
+    if (!cartHeader) return;
+
+    // avoid adding twice
+    if (!cartHeader.querySelector('.cart-header-right')) {
+      const headerRight = document.createElement('div');
+      headerRight.className = 'cart-header-right';
+
+      const totalWrap = document.createElement('div');
+      totalWrap.className = 'cart-header-total';
+      totalWrap.id = 'cart-header-total';
+      totalWrap.innerText = 'GHC 0';
+
+      const headerCheckout = document.createElement('button');
+      headerCheckout.className = 'cart-header-checkout';
+      headerCheckout.id = 'cart-header-checkout';
+      headerCheckout.type = 'button';
+      headerCheckout.setAttribute('aria-label', 'Checkout and pay');
+      headerCheckout.innerHTML = '<i class="fa fa-credit-card" aria-hidden="true"></i> Checkout';
+
+      headerRight.appendChild(totalWrap);
+      headerRight.appendChild(headerCheckout);
+      cartHeader.appendChild(headerRight);
+    }
+
+    // wire header checkout to existing footer checkout or to checkout modal opener
+    const headerCheckoutBtn = document.getElementById('cart-header-checkout');
+    const footerCheckoutBtn = document.getElementById('checkout-btn');
+
+    headerCheckoutBtn && headerCheckoutBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      // prefer the footer checkout button (keeps single handler)
+      if (footerCheckoutBtn) {
+        footerCheckoutBtn.click();
+        return;
+      }
+      // fallback: click any element that looks like a checkout opener
+      const alt = document.querySelector('[data-action="checkout"], [data-action="pay"], #cf-submit');
+      if (alt) { alt.click(); return; }
+      // as last resort call openCheckoutFull if it's available
+      if (typeof openCheckoutFull === 'function') {
+        openCheckoutFull();
+      } else {
+        alert('Checkout is not available. Please use the Pay button.');
+      }
+    });
+
+    // sync header total with main cart totals
+    const headerTotalEl = document.getElementById('cart-header-total');
+    const cartTotalEl = document.getElementById('cart-total');
+    const cartSubtotalEl = document.getElementById('cart-subtotal');
+
+    function syncHeaderTotal() {
+      try {
+        // prefer computeCartTotals if available
+        if (typeof computeCartTotals === 'function') {
+          const t = computeCartTotals();
+          if (t && typeof t.total !== 'undefined') {
+            headerTotalEl.innerText = `GHC ${Math.round(t.total)}`;
+            return;
+          }
+        }
+        // else read DOM totals
+        if (cartTotalEl && cartTotalEl.innerText) {
+          headerTotalEl.innerText = cartTotalEl.innerText;
+        } else if (cartSubtotalEl && cartSubtotalEl.innerText) {
+          headerTotalEl.innerText = cartSubtotalEl.innerText;
+        } else {
+          headerTotalEl.innerText = 'GHC 0';
+        }
+      } catch (err) {
+        // ignore
+      }
+    }
+
+    // Observe DOM changes on totals if present
+    const observeTargets = [];
+    if (cartTotalEl) observeTargets.push(cartTotalEl);
+    if (cartSubtotalEl) observeTargets.push(cartSubtotalEl);
+
+    if (observeTargets.length) {
+      const mo = new MutationObserver(syncHeaderTotal);
+      observeTargets.forEach(t => mo.observe(t, { childList:true, subtree:true, characterData:true }));
+      syncHeaderTotal();
+    } else {
+      // fallback to polling
+      syncHeaderTotal();
+      setInterval(syncHeaderTotal, 700);
+    }
+
+    // If your renderCart is a global function, wrap it to call syncHeaderTotal after rendering
+    if (typeof window.renderCart === 'function' && !window.__wrapped_renderCart_for_header_total) {
+      window.__wrapped_renderCart_for_header_total = true;
+      const orig = window.renderCart;
+      window.renderCart = function() {
+        const r = orig.apply(this, arguments);
+        try { syncHeaderTotal(); } catch(e){}
+        return r;
+      };
+    }
+  });
+})();
+</script>
+<!-- ===== In-page Checkout Section (Task 3) ===== -->
+<style>
+/* Checkout page (in-file, not a modal) */
+#checkout-page { display: none; position: fixed; inset: 0; z-index: 3200; background: linear-gradient(180deg, rgba(0,0,0,0.6), rgba(0,0,0,0.6)); align-items: center; justify-content: center; padding: 12px; box-sizing: border-box; }
+#checkout-page[aria-hidden="false"] { display: flex; }
+#checkout-inner { width: 100%; max-width: 920px; border-radius: 12px; overflow: hidden; box-shadow: 0 40px 120px rgba(0,0,0,0.7); background: linear-gradient(180deg,#080808,#050505); color: #fff; display: grid; grid-template-columns: 1fr 360px; gap:0; }
+@media (max-width: 900px) { #checkout-inner { grid-template-columns: 1fr; } }
+
+.checkout-left { padding: 16px 18px; max-height: 90vh; overflow:auto; }
+.checkout-right { padding: 16px 18px; border-left: 1px solid rgba(255,255,255,0.03); background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.00)); overflow:auto; max-height: 90vh; }
+
+.checkout-header { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:12px; }
+.checkout-title { color: var(--accent-2); font-weight:900; font-size:18px; margin:0; }
+
+.form-row { display:flex; gap:8px; margin-bottom:10px; }
+.form-col { flex:1; display:flex; flex-direction:column; gap:6px; }
+.input, select, textarea { width:100%; padding:10px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.04); background:transparent; color:#fff; font-weight:800; box-sizing:border-box; }
+.input[readonly] { cursor:pointer; background: rgba(255,255,255,0.01); }
+
+.order-line { display:flex; gap:8px; align-items:center; margin-bottom:10px; }
+.order-line img { width:64px; height:48px; object-fit:cover; border-radius:8px; border:1px solid rgba(255,255,255,0.04); }
+.order-line .ol-meta { flex:1; min-width:0; }
+.order-line .ol-meta strong { display:block; font-weight:900; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.order-line .ol-meta small { color: rgba(255,255,255,0.75); }
+.order-line .ol-price { font-weight:900; color:var(--accent-2); min-width:70px; text-align:right; }
+
+.checkout-actions { display:flex; gap:10px; justify-content:flex-end; margin-top:12px; }
+.btn.full { padding:12px 16px; border-radius:12px; font-weight:900; min-width:140px; }
+.btn.primary.full { background: linear-gradient(90deg,var(--accent-1),var(--accent-2)); color:#111; border:0; box-shadow: 0 12px 36px rgba(255,106,0,0.12); }
+
+/* small helper area */
+.checkout-note { color: rgba(255,255,255,0.78); font-size:13px; margin-top:12px; }
+
+/* header close button */
+#checkout-close { background:transparent; border:0; color: var(--muted); font-size:18px; padding:8px; }
+
+/* subtle responsive */
+@media (max-width:600px){
+  .checkout-right { padding-top:6px; }
+  .order-line img { width:56px; height:44px; }
+  .checkout-title { font-size:16px; }
+}
+</style>
+
+<section id="checkout-page" aria-hidden="true" role="dialog" aria-label="Checkout page">
+  <div id="checkout-inner" role="document">
     <div class="checkout-left">
       <div class="checkout-header">
         <h3 class="checkout-title"><i class="fa fa-shopping-basket"></i> Complete Order</h3>
-        <div style="display:flex; gap:8px;">
-          <button id="checkout-full-close" class="icon-btn" aria-label="Close"><i class="fa fa-times"></i></button>
+        <div>
+          <button id="checkout-close" class="icon-btn" aria-label="Close checkout"><i class="fa fa-times"></i></button>
         </div>
       </div>
 
@@ -3041,12 +3193,16 @@ a:focus, button:focus { outline: 3px solid rgba(255,204,51,0.10); outline-offset
           <button id="cf-submit" class="btn primary full">Confirm & Pay</button>
           <button id="cf-cancel" class="btn ghost full">Cancel</button>
         </div>
+
+        <div class="checkout-note small-muted">
+          By confirming you agree to our terms. For delivery we will estimate fees based on your selected address.
+        </div>
       </div>
     </div>
 
-    <div class="checkout-right">
+    <aside class="checkout-right" aria-label="Order summary">
       <h4 style="margin:0 0 10px 0; color:var(--accent-2); font-weight:900;">Your order</h4>
-      <div id="cf-order-lines">
+      <div id="cf-order-lines" style="margin-bottom:6px;">
         <!-- order lines injected here -->
       </div>
 
@@ -3072,437 +3228,365 @@ a:focus, button:focus { outline: 3px solid rgba(255,204,51,0.10); outline-offset
       <div style="margin-top:12px;" class="small-muted">
         Please confirm your details before proceeding. You will receive an email & SMS after payment.
       </div>
-    </div>
+    </aside>
   </div>
-</div>
-
-<!-- Map modal -->
-<div id="map-modal" aria-hidden="true" role="dialog" aria-label="Pick your address">
-  <div class="map-inner">
-    <div class="map-top">
-      <input id="map-search" class="map-search" placeholder="Search for address (e.g., 'Tema Community 25')" />
-      <button id="map-search-btn" class="btn ghost" style="min-width:90px;">Search</button>
-      <button id="map-close" class="icon-btn" aria-label="Close map"><i class="fa fa-times"></i></button>
-    </div>
-    <div id="map" style="height:100%;"></div>
-    <div class="map-actions">
-      <div id="map-results" class="map-results"></div>
-      <button id="map-confirm" class="btn primary full">Select this location</button>
-    </div>
-  </div>
-</div>
-
-<div class="toast wrap-toast" aria-hidden="true"></div>
+</section>
 
 <script>
-/* Enhanced checkout + map picker script
-   - Replace previous checkout modal behavior. Binds to #checkout-btn and header checkout if present.
-   - Uses Leaflet + Nominatim for address search & pick.
-   - Sends full payload to /api/pay/initialize including address and metadata, then resumes Paystack transaction.
+/* Checkout page script (Task 3)
+   - Opens in-page checkout (#checkout-page)
+   - Hides other modals/popups before opening
+   - Populates order lines from window.cart or from cart DOM
+   - Computes delivery fee using haversine distance; editable rates below
 */
 
 (function(){
-  // helpers
-  const q = (s, ctx=document) => ctx.querySelector(s);
-  const qa = (s, ctx=document) => Array.from((ctx||document).querySelectorAll(s));
-  const fmtGhc = n => `GHC ${Number(n || 0).toFixed(0)}`;
-  const toastEl = document.querySelector('.toast.wrap-toast');
-  function showToast(msg, ms=2400){ if (!toastEl) return; toastEl.textContent = msg; toastEl.classList.add('show'); setTimeout(()=> toastEl.classList.remove('show'), ms); }
+  document.addEventListener('DOMContentLoaded', () => {
+    // Configurable store coordinates (set your store exact lat/lon here)
+    const STORE_COORDS = { lat: 5.6600, lon: 0.0190 }; // <-- change to your store's lat/lon (Tema Community 25 / Devtraco approx)
+    const DELIVERY_CONFIG = {
+      baseFee: 6,        // base GHC
+      perKm: 2.5,        // GHC per km
+      minFee: 4,         // minimum fee
+      maxFee: 60,        // maximum fee
+      freeWithinKm: 0.8  // free delivery inside this radius (in km)
+    };
 
-  // elements
-  const modal = q('#checkout-full-modal');
-  const closeBtn = q('#checkout-full-close');
-  const cancelBtn = q('#cf-cancel');
-  const submitBtn = q('#cf-submit');
+    // DOM
+    const page = document.getElementById('checkout-page');
+    const inner = document.getElementById('checkout-inner');
+    const closeBtn = document.getElementById('checkout-close');
+    const cancelBtn = document.getElementById('cf-cancel');
+    const submitBtn = document.getElementById('cf-submit');
 
-  const inpName = q('#cf-name');
-  const inpPhone = q('#cf-phone');
-  const inpEmail = q('#cf-email');
-  const inpType = q('#cf-type');
-  const inpAddress = q('#cf-address');
-  const inpLat = q('#cf-lat');
-  const inpLon = q('#cf-lon');
-  const inpDate = q('#cf-date');
-  const inpTime = q('#cf-time');
-  const inpNote = q('#cf-note');
-  const inpPayMethod = q('#cf-paymethod');
+    const inpName = document.getElementById('cf-name');
+    const inpPhone = document.getElementById('cf-phone');
+    const inpEmail = document.getElementById('cf-email');
+    const inpType = document.getElementById('cf-type');
+    const inpAddress = document.getElementById('cf-address');
+    const inpLat = document.getElementById('cf-lat');
+    const inpLon = document.getElementById('cf-lon');
+    const inpDate = document.getElementById('cf-date');
+    const inpTime = document.getElementById('cf-time');
+    const inpNote = document.getElementById('cf-note');
+    const inpPayMethod = document.getElementById('cf-paymethod');
 
-  const orderLinesWrap = q('#cf-order-lines');
-  const cfSubtotal = q('#cf-subtotal');
-  const cfDelivery = q('#cf-delivery');
-  const cfPromo = q('#cf-promo');
-  const cfTotal = q('#cf-total');
+    const orderLinesWrap = document.getElementById('cf-order-lines');
+    const cfSubtotal = document.getElementById('cf-subtotal');
+    const cfDelivery = document.getElementById('cf-delivery');
+    const cfPromo = document.getElementById('cf-promo');
+    const cfTotal = document.getElementById('cf-total');
 
-  // Map modal elements
-  const mapModal = q('#map-modal');
-  const mapSearch = q('#map-search');
-  const mapSearchBtn = q('#map-search-btn');
-  const mapClose = q('#map-close');
-  const mapConfirm = q('#map-confirm');
-  const mapResults = q('#map-results');
-  let map, mapMarker, lastSelectedPlace = null, nominatimResults = [];
+    // Map modal already exists (#map-modal) and populates #cf-address/#cf-lat/#cf-lon — reuse it
+    // Helper: show checkout page
+    function openCheckoutPage() {
+      // hide any other modals/popups that might have been shown earlier
+      Array.from(document.querySelectorAll('.modal, .entry-promo, #preorder-modal')).forEach(m => {
+        try { m.style.display = 'none'; m.setAttribute && m.setAttribute('aria-hidden','true'); } catch(e){}
+      });
 
-  // Open checkout modal and populate items/totals
-  function openCheckoutFull() {
-    // Prefill basic user details from localStorage if present
-    inpName.value = localStorage.getItem('wrap_user_name') || '';
-    inpPhone.value = localStorage.getItem('wrap_user_phone') || '';
-    inpEmail.value = localStorage.getItem('wrap_checkout_email') || '';
-    inpType.value = 'delivery';
+      // prefill user details
+      inpName.value = localStorage.getItem('wrap_user_name') || '';
+      inpPhone.value = localStorage.getItem('wrap_user_phone') || '';
+      inpEmail.value = localStorage.getItem('wrap_checkout_email') || '';
 
-    // Build order lines from global cart
-    orderLinesWrap.innerHTML = '';
-    const cartLines = Object.values(window.cart || {});
-    if (!cartLines.length) {
-      orderLinesWrap.innerHTML = '<div class="small-muted">Your cart is empty.</div>';
-    } else {
-      cartLines.forEach(line => {
+      populateOrderLines();
+      refreshTotals();
+
+      page.style.display = 'flex';
+      page.setAttribute('aria-hidden','false');
+      document.body.style.overflow = 'hidden';
+      setTimeout(()=> inpName.focus && inpName.focus(), 120);
+    }
+
+    function closeCheckoutPage() {
+      page.style.display = 'none';
+      page.setAttribute('aria-hidden','true');
+      document.body.style.overflow = '';
+    }
+
+    // wire openers (override previous handlers so no pre-popup appears)
+    const footerPayBtn = document.getElementById('checkout-btn');
+    const headerCheckoutBtn = document.getElementById('cart-header-checkout');
+
+    function bindOpeners() {
+      if (footerPayBtn) {
+        footerPayBtn.removeEventListener('click', openCheckoutPage);
+        footerPayBtn.addEventListener('click', (e) => { e.preventDefault(); openCheckoutPage(); });
+      }
+      if (headerCheckoutBtn) {
+        headerCheckoutBtn.removeEventListener('click', openCheckoutPage);
+        headerCheckoutBtn.addEventListener('click', (e) => { e.preventDefault(); openCheckoutPage(); });
+      }
+    }
+    bindOpeners();
+
+    // close/cancel handlers
+    closeBtn && closeBtn.addEventListener('click', closeCheckoutPage);
+    cancelBtn && cancelBtn.addEventListener('click', closeCheckoutPage);
+    page && page.addEventListener('click', (e)=> { if (e.target === page) closeCheckoutPage(); });
+    document.addEventListener('keydown', (e)=> { if (e.key === 'Escape' && page.getAttribute('aria-hidden') === 'false') closeCheckoutPage(); });
+
+    // Populate order lines from window.cart if present, else read existing cart DOM
+    function populateOrderLines() {
+      orderLinesWrap.innerHTML = '';
+      const cartObj = window.cart || {};
+      const lines = Object.keys(cartObj).length ? Object.values(cartObj) : extractCartFromDom();
+      if (!lines.length) {
+        orderLinesWrap.innerHTML = '<div class="small-muted">Your cart is empty.</div>';
+        return;
+      }
+      lines.forEach(line => {
         const div = document.createElement('div');
         div.className = 'order-line';
         div.innerHTML = `
-          <img src="${escapeHtml(line.imageSrc||'')}" alt="${escapeHtml(line.title)}" />
+          <img src="${escapeHtml(line.imageSrc||'')}" alt="${escapeHtml(line.title||'Item')}" />
           <div class="ol-meta">
-            <strong>${escapeHtml(line.title)}</strong>
-            <small>${(line.meta && line.meta.addons) ? (line.meta.addons.map(a=>a.label).join(', ')) : ''}</small>
+            <strong>${escapeHtml(line.title||'Item')}</strong>
+            <small>${escapeHtml(buildMetaText(line.meta || {}))}</small>
           </div>
-          <div class="ol-price">${fmtGhc(line.unitPrice * line.qty)}</div>
+          <div class="ol-price">${fmtGhc((line.unitPrice||0) * (line.qty||1))}</div>
         `;
         orderLinesWrap.appendChild(div);
       });
     }
 
-    // Totals
-    const totals = (typeof computeCartTotals === 'function') ? computeCartTotals() : { subtotal:0, delivery:0, promoDiscount:0, total:0 };
-    cfSubtotal.innerText = fmtGhc(totals.subtotal || 0);
-    cfDelivery.innerText = fmtGhc(totals.delivery || 0);
-    cfPromo.innerText = `-GHC ${Math.round(totals.promoDiscount || 0)}`;
-    cfTotal.innerText = fmtGhc(totals.total || 0);
-
-    // Show modal
-    modal.style.display = 'flex';
-    modal.setAttribute('aria-hidden','false');
-    document.body.style.overflow = 'hidden';
-    setTimeout(()=> inpName.focus && inpName.focus(), 80);
-  }
-
-  function closeCheckoutFull() {
-    modal.style.display = 'none';
-    modal.setAttribute('aria-hidden','true');
-    document.body.style.overflow = '';
-  }
-
-  // Click handlers to open the full checkout (bind to footer and header checkout if present)
-  const footerPayBtn = q('#checkout-btn');
-  const headerCheckoutBtn = q('#cart-header-checkout');
-  if (footerPayBtn) footerPayBtn.addEventListener('click', (e)=> { e.preventDefault(); openCheckoutFull(); });
-  if (headerCheckoutBtn) headerCheckoutBtn.addEventListener('click', (e)=> { e.preventDefault(); openCheckoutFull(); });
-
-  // close handlers
-  closeBtn && closeBtn.addEventListener('click', closeCheckoutFull);
-  cancelBtn && cancelBtn.addEventListener('click', closeCheckoutFull);
-
-  // address input opens map modal
-  inpAddress && inpAddress.addEventListener('click', (e)=> {
-    e.preventDefault();
-    openMapModal();
-  });
-
-  // Map modal logic (Leaflet + Nominatim)
-  function openMapModal() {
-    mapModal.style.display = 'flex'; mapModal.setAttribute('aria-hidden','false');
-    document.body.style.overflow = 'hidden';
-    mapResults.innerHTML = '';
-    mapSearch.value = '';
-    lastSelectedPlace = null;
-
-    // Initialize map once
-    if (!map) {
-      map = L.map('map', { zoomControl: true }).setView([5.614818, -0.205874], 12); // Ghana center (Accra)
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; OpenStreetMap contributors'
-      }).addTo(map);
-    }
-    setTimeout(()=> map.invalidateSize(), 120);
-  }
-
-  function closeMapModal() {
-    mapModal.style.display = 'none'; mapModal.setAttribute('aria-hidden','true');
-    document.body.style.overflow = '';
-  }
-
-  // Nominatim search (debounced)
-  let searchTimer = null;
-  function nominatimSearch(qstr) {
-    if (!qstr || qstr.trim().length < 2) { mapResults.innerHTML = '<div class="map-result small-muted">Type an address to search</div>'; return; }
-    // debounce
-    clearTimeout(searchTimer);
-    searchTimer = setTimeout(async ()=> {
-      try {
-        mapResults.innerHTML = '<div class="map-result small-muted">Searching…</div>';
-        const url = 'https://nominatim.openstreetmap.org/search?format=json&limit=8&q=' + encodeURIComponent(qstr);
-        const resp = await fetch(url, { headers: { 'Accept-Language': 'en' }});
-        const data = await resp.json();
-        nominatimResults = data; // save
-        if (!Array.isArray(data) || data.length === 0) {
-          mapResults.innerHTML = '<div class="map-result small-muted">No results</div>';
-          return;
-        }
-        mapResults.innerHTML = '';
-        data.forEach((r, idx) => {
-          const div = document.createElement('div');
-          div.className = 'map-result';
-          div.innerHTML = `<strong>${escapeHtml(r.display_name.split(',').slice(0,3).join(', '))}</strong><div class="small-muted">${escapeHtml(r.display_name)}</div>`;
-          div.addEventListener('click', ()=> {
-            // center map and show marker
-            const lat = Number(r.lat), lon = Number(r.lon);
-            map.setView([lat, lon], 17);
-            if (mapMarker) map.removeLayer(mapMarker);
-            mapMarker = L.marker([lat, lon]).addTo(map);
-            lastSelectedPlace = r;
-            // highlight selected result
-            Array.from(mapResults.children).forEach(c => c.style.background = '');
-            div.style.background = 'rgba(0,0,0,0.04)';
-          });
-          mapResults.appendChild(div);
-        });
-      } catch (err) {
-        console.error('Nominatim error', err);
-        mapResults.innerHTML = '<div class="map-result small-muted">Search failed</div>';
-      }
-    }, 350);
-  }
-
-  mapSearchBtn && mapSearchBtn.addEventListener('click', ()=> nominatimSearch(mapSearch.value));
-  mapSearch && mapSearch.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); nominatimSearch(mapSearch.value); } });
-
-  // map confirm button: populate address fields with selected place (or pick map center if none)
-  mapConfirm && mapConfirm.addEventListener('click', ()=> {
-    if (lastSelectedPlace) {
-      inpAddress.value = lastSelectedPlace.display_name;
-      inpLat.value = lastSelectedPlace.lat;
-      inpLon.value = lastSelectedPlace.lon;
-      showToast('Address selected');
-      closeMapModal();
-    } else {
-      // fallback: use center of map
-      const center = map.getCenter();
-      inpLat.value = center.lat;
-      inpLon.value = center.lng;
-      // reverse geocode once to get human-friendly address
-      (async ()=> {
+    function extractCartFromDom() {
+      const arr = [];
+      const rows = Array.from(document.querySelectorAll('#cart-items li.cart-line')).filter(r=>!r.classList.contains('cart-free'));
+      rows.forEach(r => {
         try {
-          const rev = await fetch('https://nominatim.openstreetmap.org/reverse?format=json&lat=' + center.lat + '&lon=' + center.lng);
-          const res = await rev.json();
-          if (res && res.display_name) inpAddress.value = res.display_name;
-          else inpAddress.value = `${center.lat.toFixed(5)}, ${center.lng.toFixed(5)}`;
-        } catch (err) {
-          inpAddress.value = `${center.lat.toFixed(5)}, ${center.lng.toFixed(5)}`;
-        } finally {
-          showToast('Location selected');
-          closeMapModal();
-        }
-      })();
-    }
-  });
-
-  mapClose && mapClose.addEventListener('click', ()=> closeMapModal());
-  // also close when clicking outside map-inner (but we used fixed full-screen)
-  mapModal && mapModal.addEventListener('click', (e) => { if (e.target === mapModal) closeMapModal(); });
-
-  // Escape to close map modal
-  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { if (mapModal && mapModal.getAttribute('aria-hidden')==='false') closeMapModal(); if (modal && modal.getAttribute('aria-hidden')==='false' && e.target !== inpAddress) {/*keep checkout open*/} } });
-
-  // Utility escapeHtml (same as earlier)
-  function escapeHtml(str){ return String(str||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-
-  /* ---------- Submit flow: validation + Paystack integration ---------- */
-  submitBtn && submitBtn.addEventListener('click', async (ev) => {
-    ev.preventDefault();
-    submitBtn.disabled = true;
-    showToast('Validating order…');
-
-    // Validate required fields
-    const name = (inpName.value || '').trim();
-    const phone = (inpPhone.value || '').trim();
-    const email = (inpEmail.value || '').trim();
-    const type = inpType.value;
-    const address = (inpAddress.value || '').trim();
-    const lat = inpLat.value, lon = inpLon.value;
-    const date = inpDate.value, time = inpTime.value;
-    const note = inpNote.value || '';
-    const paymethod = inpPayMethod.value || 'paystack';
-
-    if (!name || !phone || !email) {
-      alert('Please complete your name, phone and email.');
-      submitBtn.disabled = false; return;
-    }
-    if (type === 'delivery' && !address) {
-      alert('Please select your address on the map for delivery.');
-      submitBtn.disabled = false; return;
-    }
-
-    // assemble cart payload from window.cart (same structure as earlier)
-    const cartLines = Object.values(window.cart || {}).map(l => ({
-      baseId: l.baseId, title: l.title, unitPrice: l.unitPrice, qty: l.qty, meta: l.meta || {}
-    }));
-
-    if (!cartLines.length) {
-      alert('Your cart is empty.');
-      submitBtn.disabled = false; return;
-    }
-
-    // totals
-    const totals = (typeof computeCartTotals === 'function') ? computeCartTotals() : { subtotal:0, delivery:0, promoDiscount:0, total:0 };
-
-    // If payment method is cash choose flow: simply save order details to server (not covered here).
-    // For Paystack proceed with the payment initialization (same as earlier).
-    if (paymethod === 'cash') {
-      // For front-end only flow we store order into localStorage as a placeholder and show confirmation.
-      const fakeOrder = {
-        id: 'local-'+Date.now(),
-        name, phone, email, type, address, lat, lon, date, time, note, cart: cartLines, totals
-      };
-      localStorage.setItem('wrap_last_order', JSON.stringify(fakeOrder));
-      showToast('Order placed (Cash on Delivery). We will contact you shortly.');
-      // Optionally clear cart
-      try { window.cart = {}; renderCart(); } catch(err){}
-      closeCheckoutFull();
-      submitBtn.disabled = false;
-      return;
-    }
-
-    // else paymethod === 'paystack' -> call server to initialize transaction
-    try {
-      const payload = {
-        name, phone, email, type, address, lat, lon, date, time, note,
-        amount_cedi: totals.total,
-        amount_pesewas: Math.round((totals.total||0)*100),
-        currency: 'GHS',
-        cart: cartLines
-      };
-
-      const res = await fetch('/api/pay/initialize', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
+          const title = (r.querySelector('.line-title')?.innerText || '').trim();
+          const qty = Number(r.querySelector('.line-qty')?.innerText || 1) || 1;
+          const priceText = r.querySelector('.line-meta strong')?.innerText || '';
+          // attempt to parse unit price from "GHC 45 × 1 = GHC 45" area
+          const match = (r.querySelector('.line-meta')?.innerText || '').match(/GHC\s*([0-9]+)/);
+          const unitPrice = match ? Number(match[1]) : 0;
+          const img = r.querySelector('img')?.src || '';
+          arr.push({ title, qty, unitPrice, unitPrice, meta: {}, imageSrc: img });
+        } catch(e){}
       });
+      return arr;
+    }
 
-      if (!res.ok) {
-        // server not available or error -> show message and optionally fallback to client-only dev flow
-        const txt = await res.text().catch(()=>null);
-        console.warn('init failed', res.status, txt);
-        // fallback message
-        if (confirm('Payment initialization failed on server. Do you want to try a client-only test payment? (Not for production)')) {
-          // client-only flow (requires PUBLIC KEY replacement)
-          const PUBLIC_KEY = 'pk_test_xxxxxxxxxxxxxxxxxxxxxxxxx'; // replace for local dev tests
-          if (!window.Paystack && !window.PaystackPop) {
-            alert('Paystack inline library not found.');
-            submitBtn.disabled=false; return;
-          }
-          // try using InlineJS newTransaction or PaystackPop.setup if available
-          if (window.Paystack && typeof window.Paystack === 'function') {
-            try {
-              const popup = new Paystack();
-              const tx = await popup.newTransaction({ key: PUBLIC_KEY, email, amount: Math.round((totals.total||0)*100), currency: 'GHS' });
-              // do verification if server available
-              showToast('Client-only payment completed (test).');
-              window.cart = {}; renderCart();
-              closeCheckoutFull();
-              submitBtn.disabled=false;
-              return;
-            } catch (err) {
-              console.error('client-only error', err);
-              alert('Client-only payment failed.');
-            }
-          } else if (window.PaystackPop) {
-            // older PaystackPop fallback
-            const ref = 'ref'+Math.floor(Math.random()*1000000);
-            const handler = window.PaystackPop.setup({
-              key: PUBLIC_KEY, email, amount: Math.round((totals.total||0)*100), currency: 'GHS', ref,
-              callback: function(response){
-                alert('Payment complete: ' + response.reference);
-                window.cart = {}; renderCart();
-                closeCheckoutFull();
-                submitBtn.disabled=false;
-              },
-              onClose: function(){ showToast('Payment cancelled'); submitBtn.disabled=false; }
-            });
-            handler.openIframe();
-            return;
-          } else {
-            alert('No client inline available.');
-            submitBtn.disabled=false; return;
-          }
-        } else {
-          submitBtn.disabled=false; return;
-        }
-      }
-
-      const initData = await res.json();
-      if (!initData || !initData.access_code) {
-        alert('Payment initialization failed. Check server logs.');
-        submitBtn.disabled=false; return;
-      }
-
-      // resume Paystack popup (Inline v2)
+    function buildMetaText(meta) {
+      const parts = [];
       try {
-        showToast('Opening payment window…');
-        const popup = new Paystack();
-        const tx = await popup.resumeTransaction(initData.access_code);
-        const reference = tx?.reference || initData.reference;
-        // verify with server
-        const vres = await fetch(`/api/pay/verify?reference=${encodeURIComponent(reference)}`);
-        if (!vres.ok) {
-          alert('Payment made but verification failed. Contact support.');
+        if (meta.addons && Array.isArray(meta.addons)) parts.push(meta.addons.map(a=>a.label || a.key).join(', '));
+        Object.keys(meta||{}).forEach(k => {
+          if (k==='addons') return;
+          const v = meta[k];
+          if (v && v.text) parts.push(String(v.text));
+        });
+      } catch(e){}
+      return parts.join(' • ');
+    }
+
+    // Totals: prefer computeCartTotals() if available else compute from window.cart or fallback DOM
+    function getTotals() {
+      if (typeof computeCartTotals === 'function') return computeCartTotals();
+      const cartObj = window.cart || {};
+      let subtotal = 0, promo=0;
+      const lines = Object.values(cartObj).length ? Object.values(cartObj) : extractCartFromDom();
+      lines.forEach(l => subtotal += (Number(l.unitPrice)||0) * (Number(l.qty)||1));
+      // basic promo detection (if global logic exists it will be used earlier)
+      // delivery will be computed separately
+      return { subtotal, delivery: 0, promoDiscount: promo, total: subtotal - promo };
+    }
+
+    function refreshTotals() {
+      const totals = getTotals();
+      cfSubtotal.innerText = fmtGhc(totals.subtotal || 0);
+      // compute delivery: only if delivery selected and we have coords
+      const type = inpType.value;
+      let deliveryFee = 0;
+      if (type === 'delivery') {
+        const lat = parseFloat(inpLat.value), lon = parseFloat(inpLon.value);
+        if (!isNaN(lat) && !isNaN(lon)) deliveryFee = computeDeliveryFee(lat, lon);
+        else deliveryFee = DELIVERY_CONFIG.baseFee; // fallback
+      }
+      cfDelivery.innerText = fmtGhc(deliveryFee || 0);
+      cfPromo.innerText = `-GHC ${Math.round(totals.promoDiscount || 0)}`;
+      const total = Math.max(0, (totals.subtotal || 0) - (totals.promoDiscount || 0) + (deliveryFee || 0));
+      cfTotal.innerText = fmtGhc(total);
+    }
+
+    // compute delivery fee using haversine distance
+    function computeDeliveryFee(lat, lon) {
+      if (typeof lat !== 'number' || typeof lon !== 'number' || isNaN(lat) || isNaN(lon)) return DELIVERY_CONFIG.baseFee;
+      const dist = haversineKm(STORE_COORDS.lat, STORE_COORDS.lon, lat, lon);
+      if (dist <= DELIVERY_CONFIG.freeWithinKm) return 0;
+      let fee = DELIVERY_CONFIG.baseFee + (dist * DELIVERY_CONFIG.perKm);
+      fee = Math.max(fee, DELIVERY_CONFIG.minFee);
+      fee = Math.min(fee, DELIVERY_CONFIG.maxFee);
+      return Math.round(fee);
+    }
+
+    // Haversine formula
+    function haversineKm(lat1, lon1, lat2, lon2) {
+      const R = 6371; // km
+      const dLat = toRad(lat2 - lat1);
+      const dLon = toRad(lon2 - lon1);
+      const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon/2) * Math.sin(dLon/2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+      return R * c;
+    }
+    function toRad(v){ return v * Math.PI / 180; }
+
+    // Address click opens existing map modal (your code already links #cf-address -> #map-modal)
+    inpAddress && inpAddress.addEventListener('click', (e) => {
+      e.preventDefault();
+      // open map modal (existing map modal code will set aria-hidden false etc.)
+      const mapModal = document.getElementById('map-modal');
+      if (mapModal) {
+        mapModal.style.display = 'flex';
+        mapModal.setAttribute('aria-hidden','false');
+        document.body.style.overflow = 'hidden';
+        try { if (window.map) setTimeout(()=> window.map.invalidateSize(), 120); } catch(e){}
+      } else {
+        alert('Map picker not found.');
+      }
+    });
+
+    // When map selection happens, your existing map-confirm logic already writes cf-address/cf-lat/cf-lon.
+    // We just add a MutationObserver or poll to react to changes and update totals.
+    const latEl = inpLat, lonEl = inpLon;
+    if (latEl && lonEl) {
+      const mo = new MutationObserver(() => { refreshTotals(); });
+      mo.observe(latEl, { attributes:true, childList:true, characterData:true, subtree:true });
+      mo.observe(lonEl, { attributes:true, childList:true, characterData:true, subtree:true });
+    }
+
+    // also refresh totals when order type changes or when cart changes
+    inpType && inpType.addEventListener('change', refreshTotals);
+    // attempt to watch cart totals element if present
+    const cartTotalEl = document.getElementById('cart-total');
+    if (cartTotalEl) {
+      const mo2 = new MutationObserver(() => { populateOrderLines(); refreshTotals(); });
+      mo2.observe(cartTotalEl, { childList:true, subtree:true, characterData:true });
+    } else {
+      // fallback: poll for cart changes
+      setInterval(()=> { populateOrderLines(); refreshTotals(); }, 1000);
+    }
+
+    // Submit handler: validate fields and assemble payload (same shape as previous modal-based flow)
+    submitBtn && submitBtn.addEventListener('click', async (ev) => {
+      ev.preventDefault();
+      submitBtn.disabled = true;
+
+      const name = (inpName.value || '').trim();
+      const phone = (inpPhone.value || '').trim();
+      const email = (inpEmail.value || '').trim();
+      const type = inpType.value;
+      const address = (inpAddress.value || '').trim();
+      const lat = inpLat.value || '';
+      const lon = inpLon.value || '';
+      const date = inpDate.value || '';
+      const time = inpTime.value || '';
+      const note = inpNote.value || '';
+      const paymethod = inpPayMethod.value || 'paystack';
+
+      if (!name || !phone || !email) {
+        alert('Please complete your name, phone and email.');
+        submitBtn.disabled = false; return;
+      }
+      if (type === 'delivery' && !address) {
+        alert('Please select your address on the map for delivery.');
+        submitBtn.disabled = false; return;
+      }
+
+      // build cart lines
+      const cartLines = Object.values(window.cart || {}).map(l => ({
+        baseId: l.baseId, title: l.title, unitPrice: l.unitPrice, qty: l.qty, meta: l.meta || {}
+      }));
+      if (!cartLines.length) {
+        alert('Your cart is empty. Add items before checkout.');
+        submitBtn.disabled = false; return;
+      }
+
+      const totals = getTotals();
+      const delivery = (type==='delivery') ? computeDeliveryFee(parseFloat(lat) || 0, parseFloat(lon) || 0) : 0;
+      const totalAmount = Math.round((totals.subtotal || 0) - (totals.promoDiscount || 0) + delivery);
+
+      // Save name/phone for convenience
+      try { localStorage.setItem('wrap_user_name', name); localStorage.setItem('wrap_user_phone', phone); } catch(e){}
+
+      if (paymethod === 'cash') {
+        // simple local "order placed" flow
+        const fakeOrder = { id: 'local-'+Date.now(), name, phone, email, type, address, lat, lon, date, time, note, cart: cartLines, totals:{ subtotal:totals.subtotal, delivery, promo:totals.promoDiscount, total: totalAmount } };
+        localStorage.setItem('wrap_last_order', JSON.stringify(fakeOrder));
+        alert('Order placed (Cash) — we will contact you.'); // replace with nice UI later
+        // clear cart if desired (depends on your UX)
+        try { window.cart = {}; if (typeof renderCart === 'function') renderCart(); } catch(e){}
+        closeCheckoutPage();
+        submitBtn.disabled = false;
+        return;
+      }
+
+      // paymethod === paystack -> call server init endpoint (same pattern as earlier)
+      try {
+        const payload = { name, phone, email, type, address, lat, lon, date, time, note, amount_pesewas: Math.round(totalAmount*100), currency:'GHS', cart: cartLines };
+        const res = await fetch('/api/pay/initialize', { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify(payload) });
+        if (!res.ok) {
+          const txt = await res.text().catch(()=>null); console.warn('init failed', res.status, txt);
+          alert('Payment initialization failed. Try again later.');
           submitBtn.disabled=false; return;
         }
-        const vdata = await vres.json();
-        const status = vdata?.data?.status || vdata?.status;
-        if (status === 'success') {
-          // Optionally send order fulfillment to server here (not implemented)
-          showToast('Payment confirmed — thank you!');
-          // clear cart
-          try { window.cart = {}; renderCart(); } catch(err){}
-          closeCheckoutFull();
+        const initData = await res.json();
+        if (!initData || !initData.access_code) { alert('Payment initialization failed.'); submitBtn.disabled=false; return; }
+
+        // resume Paystack inline
+        if (window.Paystack && typeof window.Paystack === 'function') {
+          const popup = new Paystack();
+          const tx = await popup.resumeTransaction(initData.access_code);
+          const reference = tx?.reference || initData.reference;
+          // verify server-side
+          const vres = await fetch(`/api/pay/verify?reference=${encodeURIComponent(reference)}`);
+          if (!vres.ok) { alert('Payment made but verification failed.'); submitBtn.disabled=false; return; }
+          const vdata = await vres.json();
+          const status = vdata?.data?.status || vdata?.status;
+          if (status === 'success') {
+            alert('Payment confirmed — thank you!');
+            try { window.cart = {}; if (typeof renderCart === 'function') renderCart(); } catch(e){}
+            closeCheckoutPage();
+          } else {
+            alert('Payment not verified as successful.');
+          }
+        } else if (window.PaystackPop) {
+          // fallback older setup
+          const PUBLIC_KEY = initData.publicKey || initData.key || 'pk_live_replace';
+          const handler = window.PaystackPop.setup({
+            key: PUBLIC_KEY, email, amount: Math.round(totalAmount*100), currency: 'GHS', ref: initData.reference || ('ref'+Math.floor(Math.random()*1000000)),
+            callback: function(response){
+              alert('Payment complete: ' + response.reference);
+              try { window.cart = {}; if (typeof renderCart === 'function') renderCart(); } catch(e){}
+              closeCheckoutPage();
+            },
+            onClose: function(){ alert('Payment cancelled'); }
+          });
+          handler.openIframe();
         } else {
-          alert('Payment not verified as successful.');
+          alert('Payment library not available.');
         }
       } catch (err) {
-        console.error('Paystack error', err);
-        alert('Payment window error or cancelled.');
-      }
-    } catch (err) {
-      console.error('checkout submit error', err);
-      alert('Checkout failed: ' + (err.message || err));
-    } finally {
-      submitBtn.disabled = false;
-    }
+        console.error('checkout error', err);
+        alert('Checkout failed: ' + (err.message || err));
+      } finally { submitBtn.disabled = false; }
+    });
+
+    // small helpers
+    function fmtGhc(n){ return `GHC ${Number(n||0).toFixed(0)}`; }
+    function escapeHtml(s){ return String(s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+    // When the map modal sets cf-address/cf-lat/cf-lon, we react and refresh totals
+    // (your mapConfirm earlier already sets these inputs). We simply listen to changes
+    const addrObserver = new MutationObserver(() => { populateOrderLines(); refreshTotals(); });
+    if (inpAddress) addrObserver.observe(inpAddress, { childList:true, subtree:true, characterData:true, attributes:true });
+
+    // initial small sync
+    populateOrderLines();
+    refreshTotals();
   });
-
-  // little helper to keep totals updated in the right panel if cart changes
-  function refreshTotalsInModal() {
-    const totals = (typeof computeCartTotals === 'function') ? computeCartTotals() : { subtotal:0, delivery:0, promoDiscount:0, total:0 };
-    cfSubtotal.innerText = fmtGhc(totals.subtotal || 0);
-    cfDelivery.innerText = fmtGhc(totals.delivery || 0);
-    cfPromo.innerText = `-GHC ${Math.round(totals.promoDiscount || 0)}`;
-    cfTotal.innerText = fmtGhc(totals.total || 0);
-  }
-
-  // Keep modal totals in sync when cart changes
-  const cartTotalEl = document.getElementById('cart-total');
-  if (cartTotalEl) {
-    const mo = new MutationObserver(() => refreshTotalsInModal());
-    mo.observe(cartTotalEl, { childList:true, subtree:true, characterData:true });
-  }
-  // Also update when renderCart is called (wrap on window if available)
-  if (typeof window.renderCart === 'function') {
-    const originalRenderCart = window.renderCart;
-    window.renderCart = function(){
-      const r = originalRenderCart.apply(this, arguments);
-      try { refreshTotalsInModal(); } catch(e){}
-      return r;
-    };
-  }
-
-  // utility: escapeHtml used above
 })();
 </script>
 <script>
