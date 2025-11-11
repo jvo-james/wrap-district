@@ -3956,7 +3956,7 @@ a:focus, button:focus { outline: 3px solid rgba(255,204,51,0.10); outline-offset
          }
         } else if (window.PaystackPop) {
           // fallback older setup
-          const PUBLIC_KEY = initData.publicKey || initData.key || 'pk_live_replace';
+          const PUBLIC_KEY = initData.publicKey || initData.key || 'pk_test_297586e51710e83d3c159bfe71ff45c7e23411fa';
           const handler = window.PaystackPop.setup({
             key: PUBLIC_KEY, email, amount: Math.round(totalAmount*100), currency: 'GHS', ref: initData.reference || ('ref'+Math.floor(Math.random()*1000000)),
                       callback: async function(response){
