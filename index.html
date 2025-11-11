@@ -2413,7 +2413,347 @@ a:focus, button:focus { outline: 3px solid rgba(255,204,51,0.10); outline-offset
     </div>
   </div>
 </div>
+<!-- ========== PAYSTACK FRONTEND: Checkout modal, handlers, InlineJS ========== -->
+<!-- InlineJS CDN (Popup V2) - required for resumeTransaction() -->
+<script src="https://js.paystack.co/v2/inline.js"></script>
 
+<style>
+/* Small checkout modal styles (mobile-first) */
+#checkout-modal { display:none; position:fixed; inset:0; z-index:2500; background:rgba(0,0,0,0.6); align-items:center; justify-content:center; padding:12px; }
+#checkout-modal[aria-hidden="false"] { display:flex; }
+.checkout-inner { width:100%; max-width:520px; border-radius:12px; background:linear-gradient(180deg, #0b0b0b, #070707); border:1px solid rgba(255,255,255,0.04); box-shadow:0 30px 80px rgba(0,0,0,0.7); padding:16px; box-sizing:border-box; color:#FFF; }
+.checkout-header { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:10px; }
+.checkout-title { font-weight:900; color:var(--accent-2); margin:0; }
+.checkout-body { display:flex; flex-direction:column; gap:10px; }
+.input { width:100%; padding:10px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.04); background:transparent; color:#fff; font-weight:800; box-sizing:border-box; }
+.checkout-footer { display:flex; gap:8px; justify-content:space-between; align-items:center; margin-top:12px; }
+.btn.small { padding:10px 12px; border-radius:10px; min-width:120px; font-weight:900; cursor:pointer; }
+.btn.primary { background: linear-gradient(90deg,var(--accent-1,#ff6a00),var(--accent-2,#ffcc33)); color:#111; border:0; }
+.btn.ghost { background: rgba(255,255,255,0.03); color:var(--muted,#d7d7d7); border:1px solid rgba(255,255,255,0.04); }
+.toast.wrap-toast { position:fixed; left:50%; transform:translateX(-50%); bottom:18px; z-index:2600; background:rgba(0,0,0,0.8); color:#fff; padding:10px 14px; border-radius:999px; font-weight:800; display:none; }
+.toast.wrap-toast.show { display:block; animation: toast-in 320ms cubic-bezier(.2,.9,.3,1); }
+@keyframes toast-in { from { opacity:0; transform: translateX(-50%) translateY(8px); } to { opacity:1; transform: translateX(-50%) translateY(0); } }
+</style>
+
+<!-- Checkout Modal -->
+<div id="checkout-modal" aria-hidden="true" role="dialog" aria-label="Checkout">
+  <div class="checkout-inner" role="document">
+    <div class="checkout-header">
+      <h3 class="checkout-title"><i class="fa fa-credit-card"></i> Checkout</h3>
+      <button id="checkout-close" class="icon-btn" aria-label="Close checkout"><i class="fa fa-times"></i></button>
+    </div>
+
+    <div class="checkout-body">
+      <label class="small">Email (receipt)</label>
+      <input id="checkout-email" class="input" type="email" placeholder="you@example.com" required />
+
+      <label class="small">Phone (optional)</label>
+      <input id="checkout-phone" class="input" type="tel" placeholder="0550xxxxxx" />
+
+      <div id="checkout-summary" class="small muted">Preparing order summary…</div>
+    </div>
+
+    <div class="checkout-footer">
+      <div style="font-weight:900;">
+        <div class="small">Total</div>
+        <div id="checkout-total" style="font-weight:900; color:var(--accent-2)">GHC 0</div>
+      </div>
+
+      <div style="display:flex; gap:8px;">
+        <button id="checkout-pay" class="btn small primary"><i class="fa fa-credit-card"></i> Pay</button>
+        <button id="checkout-cancel" class="btn small ghost">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast wrap-toast" aria-hidden="true"></div>
+
+<script>
+/* Front-end Paystack integration (client-only code) */
+/* - Expects server endpoints:
+     POST /api/pay/initialize  (body: { email, phone, amount_pesewas, cart, ... }) -> returns { access_code, reference, authorization_url? }
+     GET  /api/pay/verify?reference=... -> returns paystack verification result (data.data.status === 'success')
+   - Fallback: client-only PaystackPop.setup for quick dev testing (not secure for production)
+   - Uses InlineJS Popup V2 resumeTransaction(access_code) when server returns access_code.
+   - NOTE: amounts must be checked/verified server-side in pesewas (subunit).
+     Official docs: initialize on server, resumeTransaction(access_code) on client, then verify server-side.  [oai_citation:3‡Paystack](https://paystack.com/docs/developer-tools/inlinejs/?utm_source=chatgpt.com)
+*/
+
+(function () {
+  // helpers
+  const q = (s, ctx=document) => ctx.querySelector(s);
+  const qa = (s, ctx=document) => Array.from((ctx||document).querySelectorAll(s));
+  const fmtGhc = n => `GHC ${Number(n || 0).toFixed(0)}`;
+  const toastEl = document.querySelector('.toast.wrap-toast');
+
+  function showToast(msg, ms=2400){
+    if (!toastEl) return;
+    toastEl.textContent = msg;
+    toastEl.classList.add('show');
+    setTimeout(()=> toastEl.classList.remove('show'), ms);
+  }
+
+  // elements
+  const checkoutModal = q('#checkout-modal');
+  const checkoutClose = q('#checkout-close');
+  const checkoutCancel = q('#checkout-cancel');
+  const checkoutPay = q('#checkout-pay');
+  const checkoutEmail = q('#checkout-email');
+  const checkoutPhone = q('#checkout-phone');
+  const checkoutSummary = q('#checkout-summary');
+  const checkoutTotal = q('#checkout-total');
+
+  // open/close modal
+  function openCheckoutModal() {
+    // populate summary + total from existing cart totals
+    try {
+      const totals = computeCartTotals ? computeCartTotals() : { total: 0, subtotal:0, delivery:0, promoDiscount:0 };
+      checkoutTotal.innerText = fmtGhc(totals.total || 0);
+      checkoutSummary.innerHTML = `Subtotal: ${fmtGhc(totals.subtotal || 0)} • Delivery: ${fmtGhc(totals.delivery || 0)}<br>Promo: -${fmtGhc(totals.promoDiscount || 0)}`;
+      // try autofill from localStorage
+      checkoutEmail.value = localStorage.getItem('wrap_checkout_email') || '';
+      checkoutPhone.value = localStorage.getItem('wrap_checkout_phone') || '';
+    } catch (err) { console.warn('openCheckoutModal: computeCartTotals missing or error', err); }
+
+    checkoutModal.style.display = 'flex';
+    checkoutModal.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+    setTimeout(()=> checkoutEmail.focus && checkoutEmail.focus(), 120);
+  }
+  function closeCheckoutModal() {
+    checkoutModal.style.display = 'none';
+    checkoutModal.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+  }
+
+  checkoutClose?.addEventListener('click', closeCheckoutModal);
+  checkoutCancel?.addEventListener('click', closeCheckoutModal);
+
+  // Attach to your existing Pay button: prefer to bind rather than replace functions
+  const checkoutBtn = q('#checkout-btn');
+  if (checkoutBtn) {
+    checkoutBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      openCheckoutModal();
+    });
+  } else {
+    // fallback: if button missing, expose window.openCheckoutModal
+    window.openCheckoutModal = openCheckoutModal;
+  }
+
+  // Main pay handler (on modal Pay)
+  checkoutPay.addEventListener('click', async function onPay(e) {
+    e.preventDefault();
+    checkoutPay.disabled = true;
+    checkoutPay.textContent = 'Processing…';
+
+    try {
+      // Basic validation
+      const email = (checkoutEmail.value || '').trim();
+      const phone = (checkoutPhone.value || '').trim();
+      if (!email) { alert('Please enter an email for the receipt.'); checkoutPay.disabled=false; checkoutPay.textContent='Pay'; checkoutEmail.focus(); return; }
+
+      // Save for convenience
+      try { localStorage.setItem('wrap_checkout_email', email); localStorage.setItem('wrap_checkout_phone', phone); } catch(err){}
+
+      // Get cart totals and lines
+      const totals = computeCartTotals ? computeCartTotals() : null;
+      if (!totals || typeof totals.total === 'undefined') {
+        showToast('Cannot read cart totals. Please try again.');
+        checkoutPay.disabled=false; checkoutPay.textContent='Pay';
+        return;
+      }
+      if (totals.total <= 0) {
+        alert('Your cart is empty or total is zero.');
+        checkoutPay.disabled=false; checkoutPay.textContent='Pay';
+        return;
+      }
+
+      // Build lightweight cart payload
+      const cartLines = Object.values(cart || {}).map(l => ({
+        baseId: l.baseId, title: l.title, unitPrice: l.unitPrice, qty: l.qty, meta: l.meta || {}
+      }));
+
+      // Prepare payload for server: amount in pesewas (subunit)
+      const payload = {
+        email,
+        phone,
+        amount_cedi: totals.total,                          // human-readable
+        amount_pesewas: Math.round((totals.total || 0) * 100), // subunit for Paystack
+        currency: 'GHS',
+        cart: cartLines
+      };
+
+      // Call server to initialize (recommended secure flow)
+      let initData = null;
+      try {
+        const res = await fetch('/api/pay/initialize', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        if (res.ok) {
+          initData = await res.json();
+        } else {
+          // server error / not found -> fall through to fallback client-only
+          console.warn('Pay init returned non-OK', res.status);
+        }
+      } catch (err) {
+        console.warn('Pay init request failed', err);
+      }
+
+      // If we got access_code from server, use Popup V2 resumeTransaction (preferred)
+      if (initData && initData.access_code) {
+        showToast('Opening secure Paystack checkout…');
+        // InlineJS Popup V2 usage (resumeTransaction)
+        try {
+          const popup = new Paystack(); // InlineJS exposes Paystack()
+          // resumeTransaction returns a Promise resolved with transaction details or rejects if closed/failed
+          const tx = await popup.resumeTransaction(initData.access_code);
+          // tx may include reference
+          const reference = tx?.reference || initData.reference;
+          // Verify server-side
+          const verifyResp = await fetch(`/api/pay/verify?reference=${encodeURIComponent(reference)}`);
+          if (!verifyResp.ok) {
+            showToast('Payment processed — verification failed. Check dashboard.');
+            console.warn('verify response not ok', verifyResp.status);
+          } else {
+            const verifyData = await verifyResp.json();
+            const status = verifyData?.data?.status || verifyData?.status || '';
+            if (status === 'success' || (verifyData?.data && verifyData.data.status === 'success')) {
+              showToast('Payment successful — thank you!');
+              // Clear cart client-side & update UI
+              try { cart = {}; renderCart(); } catch(e){ console.warn('clear cart error', e); }
+              closeCheckoutModal();
+            } else {
+              showToast('Payment not verified as successful. Please contact support.');
+              console.log('verifyData', verifyData);
+            }
+          }
+        } catch (err) {
+          console.error('Paystack popup error / cancelled', err);
+          showToast('Payment cancelled or failed.');
+        } finally {
+          checkoutPay.disabled=false; checkoutPay.textContent='Pay';
+        }
+        return;
+      }
+
+      // FALLBACK: if server not available, offer client-only Inline (dev only)
+      // NOTE: Client-only uses your PUBLIC key and is only for local testing. Do NOT use in production.
+      // Replace 'pk_test_xxx' with your Paystack PUBLIC test key if you want to test quickly.
+      const PUBLIC_KEY = 'pk_test_xxxxxxxxxxxxxxxxxxxxxxxxx'; // <-- replace for dev test if needed
+
+      if (!window.PaystackPop && !window.Paystack) {
+        // older CDN v1 support: PaystackPop
+        if (window.PaystackPop) {
+          // Use PaystackPop.setup (older inline)
+          const ref = 'ref-' + Math.floor(Math.random()*1000000);
+          const handler = window.PaystackPop.setup({
+            key: PUBLIC_KEY,
+            email: email,
+            amount: Math.round((totals.total||0) * 100),
+            currency: 'GHS',
+            ref,
+            callback: async function(response){
+              // verify with server if available
+              const reference = response.reference;
+              try {
+                const v = await fetch(`/api/pay/verify?reference=${encodeURIComponent(reference)}`);
+                if (v.ok) {
+                  const data = await v.json();
+                  if (data?.data?.status === 'success') {
+                    showToast('Payment successful — thank you!');
+                    cart = {}; renderCart();
+                    closeCheckoutModal();
+                  } else {
+                    showToast('Payment not verified. Check dashboard.');
+                  }
+                } else {
+                  showToast('Payment made — verification not available.');
+                }
+              } catch (err) {
+                showToast('Payment completed — verification failed (network).');
+              } finally {
+                checkoutPay.disabled=false; checkoutPay.textContent='Pay';
+              }
+            },
+            onClose: function() {
+              showToast('Payment cancelled.');
+              checkoutPay.disabled=false; checkoutPay.textContent='Pay';
+            }
+          });
+          handler.openIframe();
+          return;
+        }
+        // else cannot do client-only
+        alert('Payment initialization failed (no server and inline library not found).');
+        checkoutPay.disabled=false; checkoutPay.textContent='Pay';
+        return;
+      }
+
+      // If window.Paystack (v2 InlineJS) exists but no server init, we can kick off client-only newTransaction (only for dev)
+      if (window.Paystack) {
+        try {
+          const popup = new Paystack();
+          // newTransaction() accepts an object with key,email,amount (subunit)
+          const amountPesewas = Math.round((totals.total||0) * 100);
+          // If your InlineJS build supports newTransaction, use it — this is for local/dev only
+          if (typeof popup.newTransaction === 'function') {
+            const txn = await popup.newTransaction({ key: PUBLIC_KEY, email, amount: amountPesewas, currency: 'GHS' });
+            // txn may contain reference — verify with server if possible
+            const reference = txn?.reference;
+            if (reference) {
+              try {
+                const v = await fetch(`/api/pay/verify?reference=${encodeURIComponent(reference)}`);
+                if (v.ok) { const data = await v.json(); if (data?.data?.status === 'success') { showToast('Payment successful — thank you!'); cart={}; renderCart(); closeCheckoutModal(); } else showToast('Payment not verified.'); }
+              } catch(err) { showToast('Payment completed — verification failed.'); }
+            }
+            checkoutPay.disabled=false; checkoutPay.textContent='Pay';
+            return;
+          } else {
+            // fallback: no newTransaction support -> cannot continue
+            alert('Cannot complete client-only flow: inline library missing required method.');
+            checkoutPay.disabled=false; checkoutPay.textContent='Pay';
+            return;
+          }
+        } catch (err) {
+          console.error('client-only inline error', err);
+          showToast('Client-only payment failed.');
+          checkoutPay.disabled=false; checkoutPay.textContent='Pay';
+          return;
+        }
+      }
+
+    } catch (err) {
+      console.error('checkout error', err);
+      alert('Checkout error: ' + (err.message || err));
+      checkoutPay.disabled=false; checkoutPay.textContent='Pay';
+    }
+  });
+
+  // Also allow pressing Enter on email to start checkout
+  checkoutEmail && checkoutEmail.addEventListener('keydown', (e) => { if (e.key === 'Enter') checkoutPay.click(); });
+
+  // Close modal on Escape
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && checkoutModal.getAttribute('aria-hidden') === 'false') closeCheckoutModal(); });
+
+  // Keep modal summary updated when computeCartTotals changes (watching #cart-total as simpler approach)
+  const cartTotalEl = document.getElementById('cart-total');
+  if (cartTotalEl) {
+    const mo = new MutationObserver(() => {
+      try {
+        const text = cartTotalEl.innerText || 'GHC 0';
+        checkoutTotal.innerText = text;
+        checkoutSummary.innerText = checkoutSummary.innerText; // no-op (keeps UI)
+      } catch (err) {}
+    });
+    mo.observe(cartTotalEl, { childList:true, subtree:true, characterData:true });
+  }
+
+})();
+</script>
 <script>
 /* Product modal behavior (Task 2)
    - Opens when user clicks .item-thumb OR .item-title inside a .menu-item
