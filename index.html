@@ -5853,5 +5853,56 @@ body.cart-open::before {
   });
 })();
 </script>
+  <script>
+document.addEventListener('DOMContentLoaded', function () {
+  // Robust cart open/close helper (safe to paste as a hotfix)
+  const cartDrawer = document.getElementById('cart-drawer');
+  const cartToggle = document.getElementById('cart-toggle');
+  const cartClose = document.getElementById('cart-close');
+
+  function openCart() {
+    if (!cartDrawer) return;
+    try {
+      cartDrawer.style.display = 'block';
+      cartDrawer.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+      cartClose && cartClose.focus();
+    } catch (e) { console.error('openCart failed', e); }
+  }
+
+  function closeCart() {
+    if (!cartDrawer) return;
+    try {
+      cartDrawer.style.display = 'none';
+      cartDrawer.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+      cartToggle && cartToggle.focus();
+    } catch (e) { console.error('closeCart failed', e); }
+  }
+
+  if (cartToggle) {
+    // use capture=false to avoid interfering with other capture handlers
+    cartToggle.addEventListener('click', function (ev) {
+      ev.preventDefault();
+      ev.stopPropagation();
+      openCart();
+    }, { passive: false });
+    cartToggle.addEventListener('keydown', function (ev) {
+      if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); openCart(); }
+    });
+  }
+
+  if (cartClose) {
+    cartClose.addEventListener('click', function (ev) {
+      ev.preventDefault();
+      closeCart();
+    });
+  }
+
+  // expose globally in case other code wants to call it
+  window.openCartDrawer = openCart;
+  window.closeCartDrawer = closeCart;
+});
+</script>
 </html>
   
