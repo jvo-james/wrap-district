@@ -2685,7 +2685,79 @@ a:focus, button:focus { outline: 3px solid rgba(255,204,51,0.10); outline-offset
   });
 })();
 </script>
-  
+  <style>
+/* Checkout page (in-file, not a modal) — REPLACED: ensures it sits below the header and is scrollable on mobile */
+#checkout-page {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 3200;
+  background: linear-gradient(180deg, rgba(0,0,0,0.6), rgba(0,0,0,0.6));
+  /* place checkout below the fixed header so it doesn't get overlapped by browser UI */
+  align-items: flex-start;
+  justify-content: center;
+  padding: 12px;
+  box-sizing: border-box;
+  /* allow the page container itself to scroll if content taller than viewport */
+  overflow: auto;
+}
+#checkout-page[aria-hidden="false"] { display: flex; }
+
+/* keep the inner dialog visually below the header and inside safe area */
+#checkout-inner {
+  width: 100%;
+  max-width: 920px;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 40px 120px rgba(0,0,0,0.7);
+  background: linear-gradient(180deg,#080808,#050505);
+  color: #fff;
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  gap: 0;
+  /* push the dialog down so it appears like a page below your header + safe-area */
+  margin-top: calc(56px + var(--safe-top, 12px) + 12px);
+  /* keep the dialog height bounded so inner columns can scroll independently */
+  max-height: calc(100vh - (56px + var(--safe-top,12px) + 48px));
+}
+@media (max-width: 900px) { #checkout-inner { grid-template-columns: 1fr; } }
+
+/* left and right columns should scroll individually */
+.checkout-left {
+  padding: 16px 18px;
+  max-height: 100%;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.checkout-right {
+  padding: 16px 18px;
+  border-left: 1px solid rgba(255,255,255,0.03);
+  background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.00));
+  overflow: auto;
+  max-height: 100%;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* small banner to highlight delivery-not-included message (style used by script) */
+#checkout-delivery-note {
+  display: block;
+  margin-top: 8px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: linear-gradient(90deg, rgba(255,160,80,0.06), rgba(255,255,255,0.01));
+  border: 1px solid rgba(255,160,80,0.08);
+  color: rgba(255,255,255,0.9);
+  font-weight:800;
+  font-size:13px;
+}
+
+/* small responsive tweaks */
+@media (max-width:600px){
+  .checkout-right { padding-top:6px; }
+  .order-line img { width:56px; height:44px; }
+  .checkout-title { font-size:16px; }
+}
+</style>
   <style>
 /* header right area inside cart header */
 .cart-header .cart-header-right {
@@ -3121,7 +3193,119 @@ a:focus, button:focus { outline: 3px solid rgba(255,204,51,0.10); outline-offset
   .checkout-title { font-size:16px; }
 }
 </style>
+<script>
+// --- Checkout UX improvements (replace the previous map-click handler with this) ---
+(function(){
+  // Use the same STORE_COORDS and DELIVERY_CONFIG already defined in your checkout script
+  const STORE_LABEL = 'Devtraco, Tema Community 25';
+  // Grab the existing DOM refs used in your checkout script
+  const page = document.getElementById('checkout-page');
+  const inpType = document.getElementById('cf-type');
+  const inpAddress = document.getElementById('cf-address');
+  const inpLat = document.getElementById('cf-lat');
+  const inpLon = document.getElementById('cf-lon');
+  const cfDelivery = document.getElementById('cf-delivery');
+  const cfTotal = document.getElementById('cf-total');
+  const cfSubtotal = document.getElementById('cf-subtotal');
 
+  // Inject a clear delivery-notice if not already present
+  (function ensureDeliveryNote(){
+    const header = document.querySelector('.checkout-header');
+    if (!header) return;
+    if (!document.getElementById('checkout-delivery-note')) {
+      const note = document.createElement('div');
+      note.id = 'checkout-delivery-note';
+      note.innerHTML = '<strong>Important:</strong> The price shown at checkout <em>does NOT</em> include delivery fees. Delivery fee will be estimated and communicated after checkout based on your address.';
+      header.parentNode.insertBefore(note, header.nextSibling);
+    }
+  })();
+
+  // Toggle address input behavior depending on Order Type
+  function toggleAddressField() {
+    const type = (inpType && inpType.value) || 'delivery';
+    if (!inpAddress) return;
+    if (type === 'delivery') {
+      // allow user to type their address manually for delivery
+      inpAddress.removeAttribute('readonly');
+      // if the input currently contains the store address placeholder, clear it for user to type
+      if ((inpAddress.value || '').trim() === STORE_LABEL) inpAddress.value = '';
+      // clear any stored lat/lon (user should optionally provide if available)
+      // Keep existing lat/lon if user previously selected
+      // visually hint the input
+      inpAddress.placeholder = 'Enter your delivery address (e.g., House #, Street, Landmark)';
+    } else {
+      // Pickup: lock address field to store address and set coords
+      inpAddress.value = STORE_LABEL;
+      inpAddress.setAttribute('readonly', 'true');
+      // write store coords so delivery calc sees store coordinates
+      if (typeof STORE_COORDS !== 'undefined') {
+        if (inpLat) inpLat.value = String(STORE_COORDS.lat || '');
+        if (inpLon) inpLon.value = String(STORE_COORDS.lon || '');
+      }
+      inpAddress.placeholder = 'Pickup location (store address)';
+    }
+    // After toggling, refresh totals so Delivery line updates accordingly
+    try { refreshTotals && refreshTotals(); } catch(e){}
+  }
+
+  // Wire change event on order type select to toggle address behavior
+  if (inpType) {
+    inpType.addEventListener('change', () => {
+      toggleAddressField();
+    });
+  }
+
+  // On page open ensure correct mode
+  try { toggleAddressField(); } catch(e){}
+
+  // Replace address click handler: do NOT open map modal automatically.
+  // Users will type their address in the address field when delivery is selected.
+  if (inpAddress) {
+    inpAddress.addEventListener('click', (e) => {
+      // if pickup selected, do nothing (address is store address & readonly)
+      const type = (inpType && inpType.value) || 'delivery';
+      if (type === 'pickup') {
+        // keep focus but don't open any map
+        return;
+      }
+      // for delivery: allow typing. (If you still want an optional "Use map" button later you can add it)
+      inpAddress.removeAttribute('readonly');
+      // focus so user can type immediately
+      setTimeout(()=> inpAddress.focus(), 60);
+    });
+  }
+
+  // Ensure refreshTotals recalculates delivery only when type is delivery and address is present
+  // (your existing computeDeliveryFee/refreshTotals already handles lat/lon; we simply ensure it runs on address edits)
+  if (inpAddress) {
+    inpAddress.addEventListener('input', () => {
+      // Clear lat/lon if user types a new free-text address (unless you implement geocoding later)
+      if (inpLat) inpLat.value = '';
+      if (inpLon) inpLon.value = '';
+      try { refreshTotals && refreshTotals(); } catch(e){}
+    });
+  }
+
+  // When checkout opens make sure it's positioned under the header (safety) and focus first field
+  (function ensureOpenPositioning(){
+    const origOpen = openCheckoutPage;
+    // If openCheckoutPage exists, wrap it to add a scrollIntoView to ensure top visible
+    if (typeof openCheckoutPage === 'function') {
+      window.openCheckoutPage = function() {
+        origOpen.apply(this, arguments);
+        try {
+          // ensure the checkout dialog is visually scrolled into view (below header)
+          const inner = document.getElementById('checkout-inner');
+          if (inner) inner.scrollIntoView({ behavior: 'auto', block: 'start' });
+        } catch(e){}
+      };
+    }
+  })();
+
+  // Run once to set initial UI correctly
+  try { toggleAddressField(); } catch(e){}
+})();
+</script>
 <section id="checkout-page" aria-hidden="true" role="dialog" aria-label="Checkout page">
   <div id="checkout-inner" role="document">
     <div class="checkout-left">
@@ -3231,6 +3415,208 @@ a:focus, button:focus { outline: 3px solid rgba(255,204,51,0.10); outline-offset
     </aside>
   </div>
 </section>
+  <!-- ========== ORDER CONFIRMATION MODAL (shows after successful payment + reload) ========= -->
+<style>
+/* Confirmation modal styles */
+#order-confirmation-modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 8000;
+  background: rgba(0,0,0,0.6);
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+  box-sizing: border-box;
+}
+#order-confirmation-modal[aria-hidden="false"] { display:flex; }
+
+.oc-inner {
+  width: 100%;
+  max-width: 720px;
+  border-radius: 12px;
+  background: linear-gradient(180deg,#0b0b0b,#060606);
+  color: #fff;
+  box-shadow: 0 40px 120px rgba(0,0,0,0.7);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px;
+}
+.oc-header { display:flex; gap:12px; align-items:center; justify-content:space-between; }
+.oc-title { font-size:18px; font-weight:900; color: var(--accent-2, #FFD166); margin:0; }
+.oc-body { display:flex; gap:12px; flex-direction:column; max-height: 60vh; overflow:auto; padding:6px 0; }
+.oc-grid { display:grid; grid-template-columns: 1fr 160px; gap:12px; align-items:start; }
+.oc-lines { border-top:1px dashed rgba(255,255,255,0.04); padding-top:8px; }
+.oc-line { display:flex; justify-content:space-between; gap:8px; padding:6px 0; border-bottom:1px solid rgba(255,255,255,0.02); }
+.oc-total { font-weight:900; color: var(--accent-2, #FFD166); font-size:18px; }
+.oc-actions { display:flex; gap:8px; justify-content:flex-end; margin-top:12px; }
+.btn.print { padding:10px 12px; border-radius:10px; font-weight:900; background: linear-gradient(90deg, var(--accent-1, #FF6A00), var(--accent-2, #FFD166)); color:#111; border:0; }
+.btn.ok { padding:10px 12px; border-radius:10px; font-weight:900; background: transparent; color: #fff; border: 1px solid rgba(255,255,255,0.06); }
+
+/* print-only styles: print only modal content */
+@media print {
+  body * { visibility: hidden; }
+  #order-confirmation-modal, #order-confirmation-modal * { visibility: visible; }
+  #order-confirmation-modal { position: static; background: #fff; }
+  .oc-inner { box-shadow: none; background: #fff; color: #000; }
+}
+</style>
+
+<div id="order-confirmation-modal" role="dialog" aria-hidden="true" aria-label="Order confirmation">
+  <div class="oc-inner" role="document">
+    <div class="oc-header">
+      <h3 class="oc-title"><i class="fa fa-check-circle"></i> Order Confirmed</h3>
+      <button id="oc-close" class="icon-btn" aria-label="Close confirmation"><i class="fa fa-times"></i></button>
+    </div>
+
+    <div class="oc-body">
+      <div id="oc-summary" class="oc-grid">
+        <div>
+          <div><strong>Reference:</strong> <span id="oc-ref">—</span></div>
+          <div><strong>Name:</strong> <span id="oc-name">—</span></div>
+          <div><strong>Phone:</strong> <span id="oc-phone">—</span></div>
+          <div><strong>Email:</strong> <span id="oc-email">—</span></div>
+          <div><strong>Order type:</strong> <span id="oc-type">—</span></div>
+          <div><strong>Address:</strong> <span id="oc-address">—</span></div>
+          <div><strong>Notes:</strong> <span id="oc-note">—</span></div>
+        </div>
+        <div style="text-align:right;">
+          <div class="small-muted">Placed at</div>
+          <div id="oc-ts" style="font-weight:800;margin-bottom:10px">—</div>
+          <div class="oc-total" id="oc-total">GHC 0</div>
+        </div>
+      </div>
+
+      <div class="oc-lines" id="oc-lines">
+        <!-- order lines inserted here -->
+      </div>
+
+      <div style="margin-top:8px" class="small-muted">
+        <p><strong>Important:</strong> Delivery fee is calculated separately and will be communicated after we confirm your exact location. The total shown at checkout did <em>not</em> include delivery unless explicitly shown as added.</p>
+        <p>Please keep this reference for inquiries. We will contact you (phone/SMS/WhatsApp) with an estimated delivery fee and ETA.</p>
+      </div>
+    </div>
+
+    <div class="oc-actions">
+      <button id="oc-print" class="btn print"><i class="fa fa-file-pdf"></i> Save as PDF</button>
+      <button id="oc-ok" class="btn ok">Okay</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ORDER CONFIRMATION modal behaviour:
+   - On load, if localStorage.wrap_show_confirmation === '1', read wrap_last_order and show modal.
+   - Save as PDF -> window.print()
+   - Okay -> clear cart and confirmation data, reload to original page (cart empty).
+*/
+(function(){
+  document.addEventListener('DOMContentLoaded', () => {
+    const modal = document.getElementById('order-confirmation-modal');
+    const ocRef = document.getElementById('oc-ref');
+    const ocName = document.getElementById('oc-name');
+    const ocPhone = document.getElementById('oc-phone');
+    const ocEmail = document.getElementById('oc-email');
+    const ocType = document.getElementById('oc-type');
+    const ocAddress = document.getElementById('oc-address');
+    const ocNote = document.getElementById('oc-note');
+    const ocTs = document.getElementById('oc-ts');
+    const ocLines = document.getElementById('oc-lines');
+    const ocTotal = document.getElementById('oc-total');
+    const btnPrint = document.getElementById('oc-print');
+    const btnOk = document.getElementById('oc-ok');
+    const btnClose = document.getElementById('oc-close');
+
+    function showModal(order) {
+      if (!order) return;
+      ocRef.innerText = order.reference || ('ref-'+Math.floor(Math.random()*1000000));
+      ocName.innerText = order.name || '-';
+      ocPhone.innerText = order.phone || '-';
+      ocEmail.innerText = order.email || '-';
+      ocType.innerText = order.type || '-';
+      ocAddress.innerText = order.address || '-';
+      ocNote.innerText = order.note || '-';
+      ocTs.innerText = new Date(order.ts || Date.now()).toLocaleString();
+      ocTotal.innerText = `GHC ${Number(order.totals?.total || order.totals?.total || 0).toFixed(0)}`;
+
+      // populate order lines
+      ocLines.innerHTML = '';
+      const lines = Array.isArray(order.cart) ? order.cart : [];
+      if (!lines.length) {
+        ocLines.innerHTML = '<div class="small-muted">No line items recorded.</div>';
+      } else {
+        lines.forEach(l => {
+          const div = document.createElement('div');
+          div.className = 'oc-line';
+          const title = document.createElement('div');
+          title.innerHTML = `<strong>${escapeHtml(l.title || 'Item')}</strong><div class="small-muted">${(l.meta && l.meta.addons) ? 'Extras: '+ l.meta.addons.map(a=>escapeHtml(a.label||a.key)).join(', ') : ''}</div>`;
+          const right = document.createElement('div');
+          right.style.textAlign = 'right';
+          right.innerHTML = `${Number(l.qty || 1)} × GHC ${Number(l.unitPrice||0).toFixed(0)}<div style="font-weight:900;margin-top:4px">${'GHC ' + (Number(l.unitPrice||0) * Number(l.qty||1)).toFixed(0)}</div>`;
+          div.appendChild(title);
+          div.appendChild(right);
+          ocLines.appendChild(div);
+        });
+      }
+
+      modal.setAttribute('aria-hidden','false');
+      modal.style.display = 'flex';
+      // prevent background scroll
+      document.body.style.overflow = 'hidden';
+    }
+
+    function hideModal() {
+      modal.setAttribute('aria-hidden','true');
+      modal.style.display = 'none';
+      document.body.style.overflow = '';
+    }
+
+    // Print — use window.print which will be constrained by the @media print CSS above
+    btnPrint && btnPrint.addEventListener('click', () => {
+      // small UX: hide the close/ok before print? print CSS already hides everything except modal
+      setTimeout(() => window.print(), 80);
+    });
+
+    // Okay -> clear stored confirmation + empty cart + reload original page
+    btnOk && btnOk.addEventListener('click', () => {
+      try {
+        // clear stored order flag & data
+        localStorage.removeItem('wrap_show_confirmation');
+        localStorage.removeItem('wrap_last_order');
+        // clear cart storage used by your persistent cart
+        localStorage.removeItem('wrap_cart_v2');
+        // also clear window.cart if present
+        try { window.cart = {}; if (typeof renderCart === 'function') renderCart(); } catch(e){}
+      } catch (e) { /* ignore */ }
+      hideModal();
+      // reload to original page (strip hash/qs)
+      window.location.href = window.location.pathname;
+    });
+
+    // close X (same as okay but keep data? user asked to refresh to original page on Okay — for close we'll just hide)
+    btnClose && btnClose.addEventListener('click', () => {
+      hideModal();
+      // DO NOT remove the stored confirmation so the user can re-open if they refresh — but you can change this behavior if desired
+    });
+
+    // show modal on page load if flag present
+    try {
+      const showFlag = localStorage.getItem('wrap_show_confirmation');
+      if (showFlag === '1') {
+        const raw = localStorage.getItem('wrap_last_order');
+        const order = raw ? JSON.parse(raw) : null;
+        // show after a small delay so page finishes rendering
+        setTimeout(() => showModal(order), 220);
+      }
+    } catch (e) { console.warn('order confirm show error', e); }
+
+    // small helper
+    function escapeHtml(s){ return String(s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  });
+})();
+</script>
 
 <script>
 /* Checkout page script (Task 3)
@@ -3574,6 +3960,30 @@ a:focus, button:focus { outline: 3px solid rgba(255,204,51,0.10); outline-offset
       } finally { submitBtn.disabled = false; }
     });
 
+    if (status === 'success') {
+  // Build a small order object to show in the confirmation modal after reload
+  const order = {
+    reference: reference || initData.reference || (vdata?.data?.reference),
+    name, phone, email, type, address, lat, lon, date, time, note,
+    cart: cartLines,
+    totals: { subtotal: totals.subtotal, delivery, promo: totals.promoDiscount, total: totalAmount },
+    ts: new Date().toISOString()
+  };
+
+  // persist for the post-reload confirmation modal
+  try {
+    localStorage.setItem('wrap_last_order', JSON.stringify(order));
+    localStorage.setItem('wrap_show_confirmation', '1');
+  } catch (e) { /* ignore storage errors */ }
+
+  // clear local cart then reload so the confirmation modal is shown on next load
+  try { window.cart = {}; if (typeof renderCart === 'function') renderCart(); } catch(e){}
+  // reload page so user sees a fresh page and the confirmation modal will then appear
+  window.location.reload();
+} else {
+  alert('Payment not verified as successful.');
+}
+    
     // small helpers
     function fmtGhc(n){ return `GHC ${Number(n||0).toFixed(0)}`; }
     function escapeHtml(s){ return String(s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
