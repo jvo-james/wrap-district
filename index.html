@@ -5897,5 +5897,108 @@ body.cart-open::before {
   });
 })();
 </script>
+
+  <script>
+/* Reliable cart open/close helper — paste near end of body */
+(function(){
+  document.addEventListener('DOMContentLoaded', () => {
+    const cartToggle = document.getElementById('cart-toggle');
+    const cartDrawer = document.getElementById('cart-drawer');
+    const cartClose = document.getElementById('cart-close');
+
+    if (!cartToggle || !cartDrawer) {
+      console.warn('Cart helper: #cart-toggle or #cart-drawer not found.');
+      return;
+    }
+
+    // Ensure initial ARIA state consistent
+    if (!cartDrawer.hasAttribute('aria-hidden')) cartDrawer.setAttribute('aria-hidden', 'true');
+    if (cartDrawer.getAttribute('aria-hidden') === 'true') cartDrawer.style.display = 'none';
+
+    // Small helper to force repaint so CSS transition runs reliably
+    function showDrawer() {
+      try {
+        cartDrawer.style.display = 'block';
+        // force reflow before changing aria so transition applies
+        // eslint-disable-next-line no-unused-expressions
+        cartDrawer.offsetHeight;
+        cartDrawer.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+        // update any visible counters / focus
+        const focusTarget = cartDrawer.querySelector('.cart-body') || cartDrawer;
+        setTimeout(() => { try { focusTarget && focusTarget.focus && focusTarget.focus(); } catch(e){} }, 120);
+        console.log('Cart helper: opened cart drawer');
+      } catch (err) {
+        console.error('Cart helper: showDrawer error', err);
+      }
+    }
+
+    function hideDrawer() {
+      try {
+        cartDrawer.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+        // leave visible until transition ends to avoid a flash; then hide after transition duration (match your CSS 420ms)
+        setTimeout(() => {
+          if (cartDrawer.getAttribute('aria-hidden') === 'true') cartDrawer.style.display = 'none';
+        }, 460);
+        console.log('Cart helper: closed cart drawer');
+      } catch (err) {
+        console.error('Cart helper: hideDrawer error', err);
+      }
+    }
+
+    // toggle function (exposed for other code if needed)
+    function toggleDrawer(e) {
+      if (e && e.preventDefault) e.preventDefault();
+      // If something else stoppedImmediatePropagation, we still run this because listener is not capture-phase.
+      const isOpen = cartDrawer.getAttribute('aria-hidden') === 'false';
+      if (isOpen) hideDrawer(); else showDrawer();
+    }
+
+    // Attach a direct click listener (non-capture) to the cart toggle to avoid interference with capture-phase interceptors
+    cartToggle.removeEventListener('click', toggleDrawer);
+    cartToggle.addEventListener('click', function(e){
+      // Log if some earlier handler called stopPropagation by checking defaultPrevented (best-effort)
+      if (e.defaultPrevented) {
+        console.warn('Cart helper: click default prevented on #cart-toggle — another handler may interfere.');
+      }
+      toggleDrawer(e);
+    }, { passive: false });
+
+    // Close controls
+    if (cartClose) {
+      cartClose.removeEventListener('click', hideDrawer);
+      cartClose.addEventListener('click', (e) => { e.preventDefault(); hideDrawer(); });
+    }
+
+    // Click outside drawer closes it (click on overlay area)
+    cartDrawer.addEventListener('click', (ev) => {
+      if (ev.target === cartDrawer) hideDrawer();
+    });
+
+    // Close on Escape
+    document.addEventListener('keydown', (ev) => {
+      if (ev.key === 'Escape' && cartDrawer.getAttribute('aria-hidden') === 'false') {
+        hideDrawer();
+      }
+    });
+
+    // Expose for console debugging / other scripts
+    window.__wrap_cart_helpers = {
+      open: showDrawer,
+      close: hideDrawer,
+      toggle: toggleDrawer,
+      drawerEl: cartDrawer
+    };
+
+    // Quick sanity check: if cart-drawer has display:none !important OR a CSS rule preventing it,
+    // print guidance to console to help debugging.
+    const style = window.getComputedStyle(cartDrawer);
+    if (style.display === 'none' && cartDrawer.getAttribute('aria-hidden') === 'true') {
+      console.info('Cart helper: drawer initially hidden (aria-hidden=true). Use `__wrap_cart_helpers.open()` in console to test opening.');
+    }
+  });
+})();
+</script>
 </html>
   
