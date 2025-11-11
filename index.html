@@ -5814,5 +5814,202 @@ body.cart-open::before {
   });
 })();
 </script>
+  <script>
+(function(){
+  document.addEventListener('DOMContentLoaded', () => {
+    const cartToggle = document.getElementById('cart-toggle');
+    const cartDrawer = document.getElementById('cart-drawer');
+    const cartClose = document.getElementById('cart-close');
+    const opener = cartToggle || document.querySelector('[data-open-cart]');
+
+    function focusFirstInDrawer() {
+      if (!cartDrawer) return;
+      const focusable = cartDrawer.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+      if (focusable) focusable.focus();
+    }
+
+    function openCart() {
+      if (!cartDrawer) return;
+      cartDrawer.style.display = 'block';
+      // ensure no aria-hidden violation: blur any focused element that is inside the drawer before hiding it
+      setTimeout(()=> { 
+        cartDrawer.setAttribute('aria-hidden','false'); 
+        focusFirstInDrawer();
+        document.body.style.overflow = 'hidden';
+      }, 10);
+    }
+
+    function closeCart() {
+      if (!cartDrawer) return;
+      cartDrawer.setAttribute('aria-hidden','true');
+      cartDrawer.style.transform = 'translateX(110%)';
+      cartDrawer.style.opacity = '0';
+      setTimeout(()=> {
+        cartDrawer.style.display = 'none';
+        document.body.style.overflow = '';
+        if (opener) opener.focus();
+      }, 420);
+    }
+
+    if (cartToggle) cartToggle.addEventListener('click', (ev) => {
+      ev.preventDefault();
+      // If ensureOpenPositioning tries to call openCheckoutPage too early, delay briefly
+      if (typeof window.openCheckoutPage !== 'function') {
+        // short delay to allow other script to initialise (quick test)
+        const waiter = setTimeout(()=> { try { openCart(); } catch(e){} }, 150);
+        return;
+      }
+      openCart();
+    });
+
+    if (cartClose) cartClose.addEventListener('click', closeCart);
+
+    document.addEventListener('keydown', (ev)=>{
+      if (ev.key === 'Escape') closeCart();
+    });
+  });
+})();
+</script>
+
+  <script>
+(function(){
+  // Robust helper to wait / patch global functions that may be defined later
+  function whenDefined(propName, cb, interval = 50, timeout = 5000) {
+    const start = Date.now();
+    const id = setInterval(()=>{
+      if (typeof window[propName] !== 'undefined') {
+        clearInterval(id);
+        cb(window[propName]);
+      } else if (Date.now() - start > timeout) {
+        clearInterval(id);
+        cb(undefined, new Error(propName + ' not defined within timeout'));
+      }
+    }, interval);
+  }
+
+  /* ---------- Patch ensureOpenPositioning to avoid calling openCheckoutPage early ---------- */
+  (function patchEnsureOpenPositioning(){
+    // If ensureOpenPositioning already exists, wrap it. Otherwise wait for it to be defined then wrap.
+    function wrap(originalFn){
+      if (!originalFn || typeof originalFn !== 'function') return;
+      const wrapped = function(...args){
+        // If openCheckoutPage is not ready, wait briefly and then call (queue)
+        if (typeof window.openCheckoutPage !== 'function') {
+          console.warn('ensureOpenPositioning detected before openCheckoutPage initialised — delaying call');
+          const waiter = setInterval(()=>{
+            if (typeof window.openCheckoutPage === 'function') {
+              clearInterval(waiter);
+              try { originalFn.apply(this,args); } catch(e){ console.error(e); }
+            }
+          }, 60);
+          // give up after a while so page doesn't hang forever
+          setTimeout(()=> clearInterval(waiter), 6000);
+          return;
+        }
+        return originalFn.apply(this,args);
+      };
+      // replace global fn
+      try { window.ensureOpenPositioning = wrapped; } catch(e){ console.warn('Could not override ensureOpenPositioning', e); }
+    }
+
+    if (typeof window.ensureOpenPositioning === 'function') {
+      wrap(window.ensureOpenPositioning);
+    } else {
+      // wait for it to appear and then wrap
+      whenDefined('ensureOpenPositioning', (fn, err) => { if (fn) wrap(fn); });
+    }
+  })();
+
+  /* ---------- Queue/defer openCheckoutPage calls until a real implementation appears ---------- */
+  (function queueOpenCheckoutPage(){
+    if (typeof window.openCheckoutPage === 'function') return; // nothing to do if already exists
+
+    const queued = [];
+    // temporary stub that collects calls
+    window.openCheckoutPage = function(...args){
+      queued.push(args);
+      console.warn('openCheckoutPage called before definition — queued');
+    };
+
+    // watch for definition: if someone overwrites openCheckoutPage with a real function later, detect and flush
+    const checkInterval = setInterval(()=>{
+      // real function must be a different function than our stub (we can't reliably compare, so we check if the stub was replaced)
+      if (typeof window.openCheckoutPage === 'function' && window.openCheckoutPage.toString().indexOf('queued') === -1) {
+        // Found a replacement — flush queued calls
+        const real = window.openCheckoutPage;
+        clearInterval(checkInterval);
+        setTimeout(()=> {
+          try { queued.forEach(args => real.apply(window, args)); } catch(e){ console.error('Error flushing queued openCheckoutPage calls', e); }
+        }, 10);
+      }
+    }, 60);
+    // stop polling after a long timeout
+    setTimeout(()=> clearInterval(checkInterval), 10000);
+  })();
+
+  /* ---------- Cart open/close with correct focus management (prevents aria-hidden focus block) ---------- */
+  (function cartUI(){
+    document.addEventListener('DOMContentLoaded', () => {
+      const cartToggle = document.getElementById('cart-toggle') || document.querySelector('[data-open-cart]');
+      const cartDrawer = document.getElementById('cart-drawer') || document.querySelector('.cart-drawer');
+      const cartClose = document.getElementById('cart-close') || (cartDrawer && cartDrawer.querySelector('[data-close-cart], .cart-close'));
+
+      if (!cartDrawer || !cartToggle) return;
+
+      // helpers
+      function firstFocusable(container){
+        return container.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+      }
+
+      function openCart() {
+        // show drawer before moving focus to avoid aria-hidden violation
+        cartDrawer.style.display = 'block';
+        // small delay to ensure display applied
+        setTimeout(()=> {
+          cartDrawer.setAttribute('aria-hidden', 'false');
+          // move focus into drawer
+          const f = firstFocusable(cartDrawer);
+          if (f) f.focus();
+          document.body.style.overflow = 'hidden';
+        }, 8);
+      }
+
+      function closeCart() {
+        // move focus out of drawer before hiding to avoid "descendant retained focus" error
+        if (cartToggle) cartToggle.focus();
+        cartDrawer.setAttribute('aria-hidden', 'true');
+        // allow CSS transition to hide visually then remove from flow
+        setTimeout(()=> {
+          cartDrawer.style.display = 'none';
+          document.body.style.overflow = '';
+        }, 420);
+      }
+
+      cartToggle.addEventListener('click', (ev) => {
+        ev.preventDefault();
+        // If openCheckoutPage is required in ensureOpenPositioning, we patched it to wait.
+        // Here we simply toggle the drawer safely.
+        const isOpen = cartDrawer.getAttribute('aria-hidden') === 'false';
+        if (isOpen) closeCart(); else openCart();
+      });
+
+      if (cartClose) cartClose.addEventListener('click', (ev)=> { ev.preventDefault(); closeCart(); });
+
+      document.addEventListener('keydown', (ev)=>{
+        if (ev.key === 'Escape' && cartDrawer.getAttribute('aria-hidden') === 'false') closeCart();
+      });
+
+      // Defensive: ensure aria-hidden and display state are consistent on load
+      setTimeout(()=> {
+        if (cartDrawer.style.display !== 'none' && cartDrawer.getAttribute('aria-hidden') !== 'false') {
+          cartDrawer.setAttribute('aria-hidden','false');
+        }
+      }, 50);
+    });
+  })();
+
+})();
+</script>
+
 </html>
   
