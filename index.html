@@ -1670,6 +1670,153 @@ a { color: var(--accent-2); text-decoration: none; }
 /* End of menu styles */
 </style>
   <style>
+    /* -------------------------
+   INPUT VISIBILITY FIX — paste after your other styles
+   Applies to #checkout-page (Complete Order) and menu controls (.select, .addon)
+   ------------------------- */
+
+:root{
+  /* fallback highlight when needed */
+  --input-bg: rgba(255,255,255,0.03);
+  --input-border: rgba(255,255,255,0.10);
+  --placeholder: rgba(255,255,255,0.72);
+  --input-focus: rgba(255,204,51,0.16);
+}
+
+/* Generic inputs / textareas used in checkout & preorders */
+#checkout-page .input,
+#preorder-modal .input,
+#checkout-full-modal .input,
+.input, input[type="text"], input[type="tel"], input[type="email"], textarea,
+.select {
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  /* slightly brighter so it sits above the page background */
+  border: 1px solid var(--input-border);
+  color: #fff !important;
+  padding: 10px 12px;
+  border-radius: 10px;
+  box-shadow: inset 0 2px 6px rgba(0,0,0,0.45);
+  -webkit-appearance: none;
+  appearance: none;
+  outline: none;
+}
+
+/* Ensure placeholder text is readable */
+input::placeholder, textarea::placeholder, .input::placeholder,
+.select::placeholder {
+  color: var(--placeholder) !important;
+  opacity: 1;
+}
+
+/* Stronger focus state for accessibility */
+#checkout-page .input:focus,
+#preorder-modal .input:focus,
+.input:focus,
+.select:focus,
+select:focus {
+  box-shadow: 0 6px 24px var(--input-focus), inset 0 2px 6px rgba(0,0,0,0.5);
+  border-color: rgba(255,204,51,0.22);
+  outline: none;
+  transform: translateZ(0);
+}
+
+/* Selects: show custom arrow and make the arrow visible on dark background */
+.select, select {
+  background-image:
+    linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.00)),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24'%3E%3Cpath fill='%23FFFFFF' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 14px;
+  padding-right: 38px; /* room for arrow */
+  cursor: pointer;
+}
+
+/* Make select text bold & clear */
+.select, select { font-weight:800; color:#fff; }
+
+/* Checkbox / addon styling — uses markup: <label class="addon"><input type="checkbox"/><span>Label</span></label> */
+.addon {
+  --box-size: 18px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.03);
+  background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.00));
+  color: rgba(255,255,255,0.92);
+  cursor: pointer;
+}
+
+/* Visually hide native checkbox but keep accessible — we style a clear square instead */
+.addon input[type="checkbox"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: var(--box-size);
+  height: var(--box-size);
+  min-width: var(--box-size);
+  display:inline-grid;
+  place-items: center;
+  border-radius: 6px;
+  border: 2px solid rgba(255,255,255,0.10);
+  background: rgba(255,255,255,0.02);
+  margin: 0;
+  transition: background 180ms ease, border-color 180ms ease, box-shadow 180ms ease, transform 120ms ease;
+}
+
+/* Unchecked: subtle contrast */
+.addon input[type="checkbox"] + span { position: relative; padding-left: 0; }
+
+/* Checked state: gradient + subtle checkmark */
+.addon input[type="checkbox"]:checked {
+  background: linear-gradient(90deg, var(--accent-1), var(--accent-2));
+  border-color: rgba(255,255,255,0.02);
+  box-shadow: 0 8px 24px rgba(255,106,0,0.12);
+  transform: translateY(-1px);
+}
+
+/* place a checkmark using adjacent span ::before for crisp vector-free rendering */
+.addon input[type="checkbox"]:checked + span::before {
+  content: '✔';
+  position: absolute;
+  left: -26px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 13px;
+  color: #111;
+  font-weight: 900;
+  line-height: 1;
+  /* give it a circle-like padding so it sits within the checkbox area visually */
+  width: var(--box-size);
+  height: var(--box-size);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ensure the text next to checkbox remains readable */
+.addon span { color: rgba(255,255,255,0.95); font-weight:800; }
+
+/* When the checkbox is focused via keyboard, show clear ring */
+.addon input[type="checkbox"]:focus {
+  outline: 3px solid rgba(255,204,51,0.14);
+  outline-offset: 2px;
+}
+
+/* Make radio / hidden inputs / small selects visible inside modal / checkout too */
+#checkout-page select, #checkout-page .input, #checkout-page textarea { color: #fff !important; }
+
+/* Print/Save as PDF hints:
+   - When printing we want input values to be visible (browser may hide backgrounds).
+   - This rule brightens inputs when printing.
+*/
+@media print {
+  input, textarea, select { background: #ffffff !important; color: #000 !important; -webkit-print-color-adjust: exact; }
+  .addon input[type="checkbox"] { background: #000 !important; color:#fff !important; }
+}
+  </style>
+  <style>
 /* =========================
    Wrap District — Remaining UI: Modals, Promo Details, Mobile Nav, Entry Modal,
    Contact/Footer, Global utilities and finishing touches.
@@ -3566,10 +3713,203 @@ a:focus, button:focus { outline: 3px solid rgba(255,204,51,0.10); outline-offset
     }
 
     // Print — use window.print which will be constrained by the @media print CSS above
-    btnPrint && btnPrint.addEventListener('click', () => {
-      // small UX: hide the close/ok before print? print CSS already hides everything except modal
-      setTimeout(() => window.print(), 80);
-    });
+    // Replace the existing btnPrint handler with this improved printable window generator
+btnPrint && btnPrint.addEventListener('click', () => {
+  try {
+    // Try to load the last order from localStorage (the confirmation modal uses this already)
+    const raw = localStorage.getItem('wrap_last_order');
+    const order = raw ? JSON.parse(raw) : null;
+
+    if (!order) {
+      alert('No order data available to print.');
+      return;
+    }
+
+    // Helper to escape HTML
+    const escapeHtml = (s) => String(s || '').replace(/&/g,'&amp;').replace(/"/g,'&quot;')
+      .replace(/'/g,'&#39;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+    // Build lines HTML; ensure we display all meta info (addons, size, protein, etc.)
+    const lines = Array.isArray(order.cart) ? order.cart : [];
+    let linesHtml = '';
+    let computedSubtotal = 0;
+    if (!lines.length) {
+      linesHtml = '<tr><td colspan="5" style="text-align:center;padding:12px 0;color:#666">No line items recorded.</td></tr>';
+    } else {
+      lines.forEach((l, idx) => {
+        const qty = Number(l.qty || 1);
+        const unit = Number(l.unitPrice || l.unit_price || 0);
+        const lineTotal = Math.round(qty * unit);
+        computedSubtotal += lineTotal;
+
+        // Build meta details string (extras, protein, size, any other keys)
+        const metaParts = [];
+        if (l.meta) {
+          try {
+            // addons (common structure)
+            if (Array.isArray(l.meta.addons) && l.meta.addons.length) {
+              metaParts.push('Extras: ' + l.meta.addons.map(a => escapeHtml(a.label || a.key || a)).join(', '));
+            }
+            // other keys
+            Object.keys(l.meta).forEach(k => {
+              if (k === 'addons') return;
+              const v = l.meta[k];
+              if (!v) return;
+              if (typeof v === 'object') {
+                if (v.text) metaParts.push(`${escapeHtml(k)}: ${escapeHtml(v.text)}`);
+                else if (v.label) metaParts.push(`${escapeHtml(k)}: ${escapeHtml(v.label)}`);
+                else {
+                  // stringify basic object
+                  metaParts.push(`${escapeHtml(k)}: ${escapeHtml(JSON.stringify(v))}`);
+                }
+              } else {
+                metaParts.push(`${escapeHtml(k)}: ${escapeHtml(String(v))}`);
+              }
+            });
+          } catch (e) { /* ignore meta parsing errors */ }
+        }
+        const metaHtml = metaParts.length ? `<div style="font-size:12px;color:#444;margin-top:6px;">${metaParts.join(' • ')}</div>` : '';
+
+        linesHtml += `
+          <tr>
+            <td style="padding:10px 8px; vertical-align:top; border-bottom:1px solid #eee;">
+              <strong>${escapeHtml(l.title || l.name || 'Item')}</strong>${metaHtml}
+            </td>
+            <td style="padding:10px 8px; vertical-align:top; border-bottom:1px solid #eee; text-align:center;">${qty}</td>
+            <td style="padding:10px 8px; vertical-align:top; border-bottom:1px solid #eee; text-align:right;">GHC ${Number(unit).toFixed(0)}</td>
+            <td style="padding:10px 8px; vertical-align:top; border-bottom:1px solid #eee; text-align:right;">GHC ${lineTotal.toFixed(0)}</td>
+          </tr>
+        `;
+      });
+    }
+
+    // Use totals from order.totals if present; otherwise fall back to computedSubtotal and order fields
+    const totals = order.totals || {};
+    const subtotal = (typeof totals.subtotal !== 'undefined') ? Number(totals.subtotal) : computedSubtotal;
+    const delivery = (typeof totals.delivery !== 'undefined') ? Number(totals.delivery || 0) : Number(totals.delivery || 0);
+    const promoDiscount = (typeof totals.promo !== 'undefined') ? Number(totals.promo || totals.promoDiscount || 0) : Number(totals.promoDiscount || 0);
+    const total = (typeof totals.total !== 'undefined') ? Number(totals.total) : Math.max(0, subtotal - (promoDiscount||0) + (delivery||0));
+
+    // Build printable HTML (minimal, stable layout)
+    const printable = `
+      <!doctype html>
+      <html>
+      <head>
+        <meta charset="utf-8" />
+        <title>Wrap District — Invoice ${escapeHtml(order.reference || '')}</title>
+        <style>
+          /* Page & printing */
+          @page { size: auto; margin: 12mm; }
+          html,body { margin:0; padding:0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial; color:#222; }
+          body { padding: 18px; background: #fff; -webkit-print-color-adjust: exact; }
+          .wrap-header { display:flex; align-items:center; gap:12px; }
+          .logo-mark { background: linear-gradient(135deg,#FF6A00,#ff8c2b); color:#111; padding:6px 10px; border-radius:8px; font-weight:900; letter-spacing:1px; }
+          .brand { margin-left:6px; }
+          .brand h1 { margin:0; font-size:20px; }
+          .brand p { margin:3px 0 0 0; font-size:12px; color:#444; }
+          .meta { margin-top:14px; display:flex; justify-content:space-between; gap:12px; align-items:flex-start; }
+          .meta .left, .meta .right { width:48%; }
+          .box { border:1px solid #eee; padding:12px; border-radius:8px; background:#fafafa; }
+          table { width:100%; border-collapse:collapse; margin-top:12px; }
+          th { text-align:left; padding:10px 8px; font-size:13px; color:#333; border-bottom:2px solid #eee; }
+          td { padding:8px; font-size:13px; vertical-align:top; }
+          .totals { margin-top:12px; width:100%; max-width:420px; margin-left:auto; border-top:1px dashed #ddd; padding-top:10px; }
+          .totals .row { display:flex; justify-content:space-between; padding:6px 0; color:#222; }
+          .small { font-size:12px; color:#666; }
+          .note { margin-top:14px; font-size:12px; color:#666; }
+          /* prevent page breaks inside important sections */
+          .box, table, .totals { page-break-inside: avoid; }
+          /* ensure single page layout (avoid unexpected blank pages) */
+          html, body { height: auto !important; }
+        </style>
+      </head>
+      <body>
+        <div class="wrap-header">
+          <div class="logo-mark">WRAP</div>
+          <div class="brand">
+            <h1>Wrap District</h1>
+            <p class="small">Fresh • Hot • Fast — Tema Community 25</p>
+            <p class="small">Phone: 0552509241 • Location: Devtraco, Tema</p>
+          </div>
+        </div>
+
+        <div class="meta">
+          <div class="left box">
+            <div><strong>Customer</strong></div>
+            <div style="margin-top:6px"><strong>${escapeHtml(order.name || '—')}</strong></div>
+            <div class="small">${escapeHtml(order.phone || '—')} • ${escapeHtml(order.email || '')}</div>
+            <div style="margin-top:8px" class="small"><strong>Order type:</strong> ${escapeHtml(order.type || '—')}</div>
+            <div style="margin-top:4px" class="small"><strong>Address:</strong> ${escapeHtml(order.address || '—')}</div>
+            <div style="margin-top:4px" class="small"><strong>Notes:</strong> ${escapeHtml(order.note || '-')}</div>
+          </div>
+          <div class="right box">
+            <div><strong>Order</strong></div>
+            <div style="margin-top:6px"><strong>Reference:</strong> ${escapeHtml(order.reference || ('ref-'+(Date.now())))}</div>
+            <div class="small" style="margin-top:6px"><strong>Placed:</strong> ${escapeHtml(new Date(order.ts || Date.now()).toLocaleString())}</div>
+            <div class="small" style="margin-top:6px"><strong>Prepared for PDF:</strong> ${escapeHtml(new Date().toLocaleString())}</div>
+          </div>
+        </div>
+
+        <table aria-label="Order lines" style="margin-top:14px;">
+          <thead>
+            <tr>
+              <th style="width:60%">Item & options</th>
+              <th style="width:10%; text-align:center">Qty</th>
+              <th style="width:15%; text-align:right">Unit</th>
+              <th style="width:15%; text-align:right">Line</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${linesHtml}
+          </tbody>
+        </table>
+
+        <div class="totals" role="complementary" aria-label="Totals summary">
+          <div class="row"><div class="small">Subtotal</div><div class="small">GHC ${Number(subtotal).toFixed(0)}</div></div>
+          <div class="row"><div class="small">Delivery</div><div class="small">GHC ${Number(delivery || 0).toFixed(0)}</div></div>
+          <div class="row"><div class="small">Promo Discount</div><div class="small">-GHC ${Number(promoDiscount || 0).toFixed(0)}</div></div>
+          <div class="row" style="font-weight:900; font-size:16px;"><div>Total</div><div>GHC ${Number(total).toFixed(0)}</div></div>
+        </div>
+
+        <div class="note">
+          <div><strong>Contact:</strong> Wrap District • 0552509241 • Tema Community 25, Devtraco</div>
+          <div style="margin-top:6px"><strong>Note:</strong> Delivery fee may be confirmed separately. Keep this reference for inquiries.</div>
+        </div>
+      </body>
+      </html>
+    `;
+
+    // Open a focused new window with the invoice HTML, print, then close.
+    const w = window.open('', '_blank', 'toolbar=0,location=0,menubar=0,width=900,height=1100');
+    if (!w) {
+      // fallback: print current window (less ideal)
+      alert('Unable to open print window; your browser may be blocking popups. Please allow popups and try again.');
+      return;
+    }
+    w.document.open();
+    w.document.write(printable);
+    w.document.close();
+
+    // Wait for content to be rendered, then print and close
+    w.focus();
+    // Give the browser a short moment to layout
+    setTimeout(() => {
+      try {
+        w.print();
+      } catch (e) {
+        console.warn('Print failed in new window:', e);
+      }
+      // Close the print window shortly after print dialog invoked
+      setTimeout(() => {
+        try { w.close(); } catch (e) { /* ignore */ }
+      }, 800);
+    }, 350);
+
+  } catch (err) {
+    console.error('Print invoice error', err);
+    alert('Could not create invoice for printing. See console for details.');
+  }
+});
 
     // Okay -> clear stored confirmation + empty cart + reload original page
     btnOk && btnOk.addEventListener('click', () => {
@@ -3609,7 +3949,231 @@ a:focus, button:focus { outline: 3px solid rgba(255,204,51,0.10); outline-offset
   });
 })();
 </script>
+<script>
+(function(){
+  document.addEventListener('DOMContentLoaded', function(){
+    // 1) Soft-filter any alert/confirm that contains the ORDER SUMMARY text so it never blocks UX.
+    try {
+      const _alert = window.alert;
+      const _confirm = window.confirm;
+      window.alert = function(msg){
+        try {
+          if (typeof msg === 'string' && msg.includes('ORDER SUMMARY')) {
+            // swallow the noisy test/order-summary alert
+            console.info('Suppressed alert containing ORDER SUMMARY');
+            return;
+          }
+        } catch(e){}
+        return _alert.apply(window, arguments);
+      };
+      window.confirm = function(msg){
+        try {
+          if (typeof msg === 'string' && msg.includes('ORDER SUMMARY')) {
+            console.info('Suppressed confirm containing ORDER SUMMARY');
+            return true; // pretend user pressed OK if needed by legacy flows
+          }
+        } catch(e){}
+        return _confirm.apply(window, arguments);
+      };
+    } catch(e){ console.warn('Could not override alert/confirm', e); }
 
+    // 2) Intercept clicks on all checkout/pay triggers so any legacy alert-based flow can't fire.
+    const CHECKOUT_SELECTORS = [
+      '#checkout-btn',
+      '#cart-header-checkout',
+      '.cart-header .cart-header-checkout',
+      '[data-action="checkout"]',
+      '[data-action="pay"]',
+      '.cart-footer .btn.primary',
+      '#cart-toggle'
+    ];
+
+    function safeOpenCheckout() {
+      // Prefer the in-page checkout function(s) if present
+      if (typeof openCheckoutPage === 'function') { try { openCheckoutPage(); return; } catch(e){} }
+      if (typeof openCheckoutFull === 'function') { try { openCheckoutFull(); return; } catch(e){} }
+      // fallback: click the footer checkout if present
+      const footer = document.getElementById('checkout-btn');
+      if (footer) { try { footer.click(); return; } catch(e){} }
+      // last resort: open the cart drawer
+      const cart = document.getElementById('cart-drawer');
+      if (cart) { cart.style.display = 'block'; cart.setAttribute('aria-hidden','false'); document.body.style.overflow = 'hidden'; }
+    }
+
+    function attachInterceptor(el){
+      if (!el) return;
+      // clear inline onclick if present (helps some simple use-cases)
+      try { if (el.getAttribute && el.getAttribute('onclick')) el.removeAttribute('onclick'); } catch(e){}
+
+      // Add a capture-phase listener that prevents other click handlers from running on this element.
+      // We use capture + stopImmediatePropagation to be robust to duplicate handlers.
+      el.addEventListener('click', function(ev){
+        try {
+          ev.preventDefault();
+          // stop other handlers attached to this element from executing
+          ev.stopImmediatePropagation();
+        } catch(e){}
+        // Temporarily silence alerts/confirm used synchronously by other scripts
+        const oldAlert = window.alert;
+        const oldConfirm = window.confirm;
+        try {
+          window.alert = function(){};
+          window.confirm = function(){ return true; };
+          // Open the proper checkout UI
+          safeOpenCheckout();
+        } catch(e){ console.error(e); }
+        finally {
+          // restore original functions (rest of app behavior unchanged)
+          try { window.alert = oldAlert; window.confirm = oldConfirm; } catch(e){}
+        }
+      }, true); // capture = true
+    }
+
+    // Attach interceptors to all matching elements (existing + future)
+    function attachAllInterceptors() {
+      CHECKOUT_SELECTORS.forEach(sel => {
+        Array.from(document.querySelectorAll(sel)).forEach(el => attachInterceptor(el));
+      });
+    }
+    attachAllInterceptors();
+
+    // If checkout buttons are injected later, watch the body and attach interceptors for new nodes
+    const mo = new MutationObserver((mutations) => {
+      let found = false;
+      mutations.forEach(m => {
+        if (m.addedNodes && m.addedNodes.length) found = true;
+      });
+      if (found) attachAllInterceptors();
+    });
+    mo.observe(document.body, { childList: true, subtree: true });
+  });
+})();
+</script>
+  <!-- === REPLACE your existing checkout CSS with this block === -->
+<style>
+/* CHECKOUT PAGE — unified, mobile-friendly, scrollable under fixed header */
+#checkout-page {
+  display: none;
+  position: fixed;
+  inset: 0;                 /* fill viewport */
+  z-index: 3200;
+  background: linear-gradient(180deg, rgba(0,0,0,0.6), rgba(0,0,0,0.6));
+  /* place checkout below header and allow page-level scroll if content taller than viewport */
+  align-items: flex-start;                  /* ensures top-aligned so margin-top works predictably */
+  justify-content: center;
+  padding: 12px;
+  box-sizing: border-box;
+  overflow: auto;                           /* page can scroll if inner is taller than viewport */
+  -webkit-overflow-scrolling: touch;
+}
+
+/* show when opened */
+#checkout-page[aria-hidden="false"] { display: flex; }
+
+/* Inner dialog
+   - Use margin-top to sit under the sticky header safely
+   - Use max-height so inner columns can scroll independently
+*/
+#checkout-inner {
+  width: 100%;
+  max-width: 920px;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 40px 120px rgba(0,0,0,0.7);
+  background: linear-gradient(180deg,#080808,#050505);
+  color: #fff;
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  gap: 0;
+  margin: calc(56px + var(--safe-top,12px) + 12px) auto 24px; /* pushes it below fixed header */
+  max-height: calc(100vh - (56px + var(--safe-top,12px) + 48px)); /* keeps dialog within viewport */
+  box-sizing: border-box;
+}
+
+/* On narrow screens stack into single column */
+@media (max-width: 900px) {
+  #checkout-inner { grid-template-columns: 1fr; max-width: 680px; }
+}
+
+/* Left & right columns scroll independently */
+.checkout-left,
+.checkout-right {
+  padding: 16px 18px;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  max-height: calc(100%); /* ensures columns don't overflow the dialog */
+  box-sizing: border-box;
+}
+
+/* Right column: give it a visual top so "Your order" stays visible while lines scroll */
+.checkout-right {
+  border-left: 1px solid rgba(255,255,255,0.03);
+  background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.00));
+  position: relative;
+}
+
+/* Make the "Your order" heading sticky within the right column so the user always sees the header.
+   The order lines themselves scroll under it. This prevents the feeling that the section is "stuck". */
+.checkout-right > h4 {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  margin: 0 0 10px 0;
+  padding-top: 6px;
+  background: transparent; /* inherits dialog BG */
+  color: var(--accent-2);
+  font-weight: 900;
+}
+
+/* constrain the order lines area so it scrolls nicely */
+#cf-order-lines {
+  overflow: auto;
+  max-height: calc(100vh - (56px + var(--safe-top,12px) + 240px)); /* adapt so lines area remains scrollable */
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Make the checkout close button comfortable to tap */
+#checkout-close { background: transparent; border: 0; color: var(--muted); font-size: 18px; padding: 8px; cursor: pointer; }
+
+/* small responsive tweaks */
+@media (max-width: 600px) {
+  #checkout-inner { margin-top: calc(56px + var(--safe-top, 12px) + 6px); padding-bottom: 8px; }
+  .checkout-right { border-left: none; border-top: 1px solid rgba(255,255,255,0.03); }
+  .checkout-right > h4 { top: 0; }
+  #cf-order-lines { max-height: calc(60vh); }
+}
+</style>
+
+<!-- === Small JS helper: ensure the checkout dialog and its inner scroll positions reset when opened === -->
+<script>
+(function(){
+  // call this when opening the checkout page (we already wire a few openers in your scripts)
+  function resetCheckoutScroll() {
+    try {
+      const page = document.getElementById('checkout-page');
+      const inner = document.getElementById('checkout-inner');
+      const left = inner && inner.querySelector('.checkout-left');
+      const right = inner && inner.querySelector('.checkout-right');
+      const lines = document.getElementById('cf-order-lines');
+
+      if (page) { page.scrollTop = 0; }
+      if (inner) { inner.scrollTop = 0; }
+      if (left) { left.scrollTop = 0; }
+      if (right) { right.scrollTop = 0; }
+      if (lines) { lines.scrollTop = 0; }
+
+      // put focus on the first input so mobile keyboard appears predictably
+      const first = document.querySelector('#cf-name, #cf-phone, #cf-email');
+      if (first) setTimeout(()=> first.focus(), 120);
+    } catch(e){ /* ignore */ }
+  }
+
+  // Expose helper so existing openCheckoutPage() can call it
+  window.resetCheckoutScroll = resetCheckoutScroll;
+})();
+</script>
+  
+  
 <script>
 /* Checkout page script (Task 3)
    - Opens in-page checkout (#checkout-page)
