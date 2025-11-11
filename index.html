@@ -3629,7 +3629,7 @@ a:focus, button:focus { outline: 3px solid rgba(255,204,51,0.10); outline-offset
       maxFee: 60,        // maximum fee
       freeWithinKm: 0.8  // free delivery inside this radius (in km)
     };
-
+const PAYSTACK_PUBLIC_KEY = 'pk_test_297586e51710e83d3c159bfe71ff45c7e23411fa';
     // DOM
     const page = document.getElementById('checkout-page');
     const inner = document.getElementById('checkout-inner');
@@ -3911,85 +3911,71 @@ a:focus, button:focus { outline: 3px solid rgba(255,204,51,0.10); outline-offset
      }
 
       // paymethod === paystack -> call server init endpoint (same pattern as earlier)
-          try {
-       const payload = { name, phone, email, type, address, lat, lon, date, time, note, amount_pesewas: Math.round(totalAmount*100), currency:'GHS', cart: cartLines };
-        const res = await fetch('/api/pay/initialize', { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify(payload) });
-        if (!res.ok) {         const txt = await res.text().catch(()=>null);
-          console.warn('init failed', res.status, txt);
-                      alert('Payment initialization failed. Try again later.');
-         submitBtn.disabled = false; return;
-        }
-        const initData = await res.json();
-
-       // Expect the server to return at least one of:
-       // { publicKey, reference }  OR  { authorization_url }
-        // Preferred: { publicKey: 'pk_test_xxx', reference: '...', currency: 'GHS' }
-       if (!initData || (!initData.publicKey && !initData.authorization_url && !initData.reference)) {
-         console.warn('unexpected init response', initData);
-          alert('Payment initialization returned unexpected response. Check server logs.');
-          submitBtn.disabled = false; return;
-        }
-
-        // If Paystack inline is available, use it
-        if (window.PaystackPop && (initData.publicKey || initData.key)) {
-          const PUBLIC_KEY = initData.publicKey || initData.key;
-         const handler = window.PaystackPop.setup({
+    try {
+       // If user chose inline Paystack and a public key is provided:
+        if (paymethod === 'paystack' && PAYSTACK_PUBLIC_KEY && window.PaystackPop) {
+          const PUBLIC_KEY = PAYSTACK_PUBLIC_KEY;
+          const ref = 'PSK-' + Date.now() + '-' + Math.floor(Math.random()*10000);
+          const handler = window.PaystackPop.setup({
            key: PUBLIC_KEY,
-            email: email,
+           email: email,
             amount: Math.round(totalAmount * 100),
-            currency: initData.currency || 'GHS',
-            ref: initData.reference || ('ref_' + Math.floor(Math.random()*1000000)),
-           onClose: function(){ alert('Payment cancelled'); },
-            callback: async function(response) {
-              // verify payment server-side using the reference returned by Paystack
+            currency: 'GHS',
+            ref,
+            onClose: function() {
+              alert('Payment cancelled');
+              submitBtn.disabled = false;
+            },
+            callback: function(response) {
+             // Inline Paystack returns a reference — we treat callback as success for frontend-only flow
+             const order = {
+                reference: response.reference || ref,
+                name, phone, email, type, address, lat, lon, date, time, note,
+                cart: cartLines,
+               totals: { subtotal: totals.subtotal, delivery, promo: totals.promoDiscount, total: totalAmount },
+                ts: new Date().toISOString()
+             };
              try {
-                const vres = await fetch(`/api/pay/verify?reference=${encodeURIComponent(response.reference)}`);
-                if (!vres.ok) { alert('Payment made but verification failed.'); submitBtn.disabled = false; return; }
-                const vdata = await vres.json();
-               const status = vdata?.data?.status || vdata?.status;
-                if (status === 'success') {
-                 // persist canonical order and show confirmation flow
-                  const order = {
-                    reference: response.reference,
-                    name, phone, email, type, address, lat, lon, date, time, note,
-                    cart: cartLines,
-                    totals: { subtotal: totals.subtotal, delivery, promo: totals.promoDiscount, total: totalAmount },
-                    ts: new Date().toISOString()
-                  };
-                  try {
-                    localStorage.setItem('wrap_last_order', JSON.stringify(order));
-                   localStorage.setItem('wrap_show_confirmation', '1');
-                 } catch (e) {}
-                try { window.cart = {}; if (typeof renderCart === 'function') renderCart(); } catch(e){}
-                 closeCheckoutPage();
-                 window.location.reload();
-                 return;
-               } else {
-                 alert('Payment not verified as successful.');
-               }
-             } catch (err) {
-               console.error('verification error', err);
-               alert('Payment verification failed. Contact support.');
-              } finally {
-                submitBtn.disabled = false;
-              }
+                localStorage.setItem('wrap_last_order', JSON.stringify(order));
+               localStorage.setItem('wrap_show_confirmation', '1');
+              } catch (e) {}
+             try { window.cart = {}; if (typeof renderCart === 'function') renderCart(); } catch(e){}
+             closeCheckoutPage();
+             // reload to show confirmation modal (order data is in localStorage)
+             window.location.reload();
             }
          });
-          handler.openIframe();
-         return;
+         handler.openIframe();
+          return;
        }
 
-       // Fallback: if server returned an authorization_url, redirect user there (hosted payment)
-        if (initData.authorization_url) {
-         window.location.href = initData.authorization_url;
+        // If Paystack public key missing or PaystackPop not loaded: ask user to simulate payment
+       if (paymethod === 'paystack') {
+         const simulate = confirm('No Paystack public key detected. Do you want to simulate a successful payment locally for testing? (No real money will be charged)');
+          if (!simulate) {
+            alert('Payment cancelled. To use real Paystack, set PAYSTACK_PUBLIC_KEY in the checkout script.');
+            submitBtn.disabled = false;
+            return;
+          }
+          // Simulate success
+         const order = {
+           reference: 'SIM-' + Date.now(),
+           name, phone, email, type, address, lat, lon, date, time, note,
+           cart: cartLines,
+           totals: { subtotal: totals.subtotal, delivery, promo: totals.promoDiscount, total: totalAmount },
+          ts: new Date().toISOString()
+          };
+         try {
+           localStorage.setItem('wrap_last_order', JSON.stringify(order));
+           localStorage.setItem('wrap_show_confirmation', '1');
+         } catch (e) {}
+          try { window.cart = {}; if (typeof renderCart === 'function') renderCart(); } catch(e){}
+          closeCheckoutPage();
+          window.location.reload();
          return;
        }
-
-       // If we reached here, we couldn't open inline and have no redirect
-        alert('Payment could not be started (no inline library and no redirect URL). Check server/init response.');
-       submitBtn.disabled = false;
       } catch (err) {
-       console.error('checkout error', err);
+        console.error('checkout error', err);
         alert('Checkout failed: ' + (err.message || err));
         submitBtn.disabled = false;
       }
