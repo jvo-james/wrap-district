@@ -5832,5 +5832,70 @@ body.cart-open::before {
   });
 })();
 </script>
+  <script>
+/* Robust cart toggle: capture-phase handler that opens/closes cart reliably */
+(function(){
+  document.addEventListener('DOMContentLoaded', function(){
+    const btn = document.getElementById('cart-toggle');
+    const cart = document.getElementById('cart-drawer');
+    const cartClose = document.getElementById('cart-close');
+
+    if (!btn || !cart) return;
+
+    // Ensure initial ARIA state consistent
+    btn.setAttribute('aria-expanded', String(cart.getAttribute('aria-hidden') === 'false'));
+
+    // Handler (capture=true to run before other handlers and avoid interference)
+    btn.addEventListener('click', function(ev){
+      try {
+        ev.preventDefault();
+        // Stop other handlers from blocking our open/close (we handle it explicitly)
+        ev.stopImmediatePropagation();
+      } catch(e){}
+
+      const isOpen = cart.getAttribute('aria-hidden') === 'false' || cart.style.display === 'block';
+
+      if (isOpen) {
+        cart.style.display = 'none';
+        cart.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+        btn.setAttribute('aria-expanded', 'false');
+        // return focus to cart button for accessibility
+        try { btn.focus(); } catch(e){}
+      } else {
+        cart.style.display = 'block';
+        cart.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+        btn.setAttribute('aria-expanded', 'true');
+        // focus the cart close button for keyboard users
+        setTimeout(() => { try { cartClose && cartClose.focus(); } catch(e){} }, 80);
+      }
+    }, true); // capture phase
+
+    // Wire explicit close (in case other scripts don't)
+    if (cartClose) {
+      cartClose.addEventListener('click', function(){
+        cart.style.display = 'none';
+        cart.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+        btn.setAttribute('aria-expanded', 'false');
+        try { btn.focus(); } catch(e){}
+      });
+    }
+
+    // Also close cart if user clicks outside it
+    cart.addEventListener('click', function(e){
+      if (e.target === cart) {
+        cart.style.display = 'none';
+        cart.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+        btn.setAttribute('aria-expanded', 'false');
+        try { btn.focus(); } catch(e){}
+      }
+    });
+
+  });
+})();
+</script>
 </html>
   
