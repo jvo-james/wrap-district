@@ -1670,153 +1670,6 @@ a { color: var(--accent-2); text-decoration: none; }
 /* End of menu styles */
 </style>
   <style>
-    /* -------------------------
-   INPUT VISIBILITY FIX — paste after your other styles
-   Applies to #checkout-page (Complete Order) and menu controls (.select, .addon)
-   ------------------------- */
-
-:root{
-  /* fallback highlight when needed */
-  --input-bg: rgba(255,255,255,0.03);
-  --input-border: rgba(255,255,255,0.10);
-  --placeholder: rgba(255,255,255,0.72);
-  --input-focus: rgba(255,204,51,0.16);
-}
-
-/* Generic inputs / textareas used in checkout & preorders */
-#checkout-page .input,
-#preorder-modal .input,
-#checkout-full-modal .input,
-.input, input[type="text"], input[type="tel"], input[type="email"], textarea,
-.select {
-  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-  /* slightly brighter so it sits above the page background */
-  border: 1px solid var(--input-border);
-  color: #fff !important;
-  padding: 10px 12px;
-  border-radius: 10px;
-  box-shadow: inset 0 2px 6px rgba(0,0,0,0.45);
-  -webkit-appearance: none;
-  appearance: none;
-  outline: none;
-}
-
-/* Ensure placeholder text is readable */
-input::placeholder, textarea::placeholder, .input::placeholder,
-.select::placeholder {
-  color: var(--placeholder) !important;
-  opacity: 1;
-}
-
-/* Stronger focus state for accessibility */
-#checkout-page .input:focus,
-#preorder-modal .input:focus,
-.input:focus,
-.select:focus,
-select:focus {
-  box-shadow: 0 6px 24px var(--input-focus), inset 0 2px 6px rgba(0,0,0,0.5);
-  border-color: rgba(255,204,51,0.22);
-  outline: none;
-  transform: translateZ(0);
-}
-
-/* Selects: show custom arrow and make the arrow visible on dark background */
-.select, select {
-  background-image:
-    linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.00)),
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24'%3E%3Cpath fill='%23FFFFFF' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 10px center;
-  background-size: 14px;
-  padding-right: 38px; /* room for arrow */
-  cursor: pointer;
-}
-
-/* Make select text bold & clear */
-.select, select { font-weight:800; color:#fff; }
-
-/* Checkbox / addon styling — uses markup: <label class="addon"><input type="checkbox"/><span>Label</span></label> */
-.addon {
-  --box-size: 18px;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 10px;
-  border-radius: 10px;
-  border: 1px solid rgba(255,255,255,0.03);
-  background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.00));
-  color: rgba(255,255,255,0.92);
-  cursor: pointer;
-}
-
-/* Visually hide native checkbox but keep accessible — we style a clear square instead */
-.addon input[type="checkbox"] {
-  -webkit-appearance: none;
-  appearance: none;
-  width: var(--box-size);
-  height: var(--box-size);
-  min-width: var(--box-size);
-  display:inline-grid;
-  place-items: center;
-  border-radius: 6px;
-  border: 2px solid rgba(255,255,255,0.10);
-  background: rgba(255,255,255,0.02);
-  margin: 0;
-  transition: background 180ms ease, border-color 180ms ease, box-shadow 180ms ease, transform 120ms ease;
-}
-
-/* Unchecked: subtle contrast */
-.addon input[type="checkbox"] + span { position: relative; padding-left: 0; }
-
-/* Checked state: gradient + subtle checkmark */
-.addon input[type="checkbox"]:checked {
-  background: linear-gradient(90deg, var(--accent-1), var(--accent-2));
-  border-color: rgba(255,255,255,0.02);
-  box-shadow: 0 8px 24px rgba(255,106,0,0.12);
-  transform: translateY(-1px);
-}
-
-/* place a checkmark using adjacent span ::before for crisp vector-free rendering */
-.addon input[type="checkbox"]:checked + span::before {
-  content: '✔';
-  position: absolute;
-  left: -26px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 13px;
-  color: #111;
-  font-weight: 900;
-  line-height: 1;
-  /* give it a circle-like padding so it sits within the checkbox area visually */
-  width: var(--box-size);
-  height: var(--box-size);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* ensure the text next to checkbox remains readable */
-.addon span { color: rgba(255,255,255,0.95); font-weight:800; }
-
-/* When the checkbox is focused via keyboard, show clear ring */
-.addon input[type="checkbox"]:focus {
-  outline: 3px solid rgba(255,204,51,0.14);
-  outline-offset: 2px;
-}
-
-/* Make radio / hidden inputs / small selects visible inside modal / checkout too */
-#checkout-page select, #checkout-page .input, #checkout-page textarea { color: #fff !important; }
-
-/* Print/Save as PDF hints:
-   - When printing we want input values to be visible (browser may hide backgrounds).
-   - This rule brightens inputs when printing.
-*/
-@media print {
-  input, textarea, select { background: #ffffff !important; color: #000 !important; -webkit-print-color-adjust: exact; }
-  .addon input[type="checkbox"] { background: #000 !important; color:#fff !important; }
-}
-  </style>
-  <style>
 /* =========================
    Wrap District — Remaining UI: Modals, Promo Details, Mobile Nav, Entry Modal,
    Contact/Footer, Global utilities and finishing touches.
@@ -2716,7 +2569,113 @@ a:focus, button:focus { outline: 3px solid rgba(255,204,51,0.10); outline-offset
   </div>
 </div>
   </main>
- 
+  <!-- ===== Menu tabs + Cart header checkout enhancements ===== -->
+<script>
+(function(){
+  document.addEventListener('DOMContentLoaded', function(){
+    // Order button: prefer opening cart if it has items, else scroll to menu
+    const orderBtn = document.getElementById('footer-order');
+    const menuAnchor = document.getElementById('menu');
+    const cartToggle = document.getElementById('cart-toggle');
+
+    orderBtn && orderBtn.addEventListener('click', function(e){
+      // If there's a cart with items, open drawer; otherwise scroll to menu
+      try {
+        const cartCount = Number((document.getElementById('cart-count')||{}).innerText) || 0;
+        if (cartCount > 0 && cartToggle) {
+          cartToggle.click();
+        } else if (menuAnchor) {
+          menuAnchor.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } else {
+          window.location.hash = '#menu';
+        }
+      } catch(err) {
+        if (menuAnchor) menuAnchor.scrollIntoView({ behavior: 'smooth' });
+      }
+    });
+
+    // Our location - open checkout map modal if present (map modal id #map-modal)
+    const locBtn = document.getElementById('footer-locate');
+  locBtn && locBtn.addEventListener('click', function(){
+     const contact = document.getElementById('contact');
+     if (contact) contact.scrollIntoView({ behavior: 'smooth' });
+     else window.location.hash = '#contact';
+   });
+
+    // small accessibility: ensure links open new tab for external glances
+    const wa = document.getElementById('footer-wa');
+    if (wa) wa.setAttribute('rel','noopener noreferrer');
+  });
+})();
+</script>
+  <script>
+(function(){
+  document.addEventListener('DOMContentLoaded', function(){
+    const mobileNav = document.getElementById('mobile-nav');
+    const hamburger = document.getElementById('hamburger');
+    const navCloseBtn = document.getElementById('nav-close');
+
+    if (!mobileNav) return;
+
+    // Helper to close nav (keeps ARIA + visual in sync)
+    function closeMobileNav() {
+      mobileNav.style.display = 'none';
+      mobileNav.setAttribute('aria-hidden', 'true');
+      if (hamburger) hamburger.setAttribute('aria-expanded', 'false');
+      // return focus to hamburger for keyboard users
+      try { hamburger && hamburger.focus(); } catch(e){}
+      // restore page scroll if other scripts toggled it
+      try { document.body.style.overflow = ''; } catch(e){}
+    }
+
+    // Attach handler to each nav link inside mobile nav
+    const navLinks = Array.from(mobileNav.querySelectorAll('a.nav-link, .nav-list a'));
+    navLinks.forEach(link => {
+      link.addEventListener('click', function(e){
+        // Close menu immediately (visual)
+        closeMobileNav();
+
+        // If it's an internal anchor, do smooth scroll to target instead of default jump
+        const href = (link.getAttribute('href') || '').trim();
+        if (href && href.startsWith('#')) {
+          const target = document.querySelector(href);
+          if (target) {
+            // prevent default jump (we already closed nav)
+            e.preventDefault();
+            // small delay so closing animation (if any) feels natural
+            setTimeout(() => {
+              target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 120);
+          }
+        }
+      }, { passive: true });
+    });
+
+    // Also ensure the "close" button and Escape key work (safe fallback)
+    navCloseBtn && navCloseBtn.addEventListener('click', closeMobileNav);
+    document.addEventListener('keydown', (ev) => {
+      if (ev.key === 'Escape' && mobileNav.getAttribute('aria-hidden') === 'false') closeMobileNav();
+    });
+
+    // If other scripts toggle nav by setting aria-hidden/display, keep state consistent when opening:
+    // (optional convenience) when hamburger opens, ensure mobileNav is focusable
+    if (hamburger) {
+      hamburger.addEventListener('click', () => {
+        const expanded = hamburger.getAttribute('aria-expanded') === 'true';
+        // If it becomes open (expanded true), ensure mobileNav is visible and focusable
+        setTimeout(() => {
+          if (hamburger.getAttribute('aria-expanded') === 'true') {
+            mobileNav.style.display = 'block';
+            mobileNav.setAttribute('aria-hidden', 'false');
+            mobileNav.setAttribute('tabindex','-1');
+            try { mobileNav.focus(); } catch(e){}
+          }
+        }, 60);
+      });
+    }
+  });
+})();
+</script>
   <style>
 /* Checkout page (in-file, not a modal) — REPLACED: ensures it sits below the header and is scrollable on mobile */
 #checkout-page {
@@ -2822,7 +2781,164 @@ a:focus, button:focus { outline: 3px solid rgba(255,204,51,0.10); outline-offset
 .tab-btn[role="tab"] { cursor:pointer; }
 </style>
 
+<script>
+(function(){
+  document.addEventListener('DOMContentLoaded', () => {
+    /* ---------- 1) Menu-tabs: filter behaviour ---------- */
+    const tabButtons = Array.from(document.querySelectorAll('.menu-tabs .tab-btn'));
+    const menuItems = Array.from(document.querySelectorAll('.menu-item'));
 
+    function applyTabFilter(cat) {
+      // cat is the data-cat value (e.g. "wraps" or "all")
+      menuItems.forEach(item => {
+        const itemCat = (item.dataset.category || '').toLowerCase();
+        if (!cat || cat === 'all') {
+          item.style.display = ''; // show
+          item.setAttribute('aria-hidden','false');
+        } else {
+          // show when itemCat matches or contains cat
+          const show = itemCat.split(' ').some(c => c === cat) || itemCat === cat;
+          item.style.display = show ? '' : 'none';
+          item.setAttribute('aria-hidden', show ? 'false' : 'true');
+        }
+      });
+    }
+
+    function setActiveTab(btn) {
+      tabButtons.forEach(b => {
+        const is = b === btn;
+        b.classList.toggle('is-active', is);
+        b.setAttribute('aria-selected', String(is));
+        if (is) b.focus && b.focus();
+      });
+    }
+
+    tabButtons.forEach(btn => {
+      // Ensure accessible attributes present
+      if (!btn.hasAttribute('role')) btn.setAttribute('role','tab');
+      if (!btn.hasAttribute('tabindex')) btn.setAttribute('tabindex','0');
+
+      btn.addEventListener('click', (e) => {
+        const cat = (btn.dataset.cat || '').toLowerCase();
+        setActiveTab(btn);
+        applyTabFilter(cat);
+      });
+
+      // keyboard support: Enter / Space
+      btn.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          btn.click();
+        }
+      });
+    });
+
+    // initialize: find active tab or default to first
+    const initial = tabButtons.find(b => b.classList.contains('is-active')) || tabButtons[0];
+    if (initial) {
+      setActiveTab(initial);
+      applyTabFilter((initial.dataset.cat || 'all').toLowerCase());
+    }
+
+    /* ---------- 2) Cart header: add total + checkout button ---------- */
+    const cartHeader = document.querySelector('.cart-header');
+    if (cartHeader && !cartHeader.querySelector('.cart-header-right')) {
+      // create container
+      const headerRight = document.createElement('div');
+      headerRight.className = 'cart-header-right';
+
+      // total display
+      const totalWrap = document.createElement('div');
+      totalWrap.className = 'cart-header-total';
+      totalWrap.id = 'cart-header-total';
+      totalWrap.innerText = 'GHC 0';
+
+      // checkout button
+      const headerCheckout = document.createElement('button');
+      headerCheckout.className = 'cart-header-checkout';
+      headerCheckout.id = 'cart-header-checkout';
+      headerCheckout.type = 'button';
+      headerCheckout.setAttribute('aria-label', 'Checkout and pay');
+      headerCheckout.innerHTML = '<i class="fa fa-credit-card" aria-hidden="true"></i> Checkout';
+
+      headerRight.appendChild(totalWrap);
+      headerRight.appendChild(headerCheckout);
+
+      cartHeader.appendChild(headerRight);
+
+      // wire checkout click to existing footer checkout (preferred)
+      headerCheckout.addEventListener('click', () => {
+        // try to reuse modal: if #checkout-btn exists -> trigger click
+        const footerCheckout = document.getElementById('checkout-btn');
+        if (footerCheckout) {
+          footerCheckout.click(); // will open checkout modal already wired
+        } else if (typeof window.openCheckoutModal === 'function') {
+          window.openCheckoutModal(); // fallback if we exposed it earlier
+        } else {
+          // fallback: simulate click on modal opener if present
+          const alt = document.querySelector('[data-action="checkout"], [data-action="pay"]');
+          if (alt) alt.click();
+          else alert('Checkout not available. Please use the Pay button.');
+        }
+      });
+    }
+
+    // Sync header total with computeCartTotals or with #cart-total element
+    const headerTotalEl = document.getElementById('cart-header-total');
+    const cartTotalEl = document.getElementById('cart-total');
+    const cartSubtotalEl = document.getElementById('cart-subtotal');
+
+    function syncHeaderTotal() {
+      try {
+        // Prefer computeCartTotals if available (accurate), otherwise read #cart-total text
+        if (typeof computeCartTotals === 'function') {
+          const t = computeCartTotals();
+          if (t && typeof t.total !== 'undefined') {
+            headerTotalEl.innerText = `GHC ${Math.round(t.total)}`;
+            return;
+          }
+        }
+        if (cartTotalEl && cartTotalEl.innerText) {
+          headerTotalEl.innerText = cartTotalEl.innerText;
+        } else if (cartSubtotalEl && cartSubtotalEl.innerText) {
+          headerTotalEl.innerText = cartSubtotalEl.innerText;
+        }
+      } catch (err) { /* ignore */ }
+    }
+
+    // Observe changes to cart totals (watch #cart-total and #cart-subtotal)
+    const targets = [];
+    if (cartTotalEl) targets.push(cartTotalEl);
+    if (cartSubtotalEl) targets.push(cartSubtotalEl);
+
+    if (targets.length) {
+      const mo = new MutationObserver(syncHeaderTotal);
+      targets.forEach(t => mo.observe(t, { childList:true, subtree:true, characterData:true }));
+      // call once now
+      syncHeaderTotal();
+    } else {
+      // fallback: poll every 700ms
+      syncHeaderTotal();
+      setInterval(syncHeaderTotal, 700);
+    }
+
+    // Also update when renderCart() is called by hooking into the global renderCart if present
+    // (non-invasive override: wrap existing renderCart to call syncHeaderTotal after)
+    if (typeof window.renderCart === 'function') {
+      const originalRenderCart = window.renderCart;
+      window.renderCart = function() {
+        const result = originalRenderCart.apply(this, arguments);
+        try { syncHeaderTotal(); } catch(e){/*ignore*/ }
+        return result;
+      };
+    } else {
+      // If renderCart is defined as local function (not on window), we can't wrap it — rely on MutationObserver/polling.
+    }
+
+  });
+})();
+</script>
+<!-- Product detail modal (Task 2) -->
 <style>
 /* Basic modal sizing tweaks (uses existing .modal/.modal-inner from your CSS) */
 #product-modal .modal-inner { max-width:520px; width:100%; padding:0; border-radius:14px; overflow:hidden; }
@@ -2918,6 +3034,113 @@ a:focus, button:focus { outline: 3px solid rgba(255,204,51,0.10); outline-offset
 
 
 
+  <script>
+(function(){
+  document.addEventListener('DOMContentLoaded', () => {
+    // find cart header
+    const cartHeader = document.querySelector('.cart-header');
+    if (!cartHeader) return;
+
+    // avoid adding twice
+    if (!cartHeader.querySelector('.cart-header-right')) {
+      const headerRight = document.createElement('div');
+      headerRight.className = 'cart-header-right';
+
+      const totalWrap = document.createElement('div');
+      totalWrap.className = 'cart-header-total';
+      totalWrap.id = 'cart-header-total';
+      totalWrap.innerText = 'GHC 0';
+
+      const headerCheckout = document.createElement('button');
+      headerCheckout.className = 'cart-header-checkout';
+      headerCheckout.id = 'cart-header-checkout';
+      headerCheckout.type = 'button';
+      headerCheckout.setAttribute('aria-label', 'Checkout and pay');
+      headerCheckout.innerHTML = '<i class="fa fa-credit-card" aria-hidden="true"></i> Checkout';
+
+      headerRight.appendChild(totalWrap);
+      headerRight.appendChild(headerCheckout);
+      cartHeader.appendChild(headerRight);
+    }
+
+    // wire header checkout to existing footer checkout or to checkout modal opener
+    const headerCheckoutBtn = document.getElementById('cart-header-checkout');
+    const footerCheckoutBtn = document.getElementById('checkout-btn');
+
+    headerCheckoutBtn && headerCheckoutBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      // prefer the footer checkout button (keeps single handler)
+      if (footerCheckoutBtn) {
+        footerCheckoutBtn.click();
+        return;
+      }
+      // fallback: click any element that looks like a checkout opener
+      const alt = document.querySelector('[data-action="checkout"], [data-action="pay"], #cf-submit');
+      if (alt) { alt.click(); return; }
+      // as last resort call openCheckoutFull if it's available
+      if (typeof openCheckoutFull === 'function') {
+        openCheckoutFull();
+      } else {
+        alert('Checkout is not available. Please use the Pay button.');
+      }
+    });
+
+    // sync header total with main cart totals
+    const headerTotalEl = document.getElementById('cart-header-total');
+    const cartTotalEl = document.getElementById('cart-total');
+    const cartSubtotalEl = document.getElementById('cart-subtotal');
+
+    function syncHeaderTotal() {
+      try {
+        // prefer computeCartTotals if available
+        if (typeof computeCartTotals === 'function') {
+          const t = computeCartTotals();
+          if (t && typeof t.total !== 'undefined') {
+            headerTotalEl.innerText = `GHC ${Math.round(t.total)}`;
+            return;
+          }
+        }
+        // else read DOM totals
+        if (cartTotalEl && cartTotalEl.innerText) {
+          headerTotalEl.innerText = cartTotalEl.innerText;
+        } else if (cartSubtotalEl && cartSubtotalEl.innerText) {
+          headerTotalEl.innerText = cartSubtotalEl.innerText;
+        } else {
+          headerTotalEl.innerText = 'GHC 0';
+        }
+      } catch (err) {
+        // ignore
+      }
+    }
+
+    // Observe DOM changes on totals if present
+    const observeTargets = [];
+    if (cartTotalEl) observeTargets.push(cartTotalEl);
+    if (cartSubtotalEl) observeTargets.push(cartSubtotalEl);
+
+    if (observeTargets.length) {
+      const mo = new MutationObserver(syncHeaderTotal);
+      observeTargets.forEach(t => mo.observe(t, { childList:true, subtree:true, characterData:true }));
+      syncHeaderTotal();
+    } else {
+      // fallback to polling
+      syncHeaderTotal();
+      setInterval(syncHeaderTotal, 700);
+    }
+
+    // If your renderCart is a global function, wrap it to call syncHeaderTotal after rendering
+    if (typeof window.renderCart === 'function' && !window.__wrapped_renderCart_for_header_total) {
+      window.__wrapped_renderCart_for_header_total = true;
+      const orig = window.renderCart;
+      window.renderCart = function() {
+        const r = orig.apply(this, arguments);
+        try { syncHeaderTotal(); } catch(e){}
+        return r;
+      };
+    }
+  });
+})();
+</script>
 <!-- ===== In-page Checkout Section (Task 3) ===== -->
 <style>
 /* Checkout page (in-file, not a modal) */
@@ -2961,7 +3184,119 @@ a:focus, button:focus { outline: 3px solid rgba(255,204,51,0.10); outline-offset
   .checkout-title { font-size:16px; }
 }
 </style>
+<script>
+// --- Checkout UX improvements (replace the previous map-click handler with this) ---
+(function(){
+  // Use the same STORE_COORDS and DELIVERY_CONFIG already defined in your checkout script
+  const STORE_LABEL = 'Devtraco, Tema Community 25';
+  // Grab the existing DOM refs used in your checkout script
+  const page = document.getElementById('checkout-page');
+  const inpType = document.getElementById('cf-type');
+  const inpAddress = document.getElementById('cf-address');
+  const inpLat = document.getElementById('cf-lat');
+  const inpLon = document.getElementById('cf-lon');
+  const cfDelivery = document.getElementById('cf-delivery');
+  const cfTotal = document.getElementById('cf-total');
+  const cfSubtotal = document.getElementById('cf-subtotal');
 
+  // Inject a clear delivery-notice if not already present
+  (function ensureDeliveryNote(){
+    const header = document.querySelector('.checkout-header');
+    if (!header) return;
+    if (!document.getElementById('checkout-delivery-note')) {
+      const note = document.createElement('div');
+      note.id = 'checkout-delivery-note';
+      note.innerHTML = '<strong>Important:</strong> The price shown at checkout <em>does NOT</em> include delivery fees. Delivery fee will be estimated and communicated after checkout based on your address.';
+      header.parentNode.insertBefore(note, header.nextSibling);
+    }
+  })();
+
+  // Toggle address input behavior depending on Order Type
+  function toggleAddressField() {
+    const type = (inpType && inpType.value) || 'delivery';
+    if (!inpAddress) return;
+    if (type === 'delivery') {
+      // allow user to type their address manually for delivery
+      inpAddress.removeAttribute('readonly');
+      // if the input currently contains the store address placeholder, clear it for user to type
+      if ((inpAddress.value || '').trim() === STORE_LABEL) inpAddress.value = '';
+      // clear any stored lat/lon (user should optionally provide if available)
+      // Keep existing lat/lon if user previously selected
+      // visually hint the input
+      inpAddress.placeholder = 'Enter your delivery address (e.g., House #, Street, Landmark)';
+    } else {
+      // Pickup: lock address field to store address and set coords
+      inpAddress.value = STORE_LABEL;
+      inpAddress.setAttribute('readonly', 'true');
+      // write store coords so delivery calc sees store coordinates
+      if (typeof STORE_COORDS !== 'undefined') {
+        if (inpLat) inpLat.value = String(STORE_COORDS.lat || '');
+        if (inpLon) inpLon.value = String(STORE_COORDS.lon || '');
+      }
+      inpAddress.placeholder = 'Pickup location (store address)';
+    }
+    // After toggling, refresh totals so Delivery line updates accordingly
+    try { refreshTotals && refreshTotals(); } catch(e){}
+  }
+
+  // Wire change event on order type select to toggle address behavior
+  if (inpType) {
+    inpType.addEventListener('change', () => {
+      toggleAddressField();
+    });
+  }
+
+  // On page open ensure correct mode
+  try { toggleAddressField(); } catch(e){}
+
+  // Replace address click handler: do NOT open map modal automatically.
+  // Users will type their address in the address field when delivery is selected.
+  if (inpAddress) {
+    inpAddress.addEventListener('click', (e) => {
+      // if pickup selected, do nothing (address is store address & readonly)
+      const type = (inpType && inpType.value) || 'delivery';
+      if (type === 'pickup') {
+        // keep focus but don't open any map
+        return;
+      }
+      // for delivery: allow typing. (If you still want an optional "Use map" button later you can add it)
+      inpAddress.removeAttribute('readonly');
+      // focus so user can type immediately
+      setTimeout(()=> inpAddress.focus(), 60);
+    });
+  }
+
+  // Ensure refreshTotals recalculates delivery only when type is delivery and address is present
+  // (your existing computeDeliveryFee/refreshTotals already handles lat/lon; we simply ensure it runs on address edits)
+  if (inpAddress) {
+    inpAddress.addEventListener('input', () => {
+      // Clear lat/lon if user types a new free-text address (unless you implement geocoding later)
+      if (inpLat) inpLat.value = '';
+      if (inpLon) inpLon.value = '';
+      try { refreshTotals && refreshTotals(); } catch(e){}
+    });
+  }
+
+  // When checkout opens make sure it's positioned under the header (safety) and focus first field
+  (function ensureOpenPositioning(){
+    const origOpen = openCheckoutPage;
+    // If openCheckoutPage exists, wrap it to add a scrollIntoView to ensure top visible
+    if (typeof openCheckoutPage === 'function') {
+      window.openCheckoutPage = function() {
+        origOpen.apply(this, arguments);
+        try {
+          // ensure the checkout dialog is visually scrolled into view (below header)
+          const inner = document.getElementById('checkout-inner');
+          if (inner) inner.scrollIntoView({ behavior: 'auto', block: 'start' });
+        } catch(e){}
+      };
+    }
+  })();
+
+  // Run once to set initial UI correctly
+  try { toggleAddressField(); } catch(e){}
+})();
+</script>
 <section id="checkout-page" aria-hidden="true" role="dialog" aria-label="Checkout page">
   <div id="checkout-inner" role="document">
     <div class="checkout-left">
@@ -3163,102 +3498,719 @@ a:focus, button:focus { outline: 3px solid rgba(255,204,51,0.10); outline-offset
   </div>
 </div>
 
-
-<style>
-/* CHECKOUT PAGE — unified, mobile-friendly, scrollable under fixed header */
-#checkout-page {
-  display: none;
-  position: fixed;
-  inset: 0;                 /* fill viewport */
-  z-index: 3200;
-  background: linear-gradient(180deg, rgba(0,0,0,0.6), rgba(0,0,0,0.6));
-  /* place checkout below header and allow page-level scroll if content taller than viewport */
-  align-items: flex-start;                  /* ensures top-aligned so margin-top works predictably */
-  justify-content: center;
-  padding: 12px;
-  box-sizing: border-box;
-  overflow: auto;                           /* page can scroll if inner is taller than viewport */
-  -webkit-overflow-scrolling: touch;
-}
-
-/* show when opened */
-#checkout-page[aria-hidden="false"] { display: flex; }
-
-/* Inner dialog
-   - Use margin-top to sit under the sticky header safely
-   - Use max-height so inner columns can scroll independently
+<script>
+/* ORDER CONFIRMATION modal behaviour:
+   - On load, if localStorage.wrap_show_confirmation === '1', read wrap_last_order and show modal.
+   - Save as PDF -> window.print()
+   - Okay -> clear cart and confirmation data, reload to original page (cart empty).
 */
-#checkout-inner {
-  width: 100%;
-  max-width: 920px;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 40px 120px rgba(0,0,0,0.7);
-  background: linear-gradient(180deg,#080808,#050505);
-  color: #fff;
-  display: grid;
-  grid-template-columns: 1fr 360px;
-  gap: 0;
-  margin: calc(56px + var(--safe-top,12px) + 12px) auto 24px; /* pushes it below fixed header */
-  max-height: calc(100vh - (56px + var(--safe-top,12px) + 48px)); /* keeps dialog within viewport */
-  box-sizing: border-box;
-}
+(function(){
+  document.addEventListener('DOMContentLoaded', () => {
+    const modal = document.getElementById('order-confirmation-modal');
+    const ocRef = document.getElementById('oc-ref');
+    const ocName = document.getElementById('oc-name');
+    const ocPhone = document.getElementById('oc-phone');
+    const ocEmail = document.getElementById('oc-email');
+    const ocType = document.getElementById('oc-type');
+    const ocAddress = document.getElementById('oc-address');
+    const ocNote = document.getElementById('oc-note');
+    const ocTs = document.getElementById('oc-ts');
+    const ocLines = document.getElementById('oc-lines');
+    const ocTotal = document.getElementById('oc-total');
+    const btnPrint = document.getElementById('oc-print');
+    const btnOk = document.getElementById('oc-ok');
+    const btnClose = document.getElementById('oc-close');
 
-/* On narrow screens stack into single column */
-@media (max-width: 900px) {
-  #checkout-inner { grid-template-columns: 1fr; max-width: 680px; }
-}
+    function showModal(order) {
+      if (!order) return;
+      ocRef.innerText = order.reference || ('ref-'+Math.floor(Math.random()*1000000));
+      ocName.innerText = order.name || '-';
+      ocPhone.innerText = order.phone || '-';
+      ocEmail.innerText = order.email || '-';
+      ocType.innerText = order.type || '-';
+      ocAddress.innerText = order.address || '-';
+      ocNote.innerText = order.note || '-';
+      ocTs.innerText = new Date(order.ts || Date.now()).toLocaleString();
+      ocTotal.innerText = `GHC ${Number(order.totals?.total || order.totals?.total || 0).toFixed(0)}`;
 
-/* Left & right columns scroll independently */
-.checkout-left,
-.checkout-right {
-  padding: 16px 18px;
-  overflow: auto;
-  -webkit-overflow-scrolling: touch;
-  max-height: calc(100%); /* ensures columns don't overflow the dialog */
-  box-sizing: border-box;
-}
+      // populate order lines
+      ocLines.innerHTML = '';
+      const lines = Array.isArray(order.cart) ? order.cart : [];
+      if (!lines.length) {
+        ocLines.innerHTML = '<div class="small-muted">No line items recorded.</div>';
+      } else {
+        lines.forEach(l => {
+          const div = document.createElement('div');
+          div.className = 'oc-line';
+          const title = document.createElement('div');
+          title.innerHTML = `<strong>${escapeHtml(l.title || 'Item')}</strong><div class="small-muted">${(l.meta && l.meta.addons) ? 'Extras: '+ l.meta.addons.map(a=>escapeHtml(a.label||a.key)).join(', ') : ''}</div>`;
+          const right = document.createElement('div');
+          right.style.textAlign = 'right';
+          right.innerHTML = `${Number(l.qty || 1)} × GHC ${Number(l.unitPrice||0).toFixed(0)}<div style="font-weight:900;margin-top:4px">${'GHC ' + (Number(l.unitPrice||0) * Number(l.qty||1)).toFixed(0)}</div>`;
+          div.appendChild(title);
+          div.appendChild(right);
+          ocLines.appendChild(div);
+        });
+      }
 
-/* Right column: give it a visual top so "Your order" stays visible while lines scroll */
-.checkout-right {
-  border-left: 1px solid rgba(255,255,255,0.03);
-  background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.00));
-  position: relative;
-}
+      modal.setAttribute('aria-hidden','false');
+      modal.style.display = 'flex';
+      // prevent background scroll
+      document.body.style.overflow = 'hidden';
+    }
 
-/* Make the "Your order" heading sticky within the right column so the user always sees the header.
-   The order lines themselves scroll under it. This prevents the feeling that the section is "stuck". */
-.checkout-right > h4 {
-  position: sticky;
-  top: 0;
-  z-index: 5;
-  margin: 0 0 10px 0;
-  padding-top: 6px;
-  background: transparent; /* inherits dialog BG */
-  color: var(--accent-2);
-  font-weight: 900;
-}
+    function hideModal() {
+      modal.setAttribute('aria-hidden','true');
+      modal.style.display = 'none';
+      document.body.style.overflow = '';
+    }
 
-/* constrain the order lines area so it scrolls nicely */
-#cf-order-lines {
-  overflow: auto;
-  max-height: calc(100vh - (56px + var(--safe-top,12px) + 240px)); /* adapt so lines area remains scrollable */
-  -webkit-overflow-scrolling: touch;
-}
+    // Print — use window.print which will be constrained by the @media print CSS above
+    btnPrint && btnPrint.addEventListener('click', () => {
+      // small UX: hide the close/ok before print? print CSS already hides everything except modal
+      setTimeout(() => window.print(), 80);
+    });
 
-/* Make the checkout close button comfortable to tap */
-#checkout-close { background: transparent; border: 0; color: var(--muted); font-size: 18px; padding: 8px; cursor: pointer; }
+    // Okay -> clear stored confirmation + empty cart + reload original page
+    btnOk && btnOk.addEventListener('click', () => {
+      try {
+        // clear stored order flag & data
+        localStorage.removeItem('wrap_show_confirmation');
+        localStorage.removeItem('wrap_last_order');
+        // clear cart storage used by your persistent cart
+        localStorage.removeItem('wrap_cart_v2');
+        // also clear window.cart if present
+        try { window.cart = {}; if (typeof renderCart === 'function') renderCart(); } catch(e){}
+      } catch (e) { /* ignore */ }
+      hideModal();
+      // reload to original page (strip hash/qs)
+      window.location.href = window.location.pathname;
+    });
 
-/* small responsive tweaks */
-@media (max-width: 600px) {
-  #checkout-inner { margin-top: calc(56px + var(--safe-top, 12px) + 6px); padding-bottom: 8px; }
-  .checkout-right { border-left: none; border-top: 1px solid rgba(255,255,255,0.03); }
-  .checkout-right > h4 { top: 0; }
-  #cf-order-lines { max-height: calc(60vh); }
-}
-</style>
+    // close X (same as okay but keep data? user asked to refresh to original page on Okay — for close we'll just hide)
+    btnClose && btnClose.addEventListener('click', () => {
+      hideModal();
+      // DO NOT remove the stored confirmation so the user can re-open if they refresh — but you can change this behavior if desired
+    });
 
+    // show modal on page load if flag present
+    try {
+      const showFlag = localStorage.getItem('wrap_show_confirmation');
+      if (showFlag === '1') {
+        const raw = localStorage.getItem('wrap_last_order');
+        const order = raw ? JSON.parse(raw) : null;
+        // show after a small delay so page finishes rendering
+        setTimeout(() => showModal(order), 220);
+      }
+    } catch (e) { console.warn('order confirm show error', e); }
 
+    // small helper
+    function escapeHtml(s){ return String(s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  });
+})();
+</script>
+
+<script>
+/* Checkout page script (Task 3)
+   - Opens in-page checkout (#checkout-page)
+   - Hides other modals/popups before opening
+   - Populates order lines from window.cart or from cart DOM
+   - Computes delivery fee using haversine distance; editable rates below
+*/
+
+(function(){
+  document.addEventListener('DOMContentLoaded', () => {
+    // Configurable store coordinates (set your store exact lat/lon here)
+    const STORE_COORDS = { lat: 5.6600, lon: 0.0190 }; // <-- change to your store's lat/lon (Tema Community 25 / Devtraco approx)
+    const DELIVERY_CONFIG = {
+      baseFee: 6,        // base GHC
+      perKm: 2.5,        // GHC per km
+      minFee: 4,         // minimum fee
+      maxFee: 60,        // maximum fee
+      freeWithinKm: 0.8  // free delivery inside this radius (in km)
+    };
+
+    // DOM
+    const page = document.getElementById('checkout-page');
+    const inner = document.getElementById('checkout-inner');
+    const closeBtn = document.getElementById('checkout-close');
+    const cancelBtn = document.getElementById('cf-cancel');
+    const submitBtn = document.getElementById('cf-submit');
+
+    const inpName = document.getElementById('cf-name');
+    const inpPhone = document.getElementById('cf-phone');
+    const inpEmail = document.getElementById('cf-email');
+    const inpType = document.getElementById('cf-type');
+    const inpAddress = document.getElementById('cf-address');
+    const inpLat = document.getElementById('cf-lat');
+    const inpLon = document.getElementById('cf-lon');
+    const inpDate = document.getElementById('cf-date');
+    const inpTime = document.getElementById('cf-time');
+    const inpNote = document.getElementById('cf-note');
+    const inpPayMethod = document.getElementById('cf-paymethod');
+
+    const orderLinesWrap = document.getElementById('cf-order-lines');
+    const cfSubtotal = document.getElementById('cf-subtotal');
+    const cfDelivery = document.getElementById('cf-delivery');
+    const cfPromo = document.getElementById('cf-promo');
+    const cfTotal = document.getElementById('cf-total');
+
+    // Map modal already exists (#map-modal) and populates #cf-address/#cf-lat/#cf-lon — reuse it
+    // Helper: show checkout page
+    function openCheckoutPage() {
+      // hide any other modals/popups that might have been shown earlier
+      Array.from(document.querySelectorAll('.modal, .entry-promo, #preorder-modal')).forEach(m => {
+        try { m.style.display = 'none'; m.setAttribute && m.setAttribute('aria-hidden','true'); } catch(e){}
+      });
+
+      // prefill user details
+      inpName.value = localStorage.getItem('wrap_user_name') || '';
+      inpPhone.value = localStorage.getItem('wrap_user_phone') || '';
+      inpEmail.value = localStorage.getItem('wrap_checkout_email') || '';
+
+      populateOrderLines();
+      refreshTotals();
+
+      page.style.display = 'flex';
+      page.setAttribute('aria-hidden','false');
+      document.body.style.overflow = 'hidden';
+      setTimeout(()=> inpName.focus && inpName.focus(), 120);
+    }
+
+    function closeCheckoutPage() {
+      page.style.display = 'none';
+      page.setAttribute('aria-hidden','true');
+      document.body.style.overflow = '';
+    }
+
+    // wire openers (override previous handlers so no pre-popup appears)
+    const footerPayBtn = document.getElementById('checkout-btn');
+    const headerCheckoutBtn = document.getElementById('cart-header-checkout');
+
+    function bindOpeners() {
+      if (footerPayBtn) {
+        footerPayBtn.removeEventListener('click', openCheckoutPage);
+        footerPayBtn.addEventListener('click', (e) => { e.preventDefault(); openCheckoutPage(); });
+      }
+      if (headerCheckoutBtn) {
+        headerCheckoutBtn.removeEventListener('click', openCheckoutPage);
+        headerCheckoutBtn.addEventListener('click', (e) => { e.preventDefault(); openCheckoutPage(); });
+      }
+    }
+    bindOpeners();
+
+    // close/cancel handlers
+    closeBtn && closeBtn.addEventListener('click', closeCheckoutPage);
+    cancelBtn && cancelBtn.addEventListener('click', closeCheckoutPage);
+    page && page.addEventListener('click', (e)=> { if (e.target === page) closeCheckoutPage(); });
+    document.addEventListener('keydown', (e)=> { if (e.key === 'Escape' && page.getAttribute('aria-hidden') === 'false') closeCheckoutPage(); });
+
+    // Populate order lines from window.cart if present, else read existing cart DOM
+    function populateOrderLines() {
+      orderLinesWrap.innerHTML = '';
+      const cartObj = window.cart || {};
+      const lines = Object.keys(cartObj).length ? Object.values(cartObj) : extractCartFromDom();
+      if (!lines.length) {
+        orderLinesWrap.innerHTML = '<div class="small-muted">Your cart is empty.</div>';
+        return;
+      }
+      lines.forEach(line => {
+        const div = document.createElement('div');
+        div.className = 'order-line';
+        div.innerHTML = `
+          <img src="${escapeHtml(line.imageSrc||'')}" alt="${escapeHtml(line.title||'Item')}" />
+          <div class="ol-meta">
+            <strong>${escapeHtml(line.title||'Item')}</strong>
+            <small>${escapeHtml(buildMetaText(line.meta || {}))}</small>
+          </div>
+          <div class="ol-price">${fmtGhc((line.unitPrice||0) * (line.qty||1))}</div>
+        `;
+        orderLinesWrap.appendChild(div);
+      });
+    }
+
+    function extractCartFromDom() {
+      const arr = [];
+      const rows = Array.from(document.querySelectorAll('#cart-items li.cart-line')).filter(r=>!r.classList.contains('cart-free'));
+      rows.forEach(r => {
+        try {
+          const title = (r.querySelector('.line-title')?.innerText || '').trim();
+          const qty = Number(r.querySelector('.line-qty')?.innerText || 1) || 1;
+          const priceText = r.querySelector('.line-meta strong')?.innerText || '';
+          // attempt to parse unit price from "GHC 45 × 1 = GHC 45" area
+          const match = (r.querySelector('.line-meta')?.innerText || '').match(/GHC\s*([0-9]+)/);
+          const unitPrice = match ? Number(match[1]) : 0;
+          const img = r.querySelector('img')?.src || '';
+          arr.push({ title, qty, unitPrice, unitPrice, meta: {}, imageSrc: img });
+        } catch(e){}
+      });
+      return arr;
+    }
+
+    function buildMetaText(meta) {
+      const parts = [];
+      try {
+        if (meta.addons && Array.isArray(meta.addons)) parts.push(meta.addons.map(a=>a.label || a.key).join(', '));
+        Object.keys(meta||{}).forEach(k => {
+          if (k==='addons') return;
+          const v = meta[k];
+          if (v && v.text) parts.push(String(v.text));
+        });
+      } catch(e){}
+      return parts.join(' • ');
+    }
+
+    // Totals: prefer computeCartTotals() if available else compute from window.cart or fallback DOM
+    function getTotals() {
+      if (typeof computeCartTotals === 'function') return computeCartTotals();
+      const cartObj = window.cart || {};
+      let subtotal = 0, promo=0;
+      const lines = Object.values(cartObj).length ? Object.values(cartObj) : extractCartFromDom();
+      lines.forEach(l => subtotal += (Number(l.unitPrice)||0) * (Number(l.qty)||1));
+      // basic promo detection (if global logic exists it will be used earlier)
+      // delivery will be computed separately
+      return { subtotal, delivery: 0, promoDiscount: promo, total: subtotal - promo };
+    }
+
+    function refreshTotals() {
+      const totals = getTotals();
+      cfSubtotal.innerText = fmtGhc(totals.subtotal || 0);
+      // compute delivery: only if delivery selected and we have coords
+      const type = inpType.value;
+      let deliveryFee = 0;
+      if (type === 'delivery') {
+        const lat = parseFloat(inpLat.value), lon = parseFloat(inpLon.value);
+        if (!isNaN(lat) && !isNaN(lon)) deliveryFee = computeDeliveryFee(lat, lon);
+        else deliveryFee = DELIVERY_CONFIG.baseFee; // fallback
+      }
+      cfDelivery.innerText = fmtGhc(deliveryFee || 0);
+      cfPromo.innerText = `-GHC ${Math.round(totals.promoDiscount || 0)}`;
+      const total = Math.max(0, (totals.subtotal || 0) - (totals.promoDiscount || 0) + (deliveryFee || 0));
+      cfTotal.innerText = fmtGhc(total);
+    }
+
+    // compute delivery fee using haversine distance
+    function computeDeliveryFee(lat, lon) {
+      if (typeof lat !== 'number' || typeof lon !== 'number' || isNaN(lat) || isNaN(lon)) return DELIVERY_CONFIG.baseFee;
+      const dist = haversineKm(STORE_COORDS.lat, STORE_COORDS.lon, lat, lon);
+      if (dist <= DELIVERY_CONFIG.freeWithinKm) return 0;
+      let fee = DELIVERY_CONFIG.baseFee + (dist * DELIVERY_CONFIG.perKm);
+      fee = Math.max(fee, DELIVERY_CONFIG.minFee);
+      fee = Math.min(fee, DELIVERY_CONFIG.maxFee);
+      return Math.round(fee);
+    }
+
+    // Haversine formula
+    function haversineKm(lat1, lon1, lat2, lon2) {
+      const R = 6371; // km
+      const dLat = toRad(lat2 - lat1);
+      const dLon = toRad(lon2 - lon1);
+      const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon/2) * Math.sin(dLon/2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+      return R * c;
+    }
+    function toRad(v){ return v * Math.PI / 180; }
+
+    // Address click opens existing map modal (your code already links #cf-address -> #map-modal)
+    inpAddress && inpAddress.addEventListener('click', (e) => {
+     const type = (inpType && inpType.value) || 'delivery';
+      if (type === 'pickup') {
+        // keep it readonly and do nothing
+        e.preventDefault();
+        return;
+      }
+     // Delivery — ensure the field is editable and focus so the user can type
+      inpAddress.removeAttribute('readonly');
+      setTimeout(()=> { try { inpAddress.focus(); } catch(e){} }, 60);
+    });
+
+    // When map selection happens, your existing map-confirm logic already writes cf-address/cf-lat/cf-lon.
+    // We just add a MutationObserver or poll to react to changes and update totals.
+    const latEl = inpLat, lonEl = inpLon;
+    if (latEl && lonEl) {
+      const mo = new MutationObserver(() => { refreshTotals(); });
+      mo.observe(latEl, { attributes:true, childList:true, characterData:true, subtree:true });
+      mo.observe(lonEl, { attributes:true, childList:true, characterData:true, subtree:true });
+    }
+
+    // also refresh totals when order type changes or when cart changes
+    inpType && inpType.addEventListener('change', refreshTotals);
+    // attempt to watch cart totals element if present
+    const cartTotalEl = document.getElementById('cart-total');
+    if (cartTotalEl) {
+      const mo2 = new MutationObserver(() => { populateOrderLines(); refreshTotals(); });
+      mo2.observe(cartTotalEl, { childList:true, subtree:true, characterData:true });
+    } else {
+      // fallback: poll for cart changes
+      setInterval(()=> { populateOrderLines(); refreshTotals(); }, 1000);
+    }
+
+    // Submit handler: validate fields and assemble payload (same shape as previous modal-based flow)
+    submitBtn && submitBtn.addEventListener('click', async (ev) => {
+      ev.preventDefault();
+      submitBtn.disabled = true;
+
+      const name = (inpName.value || '').trim();
+      const phone = (inpPhone.value || '').trim();
+      const email = (inpEmail.value || '').trim();
+      const type = inpType.value;
+      const address = (inpAddress.value || '').trim();
+      const lat = inpLat.value || '';
+      const lon = inpLon.value || '';
+      const date = inpDate.value || '';
+      const time = inpTime.value || '';
+      const note = inpNote.value || '';
+      const paymethod = inpPayMethod.value || 'paystack';
+
+      if (!name || !phone || !email) {
+        alert('Please complete your name, phone and email.');
+        submitBtn.disabled = false; return;
+      }
+      if (type === 'delivery' && !address) {
+        alert('Please select your address on the map for delivery.');
+        submitBtn.disabled = false; return;
+      }
+
+      // build cart lines
+      const cartLines = Object.values(window.cart || {}).map(l => ({
+        baseId: l.baseId, title: l.title, unitPrice: l.unitPrice, qty: l.qty, meta: l.meta || {}
+      }));
+      if (!cartLines.length) {
+        alert('Your cart is empty. Add items before checkout.');
+        submitBtn.disabled = false; return;
+      }
+
+      const totals = getTotals();
+      const delivery = (type==='delivery') ? computeDeliveryFee(parseFloat(lat) || 0, parseFloat(lon) || 0) : 0;
+      const totalAmount = Math.round((totals.subtotal || 0) - (totals.promoDiscount || 0) + delivery);
+
+      // Save name/phone for convenience
+      try { localStorage.setItem('wrap_user_name', name); localStorage.setItem('wrap_user_phone', phone); } catch(e){}
+
+     if (paymethod === 'cash') {
+       // simple local "order placed" flow (Cash)
+      const fakeOrder = {
+        id: 'local-' + Date.now(),
+          reference: 'CASH-' + Date.now(),
+         name, phone, email, type, address, lat, lon, date, time, note,
+         cart: cartLines,
+         totals: { subtotal: totals.subtotal, delivery, promo: totals.promoDiscount, total: totalAmount },
+          ts: new Date().toISOString()
+       };
+       try {
+          localStorage.setItem('wrap_last_order', JSON.stringify(fakeOrder));
+         localStorage.setItem('wrap_show_confirmation', '1'); // -> triggers confirmation modal on next load
+        } catch (e) { /* ignore storage errors */ }
+
+       // clear cart, close and reload so confirmation modal appears
+       try { window.cart = {}; if (typeof renderCart === 'function') renderCart(); } catch (e) {}
+        closeCheckoutPage();
+        // reload page (confirmation modal code will read localStorage and show modal)
+       window.location.reload();
+       return;
+     }
+
+      // paymethod === paystack -> call server init endpoint (same pattern as earlier)
+          try {
+       const payload = { name, phone, email, type, address, lat, lon, date, time, note, amount_pesewas: Math.round(totalAmount*100), currency:'GHS', cart: cartLines };
+        const res = await fetch('/api/pay/initialize', { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify(payload) });
+        if (!res.ok) {         const txt = await res.text().catch(()=>null);
+          console.warn('init failed', res.status, txt);
+                      alert('Payment initialization failed. Try again later.');
+         submitBtn.disabled = false; return;
+        }
+        const initData = await res.json();
+
+       // Expect the server to return at least one of:
+       // { publicKey, reference }  OR  { authorization_url }
+        // Preferred: { publicKey: 'pk_test_xxx', reference: '...', currency: 'GHS' }
+       if (!initData || (!initData.publicKey && !initData.authorization_url && !initData.reference)) {
+         console.warn('unexpected init response', initData);
+          alert('Payment initialization returned unexpected response. Check server logs.');
+          submitBtn.disabled = false; return;
+        }
+
+        // If Paystack inline is available, use it
+        if (window.PaystackPop && (initData.publicKey || initData.key)) {
+          const PUBLIC_KEY = initData.publicKey || initData.key;
+         const handler = window.PaystackPop.setup({
+           key: PUBLIC_KEY,
+            email: email,
+            amount: Math.round(totalAmount * 100),
+            currency: initData.currency || 'GHS',
+            ref: initData.reference || ('ref_' + Math.floor(Math.random()*1000000)),
+           onClose: function(){ alert('Payment cancelled'); },
+            callback: async function(response) {
+              // verify payment server-side using the reference returned by Paystack
+             try {
+                const vres = await fetch(`/api/pay/verify?reference=${encodeURIComponent(response.reference)}`);
+                if (!vres.ok) { alert('Payment made but verification failed.'); submitBtn.disabled = false; return; }
+                const vdata = await vres.json();
+               const status = vdata?.data?.status || vdata?.status;
+                if (status === 'success') {
+                 // persist canonical order and show confirmation flow
+                  const order = {
+                    reference: response.reference,
+                    name, phone, email, type, address, lat, lon, date, time, note,
+                    cart: cartLines,
+                    totals: { subtotal: totals.subtotal, delivery, promo: totals.promoDiscount, total: totalAmount },
+                    ts: new Date().toISOString()
+                  };
+                  try {
+                    localStorage.setItem('wrap_last_order', JSON.stringify(order));
+                   localStorage.setItem('wrap_show_confirmation', '1');
+                 } catch (e) {}
+                try { window.cart = {}; if (typeof renderCart === 'function') renderCart(); } catch(e){}
+                 closeCheckoutPage();
+                 window.location.reload();
+                 return;
+               } else {
+                 alert('Payment not verified as successful.');
+               }
+             } catch (err) {
+               console.error('verification error', err);
+               alert('Payment verification failed. Contact support.');
+              } finally {
+                submitBtn.disabled = false;
+              }
+            }
+         });
+          handler.openIframe();
+         return;
+       }
+
+       // Fallback: if server returned an authorization_url, redirect user there (hosted payment)
+        if (initData.authorization_url) {
+         window.location.href = initData.authorization_url;
+         return;
+       }
+
+       // If we reached here, we couldn't open inline and have no redirect
+        alert('Payment could not be started (no inline library and no redirect URL). Check server/init response.');
+       submitBtn.disabled = false;
+      } catch (err) {
+       console.error('checkout error', err);
+        alert('Checkout failed: ' + (err.message || err));
+        submitBtn.disabled = false;
+      }
+    });
+    
+    // small helpers
+    function fmtGhc(n){ return `GHC ${Number(n||0).toFixed(0)}`; }
+    function escapeHtml(s){ return String(s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+    // When the map modal sets cf-address/cf-lat/cf-lon, we react and refresh totals
+    // (your mapConfirm earlier already sets these inputs). We simply listen to changes
+    const addrObserver = new MutationObserver(() => { populateOrderLines(); refreshTotals(); });
+    if (inpAddress) addrObserver.observe(inpAddress, { childList:true, subtree:true, characterData:true, attributes:true });
+
+    // initial small sync
+    populateOrderLines();
+    refreshTotals();
+  });
+})();
+</script>
+<script>
+/* Product modal behavior (Task 2)
+   - Opens when user clicks .item-thumb OR .item-title inside a .menu-item
+   - Clones the .item-config into modal and keeps live price updates
+   - On Add, copies selections back into original item's controls and triggers original add-btn
+*/
+(function(){
+  document.addEventListener('DOMContentLoaded', () => {
+    const modal = document.getElementById('product-modal');
+    const pmThumb = document.getElementById('pm-thumb');
+    const pmTitle = document.getElementById('pm-title');
+    const pmDesc = document.getElementById('pm-desc');
+    const pmBody = document.getElementById('pm-body');
+    const pmPrice = document.getElementById('pm-price');
+    const pmAdd = document.getElementById('pm-add');
+    const pmCancel = document.getElementById('pm-cancel');
+    const pmClose = document.getElementById('pm-close');
+
+    let activeMenuItem = null;     // original menu-item element
+    let clonedConfig = null;       // clone of .item-config to show inside modal
+
+    // helper: format as GHC
+    const fmtGhc = (n) => `GHC ${Number(n||0).toFixed(0)}`;
+
+    // local price calculation (mirrors your calculateItemPrice)
+    function calculatePriceFromContainer(container){
+      let total = 0;
+      // selects
+      const selects = container.querySelectorAll('select');
+      selects.forEach(s => { total += Number(s.value) || 0; });
+      // addons (checkboxes with class addon-checkbox inside input)
+      const addons = container.querySelectorAll('input.addon-checkbox, input[type="checkbox"]');
+      addons.forEach(cb => { if (cb.checked) total += Number(cb.value) || 0; });
+      // fallback: if no select found, try price-value span
+      if (selects.length === 0) {
+        const fallback = Number(container.querySelector('.price-value')?.innerText || 0);
+        if (fallback) total = fallback;
+      }
+      return Math.round(total);
+    }
+
+    // update modal price display based on clonedConfig
+    function updateModalPrice(){
+      if (!clonedConfig) return;
+      const p = calculatePriceFromContainer(clonedConfig);
+      pmPrice.innerText = fmtGhc(p);
+    }
+
+    // open modal for a given menu-item element
+    function openProductModal(menuItem){
+      if (!menuItem) return;
+      activeMenuItem = menuItem;
+
+      // set image + title + desc
+      const thumb = menuItem.querySelector('.item-thumb');
+      const title = menuItem.querySelector('.item-title')?.innerText || 'Item';
+      const desc = menuItem.querySelector('.item-desc')?.innerText || '';
+
+      pmThumb.src = thumb?.src || '';
+      pmThumb.alt = title;
+      pmTitle.innerText = title;
+      pmDesc.innerText = desc;
+
+      // clone the .item-config if exists, else create a basic view
+      const config = menuItem.querySelector('.item-config');
+      pmBody.innerHTML = ''; // clear previous
+      clonedConfig = config ? config.cloneNode(true) : null;
+
+      if (clonedConfig) {
+        // ensure cloned controls are interactive
+        // Remove any ids that may conflict
+        Array.from(clonedConfig.querySelectorAll('[id]')).forEach(el => el.removeAttribute('id'));
+        pmBody.appendChild(clonedConfig);
+
+        // add listeners to cloned controls to update price live
+        clonedConfig.querySelectorAll('select, input[type="checkbox"]').forEach(inp => {
+          inp.addEventListener('change', updateModalPrice);
+        });
+      } else {
+        // fallback: create a summary
+        const fallback = document.createElement('div');
+        fallback.className = 'glass-card small';
+        fallback.innerText = 'No configurable options for this item.';
+        pmBody.appendChild(fallback);
+      }
+
+      // initial price update
+      updateModalPrice();
+
+      // show modal
+      modal.style.display = 'flex';
+      modal.setAttribute('aria-hidden','false');
+      document.body.style.overflow = 'hidden';
+      setTimeout(()=> pmClose && pmClose.focus(), 80);
+    }
+
+    // close modal and cleanup
+    function closeProductModal(){
+      // clear cloned config
+      pmBody.innerHTML = '';
+      clonedConfig = null;
+      activeMenuItem = null;
+      modal.style.display = 'none';
+      modal.setAttribute('aria-hidden','true');
+      document.body.style.overflow = '';
+    }
+
+    // Wire clicks on image and title to open modal
+    function attachOpeners(){
+      // find all menu items
+      const menuItems = Array.from(document.querySelectorAll('.menu-item'));
+      menuItems.forEach(mi => {
+        const thumb = mi.querySelector('.item-thumb');
+        const titleEl = mi.querySelector('.item-title');
+        [thumb, titleEl].forEach(openEl => {
+          if (!openEl) return;
+          openEl.style.cursor = 'pointer';
+          openEl.addEventListener('click', (e) => {
+            e.stopPropagation();
+            openProductModal(mi);
+          });
+        });
+      });
+    }
+
+    // On Add in modal: copy cloned selections back to the original menu-item controls, then trigger original add-btn
+    pmAdd.addEventListener('click', () => {
+      if (!activeMenuItem) return;
+      if (!clonedConfig) {
+        // no config -> just click original add button
+        const origAdd = activeMenuItem.querySelector('.add-btn');
+        origAdd && origAdd.click();
+        closeProductModal();
+        return;
+      }
+
+      // copy selects by name (or position) and checkboxes by data-addon-key / label text
+      try {
+        // Selects
+        const clonedSelects = Array.from(clonedConfig.querySelectorAll('select'));
+        clonedSelects.forEach(cs => {
+          const name = cs.name;
+          if (!name) return;
+          const orig = activeMenuItem.querySelector(`select[name="${name}"]`);
+          if (orig) orig.value = cs.value;
+          // trigger change event on orig so price update listeners run
+          if (orig) orig.dispatchEvent(new Event('change', { bubbles: true }));
+        });
+
+        // Checkboxes (addons)
+        const clonedCbs = Array.from(clonedConfig.querySelectorAll('input[type="checkbox"]'));
+        clonedCbs.forEach(ccb => {
+          const key = ccb.dataset.addonKey;
+          // try matching by data-addon-key first
+          let origCb = key ? activeMenuItem.querySelector(`input.addon-checkbox[data-addon-key="${key}"]`) : null;
+          // fallback: match by label text (span)
+          if (!origCb) {
+            const labelText = ccb.closest('.addon')?.querySelector('span')?.innerText?.trim();
+            if (labelText) {
+              origCb = Array.from(activeMenuItem.querySelectorAll('.addon')).map(a=>({el:a, txt:a.querySelector('span')?.innerText?.trim()})).find(x=>x.txt===labelText)?.el?.querySelector('input[type="checkbox"]') || null;
+            }
+          }
+          if (origCb) {
+            origCb.checked = !!ccb.checked;
+            origCb.dispatchEvent(new Event('change', { bubbles: true }));
+          }
+        });
+
+        // After copying inputs back to original, click the original add button to use existing cart logic
+        const origAddBtn = activeMenuItem.querySelector('.add-btn');
+        if (origAddBtn) {
+          origAddBtn.click();
+          // close modal shortly after
+          setTimeout(() => closeProductModal(), 260);
+        } else {
+          // fallback: just close and show toast
+          closeProductModal();
+          console.warn('Original add button not found for item', activeMenuItem);
+        }
+      } catch (err) {
+        console.error('Error copying modal selections back to original item:', err);
+        closeProductModal();
+      }
+    });
+
+    // cancel/close handlers
+    pmCancel.addEventListener('click', closeProductModal);
+    pmClose.addEventListener('click', closeProductModal);
+    modal.addEventListener('click', (e) => { if (e.target === modal) closeProductModal(); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && modal.style.display === 'flex') closeProductModal(); });
+
+    // Attach openers initially and whenever new menu items might be added later (MutationObserver)
+    attachOpeners();
+    const menuGrid = document.getElementById('menu-grid');
+    if (menuGrid) {
+      const mo = new MutationObserver(() => attachOpeners());
+      mo.observe(menuGrid, { childList: true, subtree: true });
+    }
+  });
+})();
+</script>
   <!-- Task 3: Promo slideshow (paste after your scripts, before </body>) -->
 <style>
 /* Promo slideshow styles — mobile-first, uses your accent variables */
@@ -3319,7 +4271,322 @@ a:focus, button:focus { outline: 3px solid rgba(255,204,51,0.10); outline-offset
 }
 </style>
 
+<script>
+(function(){
+  document.addEventListener('DOMContentLoaded', () => {
+    const promoContainer = document.getElementById('promo-details');
+    if (!promoContainer) return;
 
+    // Build carousel markup (2 slides)
+    promoContainer.innerHTML = `
+      <div class="promo-carousel" aria-roledescription="carousel" aria-label="Promotions carousel">
+        <div class="pc-slides" id="pc-slides">
+          <section class="pc-slide" data-index="0" id="pc-slide-0" role="group" aria-roledescription="slide" aria-label="Shawarma Promo" style="background-image: url('promo-shawarma.jpg');">
+            <div class="overlay">
+              <div class="promo-card">
+                <div class="promo-left"><i class="fa fa-fire pc-ico" aria-hidden="true"></i></div>
+                <div class="promo-right">
+                  <div class="promo-eyebrow">Limited • Tuesday</div>
+                  <h3 class="promo-title">Buy 2 Shawarmas — Get 1 Free</h3>
+                  <div class="promo-desc">Add 2 qualifying shawarmas at checkout on Tuesdays and the third becomes free automatically. Applies per 3 items.</div>
+                  <div class="promo-cta-row">
+                    <button class="btn primary" data-action="apply-promo" data-promo-code="TUES-B2G1" aria-label="Claim Shawarma promo"><i class="fa fa-tag"></i> Claim Promo</button>
+                    <button class="btn ghost" data-action="promo-details" data-target="shawarma" aria-expanded="false"><i class="fa fa-info-circle"></i> Details</button>
+                    <button class="btn primary" data-action="preorder-promo"><i class="fa fa-calendar-check"></i> Preorder</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="pc-slide" data-index="1" id="pc-slide-1" role="group" aria-roledescription="slide" aria-label="Loaded Fries Promo" style="background-image: url('promo-fries.jpg');">
+            <div class="overlay">
+              <div class="promo-card">
+                <div class="promo-left"><i class="fa fa-bolt pc-ico" aria-hidden="true"></i></div>
+                <div class="promo-right">
+                  <div class="promo-eyebrow">Freebie • All Days (promo hours)</div>
+                  <h3 class="promo-title">Loaded Fries → Free Coke</h3>
+                  <div class="promo-desc">Buy qualifying Loaded Fries during promo hours and get a free Coke added to your cart automatically.</div>
+                  <div class="promo-cta-row">
+                    <button class="btn primary" data-action="apply-promo" data-promo-code="FRIES-FCOKE" aria-label="Claim Fries promo"><i class="fa fa-tag"></i> Claim Promo</button>
+                    <button class="btn ghost" data-action="promo-details" data-target="fries" aria-expanded="false"><i class="fa fa-info-circle"></i> Details</button>
+                    <button class="btn primary" data-action="preorder-promo"><i class="fa fa-calendar-check"></i> Preorder</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <div class="promo-controls" aria-hidden="false">
+          <div class="pc-nav">
+            <button class="slide-prev icon-btn" aria-label="Previous promo"><i class="fa fa-chevron-left"></i></button>
+          </div>
+
+          <div class="pc-dots" role="tablist" aria-label="Promo slides">
+            <button class="pc-dot is-active" data-index="0" aria-label="Slide 1"></button>
+            <button class="pc-dot" data-index="1" aria-label="Slide 2"></button>
+          </div>
+
+          <div class="pc-nav">
+            <button class="slide-next icon-btn" aria-label="Next promo"><i class="fa fa-chevron-right"></i></button>
+          </div>
+        </div>
+      </div>
+
+      <!-- hidden area for details text toggling -->
+      <div id="promo-more" class="promo-help hidden" style="margin-top:10px;">
+        <div class="glass-card">
+          <div id="promo-more-content" class="small muted"></div>
+        </div>
+      </div>
+    `;
+
+    // Slide behavior
+    const slides = Array.from(document.querySelectorAll('.pc-slide'));
+    const dots = Array.from(document.querySelectorAll('.pc-dot'));
+    const prevBtn = document.querySelector('.slide-prev');
+    const nextBtn = document.querySelector('.slide-next');
+    let current = 0;
+    let autoTimer = null;
+    const AUTO_DELAY = 6000;
+
+    function showSlide(idx) {
+      idx = (idx + slides.length) % slides.length;
+      slides.forEach((s,i) => {
+        s.classList.toggle('is-active', i===idx);
+        s.setAttribute('aria-hidden', i===idx ? 'false' : 'true');
+      });
+      dots.forEach((d,i) => d.classList.toggle('is-active', i===idx));
+      current = idx;
+    }
+
+    function nextSlide() { showSlide(current+1); }
+    function prevSlide() { showSlide(current-1); }
+
+    // auto-rotate
+    function startAuto() { stopAuto(); autoTimer = setInterval(() => nextSlide(), AUTO_DELAY); }
+    function stopAuto() { if (autoTimer) { clearInterval(autoTimer); autoTimer = null; } }
+
+    // event listeners
+    nextBtn?.addEventListener('click', (e) => { e.preventDefault(); nextSlide(); startAuto(); });
+    prevBtn?.addEventListener('click', (e) => { e.preventDefault(); prevSlide(); startAuto(); });
+    dots.forEach(d => d.addEventListener('click', () => { showSlide(Number(d.dataset.index)); startAuto(); }));
+
+    // pause on hover / touchstart
+    const carouselEl = document.querySelector('.promo-carousel');
+    carouselEl?.addEventListener('mouseenter', stopAuto);
+    carouselEl?.addEventListener('mouseleave', startAuto);
+    carouselEl?.addEventListener('touchstart', stopAuto, {passive:true});
+    carouselEl?.addEventListener('touchend', startAuto, {passive:true});
+
+    // init
+    showSlide(0);
+    startAuto();
+
+    // Promo CTA handlers: Claim Promo, Details, Preorder
+    function showToast(msg, t = 2200) {
+      let tEl = document.querySelector('.wrap-toast');
+      if (!tEl) { tEl = document.createElement('div'); tEl.className = 'toast wrap-toast'; document.body.appendChild(tEl); }
+      tEl.textContent = msg;
+      tEl.classList.add('show');
+      setTimeout(()=> tEl.classList.remove('show'), t);
+    }
+
+    // Claim buttons: record in localStorage and show quick feedback
+    promoContainer.querySelectorAll('button[data-action="apply-promo"]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const code = btn.dataset.promoCode || 'UNKNOWN';
+        // store claim flag (not tied to cart logic yet)
+        try { localStorage.setItem('wrap_claimed_promo_'+code, JSON.stringify({ ts: Date.now() })); } catch (err) {}
+        showToast('Promo claimed: ' + code + '. Add qualifying items at checkout.');
+        btn.classList.add('is-claimed');
+      });
+    });
+
+    // Details toggles: show more copy in #promo-more-content
+    const detailsMap = {
+      'shawarma': `<strong>Shawarma Promo (Buy 2 Get 1 Free)</strong><br>
+                   Promo works per 3 Shawarmas. On Tuesdays, the cheapest of each group of 3 will be discounted to free automatically at checkout. Add 2 qualifying shawarmas to your cart and the third will appear as a free line.`,
+      'fries': `<strong>Loaded Fries (Free Coke)</strong><br>
+                Buy a qualifying Loaded Fries during promo hours and we will add a free Coke to your cart. If not auto-added, use the "Add missing items" helper inside the cart.`
+    };
+    promoContainer.querySelectorAll('button[data-action="promo-details"]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const t = btn.dataset.target;
+        const content = detailsMap[t] || 'More promo details coming soon.';
+        const more = document.getElementById('promo-more');
+        const moreContent = document.getElementById('promo-more-content');
+        moreContent.innerHTML = content;
+        more.classList.toggle('hidden');
+        const expanded = btn.getAttribute('aria-expanded') === 'true';
+        btn.setAttribute('aria-expanded', String(!expanded));
+      });
+    });
+
+    // Preorder buttons: reuse your existing `data-action="preorder-promo"` behavior by triggering click on any matching element (your earlier script opened preorder modal for these)
+    promoContainer.querySelectorAll('[data-action="preorder-promo"]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        // Try to find existing preorder openers; trigger their click if present, else open #preorder-modal directly
+        const opener = document.querySelector('[data-action="preorder-promo"], #promo-preorder-btn');
+        if (opener && opener !== btn) opener.click(); // your other script listens on those and will open modal
+        else {
+          const pm = document.getElementById('preorder-modal');
+          if (pm) { pm.style.display = 'flex'; pm.setAttribute('aria-hidden','false'); document.body.style.overflow='hidden'; }
+        }
+      });
+    });
+
+    // keyboard navigation for dots (left/right)
+    document.addEventListener('keydown', (e) => {
+      if (document.activeElement && document.activeElement.tagName === 'INPUT') return; // don't interfere with typing
+      if (e.key === 'ArrowRight') { nextSlide(); startAuto(); }
+      if (e.key === 'ArrowLeft') { prevSlide(); startAuto(); }
+    });
+  });
+})();
+</script>
+  <!-- END BODY -->
+</body>
+  <script>
+/* Preorder wiring: add this AFTER your main script (place before </body>) */
+(function(){
+  document.addEventListener('DOMContentLoaded', () => {
+    const preorderModal = document.getElementById('preorder-modal');
+    const preorderClose = document.getElementById('preorder-close');
+    const preorderCancel = document.getElementById('preorder-cancel');
+    const preorderForm = document.getElementById('preorder-form');
+    const preorderName = document.getElementById('preorder-name');
+    const preorderPhone = document.getElementById('preorder-phone');
+    const preorderNote = document.getElementById('preorder-note');
+    const promoPreorderBtns = Array.from(document.querySelectorAll('[data-action="preorder-promo"], #promo-preorder-btn'));
+
+    // small toast helper (injects a toast if not present)
+    function showToast(msg, timeout = 2500) {
+      let t = document.querySelector('.wrap-toast');
+      if (!t) {
+        t = document.createElement('div');
+        t.className = 'toast wrap-toast';
+        document.body.appendChild(t);
+      }
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(()=> t.classList.remove('show'), timeout);
+    }
+
+    function openPreorder() {
+      if (!preorderModal) return;
+      preorderModal.style.display = 'block';
+      preorderModal.setAttribute('aria-hidden', 'false');
+      // prefills
+      const savedPhone = localStorage.getItem('wrap_user_phone');
+      const savedName = localStorage.getItem('wrap_user_name');
+      if (savedPhone) preorderPhone.value = savedPhone;
+      if (savedName) preorderName.value = savedName;
+      // focus first field
+      setTimeout(()=> preorderName && preorderName.focus(), 120);
+      // prevent page behind from scrolling (small helper)
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closePreorder() {
+      if (!preorderModal) return;
+      preorderModal.style.display = 'none';
+      preorderModal.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+    }
+
+    // open handlers
+    promoPreorderBtns.forEach(btn => {
+      if (!btn) return;
+      btn.addEventListener('click', (ev) => {
+        ev.preventDefault();
+        openPreorder();
+      });
+    });
+
+    // close handlers
+    preorderClose && preorderClose.addEventListener('click', () => closePreorder());
+    preorderCancel && preorderCancel.addEventListener('click', () => closePreorder());
+
+    // close when clicking outside modal-inner
+    if (preorderModal) {
+      preorderModal.addEventListener('click', (e) => {
+        if (e.target === preorderModal) closePreorder();
+      });
+    }
+
+    // ESC to close
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && preorderModal && preorderModal.style.display === 'block') closePreorder();
+    });
+
+    // small helper to read cart summary from rendered DOM (doesn't depend on your internal cart variable)
+    function buildCartSummaryFromDom() {
+      const rows = Array.from(document.querySelectorAll('#cart-items li.cart-line'));
+      const items = [];
+      rows.forEach(li => {
+        // skip promo/free-lines that visually use .cart-free
+        if (li.classList.contains('cart-free')) return;
+        const title = (li.querySelector('.line-title')?.innerText || '').trim();
+        // qty may be in .line-qty inside this line-meta or top-level
+        const qtyElem = li.querySelector('.line-qty');
+        const qty = qtyElem ? Number(qtyElem.innerText.trim()) || 1 : 1;
+        const priceText = li.querySelector('.line-meta strong')?.innerText?.trim() || '';
+        items.push({ title, qty, priceText });
+      });
+      return items;
+    }
+
+    // submit handler
+    if (preorderForm) {
+      preorderForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const name = (preorderName.value || '').trim();
+        const phone = (preorderPhone.value || '').trim();
+        const note = (preorderNote.value || '').trim();
+
+        if (!name || !phone) {
+          alert('Please enter your name and phone number to confirm preorder.');
+          return;
+        }
+
+        // Save for convenience next time
+        try {
+          localStorage.setItem('wrap_user_name', name);
+          localStorage.setItem('wrap_user_phone', phone);
+        } catch (err) { /* ignore storage errors */ }
+
+        const cartSummary = buildCartSummaryFromDom();
+        // Build a simple payload you can inspect / forward to backend later
+        const payload = {
+          name,
+          phone,
+          note,
+          timestamp: new Date().toISOString(),
+          cart: cartSummary
+        };
+
+        // For now: log & show friendly message. You will integrate real server / payment / notifications next.
+        console.log('Preorder submitted:', payload);
+
+        // show confirmation to user
+        showToast('Preorder confirmed — we will reserve your items for the next promo window.');
+
+        // close modal after a short delay
+        setTimeout(() => {
+          closePreorder();
+        }, 900);
+      });
+    }
+
+    // Accessibility: ensure modal-inner is focusable if keyboard user tabs in
+    const inner = preorderModal && preorderModal.querySelector('.modal-inner');
+    if (inner) inner.setAttribute('tabindex', '-1');
+  });
+})();
+</script>
+  <!-- Cart footer enhancement: paste after your main script and before </body> -->
 <style>
 /* Override / enhancement for cart drawer footer behavior */
 .cart-drawer {
@@ -3376,1477 +4643,644 @@ body.cart-open::before {
 </style>
 
 <script>
-/*
-  Consolidated script for Wrap District — full-page behavior.
-  - Replaces all previous <script> blocks: menu tabs, mobile nav, cart management,
-    product modal, promo carousel/countdown, checkout, preorder, order confirmation,
-    and small UI helpers.
-  - Self-contained, attaches key functions to window for compatibility (computeCartTotals, renderCart, openCheckoutPage, etc).
-  - Designed to work with the HTML/CSS you provided.
+/* Cart footer behavior + totals sync
+   Place after your main script. Non-invasive: doesn't rewrite your cart logic.
 */
 (function () {
-  'use strict';
-
-  /* -------------------------
-     Utility helpers and config
-  ------------------------- */
-  const STORE_COORDS = { lat: 5.6600, lon: 0.0190 }; // update if needed
-  const DELIVERY_CONFIG = {
-    baseFee: 6,
-    perKm: 2.5,
-    minFee: 4,
-    maxFee: 60,
-    freeWithinKm: 0.8
-  };
-  const PAYSTACK_PUBLIC_KEY = 'pk_test_297586e51710e83d3c159bfe71ff45c7e23411fa'; // replace with live key if needed
-
-  const qs = (sel, ctx = document) => ctx.querySelector(sel);
-  const qsa = (sel, ctx = document) => Array.from((ctx || document).querySelectorAll(sel));
-  const fmtGhc = (n) => `GHC ${Math.round(Number(n || 0))}`;
-  const escapeHtml = (s = '') => String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-
-  /* -------------------------
-     Persistent cart storage & model
-     window.cart is an object keyed by unique line ids
-  ------------------------- */
-  const CART_STORAGE_KEY = 'wrap_cart_v2';
-
-  function loadCart() {
-    try {
-      const raw = localStorage.getItem(CART_STORAGE_KEY);
-      const parsed = raw ? JSON.parse(raw) : {};
-      // ensure object format
-      if (parsed && typeof parsed === 'object') {
-        window.cart = parsed;
-        return parsed;
-      }
-    } catch (e) { console.warn('loadCart error', e); }
-    window.cart = {};
-    return window.cart;
-  }
-
-  function saveCart() {
-    try {
-      localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(window.cart || {}));
-    } catch (e) { console.warn('saveCart error', e); }
-  }
-
-  // Generate a stable key for a line using item id + normalized meta
-  function makeLineKey(itemId, meta) {
-    try {
-      const normalized = Object.keys(meta || {}).sort().map(k => `${k}:${JSON.stringify(meta[k])}`).join('|');
-      return `${itemId}__${hashString(normalized)}`;
-    } catch (e) { return `${itemId}__${Date.now()}`; }
-  }
-
-  function hashString(s) {
-    // simple hash to keep keys short
-    let h = 0;
-    for (let i = 0; i < s.length; i++) {
-      h = ((h << 5) - h) + s.charCodeAt(i);
-      h |= 0;
-    }
-    return Math.abs(h).toString(36);
-  }
-
-  /* -------------------------
-     Promo logic
-     - buy2get1 for shawarma: for each 3 qualifying shawarmas, one unit is free
-     - freecoke for fries: add a free Coke line when qualifying fries present
-  ------------------------- */
-  function applyPromos(cartObj) {
-    // returns an object with promoDiscount number and possibly modified lines (e.g., free items)
-    const result = { promoDiscount: 0, freeLines: [] };
-
-    // simple counters
-    let shawarmaCount = 0;
-    let shawarmaUnitPrice = 0;
-    let friesCount = 0;
-    // iterate lines
-    Object.values(cartObj).forEach(line => {
-      const id = (line.baseId || '').toLowerCase();
-      if (id.includes('shawarma')) {
-        shawarmaCount += Number(line.qty || 0);
-        // approximate unit price (if lines may differ per option, use unitPrice)
-        shawarmaUnitPrice = Number(line.unitPrice || shawarmaUnitPrice || 0);
-      }
-      if (id.includes('fries') || id.includes('loaded-fries')) {
-        friesCount += Number(line.qty || 0);
-      }
-    });
-
-    // buy 2 get 1 free (for every 3 shawarmas, discount one cheapest unitPrice)
-    if (shawarmaCount >= 3) {
-      const freeUnits = Math.floor(shawarmaCount / 3);
-      // determine discount: assume uniform price, else approximate by average unitPrice
-      const discount = freeUnits * (shawarmaUnitPrice || 0);
-      result.promoDiscount += Math.round(discount);
-    }
-
-    // Fries -> free Coke: For each qualifying fries line >=1, add a "Free Coke" free line once
-    if (friesCount > 0) {
-      // Ensure we don't add duplicate free coke lines by checking cartObj for _free_coke flag lines
-      const alreadyHas = Object.values(cartObj).some(l => l.isFree && (l.baseId || '').toLowerCase().includes('free-coke'));
-      if (!alreadyHas) {
-        result.freeLines.push({
-          id: `free-coke-${Date.now()}`,
-          baseId: 'free-coke',
-          title: 'Free Coke',
-          qty: 1,
-          unitPrice: 0,
-          isFree: true,
-          meta: {}
-        });
-      }
-    }
-
-    return result;
-  }
-
-  /* -------------------------
-     Totals computation - exposed as computeCartTotals()
-     returns { subtotal, promoDiscount, delivery, total, lines (array) }
-  ------------------------- */
-  function computeCartTotals() {
-    const cartObj = window.cart || {};
-    let subtotal = 0;
-    const lines = [];
-    Object.keys(cartObj).forEach(k => {
-      const l = cartObj[k];
-      const unit = Number(l.unitPrice || 0);
-      const qty = Number(l.qty || 1);
-      subtotal += unit * qty;
-      lines.push(Object.assign({}, l));
-    });
-
-    // promo application
-    const promo = applyPromos(cartObj);
-    // merge promo.freeLines into lines (not persisted into cart unless addFreeLines() called explicitly)
-    if (promo.freeLines && promo.freeLines.length) {
-      promo.freeLines.forEach(fl => lines.push(Object.assign({}, fl)));
-    }
-
-    const promoDiscount = Math.round(promo.promoDiscount || 0);
-    const delivery = 0; // delivery computed later in checkout context; here default 0
-    const total = Math.max(0, subtotal - promoDiscount + delivery);
-    return { subtotal: Math.round(subtotal), promoDiscount, delivery, total, lines };
-  }
-
-  // Expose computeCartTotals globally
-  window.computeCartTotals = computeCartTotals;
-
-  /* -------------------------
-     DOM render: renderCart()
-     fills #cart-items and updates counts & totals
-  ------------------------- */
-  function renderCart() {
-    const cartObj = window.cart || {};
-    const cartItemsEl = qs('#cart-items');
-    const cartCountEl = qs('#cart-count');
-    const cartMiniCountEl = qs('#cart-mini-count');
-    const cartSubtotalEl = qs('#cart-subtotal');
-    const cartTotalEl = qs('#cart-total');
-    const cartHeaderTotalEl = qs('#cart-header-total');
-    const footerSubtotalEl = qs('#footer-subtotal');
-    const footerTotalEl = qs('#footer-total');
-
-    if (!cartItemsEl) return;
-
-    cartItemsEl.innerHTML = ''; // clear
-
-    // Build list items
-    const keys = Object.keys(cartObj || {});
-    if (!keys.length) {
-      const li = document.createElement('li');
-      li.className = 'empty';
-      li.innerText = 'Your cart is empty.';
-      cartItemsEl.appendChild(li);
-    } else {
-      keys.forEach(k => {
-        const line = cartObj[k];
-        const li = document.createElement('li');
-        li.className = 'cart-line';
-        li.dataset.cartKey = k;
-
-        // left area
-        const left = document.createElement('div');
-        left.className = 'line-left';
-        left.style.display = 'flex';
-        left.style.gap = '12px';
-        left.style.alignItems = 'center';
-
-        const img = document.createElement('img');
-        img.className = 'cart-thumb';
-        img.src = line.imageSrc || (line.meta && line.meta.image) || 'placeholder-thumb.png';
-        img.alt = line.title || '';
-        left.appendChild(img);
-
-        const titleWrap = document.createElement('div');
-        titleWrap.style.minWidth = '0';
-        const title = document.createElement('div');
-        title.className = 'line-title';
-        title.innerText = line.title || 'Item';
-        titleWrap.appendChild(title);
-
-        const meta = document.createElement('div');
-        meta.className = 'line-meta';
-        // show meta succinctly: size/protein/addons
-        const metaParts = [];
-        try {
-          if (line.meta) {
-            if (line.meta.size) metaParts.push(String(line.meta.size));
-            if (line.meta.protein) metaParts.push(String(line.meta.protein));
-            if (Array.isArray(line.meta.addons) && line.meta.addons.length) {
-              metaParts.push(line.meta.addons.map(a => a.label || a.key || a).join(', '));
-            }
-          }
-        } catch (e) { /* ignore */ }
-        meta.innerText = metaParts.join(' • ');
-        titleWrap.appendChild(meta);
-
-        left.appendChild(titleWrap);
-
-        // right controls
-        const right = document.createElement('div');
-        right.className = 'line-controls';
-        right.style.display = 'flex';
-        right.style.alignItems = 'center';
-        right.style.gap = '8px';
-
-        const qtyBtnDec = document.createElement('button');
-        qtyBtnDec.className = 'icon-btn cart-decrease';
-        qtyBtnDec.title = 'Decrease quantity';
-        qtyBtnDec.innerHTML = '<i class="fa fa-minus"></i>';
-        qtyBtnDec.addEventListener('click', (e) => {
-          e.preventDefault();
-          changeQty(k, -1);
-        });
-
-        const qtyNum = document.createElement('div');
-        qtyNum.className = 'line-qty';
-        qtyNum.innerText = String(line.qty || 1);
-        qtyNum.style.minWidth = '28px';
-        qtyNum.style.textAlign = 'center';
-
-        const qtyBtnInc = document.createElement('button');
-        qtyBtnInc.className = 'icon-btn cart-increase';
-        qtyBtnInc.title = 'Increase quantity';
-        qtyBtnInc.innerHTML = '<i class="fa fa-plus"></i>';
-        qtyBtnInc.addEventListener('click', (e) => {
-          e.preventDefault();
-          changeQty(k, 1);
-        });
-
-        const removeBtn = document.createElement('button');
-        removeBtn.className = 'icon-btn cart-remove';
-        removeBtn.title = 'Remove';
-        removeBtn.innerHTML = '<i class="fa fa-trash"></i>';
-        removeBtn.addEventListener('click', (e) => {
-          e.preventDefault();
-          removeLine(k);
-        });
-
-        const lineTotal = document.createElement('div');
-        lineTotal.className = 'line-total';
-        lineTotal.style.fontWeight = '900';
-        lineTotal.style.color = 'var(--accent-2)';
-        lineTotal.style.minWidth = '72px';
-        lineTotal.style.textAlign = 'right';
-        lineTotal.innerText = fmtGhc((line.unitPrice || 0) * (line.qty || 1));
-
-        right.appendChild(qtyBtnDec);
-        right.appendChild(qtyNum);
-        right.appendChild(qtyBtnInc);
-        right.appendChild(removeBtn);
-        right.appendChild(lineTotal);
-
-        li.appendChild(left);
-        li.appendChild(right);
-        cartItemsEl.appendChild(li);
-      });
-    }
-
-    // totals
-    const totals = computeCartTotals();
-    cartSubtotalEl && (cartSubtotalEl.innerText = fmtGhc(totals.subtotal));
-    cartTotalEl && (cartTotalEl.innerText = fmtGhc(totals.total));
-    cartHeaderTotalEl && (cartHeaderTotalEl.innerText = fmtGhc(totals.total));
-    footerSubtotalEl && (footerSubtotalEl.innerText = fmtGhc(totals.subtotal));
-    footerTotalEl && (footerTotalEl.innerText = fmtGhc(totals.total));
-
-    // counts
-    const totalItems = Object.values(window.cart || {}).reduce((s, l) => s + Number(l.qty || 0), 0);
-    cartCountEl && (cartCountEl.innerText = String(totalItems));
-    cartMiniCountEl && (cartMiniCountEl.innerText = String(totalItems));
-
-    // show/hide promo helper in cart (simple heuristic)
-    const cartPromoEl = qs('#cart-promo');
-    if (cartPromoEl) {
-      if (totals.promoDiscount > 0 || (totals.lines && totals.lines.some(l => (l.baseId||'').includes('free-coke')))) {
-        cartPromoEl.classList.remove('hidden');
-        const promoDiscountEl = qs('#promo-discount');
-        if (promoDiscountEl) promoDiscountEl.innerText = `-GHC ${totals.promoDiscount}`;
-        const promoHelp = qs('#promo-help-text');
-        if (promoHelp) promoHelp.innerText = computePromoHelpText();
-      } else {
-        cartPromoEl.classList.add('hidden');
-      }
-    }
-
-    saveCart();
-  }
-
-  // Expose renderCart globally
-  window.renderCart = renderCart;
-
-  function computePromoHelpText() {
-    // Simple helper text for cart promo area based on current cart
-    const cartObj = window.cart || {};
-    const totals = computeCartTotals();
-    // If shawarma near threshold
-    const shawarmaCount = Object.values(cartObj).reduce((s, l) => s + ((l.baseId || '').toLowerCase().includes('shawarma') ? Number(l.qty || 0) : 0), 0);
-    if (shawarmaCount > 0 && shawarmaCount % 3 !== 0) {
-      const need = 3 - (shawarmaCount % 3);
-      return `Add ${need} more shawarma${need > 1 ? 's' : ''} to get one free.`;
-    }
-    if (totals.promoDiscount > 0) return `Promo applied: -GHC ${totals.promoDiscount}`;
-    return 'Tip: add qualifying items to trigger promos like Buy 2 Get 1 Free.';
-  }
-
-  function changeQty(key, delta) {
-    if (!window.cart || !window.cart[key]) return;
-    const cur = Number(window.cart[key].qty || 0);
-    const next = Math.max(0, cur + delta);
-    if (next === 0) {
-      delete window.cart[key];
-    } else {
-      window.cart[key].qty = next;
-    }
-    saveCart();
-    renderCart();
-  }
-
-  function removeLine(key) {
-    if (!window.cart || !window.cart[key]) return;
-    delete window.cart[key];
-    saveCart();
-    renderCart();
-  }
-
-  /* -------------------------
-     Add item to cart (from menu or product modal)
-     - accepts itemId, title, unitPrice, qty (1 default), imageSrc, meta object
-  ------------------------- */
-  function addToCart({ itemId, title, unitPrice = 0, qty = 1, imageSrc = '', meta = {} }) {
-    loadCart(); // ensure window.cart exists
-    const key = makeLineKey(itemId, meta);
-    if (window.cart[key]) {
-      window.cart[key].qty = Number(window.cart[key].qty || 0) + Number(qty || 1);
-    } else {
-      window.cart[key] = {
-        baseId: itemId,
-        title: title || 'Item',
-        unitPrice: Number(unitPrice || 0),
-        qty: Number(qty || 1),
-        imageSrc: imageSrc || '',
-        meta: meta || {}
-      };
-    }
-    saveCart();
-    renderCart();
-    showToast(`${title} added to cart`);
-  }
-
-  // Expose addToCart for product modal convenience
-  window.addToCart = addToCart;
-
-  /* -------------------------
-     Toast helper
-  ------------------------- */
-  let toastTimer = null;
-  function showToast(msg, timeout = 1800) {
-    let t = qs('.toast.wrap-toast');
-    if (!t) {
-      t = document.createElement('div');
-      t.className = 'toast wrap-toast';
-      t.setAttribute('role', 'status');
-      t.innerText = msg;
-      document.body.appendChild(t);
-    }
-    t.innerText = msg;
-    t.classList.add('show');
-    if (toastTimer) clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => {
-      t.classList.remove('show');
-    }, timeout);
-  }
-
-  /* -------------------------
-     Mobile nav behavior
-  ------------------------- */
-  function setupMobileNav() {
-    const mobileNav = qs('#mobile-nav');
-    const hamburger = qs('#hamburger');
-    const navCloseBtn = qs('#nav-close');
-
-    if (!mobileNav || !hamburger) return;
-
-    function openNav() {
-      mobileNav.style.display = 'block';
-      mobileNav.setAttribute('aria-hidden', 'false');
-      hamburger.setAttribute('aria-expanded', 'true');
-      try { mobileNav.focus(); } catch (e) {}
-      document.body.style.overflow = 'hidden';
-    }
-    function closeNav() {
-      mobileNav.style.display = 'none';
-      mobileNav.setAttribute('aria-hidden', 'true');
-      hamburger.setAttribute('aria-expanded', 'false');
-      try { hamburger.focus(); } catch (e) {}
-      document.body.style.overflow = '';
-    }
-
-    hamburger.addEventListener('click', (e) => {
-      const expanded = hamburger.getAttribute('aria-expanded') === 'true';
-      if (expanded) {
-        closeNav();
-      } else {
-        openNav();
-      }
-    });
-
-    navCloseBtn && navCloseBtn.addEventListener('click', closeNav);
-    mobileNav.addEventListener('click', (e) => {
-      if (e.target === mobileNav) closeNav();
-    });
-    document.addEventListener('keydown', (ev) => {
-      if (ev.key === 'Escape' && mobileNav.getAttribute('aria-hidden') === 'false') closeNav();
-    });
-
-    // smooth-scroll nav links
-    qsa('#mobile-nav a.nav-link').forEach(link => {
-      link.addEventListener('click', (e) => {
-        // close menu immediately
-        closeNav();
-        const href = (link.getAttribute('href') || '').trim();
-        if (href && href.startsWith('#')) {
-          e.preventDefault();
-          setTimeout(() => {
-            const target = document.querySelector(href);
-            if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            else window.location.hash = href;
-          }, 120);
-        }
-      }, { passive: true });
-    });
-  }
-
-  /* -------------------------
-     Menu tabs & filtering
-  ------------------------- */
-  function setupMenuTabs() {
-    const tabButtons = qsa('.menu-tabs .tab-btn');
-    const menuItems = qsa('.menu-item');
-
-    if (!tabButtons.length) return;
-
-    function applyTabFilter(cat) {
-      menuItems.forEach(item => {
-        const itemCat = (item.dataset.category || '').toLowerCase();
-        const show = (!cat || cat === 'all') || itemCat === cat || itemCat.split(' ').includes(cat);
-        item.style.display = show ? '' : 'none';
-        item.setAttribute('aria-hidden', show ? 'false' : 'true');
-      });
-    }
-
-    function setActiveTab(btn) {
-      tabButtons.forEach(b => {
-        const is = b === btn;
-        b.classList.toggle('is-active', is);
-        b.setAttribute('aria-selected', String(is));
-        if (is) try { b.focus(); } catch (e) {}
-      });
-    }
-
-    tabButtons.forEach(btn => {
-      if (!btn.hasAttribute('role')) btn.setAttribute('role', 'tab');
-      if (!btn.hasAttribute('tabindex')) btn.setAttribute('tabindex', '0');
-
-      btn.addEventListener('click', (e) => {
-        const cat = (btn.dataset.cat || '').toLowerCase();
-        setActiveTab(btn);
-        applyTabFilter(cat);
-      });
-
-      btn.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          btn.click();
-        }
-      });
-    });
-
-    const initial = tabButtons.find(b => b.classList.contains('is-active')) || tabButtons[0];
-    if (initial) {
-      setActiveTab(initial);
-      applyTabFilter((initial.dataset.cat || 'all').toLowerCase());
-    }
-  }
-
-  /* -------------------------
-     Cart drawer open/close wiring
-  ------------------------- */
-  function setupCartDrawer() {
-    const cartToggle = qs('#cart-toggle');
-    const cartDrawer = qs('#cart-drawer');
-    const cartClose = qs('#cart-close');
+  document.addEventListener('DOMContentLoaded', () => {
+    const cartDrawer = document.getElementById('cart-drawer');
+    const cartToggle = document.getElementById('cart-toggle');
+    const cartClose = document.getElementById('cart-close');
+    const cartMiniCount = document.getElementById('cart-mini-count');
+    const cartSubtotal = document.getElementById('cart-subtotal');
+    const cartTotal = document.getElementById('cart-total');
+    const footerSubtotal = document.getElementById('footer-subtotal');
+    const footerTotal = document.getElementById('footer-total');
 
     if (!cartDrawer) return;
 
-    function openCart() {
-      cartDrawer.style.display = 'block';
-      cartDrawer.setAttribute('aria-hidden', 'false');
-      document.body.style.overflow = 'hidden';
-      try { cartDrawer.focus(); } catch (e) {}
-      renderCart();
-    }
-    function closeCart() {
-      cartDrawer.style.display = 'none';
-      cartDrawer.setAttribute('aria-hidden', 'true');
-      document.body.style.overflow = '';
-      try { cartToggle && cartToggle.focus(); } catch (e) {}
-    }
+    // Ensure drawer is flex-column (in case some earlier CSS is applied late)
+    cartDrawer.style.display = cartDrawer.style.display || 'block';
 
-    cartToggle && cartToggle.addEventListener('click', (e) => {
-      const hidden = cartDrawer.getAttribute('aria-hidden') !== 'false';
-      if (hidden) openCart(); else closeCart();
-    });
-
-    cartClose && cartClose.addEventListener('click', closeCart);
-    // clicking outside the drawer closes it
-    cartDrawer.addEventListener('click', (e) => {
-      if (e.target === cartDrawer) closeCart();
-    });
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && cartDrawer.getAttribute('aria-hidden') === 'false') closeCart();
-    });
-
-    // clear cart button
-    const clearBtn = qs('#clear-cart');
-    clearBtn && clearBtn.addEventListener('click', () => {
-      if (!confirm('Clear cart?')) return;
-      window.cart = {};
-      saveCart();
-      renderCart();
-      showToast('Cart cleared');
-    });
-
-    // Add missing (promo helper) — simple implementation: add one shawarma lite if buy2get1 near threshold
-    const addMissing = qs('#add-missing');
-    addMissing && addMissing.addEventListener('click', () => {
-      // determine nearest promo need
-      const cartObj = window.cart || {};
-      const shawarmaCount = Object.values(cartObj).reduce((s, l) => s + ((l.baseId || '').toLowerCase().includes('shawarma') ? Number(l.qty || 0) : 0), 0);
-      if (shawarmaCount % 3 === 0) {
-        showToast('Cart already meets the promo condition');
-        return;
-      }
-      const need = 3 - (shawarmaCount % 3);
-      for (let i = 0; i < need; i++) {
-        addToCart({ itemId: 'shawarma', title: 'Shawarma', unitPrice: 45, qty: 1, imageSrc: 'thumb-shawarma.jpg', meta: { size: 'classic' } });
-      }
-      renderCart();
-      showToast(`Added ${need} shawarma${need>1?'s':''} to reach promo`);
-    });
-  }
-
-  /* -------------------------
-     Attach add/remove buttons in menu (delegation)
-     - Handles computing unit price from selects and addons
-  ------------------------- */
-  function setupMenuAddButtons() {
-    // compute price from a menu-item element
-    function computeItemUnitPrice(menuItem) {
-      let total = 0;
-      // selects
-      qsa('select', menuItem).forEach(s => {
-        total += Number(s.value || 0);
-      });
-      // checkboxes with class addon-checkbox
-      qsa('input.addon-checkbox', menuItem).forEach(cb => {
-        if (cb.checked) total += Number(cb.value || 0);
-      });
-      // if the menu-item has a .price-value span, fallback to that if total is zero
-      if (total === 0) {
-        const pv = qs('.price-value', menuItem);
-        if (pv) total = Number(pv.innerText || 0);
-      }
-      return Math.round(total);
-    }
-
-    // capture add clicks
-    document.addEventListener('click', (e) => {
-      const el = e.target.closest && e.target.closest('.add-btn');
-      if (!el) return;
-      e.preventDefault();
-      const itemId = el.dataset.itemId || el.closest('.menu-item')?.dataset.itemId || el.closest('.menu-item')?.id || 'item';
-      const menuItem = el.closest('.menu-item');
-      const title = (menuItem && (qs('.item-title', menuItem)?.innerText || 'Item')) || 'Item';
-      const imageSrc = menuItem && (qs('.item-thumb', menuItem)?.src || '');
-      // assemble meta from selects and addons
-      const meta = {};
-      qsa('select', menuItem).forEach(s => {
-        const name = s.name || s.className || ('sel_' + Math.random().toString(36).slice(2,6));
-        meta[name] = { text: s.options[s.selectedIndex]?.text || s.value, value: s.value };
-      });
-      const addons = [];
-      qsa('.addon input[type="checkbox"]', menuItem).forEach(cb => {
-        if (cb.checked) {
-          addons.push({ key: cb.dataset.addonKey || cb.value, label: cb.closest('.addon')?.querySelector('span')?.innerText || cb.value, value: Number(cb.value || 0) });
-        }
-      });
-      if (addons.length) meta.addons = addons;
-      const unitPrice = computeItemUnitPrice(menuItem);
-      addToCart({ itemId, title, unitPrice, qty: 1, imageSrc, meta });
-    });
-
-    // capture remove button (in menu card) if present (some markup shows remove-btn)
-    document.addEventListener('click', (e) => {
-      const el = e.target.closest && e.target.closest('.remove-btn');
-      if (!el) return;
-      e.preventDefault();
-      // best-effort: find an existing cart key for this itemId and decrement/remove
-      const itemId = el.dataset.itemId || el.closest('.menu-item')?.dataset.itemId;
-      if (!itemId) {
-        showToast('Cannot locate item to remove');
-        return;
-      }
-      // find any matching cart key
-      const cartObj = window.cart || {};
-      const found = Object.keys(cartObj).find(k => (cartObj[k].baseId || '').toLowerCase() === itemId.toLowerCase());
-      if (found) {
-        changeQty(found, -1);
-        showToast('Item removed');
+    // When the drawer opens/closes, toggle body scroll and add subtle dim
+    function setDrawerOpen(open) {
+      if (open) {
+        cartDrawer.style.display = 'block';
+        cartDrawer.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';     // prevent background scroll
+        document.body.classList.add('cart-open');    // small dim overlay via CSS
+        // ensure drawer gets focus for keyboard navigation
+        cartDrawer.setAttribute('tabindex','-1');
+        cartDrawer.focus && cartDrawer.focus();
       } else {
-        showToast('Item not in cart');
+        cartDrawer.style.display = 'none';
+        cartDrawer.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+        document.body.classList.remove('cart-open');
+      }
+    }
+
+    // Attach to existing buttons (we add handlers in addition to your existing ones)
+    cartToggle && cartToggle.addEventListener('click', (e) => {
+      // If it's already open (aria-hidden false) then close, else open.
+      const isOpen = cartDrawer.getAttribute('aria-hidden') === 'false' || cartDrawer.style.transform === 'translateX(0)';
+      setDrawerOpen(!isOpen);
+    });
+    cartClose && cartClose.addEventListener('click', () => setDrawerOpen(false));
+
+    // Also close drawer on Escape
+    document.addEventListener('keydown', (ev) => {
+      if (ev.key === 'Escape' && cartDrawer.getAttribute('aria-hidden') === 'false') {
+        setDrawerOpen(false);
       }
     });
-  }
 
-  /* -------------------------
-     Product modal behavior
-     - opens when clicking .item-thumb or .item-title
-     - clones .item-config into modal, allows edits, then adds selections to cart
-  ------------------------- */
-  function setupProductModal() {
-    const modal = qs('#product-modal');
-    if (!modal) return;
-    const pmThumb = qs('#pm-thumb', modal);
-    const pmTitle = qs('#pm-title', modal);
-    const pmDesc = qs('#pm-desc', modal);
-    const pmBody = qs('#pm-body', modal);
-    const pmPrice = qs('#pm-price', modal);
-    const pmAdd = qs('#pm-add', modal);
-    const pmCancel = qs('#pm-cancel', modal);
-    const pmClose = qs('#pm-close', modal);
+    // Small helper: sync the small footer totals with the main totals
+    function syncFooterTotals(){
+      try {
+        if (cartSubtotal && footerSubtotal) footerSubtotal.innerText = cartSubtotal.innerText || footerSubtotal.innerText;
+        if (cartTotal && footerTotal) footerTotal.innerText = footerTotal.innerText && cartTotal.innerText ? cartTotal.innerText : footerTotal.innerText;
+      } catch (err) { /* ignore */ }
+    }
 
-    let activeMenuItem = null;
-    let clonedConfig = null;
+    // Run once on start
+    syncFooterTotals();
 
-    function calculatePriceFromContainer(container) {
+    // Watch for changes to the main totals and sync them to the footer
+    const watchTargets = [];
+    if (cartSubtotal) watchTargets.push(cartSubtotal);
+    if (cartTotal) watchTargets.push(cartTotal);
+
+    if (watchTargets.length) {
+      const observer = new MutationObserver(() => { syncFooterTotals(); });
+      watchTargets.forEach(el => {
+        try {
+          observer.observe(el, { characterData: true, childList: true, subtree: true });
+        } catch (err) { /* fallback: periodic sync */ }
+      });
+      // fallback periodic sync in case mutationobserver couldn't attach
+      setInterval(syncFooterTotals, 700);
+    } else {
+      // If those elements don't exist, still try to sync periodically
+      setInterval(syncFooterTotals, 700);
+    }
+
+    // Also ensure cart-body scroll area is sized properly on orientation/resize
+    function adjustCartBodyPadding() {
+      const bodyEl = cartDrawer.querySelector('.cart-body');
+      const footerEl = cartDrawer.querySelector('.cart-footer');
+      if (!bodyEl || !footerEl) return;
+      const footerH = footerEl.getBoundingClientRect().height || 96;
+      // ensure bottom padding is at least footer height + 12px
+      bodyEl.style.paddingBottom = (footerH + 18) + 'px';
+    }
+    window.addEventListener('resize', adjustCartBodyPadding);
+    setTimeout(adjustCartBodyPadding, 120);
+  });
+})();
+</script>
+<script>
+/* Persistent Cart — Replacement for your cart script
+   Paste this in place of (or immediately after) your current cart script block.
+   It preserves your UI behavior and adds localStorage persistence + menu selection restore.
+*/
+(function () {
+  const q = (s, ctx = document) => ctx.querySelector(s);
+  const qa = (s, ctx = document) => Array.from((ctx || document).querySelectorAll(s));
+  const fmtGhc = (n) => `GHC ${Number(n).toFixed(0)}`;
+
+  document.addEventListener('DOMContentLoaded', () => {
+    // Elements
+    const hamburger = q('#hamburger'), mobileNav = q('#mobile-nav'), navClose = q('#nav-close');
+    const cartToggle = q('#cart-toggle'), cartDrawer = q('#cart-drawer'), cartClose = q('#cart-close');
+    const cartCountBadge = q('#cart-count'), cartMiniCount = q('#cart-mini-count');
+    const cartItemsList = q('#cart-items'), cartSubtotalEl = q('#cart-subtotal'), cartDeliveryEl = q('#cart-delivery'), cartTotalEl = q('#cart-total');
+    const cartPromoBlock = q('#cart-promo'), promoDiscountEl = q('#promo-discount'), promoHelpText = q('#promo-help-text'), addMissingBtn = q('#add-missing');
+    const checkoutBtn = q('#checkout-btn'), clearCartBtn = q('#clear-cart');
+    const slidesWrap = q('#slides'), slideDots = qa('.dot'), slideElements = qa('.slide'), slidePrev = q('.slide-prev'), slideNext = q('.slide-next');
+    const promoCountdownEl = q('#promo-timer'), entryPromoModal = q('#entry-promo'), entryCloseBtn = q('#entry-close');
+    const claimPromoEntryBtn = q('#claim-promo-entry'), dontShowAgainCheckbox = q('#dont-show-again');
+
+    // Storage keys (bump version if you change format later)
+    const CART_KEY = 'wrap_cart_v2';
+    const MENU_STATE_KEY = 'wrap_menu_state_v2';
+
+    // App state
+    // cart keys are unique per configuration: { key -> { id(key), baseId, title, unitPrice, qty, meta, imageSrc } }
+    let cart = loadCartFromStorage();
+
+    // Expose for other scripts that may read window.cart
+    window.cart = cart;
+
+    const promo = {
+      // only active on Tuesdays (day 2). No "claimed" override — user requested Tue-only.
+      activeDays: [2],
+      isActive() {
+        const now = new Date();
+        return this.activeDays.includes(now.getDay());
+      }
+    };
+
+    // slideshow state
+    let slideIndex = 0, slideTimer = null, slideAutoDelay = 5000;
+
+    // init small UI
+    hamburger?.addEventListener('click', () => {
+      const expanded = hamburger.getAttribute('aria-expanded') === 'true';
+      hamburger.setAttribute('aria-expanded', String(!expanded));
+      if (mobileNav) {
+        mobileNav.setAttribute('aria-hidden', String(expanded));
+        mobileNav.style.display = expanded ? 'none' : 'block';
+      }
+    });
+    navClose?.addEventListener('click', () => {
+      if (mobileNav) { mobileNav.style.display = 'none'; mobileNav.setAttribute('aria-hidden','true'); hamburger.setAttribute('aria-expanded','false'); }
+    });
+    cartToggle?.addEventListener('click', openCart);
+    cartClose?.addEventListener('click', closeCart);
+    addMissingBtn?.addEventListener('click', handleAddMissing);
+    checkoutBtn?.addEventListener('click', handleCheckout);
+    clearCartBtn?.addEventListener('click', handleClearCart);
+
+    // entry promo handlers
+    entryCloseBtn?.addEventListener('click', () => { entryPromoModal.classList.add('hidden'); });
+    claimPromoEntryBtn?.addEventListener('click', () => {
+      if (!promo.isActive()) {
+        alert('The Tuesday promo applies only on Tuesdays. You will be able to claim it when it is Tuesday in your local time.');
+        return;
+      }
+      alert('Promo is active — add qualifying items to see discounts at checkout (Tuesday).');
+    });
+    dontShowAgainCheckbox?.addEventListener('change', (e) => {
+      if (e.target.checked) { localStorage.setItem('wrap_hide_entry_promo','1'); } else { localStorage.removeItem('wrap_hide_entry_promo'); }
+    });
+
+    // slideshow
+    initSlideshow();
+
+    // menu interactions & preview price
+    initMenuInteractions();
+
+    // restore menu selections saved previously (so UI stays the same after refresh)
+    restoreMenuSelections();
+
+    // promo countdown
+    updatePromoCountdown();
+    setInterval(updatePromoCountdown, 1000);
+
+    // initial render (use renderCart defined below)
+    renderCart();
+
+    /* ----------------- Persistence helpers ----------------- */
+    function saveCartToStorage() {
+      try {
+        localStorage.setItem(CART_KEY, JSON.stringify(cart));
+        // also sync exposed window.cart
+        window.cart = cart;
+      } catch (err) {
+        console.warn('Could not save cart to localStorage:', err);
+      }
+    }
+
+    function loadCartFromStorage() {
+      try {
+        const raw = localStorage.getItem(CART_KEY);
+        if (!raw) return {};
+        const parsed = JSON.parse(raw);
+        // ensure numbers are numbers
+        Object.keys(parsed).forEach(k => {
+          const l = parsed[k];
+          l.unitPrice = Number(l.unitPrice) || 0;
+          l.qty = Number(l.qty) || 0;
+        });
+        return parsed;
+      } catch (err) {
+        console.warn('Could not load cart from storage:', err);
+        return {};
+      }
+    }
+
+    function saveMenuSelections() {
+      try {
+        const state = {};
+        qa('.menu-item').forEach(mi => {
+          const id = mi.dataset.itemId;
+          if (!id) return;
+          const selects = {};
+          qa('select', mi).forEach(s => { selects[s.name || s.className || s.dataset.item || 'select'] = s.value; });
+          const addons = [];
+          qa('input.addon-checkbox', mi).forEach(cb => { if (cb.checked) addons.push(cb.dataset.addonKey || cb.value || 'x'); });
+          state[id] = { selects, addons };
+        });
+        localStorage.setItem(MENU_STATE_KEY, JSON.stringify(state));
+      } catch (err) {
+        console.warn('Could not save menu selections:', err);
+      }
+    }
+
+    function restoreMenuSelections() {
+      try {
+        const raw = localStorage.getItem(MENU_STATE_KEY);
+        if (!raw) return;
+        const saved = JSON.parse(raw);
+        Object.keys(saved).forEach(itemId => {
+          const mi = q(`[data-item-id="${itemId}"]`);
+          if (!mi) return;
+          const info = saved[itemId];
+          if (info.selects) {
+            Object.keys(info.selects).forEach(name => {
+              const sel = mi.querySelector(`select[name="${name}"]`);
+              if (sel) sel.value = info.selects[name];
+            });
+          }
+          if (Array.isArray(info.addons)) {
+            qa('input.addon-checkbox', mi).forEach(cb => {
+              cb.checked = info.addons.includes(cb.dataset.addonKey) || info.addons.includes(cb.value);
+            });
+          }
+          // trigger a change so price recalculation picks up restored values
+          mi.querySelectorAll('select, input[type="checkbox"]').forEach(el => el.dispatchEvent(new Event('change', { bubbles:true })));
+        });
+      } catch (err) {
+        console.warn('Could not restore menu selections:', err);
+      }
+    }
+
+    // Ensure menu selections saved whenever user interacts with selects/checkboxes
+    document.addEventListener('change', (e) => {
+      if (e.target && (e.target.tagName === 'SELECT' || (e.target.type === 'checkbox' && e.target.classList.contains('addon-checkbox')))) {
+        // tiny debounce
+        clearTimeout(document._saveMenuTimer);
+        document._saveMenuTimer = setTimeout(() => { saveMenuSelections(); }, 180);
+      }
+    });
+
+    /* ----------------- Cart & Menu logic (same API as your previous script) ----------------- */
+
+    function openCart(){ cartDrawer.style.display='block'; cartDrawer.setAttribute('aria-hidden','false'); document.body.style.overflow='hidden'; }
+    function closeCart(){ cartDrawer.style.display='none'; cartDrawer.setAttribute('aria-hidden','true'); document.body.style.overflow=''; }
+
+    /* Slideshow */
+    function initSlideshow(){
+      slideElements.forEach((el, idx)=> {
+        el.style.display = idx===slideIndex ? 'block' : 'none';
+        el.setAttribute('aria-hidden', idx===slideIndex ? 'false' : 'true');
+      });
+      updateDots();
+      slidePrev?.addEventListener('click', ()=> goToSlide((slideIndex - 1 + slideElements.length) % slideElements.length));
+      slideNext?.addEventListener('click', ()=> goToSlide((slideIndex + 1) % slideElements.length));
+      slideDots.forEach(dot => dot.addEventListener('click', () => goToSlide(Number(dot.dataset.index))));
+      restartSlideTimer();
+    }
+    function restartSlideTimer(){ clearInterval(slideTimer); slideTimer = setInterval(()=> goToSlide((slideIndex+1)%slideElements.length), slideAutoDelay); }
+    function goToSlide(idx){ if (idx===slideIndex) return; slideElements[slideIndex].style.display='none'; slideElements[slideIndex].setAttribute('aria-hidden','true'); slideIndex=idx; slideElements[slideIndex].style.display='block'; slideElements[slideIndex].setAttribute('aria-hidden','false'); updateDots(); restartSlideTimer(); }
+    function updateDots(){ qa('.dot').forEach((dot,i)=> dot.classList.toggle('is-active', i===slideIndex)); }
+
+    /* Menu interactions:
+       - preview price updates when selects or addons change
+       - when Add clicked, collect selects + addons into meta, compute price, create unique cart key, add to cart
+    */
+    function initMenuInteractions(){
+      const menuItems = qa('.menu-item');
+      menuItems.forEach(item => {
+        updateItemPriceDisplay(item);
+        item.addEventListener('change', () => updateItemPriceDisplay(item));
+
+        const addBtn = q('.add-btn', item);
+        const removeBtn = q('.remove-btn', item);
+
+        addBtn?.addEventListener('click', () => {
+          const baseId = item.dataset.itemId || 'item';
+          // collect selected options
+          const meta = {};
+          qa('select', item).forEach(sel => {
+            const key = sel.name || sel.dataset.item || sel.className || ('opt_'+Math.random().toString(36).slice(2,6));
+            meta[key] = {
+              value: sel.value,
+              text: sel.options[sel.selectedIndex]?.text || ''
+            };
+          });
+          // collect addons (labels)
+          const addons = [];
+          qa('input.addon-checkbox', item).forEach(cb => {
+            if (cb.checked) {
+              const ownerLabel = cb.closest('.addon');
+              const labelText = ownerLabel?.querySelector('span')?.innerText || ownerLabel?.innerText || '';
+              addons.push({ key: cb.dataset.addonKey || '', label: labelText, value: Number(cb.value) || 0 });
+            }
+          });
+          if (addons.length) meta.addons = addons;
+
+          const price = calculateItemPrice(item);
+          const titleBase = q('.item-title', item)?.innerText?.trim() || baseId;
+          const imageSrc = q('.item-thumb', item)?.src || '';
+
+          // create a stable unique key per configuration
+          const configId = encodeURIComponent(JSON.stringify({ baseId, meta }));
+          const lineKey = `${baseId}::${configId}`;
+
+          addToCart(lineKey, { baseId, title: titleBase, unitPrice: price, qty: 1, meta, imageSrc });
+
+          // toggle buttons: show remove if any baseId in cart
+          addBtn.classList.add('hidden');
+          removeBtn.classList.remove('hidden');
+
+          // save menu selections too (makes UI persistent)
+          saveMenuSelections();
+        });
+
+        removeBtn?.addEventListener('click', () => {
+          const baseId = item.dataset.itemId;
+          const foundKey = Object.keys(cart).find(k => cart[k].baseId === baseId);
+          if (foundKey) removeItemFully(foundKey);
+          const addBtn = q('.add-btn', item), removeBtn2 = q('.remove-btn', item);
+          addBtn?.classList.remove('hidden'); removeBtn2?.classList.add('hidden');
+          saveMenuSelections();
+        });
+      });
+    }
+
+    function updateItemPriceDisplay(item){
+      try {
+        const price = calculateItemPrice(item);
+        const displayEl = q('.price-value', item);
+        if (displayEl) displayEl.innerText = Math.round(price);
+        const priceWrap = q('.item-price', item);
+        if (priceWrap) { priceWrap.classList.add('updated'); setTimeout(()=> priceWrap.classList.remove('updated'), 300); }
+      } catch (err) {
+        console.error('updateItemPriceDisplay error', err);
+      }
+    }
+
+    function calculateItemPrice(itemElement){
       let total = 0;
-      qsa('select', container).forEach(s => { total += Number(s.value || 0); });
-      qsa('input.addon-checkbox, input[type="checkbox"]', container).forEach(cb => { if (cb.checked) total += Number(cb.value || 0); });
-      if (total === 0) {
-        const fallback = Number(qs('.price-value', container)?.innerText || 0);
+      qa('select', itemElement).forEach(sel => { total += Number(sel.value) || 0; });
+      qa('input.addon-checkbox', itemElement).forEach(cb => { if (cb.checked) total += Number(cb.value) || 0; });
+      if (qa('select', itemElement).length === 0) {
+        const fallback = Number(q('.price-value', itemElement)?.innerText || 0);
         if (fallback) total = fallback;
       }
       return Math.round(total);
     }
 
-    function updateModalPrice() {
-      if (!clonedConfig || !pmPrice) return;
-      const p = calculatePriceFromContainer(clonedConfig);
-      pmPrice.innerText = fmtGhc(p);
-    }
+    /* ---------- Cart utilities ---------- */
 
-    function openProductModal(menuItem) {
-      if (!menuItem) return;
-      activeMenuItem = menuItem;
-      const thumb = qs('.item-thumb', menuItem);
-      const title = (qs('.item-title', menuItem)?.innerText || 'Item');
-      const desc = qs('.item-desc', menuItem)?.innerText || '';
-
-      pmThumb.src = thumb?.src || '';
-      pmThumb.alt = title;
-      pmTitle.innerText = title;
-      pmDesc.innerText = desc;
-
-      pmBody.innerHTML = '';
-      const config = qs('.item-config', menuItem);
-      clonedConfig = config ? config.cloneNode(true) : null;
-
-      if (clonedConfig) {
-        // remove duplicate IDs
-        qsa('[id]', clonedConfig).forEach(el => el.removeAttribute('id'));
-        // ensure inputs are interactive
-        pmBody.appendChild(clonedConfig);
-        qsa('select, input[type="checkbox"]', clonedConfig).forEach(inp => inp.addEventListener('change', updateModalPrice));
-      } else {
-        const fallback = document.createElement('div');
-        fallback.className = 'glass-card small';
-        fallback.innerText = 'No configurable options for this item.';
-        pmBody.appendChild(fallback);
+    function addToCart(key, { baseId, title, unitPrice, qty = 1, meta = {}, imageSrc = '' } = {}) {
+      if (!key) return;
+      if (!cart[key]) {
+        cart[key] = {
+          id: key,
+          baseId: baseId || (key.split('::')[0] || 'item'),
+          title: title || 'Item',
+          unitPrice: Number(unitPrice) || 0,
+          qty: 0,
+          meta: meta || {},
+          imageSrc: imageSrc || ''
+        };
       }
-      updateModalPrice();
-      modal.style.display = 'flex';
-      modal.setAttribute('aria-hidden', 'false');
-      document.body.style.overflow = 'hidden';
-      setTimeout(() => { try { pmClose && pmClose.focus(); } catch (e) {} }, 80);
+      cart[key].qty += Number(qty) || 1;
+      cart[key].unitPrice = Number(unitPrice) || cart[key].unitPrice;
+      cart[key].meta = meta || cart[key].meta;
+      cart[key].imageSrc = imageSrc || cart[key].imageSrc;
+
+      // persist
+      saveCartToStorage();
+      renderCart();
     }
 
-    function closeProductModal() {
-      pmBody.innerHTML = '';
-      clonedConfig = null;
-      activeMenuItem = null;
-      modal.style.display = 'none';
-      modal.setAttribute('aria-hidden', 'true');
-      document.body.style.overflow = '';
+    function removeItemFully(key) {
+      if (!cart[key]) return;
+      delete cart[key];
+      saveCartToStorage();
+      renderCart();
     }
 
-    // attach openers for existing menu items and future ones via delegation
-    document.addEventListener('click', (e) => {
-      const clicked = e.target;
-      const thumb = clicked.closest && clicked.closest('.item-thumb');
-      const title = clicked.closest && clicked.closest('.item-title');
-      const opener = thumb || title;
-      if (!opener) return;
-      const menuItem = opener.closest('.menu-item');
-      if (!menuItem) return;
-      e.preventDefault();
-      openProductModal(menuItem);
-    });
+    function changeItemQty(key, newQty) {
+      if (!cart[key]) return;
+      cart[key].qty = Math.max(0, Math.floor(newQty));
+      if (cart[key].qty <= 0) delete cart[key];
+      saveCartToStorage();
+      renderCart();
+    }
 
-    pmAdd && pmAdd.addEventListener('click', () => {
-      if (!activeMenuItem) { closeProductModal(); return; }
-      if (!clonedConfig) {
-        // simply click add on original item
-        const origAdd = qs('.add-btn', activeMenuItem);
-        if (origAdd) origAdd.click();
-        closeProductModal();
-        return;
-      }
-      // Compose selection meta and copy to original
-      try {
-        // copy selects by name
-        qsa('select', clonedConfig).forEach(cs => {
-          const name = cs.name;
-          if (!name) return;
-          const orig = qs(`select[name="${name}"]`, activeMenuItem);
-          if (orig) { orig.value = cs.value; orig.dispatchEvent(new Event('change', { bubbles: true })); }
-        });
-        // copy checkboxes (addon-checkbox)
-        qsa('input[type="checkbox"]', clonedConfig).forEach(ccb => {
-          const key = ccb.dataset.addonKey;
-          let origCb = key ? qs(`input.addon-checkbox[data-addon-key="${key}"]`, activeMenuItem) : null;
-          if (!origCb) {
-            const labelText = ccb.closest('.addon')?.querySelector('span')?.innerText?.trim();
-            if (labelText) {
-              const found = qsa('.addon', activeMenuItem).map(a => ({ el: a, txt: a.querySelector('span')?.innerText?.trim() })).find(x => x.txt === labelText);
-              origCb = found && found.el ? qs('input[type="checkbox"]', found.el) : null;
-            }
-          }
-          if (origCb) { origCb.checked = !!ccb.checked; origCb.dispatchEvent(new Event('change', { bubbles: true })); }
-        });
+    function computeCartTotals() {
+      let subtotal = 0, delivery = 0, promoDiscount = 0;
+      const freeItemsToShow = [];
+      Object.values(cart).forEach(line => { subtotal += (Number(line.unitPrice) || 0) * (Number(line.qty) || 0); });
 
-        // click original add
-        const origAddBtn = qs('.add-btn', activeMenuItem);
-        if (origAddBtn) {
-          origAddBtn.click();
-          setTimeout(() => closeProductModal(), 260);
-        } else {
-          closeProductModal();
-          showToast('Added (fallback)');
+      // Promo logic: Buy 2 Get 1 free for baseId 'shawarma' only on Tuesdays
+      if (promo.isActive()) {
+        const shawarmaLines = Object.values(cart).filter(l => l.baseId === 'shawarma');
+        const shawarmaQty = shawarmaLines.reduce((s,l) => s + (l.qty||0), 0);
+        if (shawarmaQty >= 3) {
+          const freeCount = Math.floor(shawarmaQty / 3);
+          let pricePool = [];
+          shawarmaLines.forEach(l => { for (let i=0;i<l.qty;i++) pricePool.push(l.unitPrice); });
+          pricePool.sort((a,b)=>a-b);
+          let discount = 0;
+          for (let i=0;i<freeCount;i++){ discount += Number(pricePool[i] || 0); }
+          if (discount > 0) { promoDiscount = Math.round(discount); freeItemsToShow.push({ id:'free-shawarma', title: 'Free Shawarma (promo)', qty: freeCount, unitPrice: 0 }); }
         }
-      } catch (err) {
-        console.error('Error copying modal selections', err);
-        closeProductModal();
-      }
-    });
-
-    pmCancel && pmCancel.addEventListener('click', closeProductModal);
-    pmClose && pmClose.addEventListener('click', closeProductModal);
-    modal && modal.addEventListener('click', (e) => { if (e.target === modal) closeProductModal(); });
-    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && modal.style.display === 'flex') closeProductModal(); });
-  }
-
-  /* -------------------------
-     Promo countdown (next Tuesday) and handlers for promo buttons
-  ------------------------- */
-  function setupPromoCountdown() {
-    const promoTimerEl = qs('#promo-timer');
-    const promoButtons = qsa('[data-action="apply-promo"], [data-action="preorder-promo"]');
-
-    // compute next Tuesday (0 = Sun, 1 = Mon, 2 = Tue)
-    function nextWeekdayDate(targetWeekday) {
-      const now = new Date();
-      const d = (targetWeekday + 7 - now.getDay()) % 7;
-      const next = new Date(now.getFullYear(), now.getMonth(), now.getDate() + (d === 0 ? 7 : d));
-      // Set to start of day (optional) — keep promo end at 23:59 local time of Tuesday
-      next.setHours(23, 59, 59, 999);
-      return next;
-    }
-
-    const promoEnd = nextWeekdayDate(2); // next Tuesday end of day
-
-    function updateCountdown() {
-      if (!promoTimerEl) return;
-      const now = new Date();
-      const diff = promoEnd - now;
-      if (diff <= 0) {
-        promoTimerEl.innerText = 'Expired';
-        return;
-      }
-      const sec = Math.floor(diff / 1000);
-      const d = Math.floor(sec / 86400);
-      const h = Math.floor((sec % 86400) / 3600);
-      const m = Math.floor((sec % 3600) / 60);
-      const s = Math.floor(sec % 60);
-      promoTimerEl.innerText = (d ? (d + 'd ') : '') + `${pad(h)}h ${pad(m)}m ${pad(s)}s`;
-    }
-    function pad(n) { return String(n).padStart(2, '0'); }
-
-    updateCountdown();
-    setInterval(updateCountdown, 1000);
-
-    // promo apply handlers (adds promo code to cart state and re-renders)
-    qsa('[data-action="apply-promo"]').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        e.preventDefault();
-        const code = btn.dataset.promoCode || btn.getAttribute('data-promo-code') || 'UNKNOWN';
-        // save to localStorage as applied code for persistence
-        try { localStorage.setItem('wrap_applied_promo', code); } catch (e) {}
-        showToast(`Promo ${code} applied`);
-        // Re-render cart so promo discount shows
-        renderCart();
-      });
-    });
-
-    // Preorder button: opens #preorder-modal
-    qsa('[data-action="preorder-promo"]').forEach(btn => btn.addEventListener('click', (e) => {
-      e.preventDefault();
-      openPreorderModal();
-    }));
-  }
-
-  /* -------------------------
-     Preorder modal handling
-  ------------------------- */
-  function openPreorderModal() {
-    const modal = qs('#preorder-modal');
-    if (!modal) return;
-    modal.style.display = 'flex';
-    modal.setAttribute('aria-hidden', 'false');
-    document.body.style.overflow = 'hidden';
-    // prefill name/phone if available
-    try {
-      qs('#preorder-name') && (qs('#preorder-name').value = localStorage.getItem('wrap_user_name') || '');
-      qs('#preorder-phone') && (qs('#preorder-phone').value = localStorage.getItem('wrap_user_phone') || '');
-    } catch (e) {}
-  }
-  function closePreorderModal() {
-    const modal = qs('#preorder-modal');
-    if (!modal) return;
-    modal.style.display = 'none';
-    modal.setAttribute('aria-hidden', 'true');
-    document.body.style.overflow = '';
-  }
-  function setupPreorderModal() {
-    const modal = qs('#preorder-modal');
-    if (!modal) return;
-    const closeBtn = qs('#preorder-close', modal);
-    const cancelBtn = qs('#preorder-cancel', modal);
-    const confirmBtn = qs('#preorder-confirm', modal);
-    const form = qs('#preorder-form', modal);
-
-    closeBtn && closeBtn.addEventListener('click', closePreorderModal);
-    cancelBtn && cancelBtn.addEventListener('click', closePreorderModal);
-
-    form && form.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const name = (qs('#preorder-name')?.value || '').trim();
-      const phone = (qs('#preorder-phone')?.value || '').trim();
-      const note = (qs('#preorder-note')?.value || '').trim();
-      if (!name || !phone) { alert('Please provide name and phone'); return; }
-      const cartLines = computeCartTotals().lines || [];
-      const fakeOrder = {
-        reference: 'PRE-' + Date.now(),
-        name, phone, email: '',
-        type: 'preorder',
-        address: '',
-        note,
-        cart: cartLines,
-        totals: computeCartTotals(),
-        ts: new Date().toISOString()
-      };
-      try {
-        localStorage.setItem('wrap_last_order', JSON.stringify(fakeOrder));
-        localStorage.setItem('wrap_show_confirmation', '1');
-      } catch (err) { /* ignore */ }
-      closePreorderModal();
-      // optionally clear cart? We keep cart intact for preorder
-      showToast('Preorder received — we will contact you');
-      setTimeout(() => window.location.reload(), 600);
-    });
-  }
-
-  /* -------------------------
-     Checkout page / modal handling
-     - openCheckoutPage() is exposed on window
-  ------------------------- */
-  function haversineKm(lat1, lon1, lat2, lon2) {
-    const R = 6371;
-    const dLat = toRad(lat2 - lat1);
-    const dLon = toRad(lon2 - lon1);
-    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-      Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
-      Math.sin(dLon / 2) * Math.sin(dLon / 2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    return R * c;
-  }
-  function toRad(v) { return v * Math.PI / 180; }
-
-  function computeDeliveryFee(lat, lon) {
-    if (isNaN(lat) || isNaN(lon)) return DELIVERY_CONFIG.baseFee;
-    const dist = haversineKm(STORE_COORDS.lat, STORE_COORDS.lon, lat, lon);
-    if (dist <= DELIVERY_CONFIG.freeWithinKm) return 0;
-    let fee = DELIVERY_CONFIG.baseFee + (dist * DELIVERY_CONFIG.perKm);
-    fee = Math.max(fee, DELIVERY_CONFIG.minFee);
-    fee = Math.min(fee, DELIVERY_CONFIG.maxFee);
-    return Math.round(fee);
-  }
-
-  function populateOrderLinesForCheckout() {
-    const orderLinesWrap = qs('#cf-order-lines');
-    if (!orderLinesWrap) return;
-    orderLinesWrap.innerHTML = '';
-    const totals = computeCartTotals();
-    const lines = Object.values(window.cart || {});
-    if (!lines.length) {
-      orderLinesWrap.innerHTML = '<div class="small-muted">Your cart is empty.</div>';
-      return;
-    }
-    lines.forEach(l => {
-      const div = document.createElement('div');
-      div.className = 'order-line';
-      div.innerHTML = `
-        <img src="${escapeHtml(l.imageSrc||'')}" alt="${escapeHtml(l.title||'Item')}" />
-        <div class="ol-meta">
-          <strong>${escapeHtml(l.title||'Item')}</strong>
-          <small>${escapeHtml(Object.keys(l.meta||{}).map(k => (l.meta[k] && l.meta[k].text) ? l.meta[k].text : '').filter(Boolean).join(' • '))}</small>
-        </div>
-        <div class="ol-price">${fmtGhc((l.unitPrice||0) * (l.qty||1))}</div>
-      `;
-      orderLinesWrap.appendChild(div);
-    });
-  }
-
-  function refreshCheckoutTotals() {
-    const cfSubtotal = qs('#cf-subtotal');
-    const cfDelivery = qs('#cf-delivery');
-    const cfPromo = qs('#cf-promo');
-    const cfTotal = qs('#cf-total');
-    if (!cfSubtotal || !cfDelivery || !cfPromo || !cfTotal) return;
-
-    const totals = computeCartTotals();
-    const subtotal = totals.subtotal || 0;
-    const promo = totals.promoDiscount || 0;
-
-    const inpType = qs('#cf-type');
-    const inpLat = qs('#cf-lat');
-    const inpLon = qs('#cf-lon');
-    let deliveryFee = 0;
-    if (inpType && inpType.value === 'delivery') {
-      const lat = parseFloat(inpLat && inpLat.value) || NaN;
-      const lon = parseFloat(inpLon && inpLon.value) || NaN;
-      deliveryFee = computeDeliveryFee(lat, lon);
-    }
-
-    cfSubtotal.innerText = fmtGhc(subtotal);
-    cfDelivery.innerText = fmtGhc(deliveryFee);
-    cfPromo.innerText = `-GHC ${promo}`;
-    cfTotal.innerText = fmtGhc(Math.max(0, subtotal - promo + deliveryFee));
-  }
-
-  function openCheckoutPage() {
-    const page = qs('#checkout-page');
-    if (!page) return;
-    // hide other modals
-    qsa('.modal, #preorder-modal').forEach(m => { try { m.style.display = 'none'; m.setAttribute('aria-hidden', 'true'); } catch (e) {} });
-    populateOrderLinesForCheckout();
-    refreshCheckoutTotals();
-    page.style.display = 'flex';
-    page.setAttribute('aria-hidden', 'false');
-    document.body.style.overflow = 'hidden';
-    // focus first input
-    setTimeout(() => {
-      const first = qs('#cf-name');
-      if (first) first.focus();
-    }, 120);
-  }
-
-  function closeCheckoutPage() {
-    const page = qs('#checkout-page');
-    if (!page) return;
-    page.style.display = 'none';
-    page.setAttribute('aria-hidden', 'true');
-    document.body.style.overflow = '';
-  }
-
-  function setupCheckoutPage() {
-    // wire openers
-    const footerPayBtn = qs('#checkout-btn');
-    const headerCheckoutBtn = qs('#cart-header-checkout');
-    if (footerPayBtn) footerPayBtn.addEventListener('click', (e) => { e.preventDefault(); openCheckoutPage(); });
-    if (headerCheckoutBtn) headerCheckoutBtn.addEventListener('click', (e) => { e.preventDefault(); openCheckoutPage(); });
-
-    // close/cancel
-    const closeBtn = qs('#checkout-close');
-    const cancelBtn = qs('#cf-cancel');
-    closeBtn && closeBtn.addEventListener('click', closeCheckoutPage);
-    cancelBtn && cancelBtn.addEventListener('click', closeCheckoutPage);
-    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && qs('#checkout-page')?.getAttribute('aria-hidden') === 'false') closeCheckoutPage(); });
-    qs('#checkout-page') && qs('#checkout-page').addEventListener('click', (e) => { if (e.target === qs('#checkout-page')) closeCheckoutPage(); });
-
-    // watchers
-    qs('#cf-type') && qs('#cf-type').addEventListener('change', refreshCheckoutTotals);
-    qs('#cf-lat') && qs('#cf-lat').addEventListener('input', refreshCheckoutTotals);
-    qs('#cf-lon') && qs('#cf-lon').addEventListener('input', refreshCheckoutTotals);
-
-    // keep totals updated periodically (catches cart changes)
-    setInterval(() => { populateOrderLinesForCheckout(); refreshCheckoutTotals(); }, 900);
-
-    // submit handler
-    const submitBtn = qs('#cf-submit');
-    submitBtn && submitBtn.addEventListener('click', async (ev) => {
-      ev.preventDefault();
-      submitBtn.disabled = true;
-
-      const name = (qs('#cf-name')?.value || '').trim();
-      const phone = (qs('#cf-phone')?.value || '').trim();
-      const email = (qs('#cf-email')?.value || '').trim();
-      const type = (qs('#cf-type')?.value || 'delivery');
-      const address = (qs('#cf-address')?.value || '').trim();
-      const lat = (qs('#cf-lat')?.value || '').trim();
-      const lon = (qs('#cf-lon')?.value || '').trim();
-      const date = (qs('#cf-date')?.value || '').trim();
-      const time = (qs('#cf-time')?.value || '').trim();
-      const note = (qs('#cf-note')?.value || '').trim();
-      const paymethod = (qs('#cf-paymethod')?.value || 'paystack');
-
-      if (!name || !phone || !email) {
-        alert('Please complete your name, phone and email.');
-        submitBtn.disabled = false;
-        return;
-      }
-      if (type === 'delivery' && !address) {
-        alert('Please provide your delivery address.');
-        submitBtn.disabled = false;
-        return;
+        const friesQty = Object.values(cart).filter(l => l.baseId === 'loaded-fries').reduce((s,l)=> s + (l.qty||0), 0);
+        if (friesQty > 0) freeItemsToShow.push({ id:'free-coke', title: 'Free Coke (promo)', qty: friesQty, unitPrice: 0 });
       }
 
-      const cartLines = Object.values(window.cart || {}).map(l => ({
-        baseId: l.baseId, title: l.title, unitPrice: l.unitPrice, qty: l.qty, meta: l.meta || {}
-      }));
-      if (!cartLines.length) {
-        alert('Your cart is empty. Add items before checkout.');
-        submitBtn.disabled = false;
-        return;
+      const total = Math.max(0, subtotal - promoDiscount + delivery);
+      return { subtotal, delivery, promoDiscount, total, freeItems: freeItemsToShow };
+    }
+
+    /* Render cart */
+    function renderCart() {
+      cartItemsList.innerHTML = '';
+      const keys = Object.keys(cart);
+      if (!keys.length) {
+        cartItemsList.innerHTML = '<li class="empty">Your cart is empty. Add something delicious!</li>';
+      } else {
+        keys.forEach(key => {
+          const line = cart[key];
+          const li = document.createElement('li');
+          li.className = 'cart-line';
+          li.dataset.itemId = key;
+          const metaLines = [];
+          try {
+            if (line.meta) {
+              Object.keys(line.meta).forEach(k=>{
+                if (k === 'addons' && Array.isArray(line.meta.addons)) {
+                  metaLines.push('Extras: ' + line.meta.addons.map(a=>a.label||a.key).join(', '));
+                } else {
+                  const v = line.meta[k];
+                  if (v && v.text) metaLines.push(`${k.replace(/[-_]/g,' ')}: ${v.text}`);
+                }
+              });
+            }
+          } catch(e){ }
+          li.innerHTML = `
+            <div style="display:flex;gap:12px;align-items:center;min-width:0">
+              <img src="${escapeHtml(line.imageSrc||'')}" alt="${escapeHtml(line.title)}" style="width:68px;height:56px;object-fit:cover;border-radius:10px;flex:0 0 68px;border:1px solid rgba(255,255,255,0.04)">
+              <div style="flex:1 1 auto;min-width:0">
+                <strong class="line-title" style="display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escapeHtml(line.title)}</strong>
+                <div class="line-meta" style="font-size:13px;color:rgba(255,255,255,0.8);margin-top:6px">
+                  ${metaLines.length ? `<div style="font-weight:700">${metaLines.join(' • ')}</div>` : ''}
+                  <div style="margin-top:6px">${fmtGhc(line.unitPrice)} × <span class="line-qty" style="font-weight:900">${line.qty}</span> = <strong style="display:inline-block;margin-left:6px">${fmtGhc(line.unitPrice * line.qty)}</strong></div>
+                </div>
+              </div>
+            </div>
+            <div class="line-controls" style="display:flex;flex-direction:column;gap:8px;align-items:flex-end;justify-content:center">
+              <button class="icon-btn cart-increase" aria-label="Increase quantity">+</button>
+              <button class="icon-btn cart-decrease" aria-label="Decrease quantity">-</button>
+              <button class="icon-btn cart-remove" aria-label="Remove item"><i class="fa fa-trash"></i></button>
+            </div>
+          `;
+          cartItemsList.appendChild(li);
+        });
       }
 
       const totals = computeCartTotals();
-      const deliveryFee = (type === 'delivery') ? computeDeliveryFee(parseFloat(lat) || 0, parseFloat(lon) || 0) : 0;
-      const totalAmount = Math.round((totals.subtotal || 0) - (totals.promoDiscount || 0) + deliveryFee);
 
-      // Save name/phone for convenience
-      try { localStorage.setItem('wrap_user_name', name); localStorage.setItem('wrap_user_phone', phone); } catch (e) {}
+      // promo block
+      if (totals.promoDiscount > 0) {
+        promoDiscountEl.innerText = `-GHC ${Math.round(totals.promoDiscount)}`;
+        promoHelpText.innerText = `Promo applied — discount: GHC ${Math.round(totals.promoDiscount)} (Tuesday only).`;
+        cartPromoBlock.classList.remove('hidden');
+      } else {
+        const shawQty = Object.values(cart).filter(l => l.baseId === 'shawarma').reduce((s,l)=> s + (l.qty||0), 0);
+        if (shawQty > 0 && promo.isActive()) {
+          const missing = (3 - (shawQty % 3)) % 3;
+          promoHelpText.innerText = `Add ${missing} more Shawarma${missing>1?'s':''} to get one free.`;
+          cartPromoBlock.classList.remove('hidden');
+        } else {
+          cartPromoBlock.classList.add('hidden');
+        }
+      }
 
-      if (paymethod === 'cash') {
-        const fakeOrder = {
-          id: 'local-' + Date.now(),
-          reference: 'CASH-' + Date.now(),
-          name, phone, email, type, address, lat, lon, date, time, note,
-          cart: cartLines,
-          totals: { subtotal: totals.subtotal, delivery: deliveryFee, promo: totals.promoDiscount, total: totalAmount },
-          ts: new Date().toISOString()
-        };
-        try {
-          localStorage.setItem('wrap_last_order', JSON.stringify(fakeOrder));
-          localStorage.setItem('wrap_show_confirmation', '1');
-        } catch (e) {}
-        // clear cart and show confirmation after reload
-        window.cart = {};
-        saveCart();
-        renderCart();
-        closeCheckoutPage();
-        window.location.reload();
+      (totals.freeItems || []).forEach(fi => {
+        const li = document.createElement('li');
+        li.className = 'cart-line cart-free';
+        li.innerHTML = `
+          <div class="line-left">
+            <strong class="line-title">${escapeHtml(fi.title)}</strong>
+            <div class="line-meta">Free × <span class="line-qty">${fi.qty}</span></div>
+          </div>
+          <div class="line-controls"></div>
+        `;
+        cartItemsList.appendChild(li);
+      });
+
+      cartSubtotalEl.innerText = fmtGhc(totals.subtotal);
+      cartDeliveryEl.innerText = fmtGhc(totals.delivery);
+      cartTotalEl.innerText = fmtGhc(totals.total);
+
+      const cartCount = Object.values(cart).reduce((s,li) => s + (li.qty||0), 0);
+      cartCountBadge.innerText = String(cartCount);
+      cartMiniCount.innerText = String(cartCount);
+
+      // attach cart control listeners (rebind after rerender)
+      qa('.cart-increase', cartItemsList).forEach(btn => btn.addEventListener('click', (e) => {
+        const key = e.target.closest('.cart-line').dataset.itemId;
+        if (!key) return;
+        changeItemQty(key, (cart[key].qty || 0) + 1);
+      }));
+      qa('.cart-decrease', cartItemsList).forEach(btn => btn.addEventListener('click', (e) => {
+        const key = e.target.closest('.cart-line').dataset.itemId;
+        if (!key) return;
+        changeItemQty(key, (cart[key].qty || 0) - 1);
+      }));
+      qa('.cart-remove', cartItemsList).forEach(btn => btn.addEventListener('click', (e) => {
+        const key = e.target.closest('.cart-line').dataset.itemId;
+        if (!key) return;
+        removeItemFully(key);
+      }));
+
+      // sync menu add/remove buttons (by baseId)
+      qa('.menu-item').forEach(mi => {
+        const baseId = mi.dataset.itemId;
+        const addBtn = q('.add-btn', mi), removeBtn = q('.remove-btn', mi);
+        const present = Object.values(cart).some(l => l.baseId === baseId && l.qty > 0);
+        if (present) { addBtn?.classList.add('hidden'); removeBtn?.classList.remove('hidden'); } else { addBtn?.classList.remove('hidden'); removeBtn?.classList.add('hidden'); }
+      });
+
+      // persist after render as well (safety)
+      saveCartToStorage();
+    }
+
+    function handleAddMissing() {
+      const shawQty = Object.values(cart).filter(l => l.baseId === 'shawarma').reduce((s,l) => s + (l.qty||0), 0);
+      const missing = (3 - (shawQty % 3)) % 3;
+      if (missing === 0) { alert('You already qualify for the Buy 2 Get 1 promo for shawarma.'); return; }
+      if (!promo.isActive()) { alert('Tuesday promo is only available on Tuesdays in your local time.'); return; }
+
+      const menuEl = q('[data-item-id="shawarma"]');
+      if (!menuEl) { alert('Shawarma item not found in menu.'); return; }
+      const price = calculateItemPrice(menuEl);
+      const title = q('.item-title', menuEl)?.innerText?.trim() || 'Shawarma';
+      const imageSrc = q('.item-thumb', menuEl)?.src || '';
+      const meta = {};
+      qa('select', menuEl).forEach(sel => {
+        const key = sel.name || sel.dataset.item || sel.className || ('opt_'+Math.random().toString(36).slice(2,6));
+        meta[key] = { value: sel.value, text: sel.options[sel.selectedIndex]?.text || '' };
+      });
+      const addons = [];
+      qa('input.addon-checkbox', menuEl).forEach(cb => { if (cb.checked) { const owner = cb.closest('.addon'); addons.push({ key: cb.dataset.addonKey || '', label: owner?.querySelector('span')?.innerText || '', value: Number(cb.value) || 0 }); } });
+      if (addons.length) meta.addons = addons;
+
+      const configId = encodeURIComponent(JSON.stringify({ baseId:'shawarma', meta }));
+      const lineKey = `shawarma::${configId}`;
+
+      for (let i=0;i<missing;i++) addToCart(lineKey, { baseId:'shawarma', title, unitPrice: price, qty:1, meta, imageSrc });
+      renderCart(); openCart();
+    }
+
+    function handleCheckout(){
+      const totals = computeCartTotals();
+      let summary = 'ORDER SUMMARY:\\n';
+      Object.values(cart).forEach(li => {
+        summary += `${li.title} (${Object.keys(li.meta).length? 'configured':'default'}) x${li.qty} — ${fmtGhc(li.unitPrice * li.qty)}\\n`;
+      });
+      if (totals.promoDiscount > 0) summary += `Promo discount: -GHC ${Math.round(totals.promoDiscount)}\\n`;
+      summary += `Subtotal: ${fmtGhc(totals.subtotal)}\\nDelivery: ${fmtGhc(totals.delivery)}\\nTotal: ${fmtGhc(totals.total)}\\n\\n`;
+      summary += 'This is a simulated checkout. Integrate Paystack flow here.';
+      alert(summary);
+    }
+
+    function handleClearCart(){
+      if (!confirm('Clear all items from cart?')) return;
+      cart = {};
+      saveCartToStorage();
+      renderCart();
+    }
+
+    function updatePromoCountdown(){
+      const now = new Date();
+      const day = now.getDay();
+      const targetDay = 2; // Tuesday
+      let daysUntil = (targetDay - day + 7) % 7;
+      if (daysUntil === 0) {
+        const endOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
+        const diff = endOfDay - now;
+        promoCountdownEl && (promoCountdownEl.innerText = formatMs(diff));
         return;
       }
-
-      // Paystack flow (inline) — if PaystackPop available and key set
-      try {
-        if (paymethod === 'paystack' && PAYSTACK_PUBLIC_KEY && window.PaystackPop) {
-          const ref = 'PSK-' + Date.now() + '-' + Math.floor(Math.random() * 10000);
-          const handler = window.PaystackPop.setup({
-            key: PAYSTACK_PUBLIC_KEY,
-            email: email,
-            amount: Math.round(totalAmount * 100),
-            currency: 'GHS',
-            ref,
-            onClose: function () {
-              alert('Payment cancelled');
-              submitBtn.disabled = false;
-            },
-            callback: function (response) {
-              // treat as success for frontend-only flow
-              const order = {
-                reference: response.reference || ref,
-                name, phone, email, type, address, lat, lon, date, time, note,
-                cart: cartLines,
-                totals: { subtotal: totals.subtotal, delivery: deliveryFee, promo: totals.promoDiscount, total: totalAmount },
-                ts: new Date().toISOString()
-              };
-              try {
-                localStorage.setItem('wrap_last_order', JSON.stringify(order));
-                localStorage.setItem('wrap_show_confirmation', '1');
-              } catch (e) {}
-              window.cart = {};
-              saveCart();
-              renderCart();
-              closeCheckoutPage();
-              window.location.reload();
-            }
-          });
-          handler.openIframe();
-          return;
-        }
-
-        // If Paystack not available, confirm simulation
-        if (paymethod === 'paystack') {
-          const simulate = confirm('Paystack not available. Simulate successful payment for testing? (No money will be charged)');
-          if (!simulate) {
-            alert('Payment cancelled. To use real Paystack, ensure Paystack script and key are available.');
-            submitBtn.disabled = false;
-            return;
-          }
-          const order = {
-            reference: 'SIM-' + Date.now(),
-            name, phone, email, type, address, lat, lon, date, time, note,
-            cart: cartLines,
-            totals: { subtotal: totals.subtotal, delivery: deliveryFee, promo: totals.promoDiscount, total: totalAmount },
-            ts: new Date().toISOString()
-          };
-          try {
-            localStorage.setItem('wrap_last_order', JSON.stringify(order));
-            localStorage.setItem('wrap_show_confirmation', '1');
-          } catch (e) {}
-          window.cart = {};
-          saveCart();
-          renderCart();
-          closeCheckoutPage();
-          window.location.reload();
-          return;
-        }
-      } catch (err) {
-        console.error('checkout error', err);
-        alert('Checkout failed: ' + (err.message || err));
-        submitBtn.disabled = false;
-      }
-    });
-  }
-
-  // expose openCheckoutPage globally
-  window.openCheckoutPage = openCheckoutPage;
-
-  /* -------------------------
-     Order confirmation modal wiring (show if localStorage flag present)
-  ------------------------- */
-  function setupOrderConfirmationModal() {
-    const modal = qs('#order-confirmation-modal');
-    if (!modal) return;
-    const btnOk = qs('#oc-ok');
-    const btnClose = qs('#oc-close');
-    const btnPrint = qs('#oc-print');
-
-    function hideModal() {
-      modal.setAttribute('aria-hidden', 'true');
-      modal.style.display = 'none';
-      document.body.style.overflow = '';
+      const nextPromo = new Date(now.getFullYear(), now.getMonth(), now.getDate() + daysUntil, 0, 0, 0);
+      const diff = nextPromo - now;
+      promoCountdownEl && (promoCountdownEl.innerText = formatMs(diff));
     }
-
-    function showModal(order) {
-      if (!order) return;
-      qs('#oc-ref').innerText = order.reference || ('ref-' + Math.floor(Math.random() * 1000000));
-      qs('#oc-name').innerText = order.name || '-';
-      qs('#oc-phone').innerText = order.phone || '-';
-      qs('#oc-email').innerText = order.email || '-';
-      qs('#oc-type').innerText = order.type || '-';
-      qs('#oc-address').innerText = order.address || '-';
-      qs('#oc-note').innerText = order.note || '-';
-      qs('#oc-ts').innerText = new Date(order.ts || Date.now()).toLocaleString();
-      qs('#oc-total').innerText = `GHC ${Number(order.totals?.total || 0).toFixed(0)}`;
-
-      const ocLines = qs('#oc-lines');
-      ocLines.innerHTML = '';
-      const lines = Array.isArray(order.cart) ? order.cart : [];
-      if (!lines.length) {
-        ocLines.innerHTML = '<div class="small-muted">No line items recorded.</div>';
-      } else {
-        lines.forEach(l => {
-          const div = document.createElement('div');
-          div.className = 'oc-line';
-          const title = escapeHtml(l.title || l.name || 'Item');
-          const qty = Number(l.qty || 1);
-          const unit = Number(l.unitPrice || 0);
-          div.innerHTML = `<div style="flex:1;"><strong>${title}</strong><div class="small-muted">${(l.meta && l.meta.addons) ? 'Extras: ' + l.meta.addons.map(a => escapeHtml(a.label || a.key || a)).join(', ') : ''}</div></div><div style="text-align:right;min-width:120px;">${qty} × GHC ${unit.toFixed(0)}<div style="font-weight:900;margin-top:4px">GHC ${Math.round(qty * unit).toFixed(0)}</div></div>`;
-          ocLines.appendChild(div);
-        });
-      }
-
-      modal.setAttribute('aria-hidden', 'false');
-      modal.style.display = 'flex';
-      document.body.style.overflow = 'hidden';
+    function formatMs(ms) {
+      if (ms <= 0) return '00:00:00';
+      const secs = Math.floor(ms / 1000);
+      const days = Math.floor(secs / 86400);
+      const hours = Math.floor((secs % 86400) / 3600);
+      const minutes = Math.floor((secs % 3600) / 60);
+      const seconds = secs % 60;
+      if (days > 0) return `${days}d ${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
+      return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
     }
+    function pad(n){ return String(n).padStart(2,'0'); }
 
-    btnOk && btnOk.addEventListener('click', () => {
-      try {
-        localStorage.removeItem('wrap_show_confirmation');
-        localStorage.removeItem('wrap_last_order');
-        localStorage.removeItem(CART_STORAGE_KEY);
-        window.cart = {};
-        saveCart();
-        renderCart();
-      } catch (e) {}
-      hideModal();
-      window.location.href = window.location.pathname;
-    });
-    btnClose && btnClose.addEventListener('click', () => {
-      hideModal();
-    });
+    function escapeHtml(str){ return String(str||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
-    btnPrint && btnPrint.addEventListener('click', () => {
-      try {
-        const raw = localStorage.getItem('wrap_last_order');
-        const order = raw ? JSON.parse(raw) : null;
-        if (!order) { alert('No order data available to print.'); return; }
-        // Open a printable window (simplified)
-        const printableHtml = buildPrintableHtml(order);
-        const w = window.open('', '_blank', 'toolbar=0,location=0,menubar=0,width=900,height=1100');
-        if (!w) { alert('Please allow popups to print.'); return; }
-        w.document.open();
-        w.document.write(printableHtml);
-        w.document.close();
-        w.focus();
-        setTimeout(() => { try { w.print(); } catch (e) { console.warn(e); } }, 300);
-      } catch (err) { console.error(err); alert('Print failed'); }
-    });
-
-    // show modal on load if flag present
-    try {
-      const showFlag = localStorage.getItem('wrap_show_confirmation');
-      if (showFlag === '1') {
-        const raw = localStorage.getItem('wrap_last_order');
-        const order = raw ? JSON.parse(raw) : null;
-        setTimeout(() => showModal(order), 220);
-      }
-    } catch (e) { console.warn('order confirm show error', e); }
-
-    function buildPrintableHtml(order) {
-      const escape = escapeHtml;
-      const lines = Array.isArray(order.cart) ? order.cart : [];
-      let linesHtml = '';
-      let computedSubtotal = 0;
-      if (!lines.length) {
-        linesHtml = '<tr><td colspan="4" style="text-align:center;padding:12px 0;color:#666">No line items recorded.</td></tr>';
-      } else {
-        lines.forEach((l) => {
-          const qty = Number(l.qty || 1);
-          const unit = Number(l.unitPrice || 0);
-          const lineTotal = Math.round(qty * unit);
-          computedSubtotal += lineTotal;
-          const metaParts = [];
-          if (l.meta) {
-            if (Array.isArray(l.meta.addons) && l.meta.addons.length) metaParts.push('Extras: ' + l.meta.addons.map(a => escape(a.label || a.key || a)).join(', '));
-            Object.keys(l.meta).forEach(k => {
-              if (k === 'addons') return;
-              const v = l.meta[k];
-              if (!v) return;
-              if (typeof v === 'object') {
-                if (v.text) metaParts.push(`${escape(k)}: ${escape(v.text)}`);
-                else if (v.label) metaParts.push(`${escape(k)}: ${escape(v.label)}`);
-                else metaParts.push(`${escape(k)}: ${escape(JSON.stringify(v))}`);
-              } else metaParts.push(`${escape(k)}: ${escape(String(v))}`);
-            });
-          }
-          const metaHtml = metaParts.length ? `<div style="font-size:12px;color:#444;margin-top:6px;">${metaParts.join(' • ')}</div>` : '';
-          linesHtml += `<tr><td style="padding:10px 8px; vertical-align:top; border-bottom:1px solid #eee;"><strong>${escape(l.title || 'Item')}</strong>${metaHtml}</td><td style="padding:10px 8px; vertical-align:top; border-bottom:1px solid #eee; text-align:center;">${qty}</td><td style="padding:10px 8px; vertical-align:top; border-bottom:1px solid #eee; text-align:right;">GHC ${Number(unit).toFixed(0)}</td><td style="padding:10px 8px; vertical-align:top; border-bottom:1px solid #eee; text-align:right;">GHC ${lineTotal.toFixed(0)}</td></tr>`;
-        });
-      }
-
-      const totals = order.totals || {};
-      const subtotal = (typeof totals.subtotal !== 'undefined') ? Number(totals.subtotal) : computedSubtotal;
-      const delivery = (typeof totals.delivery !== 'undefined') ? Number(totals.delivery || 0) : Number(totals.delivery || 0);
-      const promoDiscount = (typeof totals.promo !== 'undefined') ? Number(totals.promo || 0) : Number(totals.promoDiscount || 0);
-      const total = (typeof totals.total !== 'undefined') ? Number(totals.total) : Math.max(0, subtotal - (promoDiscount || 0) + (delivery || 0));
-
-      const printable = `<!doctype html><html><head><meta charset="utf-8" /><title>Wrap District — Invoice ${escape(order.reference||'')}</title><style>body{font-family:Arial,Helvetica,sans-serif;color:#222;padding:18px}table{width:100%;border-collapse:collapse}th,td{padding:8px;border-bottom:1px solid #eee}th{text-align:left}</style></head><body><div style="display:flex;align-items:center;gap:12px"><div style="background:linear-gradient(135deg,#FF6A00,#ff8c2b);color:#111;padding:6px 10px;border-radius:8px;font-weight:900">WRAP</div><div><h2 style="margin:0">Wrap District</h2><div style="color:#666">Fresh · Hot · Fast — Tema Community 25</div></div></div><div style="margin-top:12px;display:flex;justify-content:space-between"><div><strong>Customer</strong><div>${escape(order.name||'')}</div><div>${escape(order.phone||'')}</div></div><div><strong>Order</strong><div>Ref: ${escape(order.reference||'')}</div><div>Placed: ${escape(new Date(order.ts||Date.now()).toLocaleString())}</div></div></div><table aria-label="Order lines" style="margin-top:14px"><thead><tr><th style="width:60%">Item & options</th><th style="width:10%;text-align:center">Qty</th><th style="width:15%;text-align:right">Unit</th><th style="width:15%;text-align:right">Line</th></tr></thead><tbody>${linesHtml}</tbody></table><div style="max-width:420px;margin-left:auto;margin-top:12px"><div style="display:flex;justify-content:space-between"><div>Subtotal</div><div>GHC ${Number(subtotal).toFixed(0)}</div></div><div style="display:flex;justify-content:space-between"><div>Delivery</div><div>GHC ${Number(delivery||0).toFixed(0)}</div></div><div style="display:flex;justify-content:space-between"><div>Promo</div><div>-GHC ${Number(promoDiscount||0).toFixed(0)}</div></div><div style="display:flex;justify-content:space-between;font-weight:900;margin-top:8px"><div>Total</div><div>GHC ${Number(total).toFixed(0)}</div></div></div></body></html>`;
-      return printable;
-    }
-  }
-
-  /* -------------------------
-     Promo carousel (bottom promo section)
-  ------------------------- */
-  function setupPromoCarousel() {
-    const pcSlides = qsa('.pc-slide');
-    const pcDots = qsa('.pc-dot');
-    const prevBtn = qs('.promo-controls .slide-prev');
-    const nextBtn = qs('.promo-controls .slide-next');
-    if (!pcSlides.length) return;
-    let current = 0;
-    let autoTimer = null;
-    const AUTO_DELAY = 6000;
-
-    function showSlide(idx) {
-      idx = (idx + pcSlides.length) % pcSlides.length;
-      pcSlides.forEach((s, i) => {
-        s.classList.toggle('is-active', i === idx);
-        s.setAttribute('aria-hidden', i === idx ? 'false' : 'true');
-      });
-      pcDots.forEach((d, i) => d.classList.toggle('is-active', i === idx));
-      current = idx;
-    }
-    function nextSlide() { showSlide(current + 1); }
-    function prevSlide() { showSlide(current - 1); }
-    function startAuto() { stopAuto(); autoTimer = setInterval(nextSlide, AUTO_DELAY); }
-    function stopAuto() { if (autoTimer) { clearInterval(autoTimer); autoTimer = null; } }
-
-    nextBtn && nextBtn.addEventListener('click', (e) => { e.preventDefault(); nextSlide(); startAuto(); });
-    prevBtn && prevBtn.addEventListener('click', (e) => { e.preventDefault(); prevSlide(); startAuto(); });
-    pcDots.forEach(d => d.addEventListener('click', (e) => { e.preventDefault(); showSlide(Number(d.dataset.index || d.getAttribute('data-index'))); startAuto(); }));
-
-    showSlide(0);
-    startAuto();
-
-    // promo detail toggles
-    qsa('[data-action="promo-details"]').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        e.preventDefault();
-        const target = btn.dataset.target;
-        const more = qs('#promo-more');
-        const moreContent = qs('#promo-more-content');
-        if (!more || !moreContent) return;
-        let text = '';
-        if (target === 'shawarma') text = 'Buy 2 Shawarmas on Tuesdays and get the 3rd free. Add qualifying shawarmas to your cart and the discount will apply automatically at checkout.';
-        else if (target === 'fries') text = 'Loaded Fries promotion: when you purchase qualifying Loaded Fries during promo hours, a free Coke will be added to your cart automatically.';
-        else text = 'Promo details unavailable.';
-        moreContent.innerText = text;
-        more.classList.toggle('hidden');
-        btn.setAttribute('aria-expanded', String(!more.classList.contains('hidden')));
-      });
-    });
-  }
-
-  /* -------------------------
-     Small helpers & initial wiring
-  ------------------------- */
-  function setupMisc() {
-    // footer order button: open cart if has items else scroll to menu
-    const orderBtn = qs('#footer-order');
-    const menuAnchor = qs('#menu');
-    const cartToggle = qs('#cart-toggle');
-    orderBtn && orderBtn.addEventListener('click', (e) => {
-      try {
-        const cartCount = Number((qs('#cart-count') || {}).innerText) || 0;
-        if (cartCount > 0 && cartToggle) cartToggle.click();
-        else if (menuAnchor) menuAnchor.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        else window.location.hash = '#menu';
-      } catch (err) {
-        if (menuAnchor) menuAnchor.scrollIntoView({ behavior: 'smooth' });
-      }
-    });
-
-    // footer locate button: scroll to contact
-    const locBtn = qs('#footer-locate');
-    locBtn && locBtn.addEventListener('click', () => {
-      const contact = qs('#contact');
-      if (contact) contact.scrollIntoView({ behavior: 'smooth' });
-      else window.location.hash = '#contact';
-    });
-
-    // external WA link: ensure noopener noreferrer
-    const wa = qs('#footer-wa');
-    if (wa) wa.setAttribute('rel', 'noopener noreferrer');
-
-    // hamburger mobile nav wiring
-    setupMobileNav();
-
-    // Menu tabs wiring
-    setupMenuTabs();
-
-    // cart drawer
-    setupCartDrawer();
-
-    // add buttons
-    setupMenuAddButtons();
-
-    // product modal
-    setupProductModal();
-
-    // promo countdown + apply
-    setupPromoCountdown();
-
-    // Preorder modal
-    setupPreorderModal();
-
-    // checkout
-    setupCheckoutPage();
-
-    // promo carousel (if present)
-    setupPromoCarousel();
-
-    // order confirmation modal
-    setupOrderConfirmationModal();
-
-    // render persisted cart
-    loadCart();
-    renderCart();
-  }
-
-  /* -------------------------
-     On DOM ready initialize everything
-  ------------------------- */
-  document.addEventListener('DOMContentLoaded', () => {
-    try {
-      setupMisc();
-    } catch (err) {
-      console.error('Initialization error', err);
-    }
+    // End DOMContentLoaded
   });
-
-  /* -------------------------
-     Expose a few utilities onto window for compatibility with other inline code
-  ------------------------- */
-  window.openPreorderModal = openPreorderModal;
-  window.openCheckoutPage = openCheckoutPage;
-  window.renderCart = renderCart;
-  window.computeCartTotals = computeCartTotals;
-  window.addToCart = addToCart;
-
-})(); 
+})();
 </script>
-
-  
 </html>
   
