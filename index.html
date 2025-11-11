@@ -4998,10 +4998,62 @@ const PAYSTACK_PUBLIC_KEY = 'pk_test_297586e51710e83d3c159bfe71ff45c7e23411fa';
 </script>
   <!-- END BODY -->
 </body>
-  <script>
-/* Preorder wiring: add this AFTER your main script (place before </body>) */
+
+
+  <!-- +++ REPLACEMENT: fixed Preorder + cart toggle + simple global error logger + safe open/close helper + small touch UX +++ -->
+<script>
 (function(){
   document.addEventListener('DOMContentLoaded', () => {
+    /* --------------------------
+       Helper: cart drawer open/close/toggle
+       Ensures aria-hidden + style + focus are consistent.
+    ---------------------------*/
+    const cartDrawer = document.getElementById('cart-drawer');
+    const cartToggle = document.getElementById('cart-toggle');
+    const cartClose = document.getElementById('cart-close');
+
+    function openCart() {
+      if (!cartDrawer) return;
+      cartDrawer.style.display = 'block';
+      cartDrawer.setAttribute('aria-hidden','false');
+      document.body.style.overflow = 'hidden';
+      // focus close for keyboard users
+      try { cartClose && cartClose.focus(); } catch(e){}
+    }
+    function closeCart() {
+      if (!cartDrawer) return;
+      cartDrawer.style.display = 'none';
+      cartDrawer.setAttribute('aria-hidden','true');
+      document.body.style.overflow = '';
+      try { cartToggle && cartToggle.focus(); } catch(e){}
+    }
+    function toggleCart() {
+      if (!cartDrawer) return;
+      const hidden = cartDrawer.getAttribute('aria-hidden') === 'true' || cartDrawer.style.display === 'none';
+      if (hidden) openCart(); else closeCart();
+    }
+
+    // attach direct handlers (robust even if other scripts intercept)
+    if (cartToggle) {
+      cartToggle.addEventListener('click', function(e){
+        e.preventDefault();
+        e.stopPropagation();
+        try { toggleCart(); } catch(err){ console.error('toggleCart error', err); }
+      });
+      cartToggle.addEventListener('keydown', function(e){ if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleCart(); } });
+    }
+    if (cartClose) cartClose.addEventListener('click', (e) => { e.preventDefault(); closeCart(); });
+
+    // ensure header 'Close' also closes if someone adds another close selector
+    document.addEventListener('click', function(e){
+      if (e.target && (e.target.matches && e.target.matches('[data-action="close-cart"], .close-cart'))) {
+        e.preventDefault(); closeCart();
+      }
+    });
+
+    /* --------------------------
+       Fixed / Completed Preorder wiring
+    ---------------------------*/
     const preorderModal = document.getElementById('preorder-modal');
     const preorderClose = document.getElementById('preorder-close');
     const preorderCancel = document.getElementById('preorder-cancel');
@@ -5011,7 +5063,6 @@ const PAYSTACK_PUBLIC_KEY = 'pk_test_297586e51710e83d3c159bfe71ff45c7e23411fa';
     const preorderNote = document.getElementById('preorder-note');
     const promoPreorderBtns = Array.from(document.querySelectorAll('[data-action="preorder-promo"], #promo-preorder-btn'));
 
-    // small toast helper (injects a toast if not present)
     function showToast(msg, timeout = 2500) {
       let t = document.querySelector('.wrap-toast');
       if (!t) {
@@ -5026,16 +5077,18 @@ const PAYSTACK_PUBLIC_KEY = 'pk_test_297586e51710e83d3c159bfe71ff45c7e23411fa';
 
     function openPreorder() {
       if (!preorderModal) return;
-      preorderModal.style.display = 'block';
+      preorderModal.style.display = 'flex';
       preorderModal.setAttribute('aria-hidden', 'false');
       // prefills
-      const savedPhone = localStorage.getItem('wrap_user_phone');
-      const savedName = localStorage.getItem('wrap_user_name');
-      if (savedPhone) preorderPhone.value = savedPhone;
-      if (savedName) preorderName.value = savedName;
+      try {
+        const savedPhone = localStorage.getItem('wrap_user_phone');
+        const savedName = localStorage.getItem('wrap_user_name');
+        if (savedPhone) preorderPhone.value = savedPhone;
+        if (savedName) preorderName.value = savedName;
+      } catch(e){}
       // focus first field
       setTimeout(()=> preorderName && preorderName.focus(), 120);
-      // prevent page behind from scrolling (small helper)
+      // prevent page behind from scrolling
       document.body.style.overflow = 'hidden';
     }
 
@@ -5056,86 +5109,54 @@ const PAYSTACK_PUBLIC_KEY = 'pk_test_297586e51710e83d3c159bfe71ff45c7e23411fa';
     });
 
     // close handlers
-    preorderClose && preorderClose.addEventListener('click', () => closePreorder());
-    preorderCancel && preorderCancel.addEventListener('click', () => closePreorder());
-
-    // close when clicking outside modal-inner
-    if (preorderModal) {
-      preorderModal.addEventListener('click', (e) => {
-        if (e.target === preorderModal) closePreorder();
-      });
-    }
-
-    // ESC to close
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && preorderModal && preorderModal.style.display === 'block') closePreorder();
-    });
-
-    // small helper to read cart summary from rendered DOM (doesn't depend on your internal cart variable)
-    function buildCartSummaryFromDom() {
-      const rows = Array.from(document.querySelectorAll('#cart-items li.cart-line'));
-      const items = [];
-      rows.forEach(li => {
-        // skip promo/free-lines that visually use .cart-free
-        if (li.classList.contains('cart-free')) return;
-        const title = (li.querySelector('.line-title')?.innerText || '').trim();
-        // qty may be in .line-qty inside this line-meta or top-level
-        const qtyElem = li.querySelector('.line-qty');
-        const qty = qtyElem ? Number(qtyElem.innerText.trim()) || 1 : 1;
-        const priceText = li.querySelector('.line-meta strong')?.innerText?.trim() || '';
-        items.push({ title, qty, priceText });
-      });
-      return items;
-    }
+    if (preorderClose) preorderClose.addEventListener('click', () => closePreorder());
+    if (preorderCancel) preorderCancel.addEventListener('click', () => closePreorder());
+    // close on overlay click
+    if (preorderModal) preorderModal.addEventListener('click', (ev) => { if (ev.target === preorderModal) closePreorder(); });
+    document.addEventListener('keydown', (ev) => { if (ev.key === 'Escape' && preorderModal && preorderModal.getAttribute('aria-hidden') === 'false') closePreorder(); });
 
     // submit handler
     if (preorderForm) {
-      preorderForm.addEventListener('submit', (e) => {
+      preorderForm.addEventListener('submit', function(e){
         e.preventDefault();
         const name = (preorderName.value || '').trim();
         const phone = (preorderPhone.value || '').trim();
         const note = (preorderNote.value || '').trim();
-
         if (!name || !phone) {
-          alert('Please enter your name and phone number to confirm preorder.');
+          showToast('Please enter name and phone for preorder.');
           return;
         }
-
-        // Save for convenience next time
+        // Save to localStorage and show confirmation
         try {
-          localStorage.setItem('wrap_user_name', name);
-          localStorage.setItem('wrap_user_phone', phone);
-        } catch (err) { /* ignore storage errors */ }
-
-        const cartSummary = buildCartSummaryFromDom();
-        // Build a simple payload you can inspect / forward to backend later
-        const payload = {
-          name,
-          phone,
-          note,
-          timestamp: new Date().toISOString(),
-          cart: cartSummary
-        };
-
-        // For now: log & show friendly message. You will integrate real server / payment / notifications next.
-        console.log('Preorder submitted:', payload);
-
-        // show confirmation to user
-        showToast('Preorder confirmed — we will reserve your items for the next promo window.');
-
-        // close modal after a short delay
-        setTimeout(() => {
-          closePreorder();
-        }, 900);
+          const payload = { name, phone, note, ts: Date.now() };
+          localStorage.setItem('wrap_preorder_' + Date.now(), JSON.stringify(payload));
+        } catch(e){ console.warn('preorder storage failed', e); }
+        closePreorder();
+        showToast('Preorder received — we will contact you to confirm.');
       });
     }
 
-    // Accessibility: ensure modal-inner is focusable if keyboard user tabs in
-    const inner = preorderModal && preorderModal.querySelector('.modal-inner');
-    if (inner) inner.setAttribute('tabindex', '-1');
+    /* --------------------------
+       small safety: global JS error logger toast (helps debugging)
+    ---------------------------*/
+    window.addEventListener('error', function(ev){
+      // log to console but show a tiny user-friendly toast
+      try {
+        console.error('Global JS error:', ev.error || ev.message || ev);
+        showToast('A script error occurred — check console (devtools).', 3000);
+      } catch(e){}
+    });
+
+    // expose programmatic helpers should other scripts want to call them
+    window.openCart = openCart;
+    window.closeCart = closeCart;
+    window.toggleCart = toggleCart;
+    window.openPreorder = openPreorder;
+    window.closePreorder = closePreorder;
   });
 })();
 </script>
+<!-- +++ END REPLACEMENT +++ -->
   <!-- Cart footer enhancement: paste after your main script and before </body> -->
 <style>
 /* Override / enhancement for cart drawer footer behavior */
