@@ -5832,5 +5832,82 @@ body.cart-open::before {
   });
 })();
 </script>
+  <script>
+(function(){
+  document.addEventListener('DOMContentLoaded', function(){
+    const cartToggle = document.getElementById('cart-toggle');
+    const cartDrawer = document.getElementById('cart-drawer');
+    const cartClose = document.getElementById('cart-close');
+    const cartCount = document.getElementById('cart-count');
+    // If something unexpectedly missing, no-op safely
+    if (!cartToggle || !cartDrawer) return;
+
+    function openCart() {
+      try {
+        cartDrawer.style.display = 'block'; // ensure visible for CSS selectors
+        cartDrawer.setAttribute('aria-hidden', 'false');
+        // ensure transform transition runs by forcing a reflow
+        cartDrawer.getBoundingClientRect();
+        document.body.style.overflow = 'hidden';
+        // sync mini count if present
+        const mini = document.getElementById('cart-mini-count');
+        if (mini && cartCount) mini.innerText = cartCount.innerText || '0';
+      } catch(e){ console.warn('openCart error', e); }
+    }
+    function closeCart() {
+      try {
+        cartDrawer.setAttribute('aria-hidden', 'true');
+        // keep inline display style for a moment then hide after animation (420ms)
+        setTimeout(()=> {
+          // only hide via inline style if still aria-hidden
+          if (cartDrawer.getAttribute('aria-hidden') === 'true') {
+            cartDrawer.style.display = 'none';
+          }
+        }, 460);
+        document.body.style.overflow = '';
+      } catch(e){ console.warn('closeCart error', e); }
+    }
+    function toggleCart() {
+      const isOpen = cartDrawer.getAttribute('aria-hidden') === 'false';
+      if (isOpen) closeCart(); else openCart();
+    }
+
+    cartToggle.addEventListener('click', function(e){
+      e.preventDefault();
+      toggleCart();
+    }, {passive:false});
+
+    // Close button inside drawer
+    cartClose && cartClose.addEventListener('click', function(e){
+      e.preventDefault();
+      closeCart();
+    });
+
+    // Close when clicking on backdrop (but not when clicking inside the drawer)
+    cartDrawer.addEventListener('click', function(e){
+      if (e.target === cartDrawer) closeCart();
+    });
+
+    // Escape key closes drawer
+    document.addEventListener('keydown', function(e){
+      if (e.key === 'Escape' && cartDrawer.getAttribute('aria-hidden') === 'false') {
+        closeCart();
+      }
+    });
+
+    // Make sure external code that toggles aria-hidden works too (keeps inline display in sync)
+    const mo = new MutationObserver((mut) => {
+      const ah = cartDrawer.getAttribute('aria-hidden');
+      if (ah === 'false') cartDrawer.style.display = 'block';
+      // if closed, hide after animation (so transform animation completes)
+      if (ah === 'true') {
+        setTimeout(()=> { if (cartDrawer.getAttribute('aria-hidden') === 'true') cartDrawer.style.display = 'none'; }, 460);
+      }
+    });
+    mo.observe(cartDrawer, { attributes: true, attributeFilter: ['aria-hidden'] });
+  });
+})();
+</script>
+
 </html>
   
