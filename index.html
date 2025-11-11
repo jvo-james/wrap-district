@@ -4560,6 +4560,60 @@ const PAYSTACK_PUBLIC_KEY = 'pk_test_297586e51710e83d3c159bfe71ff45c7e23411fa';
   });
 })();
 </script>
+  <!-- ======= Reliable Cart toggle: open/close handlers ======= -->
+<script>
+ (function(){
+    document.addEventListener('DOMContentLoaded', function(){
+      const cartToggle = document.getElementById('cart-toggle');
+      const cartDrawer = document.getElementById('cart-drawer');
+      const cartClose = document.getElementById('cart-close');
+
+      if (!cartToggle || !cartDrawer) return;
+
+      function openCart(){
+        cartDrawer.style.display = 'block';
+       cartDrawer.setAttribute('aria-hidden','false');
+        cartToggle.setAttribute('aria-expanded','true');
+        // keep page behind from scrolling while drawer open
+        document.body.style.overflow = 'hidden';
+       // move focus into drawer for accessibility
+        try { cartDrawer.querySelector('.cart-header button, .cart-header [id]')?.focus(); } catch(e){}
+      }
+
+     function closeCart(){
+        cartDrawer.style.display = 'none';
+        cartDrawer.setAttribute('aria-hidden','true');
+        cartToggle.setAttribute('aria-expanded','false');
+        document.body.style.overflow = '';
+        try { cartToggle.focus(); } catch(e){}
+     }
+
+      cartToggle.addEventListener('click', function(ev){
+        ev.preventDefault();
+        ev.stopPropagation();
+        const isOpen = cartDrawer.getAttribute('aria-hidden') === 'false';
+        if (isOpen) closeCart(); else openCart();
+      }, { passive: false });
+
+      // Close via close button inside drawer
+     cartClose && cartClose.addEventListener('click', function(e){
+       e.preventDefault();
+        closeCart();
+      });
+
+     // Click outside drawer content closes it
+      cartDrawer.addEventListener('click', function(e){
+        if (e.target === cartDrawer) closeCart();
+      });
+
+      // Escape key closes the drawer
+      document.addEventListener('keydown', function(e){
+        if (e.key === 'Escape' && cartDrawer.getAttribute('aria-hidden') === 'false') closeCart();
+      });
+    });
+  })();
+</script>
+<!-- ======= end cart toggle ======= -->
 <script>
 /* Product modal behavior (Task 2)
    - Opens when user clicks .item-thumb OR .item-title inside a .menu-item
@@ -5829,174 +5883,6 @@ body.cart-open::before {
     function escapeHtml(str){ return String(str||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
     // End DOMContentLoaded
-  });
-})();
-</script>
-  <script>
-/* Robust cart toggle: capture-phase handler that opens/closes cart reliably */
-(function(){
-  document.addEventListener('DOMContentLoaded', function(){
-    const btn = document.getElementById('cart-toggle');
-    const cart = document.getElementById('cart-drawer');
-    const cartClose = document.getElementById('cart-close');
-
-    if (!btn || !cart) return;
-
-    // Ensure initial ARIA state consistent
-    btn.setAttribute('aria-expanded', String(cart.getAttribute('aria-hidden') === 'false'));
-
-    // Handler (capture=true to run before other handlers and avoid interference)
-    btn.addEventListener('click', function(ev){
-      try {
-        ev.preventDefault();
-        // Stop other handlers from blocking our open/close (we handle it explicitly)
-        ev.stopImmediatePropagation();
-      } catch(e){}
-
-      const isOpen = cart.getAttribute('aria-hidden') === 'false' || cart.style.display === 'block';
-
-      if (isOpen) {
-        cart.style.display = 'none';
-        cart.setAttribute('aria-hidden', 'true');
-        document.body.style.overflow = '';
-        btn.setAttribute('aria-expanded', 'false');
-        // return focus to cart button for accessibility
-        try { btn.focus(); } catch(e){}
-      } else {
-        cart.style.display = 'block';
-        cart.setAttribute('aria-hidden', 'false');
-        document.body.style.overflow = 'hidden';
-        btn.setAttribute('aria-expanded', 'true');
-        // focus the cart close button for keyboard users
-        setTimeout(() => { try { cartClose && cartClose.focus(); } catch(e){} }, 80);
-      }
-    }, true); // capture phase
-
-    // Wire explicit close (in case other scripts don't)
-    if (cartClose) {
-      cartClose.addEventListener('click', function(){
-        cart.style.display = 'none';
-        cart.setAttribute('aria-hidden', 'true');
-        document.body.style.overflow = '';
-        btn.setAttribute('aria-expanded', 'false');
-        try { btn.focus(); } catch(e){}
-      });
-    }
-
-    // Also close cart if user clicks outside it
-    cart.addEventListener('click', function(e){
-      if (e.target === cart) {
-        cart.style.display = 'none';
-        cart.setAttribute('aria-hidden', 'true');
-        document.body.style.overflow = '';
-        btn.setAttribute('aria-expanded', 'false');
-        try { btn.focus(); } catch(e){}
-      }
-    });
-
-  });
-})();
-</script>
-
-  <script>
-/* Reliable cart open/close helper — paste near end of body */
-(function(){
-  document.addEventListener('DOMContentLoaded', () => {
-    const cartToggle = document.getElementById('cart-toggle');
-    const cartDrawer = document.getElementById('cart-drawer');
-    const cartClose = document.getElementById('cart-close');
-
-    if (!cartToggle || !cartDrawer) {
-      console.warn('Cart helper: #cart-toggle or #cart-drawer not found.');
-      return;
-    }
-
-    // Ensure initial ARIA state consistent
-    if (!cartDrawer.hasAttribute('aria-hidden')) cartDrawer.setAttribute('aria-hidden', 'true');
-    if (cartDrawer.getAttribute('aria-hidden') === 'true') cartDrawer.style.display = 'none';
-
-    // Small helper to force repaint so CSS transition runs reliably
-    function showDrawer() {
-      try {
-        cartDrawer.style.display = 'block';
-        // force reflow before changing aria so transition applies
-        // eslint-disable-next-line no-unused-expressions
-        cartDrawer.offsetHeight;
-        cartDrawer.setAttribute('aria-hidden', 'false');
-        document.body.style.overflow = 'hidden';
-        // update any visible counters / focus
-        const focusTarget = cartDrawer.querySelector('.cart-body') || cartDrawer;
-        setTimeout(() => { try { focusTarget && focusTarget.focus && focusTarget.focus(); } catch(e){} }, 120);
-        console.log('Cart helper: opened cart drawer');
-      } catch (err) {
-        console.error('Cart helper: showDrawer error', err);
-      }
-    }
-
-    function hideDrawer() {
-      try {
-        cartDrawer.setAttribute('aria-hidden', 'true');
-        document.body.style.overflow = '';
-        // leave visible until transition ends to avoid a flash; then hide after transition duration (match your CSS 420ms)
-        setTimeout(() => {
-          if (cartDrawer.getAttribute('aria-hidden') === 'true') cartDrawer.style.display = 'none';
-        }, 460);
-        console.log('Cart helper: closed cart drawer');
-      } catch (err) {
-        console.error('Cart helper: hideDrawer error', err);
-      }
-    }
-
-    // toggle function (exposed for other code if needed)
-    function toggleDrawer(e) {
-      if (e && e.preventDefault) e.preventDefault();
-      // If something else stoppedImmediatePropagation, we still run this because listener is not capture-phase.
-      const isOpen = cartDrawer.getAttribute('aria-hidden') === 'false';
-      if (isOpen) hideDrawer(); else showDrawer();
-    }
-
-    // Attach a direct click listener (non-capture) to the cart toggle to avoid interference with capture-phase interceptors
-    cartToggle.removeEventListener('click', toggleDrawer);
-    cartToggle.addEventListener('click', function(e){
-      // Log if some earlier handler called stopPropagation by checking defaultPrevented (best-effort)
-      if (e.defaultPrevented) {
-        console.warn('Cart helper: click default prevented on #cart-toggle — another handler may interfere.');
-      }
-      toggleDrawer(e);
-    }, { passive: false });
-
-    // Close controls
-    if (cartClose) {
-      cartClose.removeEventListener('click', hideDrawer);
-      cartClose.addEventListener('click', (e) => { e.preventDefault(); hideDrawer(); });
-    }
-
-    // Click outside drawer closes it (click on overlay area)
-    cartDrawer.addEventListener('click', (ev) => {
-      if (ev.target === cartDrawer) hideDrawer();
-    });
-
-    // Close on Escape
-    document.addEventListener('keydown', (ev) => {
-      if (ev.key === 'Escape' && cartDrawer.getAttribute('aria-hidden') === 'false') {
-        hideDrawer();
-      }
-    });
-
-    // Expose for console debugging / other scripts
-    window.__wrap_cart_helpers = {
-      open: showDrawer,
-      close: hideDrawer,
-      toggle: toggleDrawer,
-      drawerEl: cartDrawer
-    };
-
-    // Quick sanity check: if cart-drawer has display:none !important OR a CSS rule preventing it,
-    // print guidance to console to help debugging.
-    const style = window.getComputedStyle(cartDrawer);
-    if (style.display === 'none' && cartDrawer.getAttribute('aria-hidden') === 'true') {
-      console.info('Cart helper: drawer initially hidden (aria-hidden=true). Use `__wrap_cart_helpers.open()` in console to test opening.');
-    }
   });
 })();
 </script>
