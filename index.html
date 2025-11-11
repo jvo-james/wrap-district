@@ -4934,16 +4934,72 @@ const PAYSTACK_PUBLIC_KEY = 'pk_test_297586e51710e83d3c159bfe71ff45c7e23411fa';
     showSlide(0);
     startAuto();
 
-    // Promo CTA handlers: Claim Promo, Details, Preorder
-    function showToast(msg, t = 2200) {
-      let tEl = document.querySelector('.wrap-toast');
-      if (!tEl) { tEl = document.createElement('div'); tEl.className = 'toast wrap-toast'; document.body.appendChild(tEl); }
-      tEl.textContent = msg;
-      tEl.classList.add('show');
-      setTimeout(()=> tEl.classList.remove('show'), t);
-    }
+   (function(){
+ tEl.textContent = msg;
+ tEl.classList.add('show');
+ // ensure only one timer at a time per toast
+ clearTimeout(tEl.__hideTimer);
+ tEl.__hideTimer = setTimeout(() => tEl.classList.remove('show'), t);
+ }
 
-    // Claim buttons: record in localStorage and show quick feedback
+ // Generic promo button handlers (delegated)
+ document.addEventListener('click', function (ev) {
+ const btn = ev.target.closest('[data-action]');
+ if (!btn) return;
+ const action = (btn.dataset.action || '').trim();
+
+ // APPLY PROMO (visual & UX only)
+ if (action === 'apply-promo') {
+ const code = btn.dataset.promoCode || btn.dataset.promo || 'PROMO';
+ // show a tiny hint and open cart so user sees discount
+ showToast(`Promo ${code} applied`);
+ const cartPromo = document.getElementById('cart-promo');
+ if (cartPromo) cartPromo.classList.remove('hidden');
+ const cartDrawer = document.getElementById('cart-drawer');
+ if (cartDrawer) { cartDrawer.style.display = 'block'; cartDrawer.setAttribute('aria-hidden','false'); document.body.style.overflow = 'hidden'; }
+ ev.preventDefault();
+ return;
+ }
+
+ // SHOW PROMO DETAILS (toggle the small details region)
+ if (action === 'promo-details') {
+ const target = btn.dataset.target || '';
+ const more = document.getElementById('promo-more');
+ const content = document.getElementById('promo-more-content');
+ if (more && content) {
+ const srcDesc = document.querySelector(`#item-${target} .item-desc`)?.innerText || '';
+ content.textContent = srcDesc || 'Promo details coming soon.';
+ more.classList.toggle('hidden');
+ }
+ ev.preventDefault();
+ return;
+ }
+
+ // PREORDER PROMO -> open the preorder modal
+ if (action === 'preorder-promo') {
+ const pm = document.getElementById('preorder-modal');
+ if (pm) {
+ pm.style.display = 'flex';
+ pm.setAttribute('aria-hidden','false');
+ document.body.style.overflow = 'hidden';
+ // focus first field if present
+ setTimeout(() => { try { document.getElementById('preorder-name')?.focus(); } catch(e){} }, 120);
+ }
+ ev.preventDefault();
+ return;
+ }
+ }, true);
+
+ // small accessibility: hide toast if user presses Escape
+ document.addEventListener('keydown', function (ev) {
+ if (ev.key === 'Escape') {
+ const tEl = document.querySelector('.wrap-toast');
+ if (tEl) tEl.classList.remove('show');
+ }
+ });
+ })();
+
+  // Claim buttons: record in localStorage and show quick feedback
     promoContainer.querySelectorAll('button[data-action="apply-promo"]').forEach(btn => {
       btn.addEventListener('click', (e) => {
         const code = btn.dataset.promoCode || 'UNKNOWN';
