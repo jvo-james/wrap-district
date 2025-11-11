@@ -3426,17 +3426,38 @@ a:focus, button:focus { outline: 3px solid rgba(255,204,51,0.10); outline-offset
 
   // When checkout opens make sure it's positioned under the header (safety) and focus first field
   (function ensureOpenPositioning(){
-    const origOpen = openCheckoutPage;
-    // If openCheckoutPage exists, wrap it to add a scrollIntoView to ensure top visible
-    if (typeof openCheckoutPage === 'function') {
+    // Safe wrapper: only reference window.openCheckoutPage via typeof first.
+    if (typeof window.openCheckoutPage === 'function') {
+      const origOpen = window.openCheckoutPage;
       window.openCheckoutPage = function() {
-        origOpen.apply(this, arguments);
+        const res = origOpen.apply(this, arguments);
         try {
-          // ensure the checkout dialog is visually scrolled into view (below header)
           const inner = document.getElementById('checkout-inner');
           if (inner) inner.scrollIntoView({ behavior: 'auto', block: 'start' });
         } catch(e){}
+        return res;
       };
+    } else {
+      // If openCheckoutPage may be defined later, poll and wrap it once it appears.
+      // This avoids ReferenceError while still preserving the desired behavior.
+      const wrapOnce = () => {
+        if (typeof window.openCheckoutPage === 'function' && !window.__wrapped_openCheckoutPage_positioning) {
+          const orig = window.openCheckoutPage;
+          window.openCheckoutPage = function() {
+            const res = orig.apply(this, arguments);
+            try {
+              const inner = document.getElementById('checkout-inner');
+              if (inner) inner.scrollIntoView({ behavior: 'auto', block: 'start' });
+            } catch(e){}
+            return res;
+          };
+          window.__wrapped_openCheckoutPage_positioning = true;
+          clearInterval(checkInterval);
+        }
+      };
+      const checkInterval = setInterval(wrapOnce, 250);
+      // try immediately as well
+      wrapOnce();
     }
   })();
 
@@ -5909,56 +5930,6 @@ body.cart-open::before {
   });
 })();
 </script>
-  <script>
-document.addEventListener('DOMContentLoaded', function () {
-  // Robust cart open/close helper (safe to paste as a hotfix)
-  const cartDrawer = document.getElementById('cart-drawer');
-  const cartToggle = document.getElementById('cart-toggle');
-  const cartClose = document.getElementById('cart-close');
-
-  function openCart() {
-    if (!cartDrawer) return;
-    try {
-      cartDrawer.style.display = 'block';
-      cartDrawer.setAttribute('aria-hidden', 'false');
-      document.body.style.overflow = 'hidden';
-      cartClose && cartClose.focus();
-    } catch (e) { console.error('openCart failed', e); }
-  }
-
-  function closeCart() {
-    if (!cartDrawer) return;
-    try {
-      cartDrawer.style.display = 'none';
-      cartDrawer.setAttribute('aria-hidden', 'true');
-      document.body.style.overflow = '';
-      cartToggle && cartToggle.focus();
-    } catch (e) { console.error('closeCart failed', e); }
-  }
-
-  if (cartToggle) {
-    // use capture=false to avoid interfering with other capture handlers
-    cartToggle.addEventListener('click', function (ev) {
-      ev.preventDefault();
-      ev.stopPropagation();
-      openCart();
-    }, { passive: false });
-    cartToggle.addEventListener('keydown', function (ev) {
-      if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); openCart(); }
-    });
-  }
-
-  if (cartClose) {
-    cartClose.addEventListener('click', function (ev) {
-      ev.preventDefault();
-      closeCart();
-    });
-  }
-
-  // expose globally in case other code wants to call it
-  window.openCartDrawer = openCart;
-  window.closeCartDrawer = closeCart;
-});
-</script>
+  
 </html>
   
