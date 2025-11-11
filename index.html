@@ -2440,7 +2440,7 @@ a:focus, button:focus { outline: 3px solid rgba(255,204,51,0.10); outline-offset
       </div>
 
       <div class="cart-footer">
-  <div class="footer-summary" style=display: none">
+  <div class="footer-summary" style="display: none">
     <div>
       <div class="small">Subtotal</div>
       <div class="total-label">Total</div>
@@ -3911,88 +3911,89 @@ a:focus, button:focus { outline: 3px solid rgba(255,204,51,0.10); outline-offset
      }
 
       // paymethod === paystack -> call server init endpoint (same pattern as earlier)
-      try {
-        const payload = { name, phone, email, type, address, lat, lon, date, time, note, amount_pesewas: Math.round(totalAmount*100), currency:'GHS', cart: cartLines };
+          try {
+       const payload = { name, phone, email, type, address, lat, lon, date, time, note, amount_pesewas: Math.round(totalAmount*100), currency:'GHS', cart: cartLines };
         const res = await fetch('/api/pay/initialize', { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify(payload) });
-        if (!res.ok) {
-          const txt = await res.text().catch(()=>null); console.warn('init failed', res.status, txt);
-          alert('Payment initialization failed. Try again later.');
-          submitBtn.disabled=false; return;
+        if (!res.ok) {         const txt = await res.text().catch(()=>null);
+          console.warn('init failed', res.status, txt);
+                      alert('Payment initialization failed. Try again later.');
+         submitBtn.disabled = false; return;
         }
         const initData = await res.json();
-        if (!initData || !initData.access_code) { alert('Payment initialization failed.'); submitBtn.disabled=false; return; }
 
-        // resume Paystack inline
-        if (window.Paystack && typeof window.Paystack === 'function') {
-          const popup = new Paystack();
-          const tx = await popup.resumeTransaction(initData.access_code);
-          const reference = tx?.reference || initData.reference;
-          // verify server-side
-          const vres = await fetch(`/api/pay/verify?reference=${encodeURIComponent(reference)}`);
-          if (!vres.ok) { alert('Payment made but verification failed.'); submitBtn.disabled=false; return; }
-          const vdata = await vres.json();
-          const status = vdata?.data?.status || vdata?.status;
-                   if (status === 'success') {
-           // build canonical order object and persist it so confirmation modal can render after reload
-           const order = {
-              reference: reference || initData.reference || (vdata?.data?.reference),
-             name, phone, email, type, address, lat, lon, date, time, note,
-            cart: cartLines,
-             totals: { subtotal: totals.subtotal, delivery, promo: totals.promoDiscount, total: totalAmount },
-             ts: new Date().toISOString()
-           };
-            try {
-             localStorage.setItem('wrap_last_order', JSON.stringify(order));
-              localStorage.setItem('wrap_show_confirmation', '1');
-            } catch (e) { /* ignore storage errors */ }
-
-           // clear cart, close checkout, then reload so user sees a fresh page and the confirmation modal
-           try { window.cart = {}; if (typeof renderCart === 'function') renderCart(); } catch (e) {}
-          closeCheckoutPage();
-            window.location.reload();
-          return;
-         } else {
-           alert('Payment not verified as successful.');
-         }
-        } else if (window.PaystackPop) {
-          // fallback older setup
-          const PUBLIC_KEY = initData.publicKey || initData.key || 'pk_test_297586e51710e83d3c159bfe71ff45c7e23411fa';
-          const handler = window.PaystackPop.setup({
-            key: PUBLIC_KEY, email, amount: Math.round(totalAmount*100), currency: 'GHS', ref: initData.reference || ('ref'+Math.floor(Math.random()*1000000)),
-                      callback: async function(response){
-             // verify on server (optionally) or assume response.reference is valid
-              const ref = response?.reference || (initData && initData.reference) || ('ref'+Math.floor(Math.random()*1000000));
-              // build order object to persist
-              const order = {
-               reference: ref,
-               name, phone, email, type, address, lat, lon, date, time, note,
-                cart: cartLines,
-                totals: { subtotal: totals.subtotal, delivery, promo: totals.promoDiscount, total: totalAmount },
-                ts: new Date().toISOString()
-              };
-              try {
-                localStorage.setItem('wrap_last_order', JSON.stringify(order));
-               localStorage.setItem('wrap_show_confirmation', '1');
-              } catch (e) {}
-
-             try { window.cart = {}; if (typeof renderCart === 'function') renderCart(); } catch (e) {}
-              closeCheckoutPage();
-              // reload so the confirmation modal opens on the fresh page
-             window.location.reload();
-            },
-            onClose: function(){ alert('Payment cancelled'); }
-          });
-          handler.openIframe();
-        } else {
-          alert('Payment library not available.');
+       // Expect the server to return at least one of:
+       // { publicKey, reference }  OR  { authorization_url }
+        // Preferred: { publicKey: 'pk_test_xxx', reference: '...', currency: 'GHS' }
+       if (!initData || (!initData.publicKey && !initData.authorization_url && !initData.reference)) {
+         console.warn('unexpected init response', initData);
+          alert('Payment initialization returned unexpected response. Check server logs.');
+          submitBtn.disabled = false; return;
         }
+
+        // If Paystack inline is available, use it
+        if (window.PaystackPop && (initData.publicKey || initData.key)) {
+          const PUBLIC_KEY = initData.publicKey || initData.key;
+         const handler = window.PaystackPop.setup({
+           key: PUBLIC_KEY,
+            email: email,
+            amount: Math.round(totalAmount * 100),
+            currency: initData.currency || 'GHS',
+            ref: initData.reference || ('ref_' + Math.floor(Math.random()*1000000)),
+           onClose: function(){ alert('Payment cancelled'); },
+            callback: async function(response) {
+              // verify payment server-side using the reference returned by Paystack
+             try {
+                const vres = await fetch(`/api/pay/verify?reference=${encodeURIComponent(response.reference)}`);
+                if (!vres.ok) { alert('Payment made but verification failed.'); submitBtn.disabled = false; return; }
+                const vdata = await vres.json();
+               const status = vdata?.data?.status || vdata?.status;
+                if (status === 'success') {
+                 // persist canonical order and show confirmation flow
+                  const order = {
+                    reference: response.reference,
+                    name, phone, email, type, address, lat, lon, date, time, note,
+                    cart: cartLines,
+                    totals: { subtotal: totals.subtotal, delivery, promo: totals.promoDiscount, total: totalAmount },
+                    ts: new Date().toISOString()
+                  };
+                  try {
+                    localStorage.setItem('wrap_last_order', JSON.stringify(order));
+                   localStorage.setItem('wrap_show_confirmation', '1');
+                 } catch (e) {}
+                try { window.cart = {}; if (typeof renderCart === 'function') renderCart(); } catch(e){}
+                 closeCheckoutPage();
+                 window.location.reload();
+                 return;
+               } else {
+                 alert('Payment not verified as successful.');
+               }
+             } catch (err) {
+               console.error('verification error', err);
+               alert('Payment verification failed. Contact support.');
+              } finally {
+                submitBtn.disabled = false;
+              }
+            }
+         });
+          handler.openIframe();
+         return;
+       }
+
+       // Fallback: if server returned an authorization_url, redirect user there (hosted payment)
+        if (initData.authorization_url) {
+         window.location.href = initData.authorization_url;
+         return;
+       }
+
+       // If we reached here, we couldn't open inline and have no redirect
+        alert('Payment could not be started (no inline library and no redirect URL). Check server/init response.');
+       submitBtn.disabled = false;
       } catch (err) {
-        console.error('checkout error', err);
+       console.error('checkout error', err);
         alert('Checkout failed: ' + (err.message || err));
-      } finally { submitBtn.disabled = false; }
+        submitBtn.disabled = false;
+      }
     });
-
-
     
     // small helpers
     function fmtGhc(n){ return `GHC ${Number(n||0).toFixed(0)}`; }
