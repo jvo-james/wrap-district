@@ -2377,6 +2377,196 @@ a:focus, button:focus { outline: 3px solid rgba(255,204,51,0.10); outline-offset
   </div>
 </div>
   </main>
+  <!-- ===== Menu tabs + Cart header checkout enhancements ===== -->
+<style>
+/* header right area inside cart header */
+.cart-header .cart-header-right {
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-left:auto;
+}
+.cart-header .cart-header-total {
+  font-weight:900;
+  color: var(--accent-2);
+  font-size:14px;
+  text-align:right;
+  min-width:80px;
+}
+.cart-header .cart-header-checkout {
+  border:0;
+  background: linear-gradient(90deg,var(--accent-1),var(--accent-2));
+  color:#111;
+  font-weight:900;
+  padding:8px 10px;
+  border-radius:10px;
+  display:inline-flex;
+  gap:8px;
+  align-items:center;
+  cursor:pointer;
+  box-shadow: 0 8px 26px rgba(255,106,0,0.10);
+}
+.cart-header .cart-header-checkout:active { transform: translateY(1px) scale(.995); }
+.tab-btn[role="tab"] { cursor:pointer; }
+</style>
+
+<script>
+(function(){
+  document.addEventListener('DOMContentLoaded', () => {
+    /* ---------- 1) Menu-tabs: filter behaviour ---------- */
+    const tabButtons = Array.from(document.querySelectorAll('.menu-tabs .tab-btn'));
+    const menuItems = Array.from(document.querySelectorAll('.menu-item'));
+
+    function applyTabFilter(cat) {
+      // cat is the data-cat value (e.g. "wraps" or "all")
+      menuItems.forEach(item => {
+        const itemCat = (item.dataset.category || '').toLowerCase();
+        if (!cat || cat === 'all') {
+          item.style.display = ''; // show
+          item.setAttribute('aria-hidden','false');
+        } else {
+          // show when itemCat matches or contains cat
+          const show = itemCat.split(' ').some(c => c === cat) || itemCat === cat;
+          item.style.display = show ? '' : 'none';
+          item.setAttribute('aria-hidden', show ? 'false' : 'true');
+        }
+      });
+    }
+
+    function setActiveTab(btn) {
+      tabButtons.forEach(b => {
+        const is = b === btn;
+        b.classList.toggle('is-active', is);
+        b.setAttribute('aria-selected', String(is));
+        if (is) b.focus && b.focus();
+      });
+    }
+
+    tabButtons.forEach(btn => {
+      // Ensure accessible attributes present
+      if (!btn.hasAttribute('role')) btn.setAttribute('role','tab');
+      if (!btn.hasAttribute('tabindex')) btn.setAttribute('tabindex','0');
+
+      btn.addEventListener('click', (e) => {
+        const cat = (btn.dataset.cat || '').toLowerCase();
+        setActiveTab(btn);
+        applyTabFilter(cat);
+      });
+
+      // keyboard support: Enter / Space
+      btn.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          btn.click();
+        }
+      });
+    });
+
+    // initialize: find active tab or default to first
+    const initial = tabButtons.find(b => b.classList.contains('is-active')) || tabButtons[0];
+    if (initial) {
+      setActiveTab(initial);
+      applyTabFilter((initial.dataset.cat || 'all').toLowerCase());
+    }
+
+    /* ---------- 2) Cart header: add total + checkout button ---------- */
+    const cartHeader = document.querySelector('.cart-header');
+    if (cartHeader && !cartHeader.querySelector('.cart-header-right')) {
+      // create container
+      const headerRight = document.createElement('div');
+      headerRight.className = 'cart-header-right';
+
+      // total display
+      const totalWrap = document.createElement('div');
+      totalWrap.className = 'cart-header-total';
+      totalWrap.id = 'cart-header-total';
+      totalWrap.innerText = 'GHC 0';
+
+      // checkout button
+      const headerCheckout = document.createElement('button');
+      headerCheckout.className = 'cart-header-checkout';
+      headerCheckout.id = 'cart-header-checkout';
+      headerCheckout.type = 'button';
+      headerCheckout.setAttribute('aria-label', 'Checkout and pay');
+      headerCheckout.innerHTML = '<i class="fa fa-credit-card" aria-hidden="true"></i> Checkout';
+
+      headerRight.appendChild(totalWrap);
+      headerRight.appendChild(headerCheckout);
+
+      cartHeader.appendChild(headerRight);
+
+      // wire checkout click to existing footer checkout (preferred)
+      headerCheckout.addEventListener('click', () => {
+        // try to reuse modal: if #checkout-btn exists -> trigger click
+        const footerCheckout = document.getElementById('checkout-btn');
+        if (footerCheckout) {
+          footerCheckout.click(); // will open checkout modal already wired
+        } else if (typeof window.openCheckoutModal === 'function') {
+          window.openCheckoutModal(); // fallback if we exposed it earlier
+        } else {
+          // fallback: simulate click on modal opener if present
+          const alt = document.querySelector('[data-action="checkout"], [data-action="pay"]');
+          if (alt) alt.click();
+          else alert('Checkout not available. Please use the Pay button.');
+        }
+      });
+    }
+
+    // Sync header total with computeCartTotals or with #cart-total element
+    const headerTotalEl = document.getElementById('cart-header-total');
+    const cartTotalEl = document.getElementById('cart-total');
+    const cartSubtotalEl = document.getElementById('cart-subtotal');
+
+    function syncHeaderTotal() {
+      try {
+        // Prefer computeCartTotals if available (accurate), otherwise read #cart-total text
+        if (typeof computeCartTotals === 'function') {
+          const t = computeCartTotals();
+          if (t && typeof t.total !== 'undefined') {
+            headerTotalEl.innerText = `GHC ${Math.round(t.total)}`;
+            return;
+          }
+        }
+        if (cartTotalEl && cartTotalEl.innerText) {
+          headerTotalEl.innerText = cartTotalEl.innerText;
+        } else if (cartSubtotalEl && cartSubtotalEl.innerText) {
+          headerTotalEl.innerText = cartSubtotalEl.innerText;
+        }
+      } catch (err) { /* ignore */ }
+    }
+
+    // Observe changes to cart totals (watch #cart-total and #cart-subtotal)
+    const targets = [];
+    if (cartTotalEl) targets.push(cartTotalEl);
+    if (cartSubtotalEl) targets.push(cartSubtotalEl);
+
+    if (targets.length) {
+      const mo = new MutationObserver(syncHeaderTotal);
+      targets.forEach(t => mo.observe(t, { childList:true, subtree:true, characterData:true }));
+      // call once now
+      syncHeaderTotal();
+    } else {
+      // fallback: poll every 700ms
+      syncHeaderTotal();
+      setInterval(syncHeaderTotal, 700);
+    }
+
+    // Also update when renderCart() is called by hooking into the global renderCart if present
+    // (non-invasive override: wrap existing renderCart to call syncHeaderTotal after)
+    if (typeof window.renderCart === 'function') {
+      const originalRenderCart = window.renderCart;
+      window.renderCart = function() {
+        const result = originalRenderCart.apply(this, arguments);
+        try { syncHeaderTotal(); } catch(e){/*ignore*/ }
+        return result;
+      };
+    } else {
+      // If renderCart is defined as local function (not on window), we can't wrap it — rely on MutationObserver/polling.
+    }
+
+  });
+})();
+</script>
 <!-- Product detail modal (Task 2) -->
 <style>
 /* Basic modal sizing tweaks (uses existing .modal/.modal-inner from your CSS) */
@@ -2417,52 +2607,179 @@ a:focus, button:focus { outline: 3px solid rgba(255,204,51,0.10); outline-offset
 <!-- InlineJS CDN (Popup V2) - required for resumeTransaction() -->
 <script src="https://js.paystack.co/v2/inline.js"></script>
 
+<!-- ======= Enhanced Checkout + Map Picker (paste before </body>) ======= -->
+
+<!-- Leaflet (Map) CSS & JS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
 <style>
-/* Small checkout modal styles (mobile-first) */
-#checkout-modal { display:none; position:fixed; inset:0; z-index:2500; background:rgba(0,0,0,0.6); align-items:center; justify-content:center; padding:12px; }
-#checkout-modal[aria-hidden="false"] { display:flex; }
-.checkout-inner { width:100%; max-width:520px; border-radius:12px; background:linear-gradient(180deg, #0b0b0b, #070707); border:1px solid rgba(255,255,255,0.04); box-shadow:0 30px 80px rgba(0,0,0,0.7); padding:16px; box-sizing:border-box; color:#FFF; }
-.checkout-header { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:10px; }
-.checkout-title { font-weight:900; color:var(--accent-2); margin:0; }
-.checkout-body { display:flex; flex-direction:column; gap:10px; }
-.input { width:100%; padding:10px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.04); background:transparent; color:#fff; font-weight:800; box-sizing:border-box; }
-.checkout-footer { display:flex; gap:8px; justify-content:space-between; align-items:center; margin-top:12px; }
-.btn.small { padding:10px 12px; border-radius:10px; min-width:120px; font-weight:900; cursor:pointer; }
-.btn.primary { background: linear-gradient(90deg,var(--accent-1,#ff6a00),var(--accent-2,#ffcc33)); color:#111; border:0; }
-.btn.ghost { background: rgba(255,255,255,0.03); color:var(--muted,#d7d7d7); border:1px solid rgba(255,255,255,0.04); }
-.toast.wrap-toast { position:fixed; left:50%; transform:translateX(-50%); bottom:18px; z-index:2600; background:rgba(0,0,0,0.8); color:#fff; padding:10px 14px; border-radius:999px; font-weight:800; display:none; }
+/* Checkout modal (full form) */
+#checkout-full-modal { display:none; position:fixed; inset:0; z-index:3000; background:rgba(0,0,0,0.6); align-items:center; justify-content:center; padding:12px; }
+#checkout-full-modal[aria-hidden="false"] { display:flex; }
+.checkout-full-inner { width:100%; max-width:720px; border-radius:12px; background:linear-gradient(180deg,#0b0b0b,#070707); border:1px solid rgba(255,255,255,0.04); box-shadow:0 40px 120px rgba(0,0,0,0.7); color:#fff; padding:0; overflow:hidden; display:grid; grid-template-columns: 1fr 360px; gap:0; }
+@media (max-width:900px) { .checkout-full-inner { grid-template-columns: 1fr; } }
+
+.checkout-left { padding:16px 18px; }
+.checkout-right { padding:16px 18px; border-left:1px solid rgba(255,255,255,0.03); background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.00)); overflow:auto; max-height: 82vh; }
+
+.checkout-header { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:12px; }
+.checkout-title { color:var(--accent-2); font-weight:900; font-size:18px; margin:0; }
+
+.form-row { display:flex; gap:8px; margin-bottom:10px; }
+.form-col { flex:1; display:flex; flex-direction:column; gap:6px; }
+.input, select, textarea { width:100%; padding:10px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.04); background:transparent; color:#fff; font-weight:800; box-sizing:border-box; }
+.input[readonly] { cursor:pointer; background: rgba(255,255,255,0.01); }
+.small-muted { color: rgba(255,255,255,0.72); font-size:13px; }
+
+.order-line { display:flex; gap:8px; align-items:center; margin-bottom:10px; }
+.order-line img { width:64px; height:48px; object-fit:cover; border-radius:8px; border:1px solid rgba(255,255,255,0.04); }
+.order-line .ol-meta { flex:1; min-width:0; }
+.order-line .ol-meta strong { display:block; font-weight:900; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.order-line .ol-meta small { color: rgba(255,255,255,0.75); }
+.order-line .ol-price { font-weight:900; color:var(--accent-2); min-width:70px; text-align:right; }
+
+.checkout-actions { display:flex; gap:10px; justify-content:flex-end; margin-top:12px; }
+.btn.full { padding:12px 16px; border-radius:12px; font-weight:900; min-width:140px; }
+.btn.primary.full { background: linear-gradient(90deg,var(--accent-1),var(--accent-2)); color:#111; border:0; box-shadow: 0 12px 36px rgba(255,106,0,0.12); }
+
+/* Map modal */
+#map-modal { display:none; position:fixed; inset:0; z-index:3600; background:rgba(0,0,0,0.6); align-items:center; justify-content:center; padding:8px; }
+#map-modal[aria-hidden="false"] { display:flex; }
+.map-inner { width:100%; max-width:920px; height:78vh; border-radius:12px; overflow:hidden; background:#fff; display:flex; flex-direction:column; }
+.map-top { display:flex; gap:8px; padding:8px; align-items:center; background:#fff; border-bottom:1px solid #eee; }
+.map-search { flex:1; padding:8px 12px; border-radius:8px; border:1px solid #ddd; }
+#map { flex:1; }
+.map-results { max-height:160px; overflow:auto; background:#fff; border-top:1px solid #eee; }
+.map-result { padding:8px 10px; border-bottom:1px solid #f1f1f1; cursor:pointer; }
+.map-result:hover { background:#f7f7f7; }
+
+.map-actions { display:flex; gap:10px; padding:8px; justify-content:flex-end; background:#fff; border-top:1px solid #eee; }
+
+.toast.wrap-toast { position:fixed; left:50%; transform:translateX(-50%); bottom:18px; z-index:4000; background:rgba(0,0,0,0.85); color:#fff; padding:10px 14px; border-radius:999px; font-weight:800; display:none; }
 .toast.wrap-toast.show { display:block; animation: toast-in 320ms cubic-bezier(.2,.9,.3,1); }
-@keyframes toast-in { from { opacity:0; transform: translateX(-50%) translateY(8px); } to { opacity:1; transform: translateX(-50%) translateY(0); } }
+
 </style>
 
-<!-- Checkout Modal -->
-<div id="checkout-modal" aria-hidden="true" role="dialog" aria-label="Checkout">
-  <div class="checkout-inner" role="document">
-    <div class="checkout-header">
-      <h3 class="checkout-title"><i class="fa fa-credit-card"></i> Checkout</h3>
-      <button id="checkout-close" class="icon-btn" aria-label="Close checkout"><i class="fa fa-times"></i></button>
-    </div>
-
-    <div class="checkout-body">
-      <label class="small">Email (receipt)</label>
-      <input id="checkout-email" class="input" type="email" placeholder="you@example.com" required />
-
-      <label class="small">Phone (optional)</label>
-      <input id="checkout-phone" class="input" type="tel" placeholder="0550xxxxxx" />
-
-      <div id="checkout-summary" class="small muted">Preparing order summary…</div>
-    </div>
-
-    <div class="checkout-footer">
-      <div style="font-weight:900;">
-        <div class="small">Total</div>
-        <div id="checkout-total" style="font-weight:900; color:var(--accent-2)">GHC 0</div>
+<!-- Checkout full modal -->
+<div id="checkout-full-modal" aria-hidden="true" role="dialog" aria-label="Complete your order">
+  <div class="checkout-full-inner" role="document">
+    <div class="checkout-left">
+      <div class="checkout-header">
+        <h3 class="checkout-title"><i class="fa fa-shopping-basket"></i> Complete Order</h3>
+        <div style="display:flex; gap:8px;">
+          <button id="checkout-full-close" class="icon-btn" aria-label="Close"><i class="fa fa-times"></i></button>
+        </div>
       </div>
 
-      <div style="display:flex; gap:8px;">
-        <button id="checkout-pay" class="btn small primary"><i class="fa fa-credit-card"></i> Pay</button>
-        <button id="checkout-cancel" class="btn small ghost">Cancel</button>
+      <div>
+        <div class="form-row">
+          <div class="form-col">
+            <label class="small-muted">Full name *</label>
+            <input id="cf-name" class="input" type="text" placeholder="Jane Doe" required />
+          </div>
+          <div class="form-col">
+            <label class="small-muted">Phone *</label>
+            <input id="cf-phone" class="input" type="tel" placeholder="0550xxxxxx" required />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-col">
+            <label class="small-muted">Email *</label>
+            <input id="cf-email" class="input" type="email" placeholder="you@example.com" required />
+          </div>
+          <div class="form-col">
+            <label class="small-muted">Order type *</label>
+            <select id="cf-type" class="input">
+              <option value="delivery">Delivery</option>
+              <option value="pickup">Pickup</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="margin-top:6px;">
+          <label class="small-muted">Address (click to search on map) *</label>
+          <input id="cf-address" class="input" type="text" placeholder="Tap to select address on map" readonly />
+          <input type="hidden" id="cf-lat" />
+          <input type="hidden" id="cf-lon" />
+        </div>
+
+        <div class="form-row" style="margin-top:10px;">
+          <div class="form-col">
+            <label class="small-muted">Preferred date</label>
+            <input id="cf-date" class="input" type="date" />
+          </div>
+          <div class="form-col">
+            <label class="small-muted">Preferred time</label>
+            <input id="cf-time" class="input" type="time" />
+          </div>
+        </div>
+
+        <div style="margin-top:10px;">
+          <label class="small-muted">Notes (delivery/pickup instructions)</label>
+          <textarea id="cf-note" class="input" rows="3" placeholder="e.g., knock twice, leave at gate"></textarea>
+        </div>
+
+        <div style="margin-top:12px;">
+          <label class="small-muted">Payment method</label>
+          <select id="cf-paymethod" class="input">
+            <option value="paystack">Pay with Card / Mobile Money (Paystack)</option>
+            <option value="cash">Cash on Delivery</option>
+          </select>
+        </div>
+
+        <div class="checkout-actions">
+          <button id="cf-submit" class="btn primary full">Confirm & Pay</button>
+          <button id="cf-cancel" class="btn ghost full">Cancel</button>
+        </div>
       </div>
+    </div>
+
+    <div class="checkout-right">
+      <h4 style="margin:0 0 10px 0; color:var(--accent-2); font-weight:900;">Your order</h4>
+      <div id="cf-order-lines">
+        <!-- order lines injected here -->
+      </div>
+
+      <div style="border-top:1px dashed rgba(255,255,255,0.04); padding-top:10px; margin-top:12px;">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <div class="small-muted">Subtotal</div>
+          <div id="cf-subtotal" class="small-muted">GHC 0</div>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
+          <div class="small-muted">Delivery</div>
+          <div id="cf-delivery" class="small-muted">GHC 0</div>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
+          <div class="small-muted">Promo</div>
+          <div id="cf-promo" class="small-muted">-GHC 0</div>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px; font-weight:900; color:#fff;">
+          <div>Total</div>
+          <div id="cf-total" style="color:var(--accent-2)">GHC 0</div>
+        </div>
+      </div>
+
+      <div style="margin-top:12px;" class="small-muted">
+        Please confirm your details before proceeding. You will receive an email & SMS after payment.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Map modal -->
+<div id="map-modal" aria-hidden="true" role="dialog" aria-label="Pick your address">
+  <div class="map-inner">
+    <div class="map-top">
+      <input id="map-search" class="map-search" placeholder="Search for address (e.g., 'Tema Community 25')" />
+      <button id="map-search-btn" class="btn ghost" style="min-width:90px;">Search</button>
+      <button id="map-close" class="icon-btn" aria-label="Close map"><i class="fa fa-times"></i></button>
+    </div>
+    <div id="map" style="height:100%;"></div>
+    <div class="map-actions">
+      <div id="map-results" class="map-results"></div>
+      <button id="map-confirm" class="btn primary full">Select this location</button>
     </div>
   </div>
 </div>
@@ -2470,288 +2787,414 @@ a:focus, button:focus { outline: 3px solid rgba(255,204,51,0.10); outline-offset
 <div class="toast wrap-toast" aria-hidden="true"></div>
 
 <script>
-/* Front-end Paystack integration (client-only code) */
-/* - Expects server endpoints:
-     POST /api/pay/initialize  (body: { email, phone, amount_pesewas, cart, ... }) -> returns { access_code, reference, authorization_url? }
-     GET  /api/pay/verify?reference=... -> returns paystack verification result (data.data.status === 'success')
-   - Fallback: client-only PaystackPop.setup for quick dev testing (not secure for production)
-   - Uses InlineJS Popup V2 resumeTransaction(access_code) when server returns access_code.
-   - NOTE: amounts must be checked/verified server-side in pesewas (subunit).
-     Official docs: initialize on server, resumeTransaction(access_code) on client, then verify server-side.  [oai_citation:3‡Paystack](https://paystack.com/docs/developer-tools/inlinejs/?utm_source=chatgpt.com)
+/* Enhanced checkout + map picker script
+   - Replace previous checkout modal behavior. Binds to #checkout-btn and header checkout if present.
+   - Uses Leaflet + Nominatim for address search & pick.
+   - Sends full payload to /api/pay/initialize including address and metadata, then resumes Paystack transaction.
 */
 
-(function () {
+(function(){
   // helpers
   const q = (s, ctx=document) => ctx.querySelector(s);
   const qa = (s, ctx=document) => Array.from((ctx||document).querySelectorAll(s));
   const fmtGhc = n => `GHC ${Number(n || 0).toFixed(0)}`;
   const toastEl = document.querySelector('.toast.wrap-toast');
-
-  function showToast(msg, ms=2400){
-    if (!toastEl) return;
-    toastEl.textContent = msg;
-    toastEl.classList.add('show');
-    setTimeout(()=> toastEl.classList.remove('show'), ms);
-  }
+  function showToast(msg, ms=2400){ if (!toastEl) return; toastEl.textContent = msg; toastEl.classList.add('show'); setTimeout(()=> toastEl.classList.remove('show'), ms); }
 
   // elements
-  const checkoutModal = q('#checkout-modal');
-  const checkoutClose = q('#checkout-close');
-  const checkoutCancel = q('#checkout-cancel');
-  const checkoutPay = q('#checkout-pay');
-  const checkoutEmail = q('#checkout-email');
-  const checkoutPhone = q('#checkout-phone');
-  const checkoutSummary = q('#checkout-summary');
-  const checkoutTotal = q('#checkout-total');
+  const modal = q('#checkout-full-modal');
+  const closeBtn = q('#checkout-full-close');
+  const cancelBtn = q('#cf-cancel');
+  const submitBtn = q('#cf-submit');
 
-  // open/close modal
-  function openCheckoutModal() {
-    // populate summary + total from existing cart totals
-    try {
-      const totals = computeCartTotals ? computeCartTotals() : { total: 0, subtotal:0, delivery:0, promoDiscount:0 };
-      checkoutTotal.innerText = fmtGhc(totals.total || 0);
-      checkoutSummary.innerHTML = `Subtotal: ${fmtGhc(totals.subtotal || 0)} • Delivery: ${fmtGhc(totals.delivery || 0)}<br>Promo: -${fmtGhc(totals.promoDiscount || 0)}`;
-      // try autofill from localStorage
-      checkoutEmail.value = localStorage.getItem('wrap_checkout_email') || '';
-      checkoutPhone.value = localStorage.getItem('wrap_checkout_phone') || '';
-    } catch (err) { console.warn('openCheckoutModal: computeCartTotals missing or error', err); }
+  const inpName = q('#cf-name');
+  const inpPhone = q('#cf-phone');
+  const inpEmail = q('#cf-email');
+  const inpType = q('#cf-type');
+  const inpAddress = q('#cf-address');
+  const inpLat = q('#cf-lat');
+  const inpLon = q('#cf-lon');
+  const inpDate = q('#cf-date');
+  const inpTime = q('#cf-time');
+  const inpNote = q('#cf-note');
+  const inpPayMethod = q('#cf-paymethod');
 
-    checkoutModal.style.display = 'flex';
-    checkoutModal.setAttribute('aria-hidden', 'false');
+  const orderLinesWrap = q('#cf-order-lines');
+  const cfSubtotal = q('#cf-subtotal');
+  const cfDelivery = q('#cf-delivery');
+  const cfPromo = q('#cf-promo');
+  const cfTotal = q('#cf-total');
+
+  // Map modal elements
+  const mapModal = q('#map-modal');
+  const mapSearch = q('#map-search');
+  const mapSearchBtn = q('#map-search-btn');
+  const mapClose = q('#map-close');
+  const mapConfirm = q('#map-confirm');
+  const mapResults = q('#map-results');
+  let map, mapMarker, lastSelectedPlace = null, nominatimResults = [];
+
+  // Open checkout modal and populate items/totals
+  function openCheckoutFull() {
+    // Prefill basic user details from localStorage if present
+    inpName.value = localStorage.getItem('wrap_user_name') || '';
+    inpPhone.value = localStorage.getItem('wrap_user_phone') || '';
+    inpEmail.value = localStorage.getItem('wrap_checkout_email') || '';
+    inpType.value = 'delivery';
+
+    // Build order lines from global cart
+    orderLinesWrap.innerHTML = '';
+    const cartLines = Object.values(window.cart || {});
+    if (!cartLines.length) {
+      orderLinesWrap.innerHTML = '<div class="small-muted">Your cart is empty.</div>';
+    } else {
+      cartLines.forEach(line => {
+        const div = document.createElement('div');
+        div.className = 'order-line';
+        div.innerHTML = `
+          <img src="${escapeHtml(line.imageSrc||'')}" alt="${escapeHtml(line.title)}" />
+          <div class="ol-meta">
+            <strong>${escapeHtml(line.title)}</strong>
+            <small>${(line.meta && line.meta.addons) ? (line.meta.addons.map(a=>a.label).join(', ')) : ''}</small>
+          </div>
+          <div class="ol-price">${fmtGhc(line.unitPrice * line.qty)}</div>
+        `;
+        orderLinesWrap.appendChild(div);
+      });
+    }
+
+    // Totals
+    const totals = (typeof computeCartTotals === 'function') ? computeCartTotals() : { subtotal:0, delivery:0, promoDiscount:0, total:0 };
+    cfSubtotal.innerText = fmtGhc(totals.subtotal || 0);
+    cfDelivery.innerText = fmtGhc(totals.delivery || 0);
+    cfPromo.innerText = `-GHC ${Math.round(totals.promoDiscount || 0)}`;
+    cfTotal.innerText = fmtGhc(totals.total || 0);
+
+    // Show modal
+    modal.style.display = 'flex';
+    modal.setAttribute('aria-hidden','false');
     document.body.style.overflow = 'hidden';
-    setTimeout(()=> checkoutEmail.focus && checkoutEmail.focus(), 120);
+    setTimeout(()=> inpName.focus && inpName.focus(), 80);
   }
-  function closeCheckoutModal() {
-    checkoutModal.style.display = 'none';
-    checkoutModal.setAttribute('aria-hidden', 'true');
+
+  function closeCheckoutFull() {
+    modal.style.display = 'none';
+    modal.setAttribute('aria-hidden','true');
     document.body.style.overflow = '';
   }
 
-  checkoutClose?.addEventListener('click', closeCheckoutModal);
-  checkoutCancel?.addEventListener('click', closeCheckoutModal);
+  // Click handlers to open the full checkout (bind to footer and header checkout if present)
+  const footerPayBtn = q('#checkout-btn');
+  const headerCheckoutBtn = q('#cart-header-checkout');
+  if (footerPayBtn) footerPayBtn.addEventListener('click', (e)=> { e.preventDefault(); openCheckoutFull(); });
+  if (headerCheckoutBtn) headerCheckoutBtn.addEventListener('click', (e)=> { e.preventDefault(); openCheckoutFull(); });
 
-  // Attach to your existing Pay button: prefer to bind rather than replace functions
-  const checkoutBtn = q('#checkout-btn');
-  if (checkoutBtn) {
-    checkoutBtn.addEventListener('click', (e) => {
-      e.preventDefault();
-      openCheckoutModal();
-    });
-  } else {
-    // fallback: if button missing, expose window.openCheckoutModal
-    window.openCheckoutModal = openCheckoutModal;
+  // close handlers
+  closeBtn && closeBtn.addEventListener('click', closeCheckoutFull);
+  cancelBtn && cancelBtn.addEventListener('click', closeCheckoutFull);
+
+  // address input opens map modal
+  inpAddress && inpAddress.addEventListener('click', (e)=> {
+    e.preventDefault();
+    openMapModal();
+  });
+
+  // Map modal logic (Leaflet + Nominatim)
+  function openMapModal() {
+    mapModal.style.display = 'flex'; mapModal.setAttribute('aria-hidden','false');
+    document.body.style.overflow = 'hidden';
+    mapResults.innerHTML = '';
+    mapSearch.value = '';
+    lastSelectedPlace = null;
+
+    // Initialize map once
+    if (!map) {
+      map = L.map('map', { zoomControl: true }).setView([5.614818, -0.205874], 12); // Ghana center (Accra)
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors'
+      }).addTo(map);
+    }
+    setTimeout(()=> map.invalidateSize(), 120);
   }
 
-  // Main pay handler (on modal Pay)
-  checkoutPay.addEventListener('click', async function onPay(e) {
-    e.preventDefault();
-    checkoutPay.disabled = true;
-    checkoutPay.textContent = 'Processing…';
+  function closeMapModal() {
+    mapModal.style.display = 'none'; mapModal.setAttribute('aria-hidden','true');
+    document.body.style.overflow = '';
+  }
 
+  // Nominatim search (debounced)
+  let searchTimer = null;
+  function nominatimSearch(qstr) {
+    if (!qstr || qstr.trim().length < 2) { mapResults.innerHTML = '<div class="map-result small-muted">Type an address to search</div>'; return; }
+    // debounce
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(async ()=> {
+      try {
+        mapResults.innerHTML = '<div class="map-result small-muted">Searching…</div>';
+        const url = 'https://nominatim.openstreetmap.org/search?format=json&limit=8&q=' + encodeURIComponent(qstr);
+        const resp = await fetch(url, { headers: { 'Accept-Language': 'en' }});
+        const data = await resp.json();
+        nominatimResults = data; // save
+        if (!Array.isArray(data) || data.length === 0) {
+          mapResults.innerHTML = '<div class="map-result small-muted">No results</div>';
+          return;
+        }
+        mapResults.innerHTML = '';
+        data.forEach((r, idx) => {
+          const div = document.createElement('div');
+          div.className = 'map-result';
+          div.innerHTML = `<strong>${escapeHtml(r.display_name.split(',').slice(0,3).join(', '))}</strong><div class="small-muted">${escapeHtml(r.display_name)}</div>`;
+          div.addEventListener('click', ()=> {
+            // center map and show marker
+            const lat = Number(r.lat), lon = Number(r.lon);
+            map.setView([lat, lon], 17);
+            if (mapMarker) map.removeLayer(mapMarker);
+            mapMarker = L.marker([lat, lon]).addTo(map);
+            lastSelectedPlace = r;
+            // highlight selected result
+            Array.from(mapResults.children).forEach(c => c.style.background = '');
+            div.style.background = 'rgba(0,0,0,0.04)';
+          });
+          mapResults.appendChild(div);
+        });
+      } catch (err) {
+        console.error('Nominatim error', err);
+        mapResults.innerHTML = '<div class="map-result small-muted">Search failed</div>';
+      }
+    }, 350);
+  }
+
+  mapSearchBtn && mapSearchBtn.addEventListener('click', ()=> nominatimSearch(mapSearch.value));
+  mapSearch && mapSearch.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); nominatimSearch(mapSearch.value); } });
+
+  // map confirm button: populate address fields with selected place (or pick map center if none)
+  mapConfirm && mapConfirm.addEventListener('click', ()=> {
+    if (lastSelectedPlace) {
+      inpAddress.value = lastSelectedPlace.display_name;
+      inpLat.value = lastSelectedPlace.lat;
+      inpLon.value = lastSelectedPlace.lon;
+      showToast('Address selected');
+      closeMapModal();
+    } else {
+      // fallback: use center of map
+      const center = map.getCenter();
+      inpLat.value = center.lat;
+      inpLon.value = center.lng;
+      // reverse geocode once to get human-friendly address
+      (async ()=> {
+        try {
+          const rev = await fetch('https://nominatim.openstreetmap.org/reverse?format=json&lat=' + center.lat + '&lon=' + center.lng);
+          const res = await rev.json();
+          if (res && res.display_name) inpAddress.value = res.display_name;
+          else inpAddress.value = `${center.lat.toFixed(5)}, ${center.lng.toFixed(5)}`;
+        } catch (err) {
+          inpAddress.value = `${center.lat.toFixed(5)}, ${center.lng.toFixed(5)}`;
+        } finally {
+          showToast('Location selected');
+          closeMapModal();
+        }
+      })();
+    }
+  });
+
+  mapClose && mapClose.addEventListener('click', ()=> closeMapModal());
+  // also close when clicking outside map-inner (but we used fixed full-screen)
+  mapModal && mapModal.addEventListener('click', (e) => { if (e.target === mapModal) closeMapModal(); });
+
+  // Escape to close map modal
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { if (mapModal && mapModal.getAttribute('aria-hidden')==='false') closeMapModal(); if (modal && modal.getAttribute('aria-hidden')==='false' && e.target !== inpAddress) {/*keep checkout open*/} } });
+
+  // Utility escapeHtml (same as earlier)
+  function escapeHtml(str){ return String(str||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+  /* ---------- Submit flow: validation + Paystack integration ---------- */
+  submitBtn && submitBtn.addEventListener('click', async (ev) => {
+    ev.preventDefault();
+    submitBtn.disabled = true;
+    showToast('Validating order…');
+
+    // Validate required fields
+    const name = (inpName.value || '').trim();
+    const phone = (inpPhone.value || '').trim();
+    const email = (inpEmail.value || '').trim();
+    const type = inpType.value;
+    const address = (inpAddress.value || '').trim();
+    const lat = inpLat.value, lon = inpLon.value;
+    const date = inpDate.value, time = inpTime.value;
+    const note = inpNote.value || '';
+    const paymethod = inpPayMethod.value || 'paystack';
+
+    if (!name || !phone || !email) {
+      alert('Please complete your name, phone and email.');
+      submitBtn.disabled = false; return;
+    }
+    if (type === 'delivery' && !address) {
+      alert('Please select your address on the map for delivery.');
+      submitBtn.disabled = false; return;
+    }
+
+    // assemble cart payload from window.cart (same structure as earlier)
+    const cartLines = Object.values(window.cart || {}).map(l => ({
+      baseId: l.baseId, title: l.title, unitPrice: l.unitPrice, qty: l.qty, meta: l.meta || {}
+    }));
+
+    if (!cartLines.length) {
+      alert('Your cart is empty.');
+      submitBtn.disabled = false; return;
+    }
+
+    // totals
+    const totals = (typeof computeCartTotals === 'function') ? computeCartTotals() : { subtotal:0, delivery:0, promoDiscount:0, total:0 };
+
+    // If payment method is cash choose flow: simply save order details to server (not covered here).
+    // For Paystack proceed with the payment initialization (same as earlier).
+    if (paymethod === 'cash') {
+      // For front-end only flow we store order into localStorage as a placeholder and show confirmation.
+      const fakeOrder = {
+        id: 'local-'+Date.now(),
+        name, phone, email, type, address, lat, lon, date, time, note, cart: cartLines, totals
+      };
+      localStorage.setItem('wrap_last_order', JSON.stringify(fakeOrder));
+      showToast('Order placed (Cash on Delivery). We will contact you shortly.');
+      // Optionally clear cart
+      try { window.cart = {}; renderCart(); } catch(err){}
+      closeCheckoutFull();
+      submitBtn.disabled = false;
+      return;
+    }
+
+    // else paymethod === 'paystack' -> call server to initialize transaction
     try {
-      // Basic validation
-      const email = (checkoutEmail.value || '').trim();
-      const phone = (checkoutPhone.value || '').trim();
-      if (!email) { alert('Please enter an email for the receipt.'); checkoutPay.disabled=false; checkoutPay.textContent='Pay'; checkoutEmail.focus(); return; }
-
-      // Save for convenience
-      try { localStorage.setItem('wrap_checkout_email', email); localStorage.setItem('wrap_checkout_phone', phone); } catch(err){}
-
-      // Get cart totals and lines
-      const totals = computeCartTotals ? computeCartTotals() : null;
-      if (!totals || typeof totals.total === 'undefined') {
-        showToast('Cannot read cart totals. Please try again.');
-        checkoutPay.disabled=false; checkoutPay.textContent='Pay';
-        return;
-      }
-      if (totals.total <= 0) {
-        alert('Your cart is empty or total is zero.');
-        checkoutPay.disabled=false; checkoutPay.textContent='Pay';
-        return;
-      }
-
-      // Build lightweight cart payload
-      const cartLines = Object.values(cart || {}).map(l => ({
-        baseId: l.baseId, title: l.title, unitPrice: l.unitPrice, qty: l.qty, meta: l.meta || {}
-      }));
-
-      // Prepare payload for server: amount in pesewas (subunit)
       const payload = {
-        email,
-        phone,
-        amount_cedi: totals.total,                          // human-readable
-        amount_pesewas: Math.round((totals.total || 0) * 100), // subunit for Paystack
+        name, phone, email, type, address, lat, lon, date, time, note,
+        amount_cedi: totals.total,
+        amount_pesewas: Math.round((totals.total||0)*100),
         currency: 'GHS',
         cart: cartLines
       };
 
-      // Call server to initialize (recommended secure flow)
-      let initData = null;
-      try {
-        const res = await fetch('/api/pay/initialize', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-        if (res.ok) {
-          initData = await res.json();
+      const res = await fetch('/api/pay/initialize', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
+      });
+
+      if (!res.ok) {
+        // server not available or error -> show message and optionally fallback to client-only dev flow
+        const txt = await res.text().catch(()=>null);
+        console.warn('init failed', res.status, txt);
+        // fallback message
+        if (confirm('Payment initialization failed on server. Do you want to try a client-only test payment? (Not for production)')) {
+          // client-only flow (requires PUBLIC KEY replacement)
+          const PUBLIC_KEY = 'pk_test_xxxxxxxxxxxxxxxxxxxxxxxxx'; // replace for local dev tests
+          if (!window.Paystack && !window.PaystackPop) {
+            alert('Paystack inline library not found.');
+            submitBtn.disabled=false; return;
+          }
+          // try using InlineJS newTransaction or PaystackPop.setup if available
+          if (window.Paystack && typeof window.Paystack === 'function') {
+            try {
+              const popup = new Paystack();
+              const tx = await popup.newTransaction({ key: PUBLIC_KEY, email, amount: Math.round((totals.total||0)*100), currency: 'GHS' });
+              // do verification if server available
+              showToast('Client-only payment completed (test).');
+              window.cart = {}; renderCart();
+              closeCheckoutFull();
+              submitBtn.disabled=false;
+              return;
+            } catch (err) {
+              console.error('client-only error', err);
+              alert('Client-only payment failed.');
+            }
+          } else if (window.PaystackPop) {
+            // older PaystackPop fallback
+            const ref = 'ref'+Math.floor(Math.random()*1000000);
+            const handler = window.PaystackPop.setup({
+              key: PUBLIC_KEY, email, amount: Math.round((totals.total||0)*100), currency: 'GHS', ref,
+              callback: function(response){
+                alert('Payment complete: ' + response.reference);
+                window.cart = {}; renderCart();
+                closeCheckoutFull();
+                submitBtn.disabled=false;
+              },
+              onClose: function(){ showToast('Payment cancelled'); submitBtn.disabled=false; }
+            });
+            handler.openIframe();
+            return;
+          } else {
+            alert('No client inline available.');
+            submitBtn.disabled=false; return;
+          }
         } else {
-          // server error / not found -> fall through to fallback client-only
-          console.warn('Pay init returned non-OK', res.status);
+          submitBtn.disabled=false; return;
+        }
+      }
+
+      const initData = await res.json();
+      if (!initData || !initData.access_code) {
+        alert('Payment initialization failed. Check server logs.');
+        submitBtn.disabled=false; return;
+      }
+
+      // resume Paystack popup (Inline v2)
+      try {
+        showToast('Opening payment window…');
+        const popup = new Paystack();
+        const tx = await popup.resumeTransaction(initData.access_code);
+        const reference = tx?.reference || initData.reference;
+        // verify with server
+        const vres = await fetch(`/api/pay/verify?reference=${encodeURIComponent(reference)}`);
+        if (!vres.ok) {
+          alert('Payment made but verification failed. Contact support.');
+          submitBtn.disabled=false; return;
+        }
+        const vdata = await vres.json();
+        const status = vdata?.data?.status || vdata?.status;
+        if (status === 'success') {
+          // Optionally send order fulfillment to server here (not implemented)
+          showToast('Payment confirmed — thank you!');
+          // clear cart
+          try { window.cart = {}; renderCart(); } catch(err){}
+          closeCheckoutFull();
+        } else {
+          alert('Payment not verified as successful.');
         }
       } catch (err) {
-        console.warn('Pay init request failed', err);
+        console.error('Paystack error', err);
+        alert('Payment window error or cancelled.');
       }
-
-      // If we got access_code from server, use Popup V2 resumeTransaction (preferred)
-      if (initData && initData.access_code) {
-        showToast('Opening secure Paystack checkout…');
-        // InlineJS Popup V2 usage (resumeTransaction)
-        try {
-          const popup = new Paystack(); // InlineJS exposes Paystack()
-          // resumeTransaction returns a Promise resolved with transaction details or rejects if closed/failed
-          const tx = await popup.resumeTransaction(initData.access_code);
-          // tx may include reference
-          const reference = tx?.reference || initData.reference;
-          // Verify server-side
-          const verifyResp = await fetch(`/api/pay/verify?reference=${encodeURIComponent(reference)}`);
-          if (!verifyResp.ok) {
-            showToast('Payment processed — verification failed. Check dashboard.');
-            console.warn('verify response not ok', verifyResp.status);
-          } else {
-            const verifyData = await verifyResp.json();
-            const status = verifyData?.data?.status || verifyData?.status || '';
-            if (status === 'success' || (verifyData?.data && verifyData.data.status === 'success')) {
-              showToast('Payment successful — thank you!');
-              // Clear cart client-side & update UI
-              try { cart = {}; renderCart(); } catch(e){ console.warn('clear cart error', e); }
-              closeCheckoutModal();
-            } else {
-              showToast('Payment not verified as successful. Please contact support.');
-              console.log('verifyData', verifyData);
-            }
-          }
-        } catch (err) {
-          console.error('Paystack popup error / cancelled', err);
-          showToast('Payment cancelled or failed.');
-        } finally {
-          checkoutPay.disabled=false; checkoutPay.textContent='Pay';
-        }
-        return;
-      }
-
-      // FALLBACK: if server not available, offer client-only Inline (dev only)
-      // NOTE: Client-only uses your PUBLIC key and is only for local testing. Do NOT use in production.
-      // Replace 'pk_test_xxx' with your Paystack PUBLIC test key if you want to test quickly.
-      const PUBLIC_KEY = 'pk_test_xxxxxxxxxxxxxxxxxxxxxxxxx'; // <-- replace for dev test if needed
-
-      if (!window.PaystackPop && !window.Paystack) {
-        // older CDN v1 support: PaystackPop
-        if (window.PaystackPop) {
-          // Use PaystackPop.setup (older inline)
-          const ref = 'ref-' + Math.floor(Math.random()*1000000);
-          const handler = window.PaystackPop.setup({
-            key: PUBLIC_KEY,
-            email: email,
-            amount: Math.round((totals.total||0) * 100),
-            currency: 'GHS',
-            ref,
-            callback: async function(response){
-              // verify with server if available
-              const reference = response.reference;
-              try {
-                const v = await fetch(`/api/pay/verify?reference=${encodeURIComponent(reference)}`);
-                if (v.ok) {
-                  const data = await v.json();
-                  if (data?.data?.status === 'success') {
-                    showToast('Payment successful — thank you!');
-                    cart = {}; renderCart();
-                    closeCheckoutModal();
-                  } else {
-                    showToast('Payment not verified. Check dashboard.');
-                  }
-                } else {
-                  showToast('Payment made — verification not available.');
-                }
-              } catch (err) {
-                showToast('Payment completed — verification failed (network).');
-              } finally {
-                checkoutPay.disabled=false; checkoutPay.textContent='Pay';
-              }
-            },
-            onClose: function() {
-              showToast('Payment cancelled.');
-              checkoutPay.disabled=false; checkoutPay.textContent='Pay';
-            }
-          });
-          handler.openIframe();
-          return;
-        }
-        // else cannot do client-only
-        alert('Payment initialization failed (no server and inline library not found).');
-        checkoutPay.disabled=false; checkoutPay.textContent='Pay';
-        return;
-      }
-
-      // If window.Paystack (v2 InlineJS) exists but no server init, we can kick off client-only newTransaction (only for dev)
-      if (window.Paystack) {
-        try {
-          const popup = new Paystack();
-          // newTransaction() accepts an object with key,email,amount (subunit)
-          const amountPesewas = Math.round((totals.total||0) * 100);
-          // If your InlineJS build supports newTransaction, use it — this is for local/dev only
-          if (typeof popup.newTransaction === 'function') {
-            const txn = await popup.newTransaction({ key: PUBLIC_KEY, email, amount: amountPesewas, currency: 'GHS' });
-            // txn may contain reference — verify with server if possible
-            const reference = txn?.reference;
-            if (reference) {
-              try {
-                const v = await fetch(`/api/pay/verify?reference=${encodeURIComponent(reference)}`);
-                if (v.ok) { const data = await v.json(); if (data?.data?.status === 'success') { showToast('Payment successful — thank you!'); cart={}; renderCart(); closeCheckoutModal(); } else showToast('Payment not verified.'); }
-              } catch(err) { showToast('Payment completed — verification failed.'); }
-            }
-            checkoutPay.disabled=false; checkoutPay.textContent='Pay';
-            return;
-          } else {
-            // fallback: no newTransaction support -> cannot continue
-            alert('Cannot complete client-only flow: inline library missing required method.');
-            checkoutPay.disabled=false; checkoutPay.textContent='Pay';
-            return;
-          }
-        } catch (err) {
-          console.error('client-only inline error', err);
-          showToast('Client-only payment failed.');
-          checkoutPay.disabled=false; checkoutPay.textContent='Pay';
-          return;
-        }
-      }
-
     } catch (err) {
-      console.error('checkout error', err);
-      alert('Checkout error: ' + (err.message || err));
-      checkoutPay.disabled=false; checkoutPay.textContent='Pay';
+      console.error('checkout submit error', err);
+      alert('Checkout failed: ' + (err.message || err));
+    } finally {
+      submitBtn.disabled = false;
     }
   });
 
-  // Also allow pressing Enter on email to start checkout
-  checkoutEmail && checkoutEmail.addEventListener('keydown', (e) => { if (e.key === 'Enter') checkoutPay.click(); });
-
-  // Close modal on Escape
-  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && checkoutModal.getAttribute('aria-hidden') === 'false') closeCheckoutModal(); });
-
-  // Keep modal summary updated when computeCartTotals changes (watching #cart-total as simpler approach)
-  const cartTotalEl = document.getElementById('cart-total');
-  if (cartTotalEl) {
-    const mo = new MutationObserver(() => {
-      try {
-        const text = cartTotalEl.innerText || 'GHC 0';
-        checkoutTotal.innerText = text;
-        checkoutSummary.innerText = checkoutSummary.innerText; // no-op (keeps UI)
-      } catch (err) {}
-    });
-    mo.observe(cartTotalEl, { childList:true, subtree:true, characterData:true });
+  // little helper to keep totals updated in the right panel if cart changes
+  function refreshTotalsInModal() {
+    const totals = (typeof computeCartTotals === 'function') ? computeCartTotals() : { subtotal:0, delivery:0, promoDiscount:0, total:0 };
+    cfSubtotal.innerText = fmtGhc(totals.subtotal || 0);
+    cfDelivery.innerText = fmtGhc(totals.delivery || 0);
+    cfPromo.innerText = `-GHC ${Math.round(totals.promoDiscount || 0)}`;
+    cfTotal.innerText = fmtGhc(totals.total || 0);
   }
 
+  // Keep modal totals in sync when cart changes
+  const cartTotalEl = document.getElementById('cart-total');
+  if (cartTotalEl) {
+    const mo = new MutationObserver(() => refreshTotalsInModal());
+    mo.observe(cartTotalEl, { childList:true, subtree:true, characterData:true });
+  }
+  // Also update when renderCart is called (wrap on window if available)
+  if (typeof window.renderCart === 'function') {
+    const originalRenderCart = window.renderCart;
+    window.renderCart = function(){
+      const r = originalRenderCart.apply(this, arguments);
+      try { refreshTotalsInModal(); } catch(e){}
+      return r;
+    };
+  }
+
+  // utility: escapeHtml used above
 })();
 </script>
 <script>
