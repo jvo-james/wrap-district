@@ -2596,20 +2596,11 @@ a:focus, button:focus { outline: 3px solid rgba(255,204,51,0.10); outline-offset
 
     // Our location - open checkout map modal if present (map modal id #map-modal)
     const locBtn = document.getElementById('footer-locate');
-    locBtn && locBtn.addEventListener('click', function(){
-      const mapModal = document.getElementById('map-modal');
-      if (mapModal) {
-        mapModal.style.display = 'flex';
-        mapModal.setAttribute('aria-hidden','false');
-        document.body.style.overflow = 'hidden';
-        // try to invalidate leaflet map size
-        try { if (window.map) setTimeout(()=> window.map.invalidateSize(), 120); } catch(e){}
-      } else {
-        // fallback: scroll to contact section
-        const contact = document.getElementById('contact');
-        contact && contact.scrollIntoView({ behavior: 'smooth' });
-      }
-    });
+  locBtn && locBtn.addEventListener('click', function(){
+     const contact = document.getElementById('contact');
+     if (contact) contact.scrollIntoView({ behavior: 'smooth' });
+     else window.location.hash = '#contact';
+   });
 
     // small accessibility: ensure links open new tab for external glances
     const wa = document.getElementById('footer-wa');
@@ -3343,8 +3334,8 @@ a:focus, button:focus { outline: 3px solid rgba(255,204,51,0.10); outline-offset
         </div>
 
         <div style="margin-top:6px;">
-          <label class="small-muted">Address (click to search on map) *</label>
-          <input id="cf-address" class="input" type="text" placeholder="Tap to select address on map" readonly />
+          <label class="small-muted">Your Address*</label>
+        <input id="cf-address" class="input" type="text" placeholder="Enter delivery address (only when Delivery selected)" readonly />
           <input type="hidden" id="cf-lat" />
           <input type="hidden" id="cf-lon" />
         </div>
@@ -3378,9 +3369,10 @@ a:focus, button:focus { outline: 3px solid rgba(255,204,51,0.10); outline-offset
           <button id="cf-cancel" class="btn ghost full">Cancel</button>
         </div>
 
-        <div class="checkout-note small-muted">
-          By confirming you agree to our terms. For delivery we will estimate fees based on your selected address.
-        </div>
+      <div id="cart-delivery-note" class="small-muted" style="margin-top:8px; padding:10px; border-radius:10px; background: linear-gradient(90deg, rgba(255,160,80,0.04), rgba(255,255,255,0.01)); border:1px solid rgba(255,160,80,0.06);">
+         <strong>Important:</strong> The checkout price shown <em>does NOT</em> include delivery fees. Delivery fee will be estimated after checkout based on your address and communicated to you.
+       </div>
+ 
       </div>
     </div>
 
@@ -3821,17 +3813,15 @@ a:focus, button:focus { outline: 3px solid rgba(255,204,51,0.10); outline-offset
 
     // Address click opens existing map modal (your code already links #cf-address -> #map-modal)
     inpAddress && inpAddress.addEventListener('click', (e) => {
-      e.preventDefault();
-      // open map modal (existing map modal code will set aria-hidden false etc.)
-      const mapModal = document.getElementById('map-modal');
-      if (mapModal) {
-        mapModal.style.display = 'flex';
-        mapModal.setAttribute('aria-hidden','false');
-        document.body.style.overflow = 'hidden';
-        try { if (window.map) setTimeout(()=> window.map.invalidateSize(), 120); } catch(e){}
-      } else {
-        alert('Map picker not found.');
+     const type = (inpType && inpType.value) || 'delivery';
+      if (type === 'pickup') {
+        // keep it readonly and do nothing
+        e.preventDefault();
+        return;
       }
+     // Delivery — ensure the field is editable and focus so the user can type
+      inpAddress.removeAttribute('readonly');
+      setTimeout(()=> { try { inpAddress.focus(); } catch(e){} }, 60);
     });
 
     // When map selection happens, your existing map-confirm logic already writes cf-address/cf-lat/cf-lon.
@@ -3897,17 +3887,28 @@ a:focus, button:focus { outline: 3px solid rgba(255,204,51,0.10); outline-offset
       // Save name/phone for convenience
       try { localStorage.setItem('wrap_user_name', name); localStorage.setItem('wrap_user_phone', phone); } catch(e){}
 
-      if (paymethod === 'cash') {
-        // simple local "order placed" flow
-        const fakeOrder = { id: 'local-'+Date.now(), name, phone, email, type, address, lat, lon, date, time, note, cart: cartLines, totals:{ subtotal:totals.subtotal, delivery, promo:totals.promoDiscount, total: totalAmount } };
-        localStorage.setItem('wrap_last_order', JSON.stringify(fakeOrder));
-        alert('Order placed (Cash) — we will contact you.'); // replace with nice UI later
-        // clear cart if desired (depends on your UX)
-        try { window.cart = {}; if (typeof renderCart === 'function') renderCart(); } catch(e){}
+     if (paymethod === 'cash') {
+       // simple local "order placed" flow (Cash)
+      const fakeOrder = {
+        id: 'local-' + Date.now(),
+          reference: 'CASH-' + Date.now(),
+         name, phone, email, type, address, lat, lon, date, time, note,
+         cart: cartLines,
+         totals: { subtotal: totals.subtotal, delivery, promo: totals.promoDiscount, total: totalAmount },
+          ts: new Date().toISOString()
+       };
+       try {
+          localStorage.setItem('wrap_last_order', JSON.stringify(fakeOrder));
+         localStorage.setItem('wrap_show_confirmation', '1'); // -> triggers confirmation modal on next load
+        } catch (e) { /* ignore storage errors */ }
+
+       // clear cart, close and reload so confirmation modal appears
+       try { window.cart = {}; if (typeof renderCart === 'function') renderCart(); } catch (e) {}
         closeCheckoutPage();
-        submitBtn.disabled = false;
-        return;
-      }
+        // reload page (confirmation modal code will read localStorage and show modal)
+       window.location.reload();
+       return;
+     }
 
       // paymethod === paystack -> call server init endpoint (same pattern as earlier)
       try {
@@ -3931,22 +3932,53 @@ a:focus, button:focus { outline: 3px solid rgba(255,204,51,0.10); outline-offset
           if (!vres.ok) { alert('Payment made but verification failed.'); submitBtn.disabled=false; return; }
           const vdata = await vres.json();
           const status = vdata?.data?.status || vdata?.status;
-          if (status === 'success') {
-            alert('Payment confirmed — thank you!');
-            try { window.cart = {}; if (typeof renderCart === 'function') renderCart(); } catch(e){}
-            closeCheckoutPage();
-          } else {
-            alert('Payment not verified as successful.');
-          }
+                   if (status === 'success') {
+           // build canonical order object and persist it so confirmation modal can render after reload
+           const order = {
+              reference: reference || initData.reference || (vdata?.data?.reference),
+             name, phone, email, type, address, lat, lon, date, time, note,
+            cart: cartLines,
+             totals: { subtotal: totals.subtotal, delivery, promo: totals.promoDiscount, total: totalAmount },
+             ts: new Date().toISOString()
+           };
+            try {
+             localStorage.setItem('wrap_last_order', JSON.stringify(order));
+              localStorage.setItem('wrap_show_confirmation', '1');
+            } catch (e) { /* ignore storage errors */ }
+
+           // clear cart, close checkout, then reload so user sees a fresh page and the confirmation modal
+           try { window.cart = {}; if (typeof renderCart === 'function') renderCart(); } catch (e) {}
+          closeCheckoutPage();
+            window.location.reload();
+          return;
+         } else {
+           alert('Payment not verified as successful.');
+         }
         } else if (window.PaystackPop) {
           // fallback older setup
           const PUBLIC_KEY = initData.publicKey || initData.key || 'pk_live_replace';
           const handler = window.PaystackPop.setup({
             key: PUBLIC_KEY, email, amount: Math.round(totalAmount*100), currency: 'GHS', ref: initData.reference || ('ref'+Math.floor(Math.random()*1000000)),
-            callback: function(response){
-              alert('Payment complete: ' + response.reference);
-              try { window.cart = {}; if (typeof renderCart === 'function') renderCart(); } catch(e){}
+                      callback: async function(response){
+             // verify on server (optionally) or assume response.reference is valid
+              const ref = response?.reference || (initData && initData.reference) || ('ref'+Math.floor(Math.random()*1000000));
+              // build order object to persist
+              const order = {
+               reference: ref,
+               name, phone, email, type, address, lat, lon, date, time, note,
+                cart: cartLines,
+                totals: { subtotal: totals.subtotal, delivery, promo: totals.promoDiscount, total: totalAmount },
+                ts: new Date().toISOString()
+              };
+              try {
+                localStorage.setItem('wrap_last_order', JSON.stringify(order));
+               localStorage.setItem('wrap_show_confirmation', '1');
+              } catch (e) {}
+
+             try { window.cart = {}; if (typeof renderCart === 'function') renderCart(); } catch (e) {}
               closeCheckoutPage();
+              // reload so the confirmation modal opens on the fresh page
+             window.location.reload();
             },
             onClose: function(){ alert('Payment cancelled'); }
           });
@@ -3960,29 +3992,7 @@ a:focus, button:focus { outline: 3px solid rgba(255,204,51,0.10); outline-offset
       } finally { submitBtn.disabled = false; }
     });
 
-    if (status === 'success') {
-  // Build a small order object to show in the confirmation modal after reload
-  const order = {
-    reference: reference || initData.reference || (vdata?.data?.reference),
-    name, phone, email, type, address, lat, lon, date, time, note,
-    cart: cartLines,
-    totals: { subtotal: totals.subtotal, delivery, promo: totals.promoDiscount, total: totalAmount },
-    ts: new Date().toISOString()
-  };
 
-  // persist for the post-reload confirmation modal
-  try {
-    localStorage.setItem('wrap_last_order', JSON.stringify(order));
-    localStorage.setItem('wrap_show_confirmation', '1');
-  } catch (e) { /* ignore storage errors */ }
-
-  // clear local cart then reload so the confirmation modal is shown on next load
-  try { window.cart = {}; if (typeof renderCart === 'function') renderCart(); } catch(e){}
-  // reload page so user sees a fresh page and the confirmation modal will then appear
-  window.location.reload();
-} else {
-  alert('Payment not verified as successful.');
-}
     
     // small helpers
     function fmtGhc(n){ return `GHC ${Number(n||0).toFixed(0)}`; }
