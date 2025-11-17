@@ -6666,6 +6666,133 @@ body.cart-open::before {
   });
 })();
 </script>
+<script>
+/* Robust global openCheckoutPage + queue + auto-bind cart buttons
+   Paste this near the end of <body> (or inside your existing script block).
+*/
+(function(){
+  // --- helper: body scroll lock (keeps existing logic consistent) ---
+  function lockBody(lock) {
+    if (lock) {
+      document.documentElement.style.overflow = 'hidden';
+      document.body.style.overflow = 'hidden';
+      // avoid layout shift on many browsers by adding right padding equal to scrollbar
+      var scrollBarWidth = window.innerWidth - document.documentElement.clientWidth;
+      document.body.style.paddingRight = (scrollBarWidth > 0 ? scrollBarWidth + 'px' : '');
+    } else {
+      document.documentElement.style.overflow = '';
+      document.body.style.overflow = '';
+      document.body.style.paddingRight = '';
+    }
+  }
+
+  // --- helper: try multiple likely selectors for your cart/drawer panel ---
+  function findCartDrawer() {
+    return document.querySelector(
+      '#cart-drawer, .cart-drawer, [data-cart-drawer], .drawer[data-drawer="cart"], .cart-panel, .checkout-drawer'
+    );
+  }
+
+  // --- queue for early calls (in case callers run before DOM ready / before drawer exists) ---
+  window.__openCheckoutQueue = window.__openCheckoutQueue || [];
+
+  // --- global function (exposed so inline onclick won't fail) ---
+  window.openCheckoutPage = function(opts) {
+    // opts unused for now but left for future extension
+    var drawer = findCartDrawer();
+    if (!drawer) {
+      // If the drawer isn't in the DOM yet, queue the call and try later.
+      console.warn('openCheckoutPage: cart drawer not found yet — queuing call.');
+      window.__openCheckoutQueue.push(opts || true);
+      return;
+    }
+
+    // Add 'open' class and aria attribute; match your site's convention if different
+    drawer.classList.add('open');
+    drawer.setAttribute('aria-hidden', 'false');
+
+    // If drawer has an overlay sibling, show it (common pattern)
+    var overlay = drawer.closest('body').querySelector('.modal-backdrop, .drawer-backdrop, .overlay');
+    if (overlay) overlay.classList.add('open');
+
+    lockBody(true);
+
+    // Focus first interactive element inside drawer for accessibility
+    var focusable = drawer.querySelector('button, [href], input, textarea, select, [tabindex]:not([tabindex="-1"])');
+    if (focusable) focusable.focus();
+  };
+
+  // --- process any queued requests once DOM is ready and drawer likely exists ---
+  function flushOpenQueue() {
+    if (!window.__openCheckoutQueue || window.__openCheckoutQueue.length === 0) return;
+    var q = window.__openCheckoutQueue.slice();
+    window.__openCheckoutQueue = [];
+    q.forEach(function(opts){ window.openCheckoutPage(opts); });
+  }
+
+  // --- attach click handlers to cart icons/buttons (common classes/attributes checked) ---
+  function attachCartButtons() {
+    var selectors = '.cart-icon-btn, [data-cart-open], .open-cart, .cart-toggle, .btn-open-cart';
+    var buttons = document.querySelectorAll(selectors);
+    buttons.forEach(function(btn){
+      if (btn.__openHandlerAttached) return;
+      btn.addEventListener('click', function(e){
+        e.preventDefault();
+        window.openCheckoutPage();
+      });
+      btn.__openHandlerAttached = true;
+    });
+  }
+
+  // If someone closes the cart, remove open states and restore scroll
+  function attachCloseLogic() {
+    document.addEventListener('click', function(e){
+      // close buttons inside drawer
+      if (e.target.closest('.modal .close, .drawer .close, [data-modal-close], [data-drawer-close]')) {
+        var open = document.querySelector('.modal.open, .drawer.open, .cart-drawer.open, .cart-drawer');
+        if (open) {
+          open.classList.remove('open');
+          open.setAttribute('aria-hidden','true');
+          lockBody(false);
+        }
+      }
+    });
+    // escape key
+    document.addEventListener('keydown', function(e){
+      if (e.key === 'Escape') {
+        var open = document.querySelector('.modal.open, .drawer.open, .cart-drawer.open, .cart-drawer');
+        if (open) {
+          open.classList.remove('open');
+          open.setAttribute('aria-hidden','true');
+          lockBody(false);
+        }
+      }
+    });
+  }
+
+  // Run attachers asap (cover case script runs after DOM loaded or before)
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function(){
+      attachCartButtons();
+      attachCloseLogic();
+      flushOpenQueue();
+    });
+  } else {
+    attachCartButtons();
+    attachCloseLogic();
+    flushOpenQueue();
+  }
+
+  // also attempt to attach whenever new content is added (simple mutation observer)
+  try {
+    var mo = new MutationObserver(function(){
+      attachCartButtons();
+    });
+    mo.observe(document.body, { childList: true, subtree: true });
+  } catch (e) { /* ignore if MutationObserver not available */ }
+
+})();
+</script>
 
 </html>
   
