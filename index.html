@@ -2716,8 +2716,7 @@ a:focus, button:focus { outline: 3px solid rgba(255,204,51,0.10); outline-offset
   </div>
 </div>
   </main>
-  <!-- ===== Menu tabs + Cart header checkout enhancements ===== -->
-
+ 
   <style>
 /* Checkout page (in-file, not a modal) — REPLACED: ensures it sits below the header and is scrollable on mobile */
 #checkout-page {
@@ -2824,7 +2823,6 @@ a:focus, button:focus { outline: 3px solid rgba(255,204,51,0.10); outline-offset
 </style>
 
 
-<!-- Product detail modal (Task 2) -->
 <style>
 /* Basic modal sizing tweaks (uses existing .modal/.modal-inner from your CSS) */
 #product-modal .modal-inner { max-width:520px; width:100%; padding:0; border-radius:14px; overflow:hidden; }
@@ -2864,6 +2862,7 @@ a:focus, button:focus { outline: 3px solid rgba(255,204,51,0.10); outline-offset
 <!-- InlineJS CDN (Popup V2) - required for resumeTransaction() -->
 <script src="https://js.paystack.co/v2/inline.js"></script>
 
+<!-- ======= Enhanced Checkout + Map Picker (paste before </body>) ======= -->
 
 <!-- Leaflet (Map) CSS & JS -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -2916,7 +2915,6 @@ a:focus, button:focus { outline: 3px solid rgba(255,204,51,0.10); outline-offset
 .toast.wrap-toast.show { display:block; animation: toast-in 320ms cubic-bezier(.2,.9,.3,1); }
 
 </style>
-
 
 
 
@@ -3166,7 +3164,6 @@ a:focus, button:focus { outline: 3px solid rgba(255,204,51,0.10); outline-offset
 </div>
 
 
-  <!-- === REPLACE your existing checkout CSS with this block === -->
 <style>
 /* CHECKOUT PAGE — unified, mobile-friendly, scrollable under fixed header */
 #checkout-page {
@@ -3323,8 +3320,6 @@ a:focus, button:focus { outline: 3px solid rgba(255,204,51,0.10); outline-offset
 </style>
 
 
-
-  <!-- Cart footer enhancement: paste after your main script and before </body> -->
 <style>
 /* Override / enhancement for cart drawer footer behavior */
 .cart-drawer {
@@ -3382,1230 +3377,1476 @@ body.cart-open::before {
 
 <script>
 /*
-  Unified page script for Wrap District — copy-paste this single block into your page
-  Replaces previous multiple scripts. Handles:
-   - Mobile nav open/close
-   - Slideshow (controls + dots + autoplay)
-   - Menu tabs filtering
-   - Product modal (clone config + add to cart)
-   - Cart (add/remove/increase/decrease, localStorage persistence)
-   - Promo rules: Buy 2 Get 1 (shawarma), Free Coke for Loaded Fries
-   - Cart drawer open/close + header totals sync
-   - Checkout page open, totals calculation, Paystack inline or simulated payment
-   - Preorder modal + form save
-   - Entry promo modal behavior + "don't show again"
-   - Promo countdown timer (counts to next Tuesday 23:59:59)
-   - Order confirmation modal read/write from localStorage
+  Consolidated script for Wrap District — full-page behavior.
+  - Replaces all previous <script> blocks: menu tabs, mobile nav, cart management,
+    product modal, promo carousel/countdown, checkout, preorder, order confirmation,
+    and small UI helpers.
+  - Self-contained, attaches key functions to window for compatibility (computeCartTotals, renderCart, openCheckoutPage, etc).
+  - Designed to work with the HTML/CSS you provided.
 */
-
-(function(){
+(function () {
   'use strict';
 
-  // ---------- Utilities ----------
-  const $ = (sel, root=document) => root.querySelector(sel);
-  const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
-  const elText = (el) => el ? (el.innerText || el.textContent || '') : '';
-  const toNum = (v, d=0) => {
-    const n = Number(String(v||'').replace(/[^\d.-]/g,'')); return isNaN(n) ? d : n;
+  /* -------------------------
+     Utility helpers and config
+  ------------------------- */
+  const STORE_COORDS = { lat: 5.6600, lon: 0.0190 }; // update if needed
+  const DELIVERY_CONFIG = {
+    baseFee: 6,
+    perKm: 2.5,
+    minFee: 4,
+    maxFee: 60,
+    freeWithinKm: 0.8
   };
-  const fmtGhc = (n) => `GHC ${Math.round(Number(n||0))}`;
-  const nowIso = () => new Date().toISOString();
+  const PAYSTACK_PUBLIC_KEY = 'pk_test_297586e51710e83d3c159bfe71ff45c7e23411fa'; // replace with live key if needed
 
-  // Cart storage key
-  const CART_KEY = 'wrap_cart_v2';
-  const LAST_ORDER_KEY = 'wrap_last_order';
-  const SHOW_CONFIRM_KEY = 'wrap_show_confirmation';
-  const ENTRY_PROMO_KEY = 'wrap_entry_promo_dontshow';
+  const qs = (sel, ctx = document) => ctx.querySelector(sel);
+  const qsa = (sel, ctx = document) => Array.from((ctx || document).querySelectorAll(sel));
+  const fmtGhc = (n) => `GHC ${Math.round(Number(n || 0))}`;
+  const escapeHtml = (s = '') => String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
-  // Minimal local cart structure: { itemId: { id, title, unitPrice, qty, meta, imageSrc } }
-  let cart = loadCart();
+  /* -------------------------
+     Persistent cart storage & model
+     window.cart is an object keyed by unique line ids
+  ------------------------- */
+  const CART_STORAGE_KEY = 'wrap_cart_v2';
 
-  // ---------- Persistence ----------
-  function saveCart() {
-    try { localStorage.setItem(CART_KEY, JSON.stringify(cart)); } catch(e){ console.warn('saveCart failed', e); }
-    renderCart();
-  }
   function loadCart() {
     try {
-      const raw = localStorage.getItem(CART_KEY);
-      if (!raw) return {};
-      return JSON.parse(raw) || {};
-    } catch(e) { console.warn('loadCart parse failed', e); return {}; }
+      const raw = localStorage.getItem(CART_STORAGE_KEY);
+      const parsed = raw ? JSON.parse(raw) : {};
+      // ensure object format
+      if (parsed && typeof parsed === 'object') {
+        window.cart = parsed;
+        return parsed;
+      }
+    } catch (e) { console.warn('loadCart error', e); }
+    window.cart = {};
+    return window.cart;
   }
-  function clearCart() {
-    cart = {};
-    try { localStorage.removeItem(CART_KEY); } catch(e){}
+
+  function saveCart() {
+    try {
+      localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(window.cart || {}));
+    } catch (e) { console.warn('saveCart error', e); }
+  }
+
+  // Generate a stable key for a line using item id + normalized meta
+  function makeLineKey(itemId, meta) {
+    try {
+      const normalized = Object.keys(meta || {}).sort().map(k => `${k}:${JSON.stringify(meta[k])}`).join('|');
+      return `${itemId}__${hashString(normalized)}`;
+    } catch (e) { return `${itemId}__${Date.now()}`; }
+  }
+
+  function hashString(s) {
+    // simple hash to keep keys short
+    let h = 0;
+    for (let i = 0; i < s.length; i++) {
+      h = ((h << 5) - h) + s.charCodeAt(i);
+      h |= 0;
+    }
+    return Math.abs(h).toString(36);
+  }
+
+  /* -------------------------
+     Promo logic
+     - buy2get1 for shawarma: for each 3 qualifying shawarmas, one unit is free
+     - freecoke for fries: add a free Coke line when qualifying fries present
+  ------------------------- */
+  function applyPromos(cartObj) {
+    // returns an object with promoDiscount number and possibly modified lines (e.g., free items)
+    const result = { promoDiscount: 0, freeLines: [] };
+
+    // simple counters
+    let shawarmaCount = 0;
+    let shawarmaUnitPrice = 0;
+    let friesCount = 0;
+    // iterate lines
+    Object.values(cartObj).forEach(line => {
+      const id = (line.baseId || '').toLowerCase();
+      if (id.includes('shawarma')) {
+        shawarmaCount += Number(line.qty || 0);
+        // approximate unit price (if lines may differ per option, use unitPrice)
+        shawarmaUnitPrice = Number(line.unitPrice || shawarmaUnitPrice || 0);
+      }
+      if (id.includes('fries') || id.includes('loaded-fries')) {
+        friesCount += Number(line.qty || 0);
+      }
+    });
+
+    // buy 2 get 1 free (for every 3 shawarmas, discount one cheapest unitPrice)
+    if (shawarmaCount >= 3) {
+      const freeUnits = Math.floor(shawarmaCount / 3);
+      // determine discount: assume uniform price, else approximate by average unitPrice
+      const discount = freeUnits * (shawarmaUnitPrice || 0);
+      result.promoDiscount += Math.round(discount);
+    }
+
+    // Fries -> free Coke: For each qualifying fries line >=1, add a "Free Coke" free line once
+    if (friesCount > 0) {
+      // Ensure we don't add duplicate free coke lines by checking cartObj for _free_coke flag lines
+      const alreadyHas = Object.values(cartObj).some(l => l.isFree && (l.baseId || '').toLowerCase().includes('free-coke'));
+      if (!alreadyHas) {
+        result.freeLines.push({
+          id: `free-coke-${Date.now()}`,
+          baseId: 'free-coke',
+          title: 'Free Coke',
+          qty: 1,
+          unitPrice: 0,
+          isFree: true,
+          meta: {}
+        });
+      }
+    }
+
+    return result;
+  }
+
+  /* -------------------------
+     Totals computation - exposed as computeCartTotals()
+     returns { subtotal, promoDiscount, delivery, total, lines (array) }
+  ------------------------- */
+  function computeCartTotals() {
+    const cartObj = window.cart || {};
+    let subtotal = 0;
+    const lines = [];
+    Object.keys(cartObj).forEach(k => {
+      const l = cartObj[k];
+      const unit = Number(l.unitPrice || 0);
+      const qty = Number(l.qty || 1);
+      subtotal += unit * qty;
+      lines.push(Object.assign({}, l));
+    });
+
+    // promo application
+    const promo = applyPromos(cartObj);
+    // merge promo.freeLines into lines (not persisted into cart unless addFreeLines() called explicitly)
+    if (promo.freeLines && promo.freeLines.length) {
+      promo.freeLines.forEach(fl => lines.push(Object.assign({}, fl)));
+    }
+
+    const promoDiscount = Math.round(promo.promoDiscount || 0);
+    const delivery = 0; // delivery computed later in checkout context; here default 0
+    const total = Math.max(0, subtotal - promoDiscount + delivery);
+    return { subtotal: Math.round(subtotal), promoDiscount, delivery, total, lines };
+  }
+
+  // Expose computeCartTotals globally
+  window.computeCartTotals = computeCartTotals;
+
+  /* -------------------------
+     DOM render: renderCart()
+     fills #cart-items and updates counts & totals
+  ------------------------- */
+  function renderCart() {
+    const cartObj = window.cart || {};
+    const cartItemsEl = qs('#cart-items');
+    const cartCountEl = qs('#cart-count');
+    const cartMiniCountEl = qs('#cart-mini-count');
+    const cartSubtotalEl = qs('#cart-subtotal');
+    const cartTotalEl = qs('#cart-total');
+    const cartHeaderTotalEl = qs('#cart-header-total');
+    const footerSubtotalEl = qs('#footer-subtotal');
+    const footerTotalEl = qs('#footer-total');
+
+    if (!cartItemsEl) return;
+
+    cartItemsEl.innerHTML = ''; // clear
+
+    // Build list items
+    const keys = Object.keys(cartObj || {});
+    if (!keys.length) {
+      const li = document.createElement('li');
+      li.className = 'empty';
+      li.innerText = 'Your cart is empty.';
+      cartItemsEl.appendChild(li);
+    } else {
+      keys.forEach(k => {
+        const line = cartObj[k];
+        const li = document.createElement('li');
+        li.className = 'cart-line';
+        li.dataset.cartKey = k;
+
+        // left area
+        const left = document.createElement('div');
+        left.className = 'line-left';
+        left.style.display = 'flex';
+        left.style.gap = '12px';
+        left.style.alignItems = 'center';
+
+        const img = document.createElement('img');
+        img.className = 'cart-thumb';
+        img.src = line.imageSrc || (line.meta && line.meta.image) || 'placeholder-thumb.png';
+        img.alt = line.title || '';
+        left.appendChild(img);
+
+        const titleWrap = document.createElement('div');
+        titleWrap.style.minWidth = '0';
+        const title = document.createElement('div');
+        title.className = 'line-title';
+        title.innerText = line.title || 'Item';
+        titleWrap.appendChild(title);
+
+        const meta = document.createElement('div');
+        meta.className = 'line-meta';
+        // show meta succinctly: size/protein/addons
+        const metaParts = [];
+        try {
+          if (line.meta) {
+            if (line.meta.size) metaParts.push(String(line.meta.size));
+            if (line.meta.protein) metaParts.push(String(line.meta.protein));
+            if (Array.isArray(line.meta.addons) && line.meta.addons.length) {
+              metaParts.push(line.meta.addons.map(a => a.label || a.key || a).join(', '));
+            }
+          }
+        } catch (e) { /* ignore */ }
+        meta.innerText = metaParts.join(' • ');
+        titleWrap.appendChild(meta);
+
+        left.appendChild(titleWrap);
+
+        // right controls
+        const right = document.createElement('div');
+        right.className = 'line-controls';
+        right.style.display = 'flex';
+        right.style.alignItems = 'center';
+        right.style.gap = '8px';
+
+        const qtyBtnDec = document.createElement('button');
+        qtyBtnDec.className = 'icon-btn cart-decrease';
+        qtyBtnDec.title = 'Decrease quantity';
+        qtyBtnDec.innerHTML = '<i class="fa fa-minus"></i>';
+        qtyBtnDec.addEventListener('click', (e) => {
+          e.preventDefault();
+          changeQty(k, -1);
+        });
+
+        const qtyNum = document.createElement('div');
+        qtyNum.className = 'line-qty';
+        qtyNum.innerText = String(line.qty || 1);
+        qtyNum.style.minWidth = '28px';
+        qtyNum.style.textAlign = 'center';
+
+        const qtyBtnInc = document.createElement('button');
+        qtyBtnInc.className = 'icon-btn cart-increase';
+        qtyBtnInc.title = 'Increase quantity';
+        qtyBtnInc.innerHTML = '<i class="fa fa-plus"></i>';
+        qtyBtnInc.addEventListener('click', (e) => {
+          e.preventDefault();
+          changeQty(k, 1);
+        });
+
+        const removeBtn = document.createElement('button');
+        removeBtn.className = 'icon-btn cart-remove';
+        removeBtn.title = 'Remove';
+        removeBtn.innerHTML = '<i class="fa fa-trash"></i>';
+        removeBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          removeLine(k);
+        });
+
+        const lineTotal = document.createElement('div');
+        lineTotal.className = 'line-total';
+        lineTotal.style.fontWeight = '900';
+        lineTotal.style.color = 'var(--accent-2)';
+        lineTotal.style.minWidth = '72px';
+        lineTotal.style.textAlign = 'right';
+        lineTotal.innerText = fmtGhc((line.unitPrice || 0) * (line.qty || 1));
+
+        right.appendChild(qtyBtnDec);
+        right.appendChild(qtyNum);
+        right.appendChild(qtyBtnInc);
+        right.appendChild(removeBtn);
+        right.appendChild(lineTotal);
+
+        li.appendChild(left);
+        li.appendChild(right);
+        cartItemsEl.appendChild(li);
+      });
+    }
+
+    // totals
+    const totals = computeCartTotals();
+    cartSubtotalEl && (cartSubtotalEl.innerText = fmtGhc(totals.subtotal));
+    cartTotalEl && (cartTotalEl.innerText = fmtGhc(totals.total));
+    cartHeaderTotalEl && (cartHeaderTotalEl.innerText = fmtGhc(totals.total));
+    footerSubtotalEl && (footerSubtotalEl.innerText = fmtGhc(totals.subtotal));
+    footerTotalEl && (footerTotalEl.innerText = fmtGhc(totals.total));
+
+    // counts
+    const totalItems = Object.values(window.cart || {}).reduce((s, l) => s + Number(l.qty || 0), 0);
+    cartCountEl && (cartCountEl.innerText = String(totalItems));
+    cartMiniCountEl && (cartMiniCountEl.innerText = String(totalItems));
+
+    // show/hide promo helper in cart (simple heuristic)
+    const cartPromoEl = qs('#cart-promo');
+    if (cartPromoEl) {
+      if (totals.promoDiscount > 0 || (totals.lines && totals.lines.some(l => (l.baseId||'').includes('free-coke')))) {
+        cartPromoEl.classList.remove('hidden');
+        const promoDiscountEl = qs('#promo-discount');
+        if (promoDiscountEl) promoDiscountEl.innerText = `-GHC ${totals.promoDiscount}`;
+        const promoHelp = qs('#promo-help-text');
+        if (promoHelp) promoHelp.innerText = computePromoHelpText();
+      } else {
+        cartPromoEl.classList.add('hidden');
+      }
+    }
+
+    saveCart();
+  }
+
+  // Expose renderCart globally
+  window.renderCart = renderCart;
+
+  function computePromoHelpText() {
+    // Simple helper text for cart promo area based on current cart
+    const cartObj = window.cart || {};
+    const totals = computeCartTotals();
+    // If shawarma near threshold
+    const shawarmaCount = Object.values(cartObj).reduce((s, l) => s + ((l.baseId || '').toLowerCase().includes('shawarma') ? Number(l.qty || 0) : 0), 0);
+    if (shawarmaCount > 0 && shawarmaCount % 3 !== 0) {
+      const need = 3 - (shawarmaCount % 3);
+      return `Add ${need} more shawarma${need > 1 ? 's' : ''} to get one free.`;
+    }
+    if (totals.promoDiscount > 0) return `Promo applied: -GHC ${totals.promoDiscount}`;
+    return 'Tip: add qualifying items to trigger promos like Buy 2 Get 1 Free.';
+  }
+
+  function changeQty(key, delta) {
+    if (!window.cart || !window.cart[key]) return;
+    const cur = Number(window.cart[key].qty || 0);
+    const next = Math.max(0, cur + delta);
+    if (next === 0) {
+      delete window.cart[key];
+    } else {
+      window.cart[key].qty = next;
+    }
+    saveCart();
     renderCart();
   }
 
-  // ---------- DOM references ----------
-  const mobileNav = $('#mobile-nav');
-  const hamburger = $('#hamburger');
-  const navCloseBtn = $('#nav-close');
+  function removeLine(key) {
+    if (!window.cart || !window.cart[key]) return;
+    delete window.cart[key];
+    saveCart();
+    renderCart();
+  }
 
-  const cartToggle = $('#cart-toggle');
-  const cartDrawer = $('#cart-drawer');
-  const cartClose = $('#cart-close');
-  const cartCountEls = [$('#cart-count'), $('#cart-mini-count')].filter(Boolean);
-  const cartItemsWrap = $('#cart-items');
-  const cartSubtotalEl = $('#cart-subtotal');
-  const cartTotalEl = $('#cart-total');
-  const cartDeliveryEl = $('#cart-delivery');
-  const cartMiniCount = $('#cart-mini-count');
-  const cartPromoBlock = $('#cart-promo');
-  const promoDiscountEl = $('#promo-discount');
-  const promoHelpText = $('#promo-help-text');
-  const addMissingBtn = $('#add-missing');
-
-  const checkoutBtn = $('#checkout-btn');
-  const headerCheckoutBtn = $('#cart-header-checkout'); // may be created by CSS script elsewhere
-  const checkoutPage = $('#checkout-page');
-  const checkoutInner = $('#checkout-inner');
-
-  const preorderModal = $('#preorder-modal');
-  const preorderBtnSelectors = ['#promo-preorder-btn', '[data-action="preorder-promo"]'];
-
-  const productModal = $('#product-modal');
-  const pmThumb = $('#pm-thumb');
-  const pmTitle = $('#pm-title');
-  const pmDesc = $('#pm-desc');
-  const pmBody = $('#pm-body');
-  const pmPrice = $('#pm-price');
-  const pmAdd = $('#pm-add');
-  const pmCancel = $('#pm-cancel');
-  const pmClose = $('#pm-close');
-
-  const entryPromo = $('#entry-promo');
-  const entryClose = $('#entry-close');
-  const claimPromoEntryBtn = $('#claim-promo-entry');
-  const dontShowAgainCheckbox = $('#dont-show-again');
-
-  const promoCountdownEl = $('#promo-timer');
-  const promoApplyButtons = Array.from(document.querySelectorAll('[data-action="apply-promo"]'));
-
-  const productSlides = $$('.slide');
-  const slideDotsWrap = $('#slide-dots');
-  const slidePrev = $('.slide-prev');
-  const slideNext = $('.slide-next');
-
-  const menuTabs = $$('.menu-tabs .tab-btn');
-
-  const orderConfirmationModal = $('#order-confirmation-modal');
-  const ocClose = $('#oc-close');
-  const ocOk = $('#oc-ok');
-  const ocPrint = $('#oc-print');
-
-  // Defensive gets
-  function el(id) { return document.getElementById(id); }
-
-  // ---------- Slideshow ----------
-  (function setupSlideshow(){
-    const slides = productSlides.length ? productSlides : $$('.pc-slide');
-    if (!slides.length) return;
-
-    let active = slides.findIndex(s => s.getAttribute('aria-hidden') === 'false');
-    if (active < 0) active = 0;
-    const dots = slideDotsWrap ? Array.from(slideDotsWrap.querySelectorAll('.dot')) : [];
-
-    function showSlide(i) {
-      i = (i + slides.length) % slides.length;
-      slides.forEach((s, idx) => {
-        const is = idx === i;
-        s.style.display = is ? '' : 'none';
-        s.setAttribute('aria-hidden', is ? 'false' : 'true');
-      });
-      // update dots
-      if (dots.length) dots.forEach((d, idx) => d.classList.toggle('is-active', idx===i));
-      active = i;
+  /* -------------------------
+     Add item to cart (from menu or product modal)
+     - accepts itemId, title, unitPrice, qty (1 default), imageSrc, meta object
+  ------------------------- */
+  function addToCart({ itemId, title, unitPrice = 0, qty = 1, imageSrc = '', meta = {} }) {
+    loadCart(); // ensure window.cart exists
+    const key = makeLineKey(itemId, meta);
+    if (window.cart[key]) {
+      window.cart[key].qty = Number(window.cart[key].qty || 0) + Number(qty || 1);
+    } else {
+      window.cart[key] = {
+        baseId: itemId,
+        title: title || 'Item',
+        unitPrice: Number(unitPrice || 0),
+        qty: Number(qty || 1),
+        imageSrc: imageSrc || '',
+        meta: meta || {}
+      };
     }
+    saveCart();
+    renderCart();
+    showToast(`${title} added to cart`);
+  }
 
-    // Bind prev/next/dots
-    slidePrev && slidePrev.addEventListener('click', ()=> showSlide(active-1));
-    slideNext && slideNext.addEventListener('click', ()=> showSlide(active+1));
-    if (dots.length) dots.forEach((d, idx) => d.addEventListener('click', ()=> showSlide(idx)));
+  // Expose addToCart for product modal convenience
+  window.addToCart = addToCart;
 
-    // Auto-advance
-    let auto = setInterval(()=> showSlide(active+1), 5000);
-    // Pause when user interacts
-    [slidePrev, slideNext, ...dots].filter(Boolean).forEach(node => {
-      node.addEventListener('mouseenter', ()=> clearInterval(auto));
-      node.addEventListener('focus', ()=> clearInterval(auto));
-      node.addEventListener('mouseleave', ()=> { auto = setInterval(()=> showSlide(active+1), 5000); });
-      node.addEventListener('blur', ()=> { auto = setInterval(()=> showSlide(active+1), 5000); });
-    });
+  /* -------------------------
+     Toast helper
+  ------------------------- */
+  let toastTimer = null;
+  function showToast(msg, timeout = 1800) {
+    let t = qs('.toast.wrap-toast');
+    if (!t) {
+      t = document.createElement('div');
+      t.className = 'toast wrap-toast';
+      t.setAttribute('role', 'status');
+      t.innerText = msg;
+      document.body.appendChild(t);
+    }
+    t.innerText = msg;
+    t.classList.add('show');
+    if (toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => {
+      t.classList.remove('show');
+    }, timeout);
+  }
 
-    // initialize
-    showSlide(active);
-  })();
+  /* -------------------------
+     Mobile nav behavior
+  ------------------------- */
+  function setupMobileNav() {
+    const mobileNav = qs('#mobile-nav');
+    const hamburger = qs('#hamburger');
+    const navCloseBtn = qs('#nav-close');
 
-  // ---------- Mobile nav ----------
-  (function setupMobileNav(){
-    if (!mobileNav) return;
-    function openNav(){
+    if (!mobileNav || !hamburger) return;
+
+    function openNav() {
       mobileNav.style.display = 'block';
-      mobileNav.setAttribute('aria-hidden','false');
-      hamburger && hamburger.setAttribute('aria-expanded', 'true');
-      try { mobileNav.focus(); } catch(e){}
+      mobileNav.setAttribute('aria-hidden', 'false');
+      hamburger.setAttribute('aria-expanded', 'true');
+      try { mobileNav.focus(); } catch (e) {}
       document.body.style.overflow = 'hidden';
     }
-    function closeNav(){
+    function closeNav() {
       mobileNav.style.display = 'none';
-      mobileNav.setAttribute('aria-hidden','true');
-      hamburger && hamburger.setAttribute('aria-expanded', 'false');
-      try { hamburger && hamburger.focus(); } catch(e){}
+      mobileNav.setAttribute('aria-hidden', 'true');
+      hamburger.setAttribute('aria-expanded', 'false');
+      try { hamburger.focus(); } catch (e) {}
       document.body.style.overflow = '';
     }
-    hamburger && hamburger.addEventListener('click', () => {
+
+    hamburger.addEventListener('click', (e) => {
       const expanded = hamburger.getAttribute('aria-expanded') === 'true';
       if (expanded) {
         closeNav();
       } else {
-        // open
-        mobileNav.style.display = 'block';
-        mobileNav.setAttribute('aria-hidden','false');
-        hamburger.setAttribute('aria-expanded','true');
-        try { mobileNav.focus(); } catch(e){}
-        document.body.style.overflow = 'hidden';
+        openNav();
       }
     });
+
     navCloseBtn && navCloseBtn.addEventListener('click', closeNav);
-    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && mobileNav.getAttribute('aria-hidden') === 'false') closeNav(); });
-    // close when nav links clicked (smooth scroll)
-    const navLinks = mobileNav ? mobileNav.querySelectorAll('a.nav-link') : [];
-    navLinks && Array.from(navLinks).forEach(link => {
-      link.addEventListener('click', (ev) => {
+    mobileNav.addEventListener('click', (e) => {
+      if (e.target === mobileNav) closeNav();
+    });
+    document.addEventListener('keydown', (ev) => {
+      if (ev.key === 'Escape' && mobileNav.getAttribute('aria-hidden') === 'false') closeNav();
+    });
+
+    // smooth-scroll nav links
+    qsa('#mobile-nav a.nav-link').forEach(link => {
+      link.addEventListener('click', (e) => {
+        // close menu immediately
+        closeNav();
         const href = (link.getAttribute('href') || '').trim();
         if (href && href.startsWith('#')) {
-          ev.preventDefault();
-          const target = document.querySelector(href);
-          closeNav();
-          setTimeout(()=> { target && target.scrollIntoView({behavior:'smooth', block:'start'}); }, 120);
-        } else {
-          closeNav();
+          e.preventDefault();
+          setTimeout(() => {
+            const target = document.querySelector(href);
+            if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            else window.location.hash = href;
+          }, 120);
         }
       }, { passive: true });
     });
-  })();
+  }
 
-  // ---------- Menu tabs filtering ----------
-  (function setupTabs(){
-    if (!menuTabs.length) return;
-    const items = $$('.menu-item');
-    function apply(cat) {
-      items.forEach(it => {
-        const itemCat = (it.dataset.category || '').toLowerCase();
-        const show = !cat || cat === 'all' || itemCat.split(' ').some(c => c === cat);
-        it.style.display = show ? '' : 'none';
-        it.setAttribute('aria-hidden', show ? 'false' : 'true');
+  /* -------------------------
+     Menu tabs & filtering
+  ------------------------- */
+  function setupMenuTabs() {
+    const tabButtons = qsa('.menu-tabs .tab-btn');
+    const menuItems = qsa('.menu-item');
+
+    if (!tabButtons.length) return;
+
+    function applyTabFilter(cat) {
+      menuItems.forEach(item => {
+        const itemCat = (item.dataset.category || '').toLowerCase();
+        const show = (!cat || cat === 'all') || itemCat === cat || itemCat.split(' ').includes(cat);
+        item.style.display = show ? '' : 'none';
+        item.setAttribute('aria-hidden', show ? 'false' : 'true');
       });
     }
-    function setActive(btn) {
-      menuTabs.forEach(b => { b.classList.toggle('is-active', b === btn); b.setAttribute('aria-selected', String(b===btn)); });
-      try { btn.focus(); } catch(e){}
+
+    function setActiveTab(btn) {
+      tabButtons.forEach(b => {
+        const is = b === btn;
+        b.classList.toggle('is-active', is);
+        b.setAttribute('aria-selected', String(is));
+        if (is) try { b.focus(); } catch (e) {}
+      });
     }
-    menuTabs.forEach(btn => {
-      btn.setAttribute('role','tab');
-      btn.tabIndex = 0;
-      btn.addEventListener('click', () => { setActive(btn); apply((btn.dataset.cat||'all').toLowerCase()); });
-      btn.addEventListener('keydown', (e)=> { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); btn.click(); }});
+
+    tabButtons.forEach(btn => {
+      if (!btn.hasAttribute('role')) btn.setAttribute('role', 'tab');
+      if (!btn.hasAttribute('tabindex')) btn.setAttribute('tabindex', '0');
+
+      btn.addEventListener('click', (e) => {
+        const cat = (btn.dataset.cat || '').toLowerCase();
+        setActiveTab(btn);
+        applyTabFilter(cat);
+      });
+
+      btn.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          btn.click();
+        }
+      });
     });
-    // init
-    const initial = menuTabs.find(b=>b.classList.contains('is-active')) || menuTabs[0];
-    if (initial) { setActive(initial); apply((initial.dataset.cat||'all').toLowerCase()); }
-  })();
 
-  // ---------- Helper: read item price from a menu-item node ----------
-  function readItemPriceFromNode(menuItem) {
-    // Strategy:
-    // 1) Sum numeric values of selects inside .item-config (option value is price)
-    // 2) Sum checked addon checkbox values
-    // 3) If none found, try .price-value text
-    // 4) Fallback to dataset price or 0
-    try {
-      let total = 0;
-      const config = menuItem.querySelector('.item-config');
-      if (config) {
-        // selects
-        config.querySelectorAll('select').forEach(s => total += toNum(s.value, 0));
-        // checkboxes (addon-checkbox)
-        config.querySelectorAll('input[type="checkbox"]').forEach(cb => { if (cb.checked) total += toNum(cb.value, 0); });
-      }
-      if (total > 0) return Math.round(total);
-      const pv = menuItem.querySelector('.price-value');
-      if (pv) {
-        const n = toNum(elText(pv));
-        if (n) return Math.round(n);
-      }
-      // dataset data-price?
-      const dsPrice = toNum(menuItem.dataset.price, 0);
-      if (dsPrice) return Math.round(dsPrice);
-      // fallback: try first select option selected numeric
-      const anySelect = menuItem.querySelector('select');
-      if (anySelect) return toNum(anySelect.value, 0);
-    } catch(e) {
-      console.warn('readItemPriceFromNode error', e);
-    }
-    return 0;
-  }
-
-  // ---------- Add item to cart (from a menu-item) ----------
-  function addItemFromMenu(menuItem, qty=1) {
-    try {
-      const itemId = menuItem.dataset.itemId || menuItem.id || ('item-'+Math.floor(Math.random()*99999));
-      const title = (menuItem.querySelector('.item-title')?.innerText || menuItem.dataset.name || itemId).trim();
-      const img = menuItem.querySelector('.item-thumb')?.src || '';
-      // Build meta from selects and addons (to show in confirmation/print)
-      const meta = {};
-      const selects = menuItem.querySelectorAll('select');
-      selects.forEach(s => { if (s.name) meta[s.name] = { label: s.options[s.selectedIndex]?.text || '', value: s.value }; });
-      const addons = [];
-      menuItem.querySelectorAll('input[type="checkbox"]').forEach(cb => {
-        if (cb.classList.contains('addon-checkbox') && cb.checked) {
-          addons.push({ key: cb.dataset.addonKey || cb.value, label: cb.closest('.addon')?.querySelector('span')?.innerText || cb.value, value: cb.value });
-        }
-      });
-      if (addons.length) meta.addons = addons;
-      const unitPrice = readItemPriceFromNode(menuItem) || toNum(menuItem.dataset.price, 0);
-
-      // Insert or update
-      if (!cart[itemId]) {
-        cart[itemId] = { id: itemId, title, unitPrice: Math.round(unitPrice), qty: 0, meta, imageSrc: img };
-      }
-      cart[itemId].qty = (cart[itemId].qty || 0) + qty;
-      // Merge meta (simple replacement)
-      cart[itemId].meta = meta;
-      saveCart();
-      showToast(`${title} added to cart`);
-    } catch(e) { console.error('addItemFromMenu error', e); }
-  }
-
-  // ---------- Remove/decrease item ----------
-  function decreaseItem(itemId, decreaseBy=1) {
-    if (!cart[itemId]) return;
-    cart[itemId].qty = (cart[itemId].qty || 0) - decreaseBy;
-    if (cart[itemId].qty <= 0) delete cart[itemId];
-    saveCart();
-  }
-  function increaseItem(itemId, inc=1) {
-    if (!cart[itemId]) return;
-    cart[itemId].qty = (cart[itemId].qty || 0) + inc;
-    saveCart();
-  }
-  function removeItem(itemId) {
-    if (!cart[itemId]) return;
-    delete cart[itemId];
-    saveCart();
-  }
-
-  // ---------- Promo rules ----------
-  function computePromoDiscount(cartObj) {
-    // returns { promoDiscount: number, promoLines: array of added free items to be added to cart for display }
-    let discount = 0;
-    const freeLines = []; // e.g., { id, title, unitPrice:0, qty, meta }
-    try {
-      // Buy-2-get-1 for shawarma (data-item-id="shawarma" or id contains 'shawarma' or dataset promo)
-      const shawarmaEntryKey = Object.keys(cartObj).find(k => (k.toLowerCase().includes('shawarma') || (cartObj[k].meta && cartObj[k].meta.promo==='buy2get1') || (cartObj[k].promo === 'buy2get1') ));
-      if (shawarmaEntryKey) {
-        const shaw = cartObj[shawarmaEntryKey];
-        const triples = Math.floor((shaw.qty || 0) / 3);
-        if (triples > 0) {
-          // discount = triples * unitPrice (assuming identical price per shawarma)
-          discount += triples * (shaw.unitPrice || 0);
-        }
-      }
-      // Loaded Fries free Coke: if loaded-fries exists and has a promo -> add free coke line
-      const friesKey = Object.keys(cartObj).find(k => k.includes('fries') || (cartObj[k].meta && cartObj[k].meta.promo === 'freecoke') || (cartObj[k].promo === 'freecoke'));
-      if (friesKey) {
-        const fries = cartObj[friesKey];
-        // For every fries qty, we add a free coke line (qty = fries.qty), but keep price 0
-        if (fries.qty > 0) {
-          // create synthetic free item with id 'free-coke'
-          freeLines.push({ id: 'free-coke', title: 'Free Coke (promo)', unitPrice: 0, qty: fries.qty, meta: { promoFrom: friesKey } });
-        }
-      }
-    } catch(e) { console.warn('computePromoDiscount error', e); }
-    return { promoDiscount: Math.round(discount), promoLines: freeLines };
-  }
-
-  // ---------- Totals & rendering ----------
-  function computeTotals() {
-    const items = Object.values(cart || {});
-    let subtotal = 0;
-    let itemCount = 0;
-    items.forEach(it => {
-      subtotal += (Number(it.unitPrice) || 0) * (Number(it.qty) || 0);
-      itemCount += (Number(it.qty) || 0);
-    });
-    const promoResult = computePromoDiscount(cart);
-    const promoDiscount = promoResult.promoDiscount || 0;
-    const promoLines = promoResult.promoLines || [];
-    // Delivery default 0 (calculated in checkout specifically)
-    const total = Math.max(0, subtotal - promoDiscount);
-    return { subtotal, promoDiscount, promoLines, total, itemCount };
-  }
-
-  function renderCart() {
-    // Renders cart drawer DOM (#cart-items), updates counts and totals
-    try {
-      // Clear cart-items
-      if (!cartItemsWrap) {
-        // update counts only
-        updateCartUI();
-        return;
-      }
-      cartItemsWrap.innerHTML = '';
-      const keys = Object.keys(cart);
-      if (!keys.length) {
-        cartItemsWrap.innerHTML = '<li class="empty">Your cart is empty.</li>';
-      } else {
-        keys.forEach(k => {
-          const it = cart[k];
-          const li = document.createElement('li');
-          li.className = 'cart-line';
-          li.dataset.itemId = it.id;
-          li.innerHTML = `
-            <div class="line-left">
-              <img class="cart-thumb" src="${escapeHtml(it.imageSrc || '')}" alt="${escapeHtml(it.title)}">
-              <div style="min-width:0">
-                <div class="line-title">${escapeHtml(it.title)}</div>
-                <div class="line-meta small-muted">GHC ${Math.round(it.unitPrice || 0)} &nbsp; <span class="line-qty">× ${it.qty}</span></div>
-              </div>
-            </div>
-            <div class="line-controls">
-              <button class="icon-btn cart-decrease" title="Decrease"><i class="fa fa-minus"></i></button>
-              <div style="width:36px; text-align:center; font-weight:900; color: var(--accent-2)">${it.qty}</div>
-              <button class="icon-btn cart-increase" title="Increase"><i class="fa fa-plus"></i></button>
-              <button class="icon-btn cart-remove" title="Remove"><i class="fa fa-trash"></i></button>
-            </div>
-          `;
-          // attach handlers
-          li.querySelector('.cart-increase').addEventListener('click', ()=> { increaseItem(it.id, 1); });
-          li.querySelector('.cart-decrease').addEventListener('click', ()=> { decreaseItem(it.id, 1); });
-          li.querySelector('.cart-remove').addEventListener('click', ()=> { removeItem(it.id); });
-          cartItemsWrap.appendChild(li);
-        });
-      }
-
-      // Apply promo free-lines into DOM (display only)
-      const totals = computeTotals();
-      if (totals.promoLines && totals.promoLines.length) {
-        totals.promoLines.forEach(fl => {
-          // ensure we don't duplicate free-coke line if it's already in cart display
-          if (!cartItemsWrap.querySelector(`li[data-item-id="${escapeSelector(fl.id)}"]`)) {
-            const li = document.createElement('li');
-            li.className = 'cart-line cart-free';
-            li.dataset.itemId = fl.id;
-            li.innerHTML = `
-              <div class="line-left">
-                <img class="cart-thumb" src="" alt="${escapeHtml(fl.title)}">
-                <div style="min-width:0">
-                  <div class="line-title">${escapeHtml(fl.title)}</div>
-                  <div class="line-meta small-muted">FREE (promo)</div>
-                </div>
-              </div>
-              <div class="line-controls">
-                <div style="width:36px; text-align:center; font-weight:900; color: var(--accent-2)">${fl.qty}</div>
-              </div>
-            `;
-            cartItemsWrap.appendChild(li);
-          }
-        });
-      }
-
-      updateCartUI();
-    } catch(e){ console.error('renderCart error', e); }
-  }
-
-  function updateCartUI() {
-    const totals = computeTotals();
-    // update counts
-    cartCountEls.forEach(el => { if (el) el.innerText = totals.itemCount || 0; });
-    if (cartMiniCount) cartMiniCount.innerText = totals.itemCount || 0;
-    // update totals display
-    cartSubtotalEl && (cartSubtotalEl.innerText = fmtGhc(totals.subtotal || 0));
-    promoDiscountEl && (promoDiscountEl.innerText = `-GHC ${Math.round(totals.promoDiscount || 0)}`);
-    cartTotalEl && (cartTotalEl.innerText = fmtGhc((totals.subtotal || 0) - (totals.promoDiscount || 0)));
-    // show/hide promo block
-    if (cartPromoBlock) {
-      if (totals.promoDiscount > 0 || (totals.promoLines && totals.promoLines.length)) {
-        cartPromoBlock.classList.remove('hidden');
-        cartPromoBlock.removeAttribute('aria-hidden');
-        // update helper text
-        if (promoHelpText) {
-          // For shawarma promo - indicate how many more needed
-          const shawKey = Object.keys(cart).find(k => k.includes('shawarma'));
-          if (shawKey) {
-            const need = 3 - ((cart[shawKey].qty || 0) % 3);
-            if (need > 0 && need < 3) promoHelpText.innerText = `Add ${need} more Shawarma(s) to get one free.`;
-            else promoHelpText.innerText = 'Promo applied.';
-          } else {
-            promoHelpText.innerText = 'Promo applied.';
-          }
-        }
-      } else {
-        cartPromoBlock.classList.add('hidden');
-        cartPromoBlock.setAttribute('aria-hidden','true');
-      }
+    const initial = tabButtons.find(b => b.classList.contains('is-active')) || tabButtons[0];
+    if (initial) {
+      setActiveTab(initial);
+      applyTabFilter((initial.dataset.cat || 'all').toLowerCase());
     }
   }
 
-  // Escape helper for building HTML
-  function escapeHtml(s) { return String(s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-  function escapeSelector(s) { return String(s||'').replace(/([ #;?%&,.+*~\':"!^$[\]()=>|\/@])/g,'\\$1'); }
+  /* -------------------------
+     Cart drawer open/close wiring
+  ------------------------- */
+  function setupCartDrawer() {
+    const cartToggle = qs('#cart-toggle');
+    const cartDrawer = qs('#cart-drawer');
+    const cartClose = qs('#cart-close');
 
-  // ---------- Attach add/remove handlers for menu items ----------
-  (function wireMenuAdders(){
-    // handle Add / Remove buttons inside menu items
-    const onAddClick = (ev) => {
-      const btn = ev.currentTarget;
-      const iid = btn.dataset.itemId;
-      const menuItem = document.querySelector(`.menu-item[data-item-id="${escapeSelector(iid)}"], #${escapeSelector(iid)}`);
-      if (!menuItem) {
-        // maybe the button is inside the menu item already
-        const mi = btn.closest('.menu-item');
-        if (mi) addItemFromMenu(mi, 1);
-      } else addItemFromMenu(menuItem, 1);
-    };
-    const onRemoveClick = (ev) => {
-      const btn = ev.currentTarget;
-      const iid = btn.dataset.itemId;
-      if (!iid) return;
-      decreaseItem(iid, 1);
-    };
-    // initial attach
-    $$('.add-btn').forEach(b => b.addEventListener('click', onAddClick));
-    $$('.remove-btn').forEach(b => b.addEventListener('click', onRemoveClick));
-    // if menu items are added later, attach via MutationObserver
-    const menuGrid = $('#menu-grid');
-    if (menuGrid) {
-      const mo = new MutationObserver(muts => {
-        muts.forEach(m => {
-          m.addedNodes && m.addedNodes.forEach(n => {
-            if (!(n instanceof Element)) return;
-            $$('.add-btn', n).forEach(b => b.addEventListener('click', onAddClick));
-            $$('.remove-btn', n).forEach(b => b.addEventListener('click', onRemoveClick));
-          });
-        });
-      });
-      mo.observe(menuGrid, { childList: true, subtree: true });
-    }
-  })();
+    if (!cartDrawer) return;
 
-  // ---------- Cart drawer open/close ----------
-  (function setupCartDrawer(){
     function openCart() {
-      if (!cartDrawer) return;
       cartDrawer.style.display = 'block';
-      cartDrawer.setAttribute('aria-hidden','false');
+      cartDrawer.setAttribute('aria-hidden', 'false');
       document.body.style.overflow = 'hidden';
+      try { cartDrawer.focus(); } catch (e) {}
       renderCart();
     }
     function closeCart() {
-      if (!cartDrawer) return;
       cartDrawer.style.display = 'none';
-      cartDrawer.setAttribute('aria-hidden','true');
+      cartDrawer.setAttribute('aria-hidden', 'true');
       document.body.style.overflow = '';
+      try { cartToggle && cartToggle.focus(); } catch (e) {}
     }
-    cartToggle && cartToggle.addEventListener('click', (e) => {
-      if (cartDrawer && cartDrawer.getAttribute('aria-hidden') === 'false') closeCart();
-      else openCart();
-    });
-    cartClose && cartClose.addEventListener('click', closeCart);
-    // clicking outside drawer closes
-    cartDrawer && cartDrawer.addEventListener('click', (e) => { if (e.target === cartDrawer) closeCart(); });
-  })();
 
-  // ---------- "Add missing items" button (to reach promo) ----------
-  if (addMissingBtn) {
-    addMissingBtn.addEventListener('click', () => {
-      // if shawarma present, add necessary items to reach next multiple of 3
-      const shawKey = Object.keys(cart).find(k => k.includes('shawarma'));
-      if (shawKey) {
-        const need = 3 - ((cart[shawKey].qty || 0) % 3);
-        if (need > 0 && need < 3) {
-          cart[shawKey].qty += need;
-          saveCart();
-          showToast(`Added ${need} Shawarma(s) to qualify for promo`);
-          return;
-        }
-      }
-      // else try add a shawarma fresh if none exists
-      const menuShaw = document.querySelector('.menu-item[data-item-id="shawarma"]') || document.getElementById('item-shawarma');
-      if (menuShaw) {
-        addItemFromMenu(menuShaw, 2); // add 2 to attempt to trigger promo
-        showToast('Added items to help you reach the promo');
+    cartToggle && cartToggle.addEventListener('click', (e) => {
+      const hidden = cartDrawer.getAttribute('aria-hidden') !== 'false';
+      if (hidden) openCart(); else closeCart();
+    });
+
+    cartClose && cartClose.addEventListener('click', closeCart);
+    // clicking outside the drawer closes it
+    cartDrawer.addEventListener('click', (e) => {
+      if (e.target === cartDrawer) closeCart();
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && cartDrawer.getAttribute('aria-hidden') === 'false') closeCart();
+    });
+
+    // clear cart button
+    const clearBtn = qs('#clear-cart');
+    clearBtn && clearBtn.addEventListener('click', () => {
+      if (!confirm('Clear cart?')) return;
+      window.cart = {};
+      saveCart();
+      renderCart();
+      showToast('Cart cleared');
+    });
+
+    // Add missing (promo helper) — simple implementation: add one shawarma lite if buy2get1 near threshold
+    const addMissing = qs('#add-missing');
+    addMissing && addMissing.addEventListener('click', () => {
+      // determine nearest promo need
+      const cartObj = window.cart || {};
+      const shawarmaCount = Object.values(cartObj).reduce((s, l) => s + ((l.baseId || '').toLowerCase().includes('shawarma') ? Number(l.qty || 0) : 0), 0);
+      if (shawarmaCount % 3 === 0) {
+        showToast('Cart already meets the promo condition');
         return;
       }
-      showToast('Could not automatically add missing items.');
+      const need = 3 - (shawarmaCount % 3);
+      for (let i = 0; i < need; i++) {
+        addToCart({ itemId: 'shawarma', title: 'Shawarma', unitPrice: 45, qty: 1, imageSrc: 'thumb-shawarma.jpg', meta: { size: 'classic' } });
+      }
+      renderCart();
+      showToast(`Added ${need} shawarma${need>1?'s':''} to reach promo`);
     });
   }
 
-  // ---------- Toast ----------
-  function showToast(msg, ms=1800) {
-    try {
-      let t = document.querySelector('.toast.wrap-toast');
-      if (!t) {
-        t = document.createElement('div');
-        t.className = 'toast wrap-toast';
-        document.body.appendChild(t);
+  /* -------------------------
+     Attach add/remove buttons in menu (delegation)
+     - Handles computing unit price from selects and addons
+  ------------------------- */
+  function setupMenuAddButtons() {
+    // compute price from a menu-item element
+    function computeItemUnitPrice(menuItem) {
+      let total = 0;
+      // selects
+      qsa('select', menuItem).forEach(s => {
+        total += Number(s.value || 0);
+      });
+      // checkboxes with class addon-checkbox
+      qsa('input.addon-checkbox', menuItem).forEach(cb => {
+        if (cb.checked) total += Number(cb.value || 0);
+      });
+      // if the menu-item has a .price-value span, fallback to that if total is zero
+      if (total === 0) {
+        const pv = qs('.price-value', menuItem);
+        if (pv) total = Number(pv.innerText || 0);
       }
-      t.innerText = msg;
-      t.classList.add('show');
-      setTimeout(()=> t.classList.remove('show'), ms);
-    } catch(e){}
+      return Math.round(total);
+    }
+
+    // capture add clicks
+    document.addEventListener('click', (e) => {
+      const el = e.target.closest && e.target.closest('.add-btn');
+      if (!el) return;
+      e.preventDefault();
+      const itemId = el.dataset.itemId || el.closest('.menu-item')?.dataset.itemId || el.closest('.menu-item')?.id || 'item';
+      const menuItem = el.closest('.menu-item');
+      const title = (menuItem && (qs('.item-title', menuItem)?.innerText || 'Item')) || 'Item';
+      const imageSrc = menuItem && (qs('.item-thumb', menuItem)?.src || '');
+      // assemble meta from selects and addons
+      const meta = {};
+      qsa('select', menuItem).forEach(s => {
+        const name = s.name || s.className || ('sel_' + Math.random().toString(36).slice(2,6));
+        meta[name] = { text: s.options[s.selectedIndex]?.text || s.value, value: s.value };
+      });
+      const addons = [];
+      qsa('.addon input[type="checkbox"]', menuItem).forEach(cb => {
+        if (cb.checked) {
+          addons.push({ key: cb.dataset.addonKey || cb.value, label: cb.closest('.addon')?.querySelector('span')?.innerText || cb.value, value: Number(cb.value || 0) });
+        }
+      });
+      if (addons.length) meta.addons = addons;
+      const unitPrice = computeItemUnitPrice(menuItem);
+      addToCart({ itemId, title, unitPrice, qty: 1, imageSrc, meta });
+    });
+
+    // capture remove button (in menu card) if present (some markup shows remove-btn)
+    document.addEventListener('click', (e) => {
+      const el = e.target.closest && e.target.closest('.remove-btn');
+      if (!el) return;
+      e.preventDefault();
+      // best-effort: find an existing cart key for this itemId and decrement/remove
+      const itemId = el.dataset.itemId || el.closest('.menu-item')?.dataset.itemId;
+      if (!itemId) {
+        showToast('Cannot locate item to remove');
+        return;
+      }
+      // find any matching cart key
+      const cartObj = window.cart || {};
+      const found = Object.keys(cartObj).find(k => (cartObj[k].baseId || '').toLowerCase() === itemId.toLowerCase());
+      if (found) {
+        changeQty(found, -1);
+        showToast('Item removed');
+      } else {
+        showToast('Item not in cart');
+      }
+    });
   }
 
-  // ---------- Product modal (clone item-config) ----------
-  (function setupProductModal(){
-    if (!productModal) return;
+  /* -------------------------
+     Product modal behavior
+     - opens when clicking .item-thumb or .item-title
+     - clones .item-config into modal, allows edits, then adds selections to cart
+  ------------------------- */
+  function setupProductModal() {
+    const modal = qs('#product-modal');
+    if (!modal) return;
+    const pmThumb = qs('#pm-thumb', modal);
+    const pmTitle = qs('#pm-title', modal);
+    const pmDesc = qs('#pm-desc', modal);
+    const pmBody = qs('#pm-body', modal);
+    const pmPrice = qs('#pm-price', modal);
+    const pmAdd = qs('#pm-add', modal);
+    const pmCancel = qs('#pm-cancel', modal);
+    const pmClose = qs('#pm-close', modal);
+
     let activeMenuItem = null;
     let clonedConfig = null;
 
-    function openFor(menuItem) {
+    function calculatePriceFromContainer(container) {
+      let total = 0;
+      qsa('select', container).forEach(s => { total += Number(s.value || 0); });
+      qsa('input.addon-checkbox, input[type="checkbox"]', container).forEach(cb => { if (cb.checked) total += Number(cb.value || 0); });
+      if (total === 0) {
+        const fallback = Number(qs('.price-value', container)?.innerText || 0);
+        if (fallback) total = fallback;
+      }
+      return Math.round(total);
+    }
+
+    function updateModalPrice() {
+      if (!clonedConfig || !pmPrice) return;
+      const p = calculatePriceFromContainer(clonedConfig);
+      pmPrice.innerText = fmtGhc(p);
+    }
+
+    function openProductModal(menuItem) {
+      if (!menuItem) return;
       activeMenuItem = menuItem;
-      const thumb = menuItem.querySelector('.item-thumb')?.src || '';
-      const title = elText(menuItem.querySelector('.item-title')) || menuItem.dataset.name || 'Item';
-      const desc = elText(menuItem.querySelector('.item-desc')) || '';
-      pmThumb.src = thumb;
+      const thumb = qs('.item-thumb', menuItem);
+      const title = (qs('.item-title', menuItem)?.innerText || 'Item');
+      const desc = qs('.item-desc', menuItem)?.innerText || '';
+
+      pmThumb.src = thumb?.src || '';
       pmThumb.alt = title;
       pmTitle.innerText = title;
       pmDesc.innerText = desc;
 
-      // clone .item-config
-      const config = menuItem.querySelector('.item-config');
       pmBody.innerHTML = '';
-      if (config) {
-        clonedConfig = config.cloneNode(true);
-        // strip ids to avoid duplicates
-        clonedConfig.querySelectorAll('[id]').forEach(n => n.removeAttribute('id'));
+      const config = qs('.item-config', menuItem);
+      clonedConfig = config ? config.cloneNode(true) : null;
+
+      if (clonedConfig) {
+        // remove duplicate IDs
+        qsa('[id]', clonedConfig).forEach(el => el.removeAttribute('id'));
+        // ensure inputs are interactive
         pmBody.appendChild(clonedConfig);
-        // live update price on change
-        clonedConfig.querySelectorAll('select, input[type="checkbox"]').forEach(inp => {
-          inp.addEventListener('change', updateModalPrice);
-        });
+        qsa('select, input[type="checkbox"]', clonedConfig).forEach(inp => inp.addEventListener('change', updateModalPrice));
       } else {
-        pmBody.innerHTML = '<div class="small-muted">No extra options.</div>';
+        const fallback = document.createElement('div');
+        fallback.className = 'glass-card small';
+        fallback.innerText = 'No configurable options for this item.';
+        pmBody.appendChild(fallback);
       }
       updateModalPrice();
-      productModal.style.display = 'flex';
-      productModal.setAttribute('aria-hidden','false');
+      modal.style.display = 'flex';
+      modal.setAttribute('aria-hidden', 'false');
       document.body.style.overflow = 'hidden';
-      setTimeout(()=> pmClose && pmClose.focus(), 80);
+      setTimeout(() => { try { pmClose && pmClose.focus(); } catch (e) {} }, 80);
     }
 
-    function closeModal() {
+    function closeProductModal() {
       pmBody.innerHTML = '';
       clonedConfig = null;
       activeMenuItem = null;
-      productModal.style.display = 'none';
-      productModal.setAttribute('aria-hidden','true');
+      modal.style.display = 'none';
+      modal.setAttribute('aria-hidden', 'true');
       document.body.style.overflow = '';
     }
 
-    function updateModalPrice() {
-      if (!clonedConfig) return;
-      // compute price same as readItemPriceFromNode (but on clonedConfig)
-      let total = 0;
-      clonedConfig.querySelectorAll('select').forEach(s => total += toNum(s.value, 0));
-      clonedConfig.querySelectorAll('input[type="checkbox"]').forEach(cb => { if (cb.checked) total += toNum(cb.value,0); });
-      pmPrice.innerText = fmtGhc(total);
-    }
+    // attach openers for existing menu items and future ones via delegation
+    document.addEventListener('click', (e) => {
+      const clicked = e.target;
+      const thumb = clicked.closest && clicked.closest('.item-thumb');
+      const title = clicked.closest && clicked.closest('.item-title');
+      const opener = thumb || title;
+      if (!opener) return;
+      const menuItem = opener.closest('.menu-item');
+      if (!menuItem) return;
+      e.preventDefault();
+      openProductModal(menuItem);
+    });
 
-    // wire openers: clicking item-thumb or item-title
-    function attachOpeners() {
-      $$('.menu-item').forEach(mi => {
-        const thumb = mi.querySelector('.item-thumb');
-        const title = mi.querySelector('.item-title');
-        [thumb, title].filter(Boolean).forEach(n => {
-          n.style.cursor = 'pointer';
-          n.addEventListener('click', (e) => {
-            e.stopPropagation();
-            openFor(mi);
-          });
-        });
-      });
-    }
-    attachOpeners();
-    const menuGrid = $('#menu-grid');
-    if (menuGrid) {
-      const mo = new MutationObserver(()=> attachOpeners());
-      mo.observe(menuGrid, { childList:true, subtree:true });
-    }
-
-    // On Add inside modal: copy selections back to original menu item, then call add
     pmAdd && pmAdd.addEventListener('click', () => {
-      if (!activeMenuItem || !clonedConfig) { closeModal(); return; }
-      try {
-        // copy selects by name
-        clonedConfig.querySelectorAll('select').forEach(cs => {
-          if (!cs.name) return;
-          const orig = activeMenuItem.querySelector(`select[name="${cs.name}"]`);
-          if (orig) { orig.value = cs.value; orig.dispatchEvent(new Event('change', { bubbles:true })); }
-        });
-        // copy checkboxes by data-addon-key or label matching
-        clonedConfig.querySelectorAll('input[type="checkbox"]').forEach(cb => {
-          const key = cb.dataset.addonKey;
-          let orig = key ? activeMenuItem.querySelector(`input.addon-checkbox[data-addon-key="${key}"]`) : null;
-          if (!orig) {
-            // fallback by label text
-            const labelText = cb.closest('.addon')?.querySelector('span')?.innerText?.trim();
-            if (labelText) {
-              orig = Array.from(activeMenuItem.querySelectorAll('.addon')).map(a=>({el:a, text:a.querySelector('span')?.innerText?.trim()})).find(x=>x.text===labelText)?.el?.querySelector('input[type="checkbox"]') || null;
-            }
-          }
-          if (orig) { orig.checked = !!cb.checked; orig.dispatchEvent(new Event('change', { bubbles:true })); }
-        });
-        // trigger add
-        const origAdd = activeMenuItem.querySelector('.add-btn');
+      if (!activeMenuItem) { closeProductModal(); return; }
+      if (!clonedConfig) {
+        // simply click add on original item
+        const origAdd = qs('.add-btn', activeMenuItem);
         if (origAdd) origAdd.click();
-      } catch(e) { console.warn('pmAdd copy failed', e); }
-      setTimeout(()=> closeModal(), 220);
-    });
-
-    pmCancel && pmCancel.addEventListener('click', () => closeModal());
-    pmClose && pmClose.addEventListener('click', () => closeModal());
-    productModal && productModal.addEventListener('click', (e) => { if (e.target === productModal) closeModal(); });
-    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && productModal.style.display === 'flex') closeModal(); });
-  })();
-
-  // ---------- Promo countdown to next Tuesday 23:59:59 ----------
-  (function setupPromoCountdown(){
-    if (!promoCountdownEl) return;
-    function nextTuesdayEnd() {
-      const now = new Date();
-      // Find next Tuesday (weekday 2 if Sunday=0)
-      const day = now.getDay();
-      const daysUntilTue = (2 - day + 7) % 7 || 7; // always next Tue (not today unless today is Tue and time passed)
-      const candidate = new Date(now.getFullYear(), now.getMonth(), now.getDate() + daysUntilTue, 23, 59, 59, 0);
-      // if today is Tuesday and time earlier, return this Tuesday's end
-      if (day === 2) {
-        // if now before 23:59:59 return today's end
-        const todayEnd = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23,59,59,0);
-        if (now < todayEnd) return todayEnd;
-        // else already passed, go to next Tue
-        return new Date(now.getFullYear(), now.getMonth(), now.getDate() + 7, 23,59,59,0);
-      }
-      return candidate;
-    }
-    function tick(){
-      const end = nextTuesdayEnd();
-      const diff = Math.max(0, end - Date.now());
-      const s = Math.floor(diff/1000)%60;
-      const m = Math.floor(diff/60000)%60;
-      const h = Math.floor(diff/3600000)%24;
-      const d = Math.floor(diff/86400000);
-      promoCountdownEl.innerText = `${d}d ${h}h ${m}m ${s}s`;
-      if (diff <= 0) { clearInterval(interval); promoCountdownEl.innerText = 'Promo period'; }
-    }
-    tick();
-    const interval = setInterval(tick, 1000);
-  })();
-
-  // ---------- Entry promo modal ----------
-  (function setupEntryPromo(){
-    if (!entryPromo) return;
-    // Show only if not disabled in localStorage
-    try {
-      const dont = localStorage.getItem(ENTRY_PROMO_KEY);
-      if (!dont) {
-        // show after small delay
-        setTimeout(()=> {
-          entryPromo.style.display = 'flex';
-          entryPromo.setAttribute('aria-hidden', 'false');
-          document.body.style.overflow = 'hidden';
-        }, 900);
-      }
-    } catch(e){}
-
-    entryClose && entryClose.addEventListener('click', ()=> { entryPromo.style.display='none'; entryPromo.setAttribute('aria-hidden','true'); document.body.style.overflow=''; });
-    claimPromoEntryBtn && claimPromoEntryBtn.addEventListener('click', () => {
-      // mark promo claimed in localStorage
-      try { localStorage.setItem('wrap_claimed_promo', 'TUES-B2G1'); } catch(e){}
-      entryPromo.style.display='none';
-      entryPromo.setAttribute('aria-hidden','true');
-      document.body.style.overflow='';
-      showToast('Promo claimed — it will apply at checkout.');
-    });
-    dontShowAgainCheckbox && dontShowAgainCheckbox.addEventListener('change', (e) => {
-      try {
-        if (dontShowAgainCheckbox.checked) localStorage.setItem(ENTRY_PROMO_KEY, '1');
-        else localStorage.removeItem(ENTRY_PROMO_KEY);
-      } catch(e){}
-    });
-  })();
-
-  // ---------- Preorder modal ----------
-  (function setupPreorder(){
-    const openBtns = preorderBtnSelectors.map(s => document.querySelector(s)).filter(Boolean);
-    const preorderForm = $('#preorder-form');
-    const preorderClose = $('#preorder-close');
-    if (!preorderModal) return;
-    function openPreorder() {
-      preorderModal.style.display = 'flex';
-      preorderModal.setAttribute('aria-hidden','false');
-      document.body.style.overflow = 'hidden';
-      setTimeout(()=> $('#preorder-name')?.focus(), 80);
-    }
-    function closePreorder() {
-      preorderModal.style.display = 'none';
-      preorderModal.setAttribute('aria-hidden','true');
-      document.body.style.overflow = '';
-    }
-    openBtns.forEach(b => b.addEventListener('click', openPreorder));
-    preorderClose && preorderClose.addEventListener('click', closePreorder);
-    preorderModal && preorderModal.addEventListener('click', (e)=> { if (e.target === preorderModal) closePreorder(); });
-    if (preorderForm) {
-      preorderForm.addEventListener('submit', (ev) => {
-        ev.preventDefault();
-        const name = $('#preorder-name')?.value || '';
-        const phone = $('#preorder-phone')?.value || '';
-        const note = $('#preorder-note')?.value || '';
-        if (!name || !phone) { alert('Please provide name and phone'); return; }
-        const preordersRaw = localStorage.getItem('wrap_preorders');
-        const arr = preordersRaw ? JSON.parse(preordersRaw) : [];
-        arr.push({ id: 'pre-'+Date.now(), name, phone, note, cart: cart, ts: nowIso() });
-        try { localStorage.setItem('wrap_preorders', JSON.stringify(arr)); } catch(e){}
-        closePreorder();
-        showToast('Preorder saved. We will reserve your items for next promo.');
-      });
-    }
-    const cancelBtn = $('#preorder-cancel');
-    cancelBtn && cancelBtn.addEventListener('click', ()=> { preorderModal.style.display='none'; preorderModal.setAttribute('aria-hidden','true'); document.body.style.overflow=''; });
-  })();
-
-  // ---------- Checkout page open/populate/submit ----------
-  (function setupCheckout(){
-    const page = $('#checkout-page');
-    const inner = $('#checkout-inner');
-    const closeBtn = $('#checkout-close');
-    const cancelBtn = $('#cf-cancel');
-    const submitBtn = $('#cf-submit');
-    const nameIn = $('#cf-name');
-    const phoneIn = $('#cf-phone');
-    const emailIn = $('#cf-email');
-    const typeIn = $('#cf-type');
-    const addrIn = $('#cf-address');
-    const latIn = $('#cf-lat');
-    const lonIn = $('#cf-lon');
-    const dateIn = $('#cf-date');
-    const timeIn = $('#cf-time');
-    const noteIn = $('#cf-note');
-    const payMethod = $('#cf-paymethod');
-
-    const orderLinesWrap = $('#cf-order-lines');
-    const cfSubtotal = $('#cf-subtotal');
-    const cfDelivery = $('#cf-delivery');
-    const cfPromo = $('#cf-promo');
-    const cfTotal = $('#cf-total');
-
-    // Compute delivery fee helper: basic Haversine from store coords
-    const STORE_COORDS = { lat: 5.6600, lon: 0.0190 }; // change if needed
-    const DELIVERY_CONFIG = { baseFee: 6, perKm: 2.5, minFee: 4, maxFee: 60, freeWithinKm: 0.8 };
-
-    function toRad(v){ return v * Math.PI / 180; }
-    function haversineKm(lat1,lon1,lat2,lon2){
-      const R=6371;
-      const dLat = toRad(lat2-lat1);
-      const dLon = toRad(lon2-lon1);
-      const a = Math.sin(dLat/2)*Math.sin(dLat/2) + Math.cos(toRad(lat1))*Math.cos(toRad(lat2))*Math.sin(dLon/2)*Math.sin(dLon/2);
-      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-      return R*c;
-    }
-    function computeDeliveryFee(lat, lon) {
-      if (!lat || !lon) return DELIVERY_CONFIG.baseFee;
-      const dist = haversineKm(STORE_COORDS.lat, STORE_COORDS.lon, Number(lat), Number(lon));
-      if (dist <= DELIVERY_CONFIG.freeWithinKm) return 0;
-      let fee = DELIVERY_CONFIG.baseFee + (dist * DELIVERY_CONFIG.perKm);
-      fee = Math.max(fee, DELIVERY_CONFIG.minFee);
-      fee = Math.min(fee, DELIVERY_CONFIG.maxFee);
-      return Math.round(fee);
-    }
-
-    function populateOrderLines() {
-      if (!orderLinesWrap) return;
-      orderLinesWrap.innerHTML = '';
-      const lines = Object.values(cart || {});
-      if (!lines.length) {
-        orderLinesWrap.innerHTML = '<div class="small-muted">Your cart is empty.</div>';
+        closeProductModal();
         return;
       }
-      lines.forEach(l => {
-        const div = document.createElement('div');
-        div.className = 'order-line';
-        div.innerHTML = `
-          <img src="${escapeHtml(l.imageSrc||'')}" alt="${escapeHtml(l.title||'Item')}" />
-          <div class="ol-meta">
-            <strong>${escapeHtml(l.title||'Item')}</strong>
-            <small>${escapeHtml((l.meta && l.meta.addons) ? l.meta.addons.map(a=>a.label).join(', ') : '')}</small>
-          </div>
-          <div class="ol-price">${fmtGhc((Number(l.unitPrice)||0) * (Number(l.qty)||1))}</div>
-        `;
-        orderLinesWrap.appendChild(div);
-      });
-    }
+      // Compose selection meta and copy to original
+      try {
+        // copy selects by name
+        qsa('select', clonedConfig).forEach(cs => {
+          const name = cs.name;
+          if (!name) return;
+          const orig = qs(`select[name="${name}"]`, activeMenuItem);
+          if (orig) { orig.value = cs.value; orig.dispatchEvent(new Event('change', { bubbles: true })); }
+        });
+        // copy checkboxes (addon-checkbox)
+        qsa('input[type="checkbox"]', clonedConfig).forEach(ccb => {
+          const key = ccb.dataset.addonKey;
+          let origCb = key ? qs(`input.addon-checkbox[data-addon-key="${key}"]`, activeMenuItem) : null;
+          if (!origCb) {
+            const labelText = ccb.closest('.addon')?.querySelector('span')?.innerText?.trim();
+            if (labelText) {
+              const found = qsa('.addon', activeMenuItem).map(a => ({ el: a, txt: a.querySelector('span')?.innerText?.trim() })).find(x => x.txt === labelText);
+              origCb = found && found.el ? qs('input[type="checkbox"]', found.el) : null;
+            }
+          }
+          if (origCb) { origCb.checked = !!ccb.checked; origCb.dispatchEvent(new Event('change', { bubbles: true })); }
+        });
 
-    function refreshTotals() {
-      const t = computeTotals();
-      cfSubtotal && (cfSubtotal.innerText = fmtGhc(t.subtotal || 0));
-      // delivery only if delivery selected:
-      const type = typeIn?.value || 'delivery';
-      let delivery = 0;
-      if (type === 'delivery') {
-        const lat = latIn?.value || '';
-        const lon = lonIn?.value || '';
-        delivery = computeDeliveryFee(lat || STORE_COORDS.lat, lon || STORE_COORDS.lon);
+        // click original add
+        const origAddBtn = qs('.add-btn', activeMenuItem);
+        if (origAddBtn) {
+          origAddBtn.click();
+          setTimeout(() => closeProductModal(), 260);
+        } else {
+          closeProductModal();
+          showToast('Added (fallback)');
+        }
+      } catch (err) {
+        console.error('Error copying modal selections', err);
+        closeProductModal();
       }
-      cfDelivery && (cfDelivery.innerText = fmtGhc(delivery || 0));
-      cfPromo && (cfPromo.innerText = `-GHC ${Math.round(t.promoDiscount || 0)}`);
-      const total = Math.max(0, (t.subtotal || 0) - (t.promoDiscount || 0) + (delivery||0));
-      cfTotal && (cfTotal.innerText = fmtGhc(total));
+    });
+
+    pmCancel && pmCancel.addEventListener('click', closeProductModal);
+    pmClose && pmClose.addEventListener('click', closeProductModal);
+    modal && modal.addEventListener('click', (e) => { if (e.target === modal) closeProductModal(); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && modal.style.display === 'flex') closeProductModal(); });
+  }
+
+  /* -------------------------
+     Promo countdown (next Tuesday) and handlers for promo buttons
+  ------------------------- */
+  function setupPromoCountdown() {
+    const promoTimerEl = qs('#promo-timer');
+    const promoButtons = qsa('[data-action="apply-promo"], [data-action="preorder-promo"]');
+
+    // compute next Tuesday (0 = Sun, 1 = Mon, 2 = Tue)
+    function nextWeekdayDate(targetWeekday) {
+      const now = new Date();
+      const d = (targetWeekday + 7 - now.getDay()) % 7;
+      const next = new Date(now.getFullYear(), now.getMonth(), now.getDate() + (d === 0 ? 7 : d));
+      // Set to start of day (optional) — keep promo end at 23:59 local time of Tuesday
+      next.setHours(23, 59, 59, 999);
+      return next;
     }
 
-    function openCheckoutPage() {
-      if (!page) return;
-      // hide other modals
-      Array.from(document.querySelectorAll('.modal, .entry-promo')).forEach(m => { try { m.style.display='none'; m.setAttribute('aria-hidden','true'); } catch(e){} });
-      populateOrderLines();
-      refreshTotals();
-      // prefill from localStorage
-      nameIn && (nameIn.value = localStorage.getItem('wrap_user_name') || '');
-      phoneIn && (phoneIn.value = localStorage.getItem('wrap_user_phone') || '');
-      emailIn && (emailIn.value = localStorage.getItem('wrap_checkout_email') || '');
-      page.style.display = 'flex';
-      page.setAttribute('aria-hidden','false');
-      document.body.style.overflow = 'hidden';
-      setTimeout(()=> nameIn && nameIn.focus(), 120);
+    const promoEnd = nextWeekdayDate(2); // next Tuesday end of day
+
+    function updateCountdown() {
+      if (!promoTimerEl) return;
+      const now = new Date();
+      const diff = promoEnd - now;
+      if (diff <= 0) {
+        promoTimerEl.innerText = 'Expired';
+        return;
+      }
+      const sec = Math.floor(diff / 1000);
+      const d = Math.floor(sec / 86400);
+      const h = Math.floor((sec % 86400) / 3600);
+      const m = Math.floor((sec % 3600) / 60);
+      const s = Math.floor(sec % 60);
+      promoTimerEl.innerText = (d ? (d + 'd ') : '') + `${pad(h)}h ${pad(m)}m ${pad(s)}s`;
+    }
+    function pad(n) { return String(n).padStart(2, '0'); }
+
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
+
+    // promo apply handlers (adds promo code to cart state and re-renders)
+    qsa('[data-action="apply-promo"]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const code = btn.dataset.promoCode || btn.getAttribute('data-promo-code') || 'UNKNOWN';
+        // save to localStorage as applied code for persistence
+        try { localStorage.setItem('wrap_applied_promo', code); } catch (e) {}
+        showToast(`Promo ${code} applied`);
+        // Re-render cart so promo discount shows
+        renderCart();
+      });
+    });
+
+    // Preorder button: opens #preorder-modal
+    qsa('[data-action="preorder-promo"]').forEach(btn => btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      openPreorderModal();
+    }));
+  }
+
+  /* -------------------------
+     Preorder modal handling
+  ------------------------- */
+  function openPreorderModal() {
+    const modal = qs('#preorder-modal');
+    if (!modal) return;
+    modal.style.display = 'flex';
+    modal.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+    // prefill name/phone if available
+    try {
+      qs('#preorder-name') && (qs('#preorder-name').value = localStorage.getItem('wrap_user_name') || '');
+      qs('#preorder-phone') && (qs('#preorder-phone').value = localStorage.getItem('wrap_user_phone') || '');
+    } catch (e) {}
+  }
+  function closePreorderModal() {
+    const modal = qs('#preorder-modal');
+    if (!modal) return;
+    modal.style.display = 'none';
+    modal.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+  }
+  function setupPreorderModal() {
+    const modal = qs('#preorder-modal');
+    if (!modal) return;
+    const closeBtn = qs('#preorder-close', modal);
+    const cancelBtn = qs('#preorder-cancel', modal);
+    const confirmBtn = qs('#preorder-confirm', modal);
+    const form = qs('#preorder-form', modal);
+
+    closeBtn && closeBtn.addEventListener('click', closePreorderModal);
+    cancelBtn && cancelBtn.addEventListener('click', closePreorderModal);
+
+    form && form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name = (qs('#preorder-name')?.value || '').trim();
+      const phone = (qs('#preorder-phone')?.value || '').trim();
+      const note = (qs('#preorder-note')?.value || '').trim();
+      if (!name || !phone) { alert('Please provide name and phone'); return; }
+      const cartLines = computeCartTotals().lines || [];
+      const fakeOrder = {
+        reference: 'PRE-' + Date.now(),
+        name, phone, email: '',
+        type: 'preorder',
+        address: '',
+        note,
+        cart: cartLines,
+        totals: computeCartTotals(),
+        ts: new Date().toISOString()
+      };
+      try {
+        localStorage.setItem('wrap_last_order', JSON.stringify(fakeOrder));
+        localStorage.setItem('wrap_show_confirmation', '1');
+      } catch (err) { /* ignore */ }
+      closePreorderModal();
+      // optionally clear cart? We keep cart intact for preorder
+      showToast('Preorder received — we will contact you');
+      setTimeout(() => window.location.reload(), 600);
+    });
+  }
+
+  /* -------------------------
+     Checkout page / modal handling
+     - openCheckoutPage() is exposed on window
+  ------------------------- */
+  function haversineKm(lat1, lon1, lat2, lon2) {
+    const R = 6371;
+    const dLat = toRad(lat2 - lat1);
+    const dLon = toRad(lon2 - lon1);
+    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
+  }
+  function toRad(v) { return v * Math.PI / 180; }
+
+  function computeDeliveryFee(lat, lon) {
+    if (isNaN(lat) || isNaN(lon)) return DELIVERY_CONFIG.baseFee;
+    const dist = haversineKm(STORE_COORDS.lat, STORE_COORDS.lon, lat, lon);
+    if (dist <= DELIVERY_CONFIG.freeWithinKm) return 0;
+    let fee = DELIVERY_CONFIG.baseFee + (dist * DELIVERY_CONFIG.perKm);
+    fee = Math.max(fee, DELIVERY_CONFIG.minFee);
+    fee = Math.min(fee, DELIVERY_CONFIG.maxFee);
+    return Math.round(fee);
+  }
+
+  function populateOrderLinesForCheckout() {
+    const orderLinesWrap = qs('#cf-order-lines');
+    if (!orderLinesWrap) return;
+    orderLinesWrap.innerHTML = '';
+    const totals = computeCartTotals();
+    const lines = Object.values(window.cart || {});
+    if (!lines.length) {
+      orderLinesWrap.innerHTML = '<div class="small-muted">Your cart is empty.</div>';
+      return;
+    }
+    lines.forEach(l => {
+      const div = document.createElement('div');
+      div.className = 'order-line';
+      div.innerHTML = `
+        <img src="${escapeHtml(l.imageSrc||'')}" alt="${escapeHtml(l.title||'Item')}" />
+        <div class="ol-meta">
+          <strong>${escapeHtml(l.title||'Item')}</strong>
+          <small>${escapeHtml(Object.keys(l.meta||{}).map(k => (l.meta[k] && l.meta[k].text) ? l.meta[k].text : '').filter(Boolean).join(' • '))}</small>
+        </div>
+        <div class="ol-price">${fmtGhc((l.unitPrice||0) * (l.qty||1))}</div>
+      `;
+      orderLinesWrap.appendChild(div);
+    });
+  }
+
+  function refreshCheckoutTotals() {
+    const cfSubtotal = qs('#cf-subtotal');
+    const cfDelivery = qs('#cf-delivery');
+    const cfPromo = qs('#cf-promo');
+    const cfTotal = qs('#cf-total');
+    if (!cfSubtotal || !cfDelivery || !cfPromo || !cfTotal) return;
+
+    const totals = computeCartTotals();
+    const subtotal = totals.subtotal || 0;
+    const promo = totals.promoDiscount || 0;
+
+    const inpType = qs('#cf-type');
+    const inpLat = qs('#cf-lat');
+    const inpLon = qs('#cf-lon');
+    let deliveryFee = 0;
+    if (inpType && inpType.value === 'delivery') {
+      const lat = parseFloat(inpLat && inpLat.value) || NaN;
+      const lon = parseFloat(inpLon && inpLon.value) || NaN;
+      deliveryFee = computeDeliveryFee(lat, lon);
     }
 
-    function closeCheckoutPage() {
-      if (!page) return;
-      page.style.display = 'none';
-      page.setAttribute('aria-hidden','true');
-      document.body.style.overflow = '';
-    }
+    cfSubtotal.innerText = fmtGhc(subtotal);
+    cfDelivery.innerText = fmtGhc(deliveryFee);
+    cfPromo.innerText = `-GHC ${promo}`;
+    cfTotal.innerText = fmtGhc(Math.max(0, subtotal - promo + deliveryFee));
+  }
 
+  function openCheckoutPage() {
+    const page = qs('#checkout-page');
+    if (!page) return;
+    // hide other modals
+    qsa('.modal, #preorder-modal').forEach(m => { try { m.style.display = 'none'; m.setAttribute('aria-hidden', 'true'); } catch (e) {} });
+    populateOrderLinesForCheckout();
+    refreshCheckoutTotals();
+    page.style.display = 'flex';
+    page.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+    // focus first input
+    setTimeout(() => {
+      const first = qs('#cf-name');
+      if (first) first.focus();
+    }, 120);
+  }
+
+  function closeCheckoutPage() {
+    const page = qs('#checkout-page');
+    if (!page) return;
+    page.style.display = 'none';
+    page.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+  }
+
+  function setupCheckoutPage() {
     // wire openers
-    checkoutBtn && checkoutBtn.addEventListener('click', (e) => { e.preventDefault(); openCheckoutPage(); });
-    // headerCheckoutBtn may be injected earlier — attach if exists
-    headerCheckoutBtn && headerCheckoutBtn.addEventListener('click', (e) => { e.preventDefault(); openCheckoutPage(); });
+    const footerPayBtn = qs('#checkout-btn');
+    const headerCheckoutBtn = qs('#cart-header-checkout');
+    if (footerPayBtn) footerPayBtn.addEventListener('click', (e) => { e.preventDefault(); openCheckoutPage(); });
+    if (headerCheckoutBtn) headerCheckoutBtn.addEventListener('click', (e) => { e.preventDefault(); openCheckoutPage(); });
 
     // close/cancel
+    const closeBtn = qs('#checkout-close');
+    const cancelBtn = qs('#cf-cancel');
     closeBtn && closeBtn.addEventListener('click', closeCheckoutPage);
     cancelBtn && cancelBtn.addEventListener('click', closeCheckoutPage);
-    page && page.addEventListener('click', (e) => { if (e.target === page) closeCheckoutPage(); });
-    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && page.getAttribute('aria-hidden') === 'false') closeCheckoutPage(); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && qs('#checkout-page')?.getAttribute('aria-hidden') === 'false') closeCheckoutPage(); });
+    qs('#checkout-page') && qs('#checkout-page').addEventListener('click', (e) => { if (e.target === qs('#checkout-page')) closeCheckoutPage(); });
 
-    // input watchers
-    typeIn && typeIn.addEventListener('change', refreshTotals);
-    latIn && latIn.addEventListener('input', refreshTotals);
-    lonIn && lonIn.addEventListener('input', refreshTotals);
+    // watchers
+    qs('#cf-type') && qs('#cf-type').addEventListener('change', refreshCheckoutTotals);
+    qs('#cf-lat') && qs('#cf-lat').addEventListener('input', refreshCheckoutTotals);
+    qs('#cf-lon') && qs('#cf-lon').addEventListener('input', refreshCheckoutTotals);
 
-    // submit handler — basic Paystack inline integration or simulation
-    submitBtn && submitBtn.addEventListener('click', (e) => {
-      e.preventDefault();
+    // keep totals updated periodically (catches cart changes)
+    setInterval(() => { populateOrderLinesForCheckout(); refreshCheckoutTotals(); }, 900);
+
+    // submit handler
+    const submitBtn = qs('#cf-submit');
+    submitBtn && submitBtn.addEventListener('click', async (ev) => {
+      ev.preventDefault();
       submitBtn.disabled = true;
-      const name = nameIn?.value?.trim() || '';
-      const phone = phoneIn?.value?.trim() || '';
-      const email = emailIn?.value?.trim() || '';
-      const type = typeIn?.value || 'delivery';
-      const address = addrIn?.value || '';
-      if (!name || !phone || !email) { alert('Please enter name, phone and email.'); submitBtn.disabled=false; return; }
-      if (type === 'delivery' && !address) { alert('Please provide your delivery address.'); submitBtn.disabled=false; return; }
 
-      const t = computeTotals();
-      const lat = latIn?.value || '';
-      const lon = lonIn?.value || '';
-      const deliveryFee = (type === 'delivery') ? computeDeliveryFee(lat || STORE_COORDS.lat, lon || STORE_COORDS.lon) : 0;
-      const totalAmount = Math.round((t.subtotal || 0) - (t.promoDiscount || 0) + (deliveryFee||0));
-      // Save contact convenience
-      try { localStorage.setItem('wrap_user_name', name); localStorage.setItem('wrap_user_phone', phone); localStorage.setItem('wrap_checkout_email', email); } catch(e){}
+      const name = (qs('#cf-name')?.value || '').trim();
+      const phone = (qs('#cf-phone')?.value || '').trim();
+      const email = (qs('#cf-email')?.value || '').trim();
+      const type = (qs('#cf-type')?.value || 'delivery');
+      const address = (qs('#cf-address')?.value || '').trim();
+      const lat = (qs('#cf-lat')?.value || '').trim();
+      const lon = (qs('#cf-lon')?.value || '').trim();
+      const date = (qs('#cf-date')?.value || '').trim();
+      const time = (qs('#cf-time')?.value || '').trim();
+      const note = (qs('#cf-note')?.value || '').trim();
+      const paymethod = (qs('#cf-paymethod')?.value || 'paystack');
 
-      // If pay with cash => simulate local order
-      const pm = payMethod?.value || 'paystack';
-      if (pm === 'cash') {
-        const order = {
-          id: 'CASH-' + Date.now(),
+      if (!name || !phone || !email) {
+        alert('Please complete your name, phone and email.');
+        submitBtn.disabled = false;
+        return;
+      }
+      if (type === 'delivery' && !address) {
+        alert('Please provide your delivery address.');
+        submitBtn.disabled = false;
+        return;
+      }
+
+      const cartLines = Object.values(window.cart || {}).map(l => ({
+        baseId: l.baseId, title: l.title, unitPrice: l.unitPrice, qty: l.qty, meta: l.meta || {}
+      }));
+      if (!cartLines.length) {
+        alert('Your cart is empty. Add items before checkout.');
+        submitBtn.disabled = false;
+        return;
+      }
+
+      const totals = computeCartTotals();
+      const deliveryFee = (type === 'delivery') ? computeDeliveryFee(parseFloat(lat) || 0, parseFloat(lon) || 0) : 0;
+      const totalAmount = Math.round((totals.subtotal || 0) - (totals.promoDiscount || 0) + deliveryFee);
+
+      // Save name/phone for convenience
+      try { localStorage.setItem('wrap_user_name', name); localStorage.setItem('wrap_user_phone', phone); } catch (e) {}
+
+      if (paymethod === 'cash') {
+        const fakeOrder = {
+          id: 'local-' + Date.now(),
           reference: 'CASH-' + Date.now(),
-          name, phone, email, type, address, lat, lon, note: noteIn?.value||'',
-          cart: Object.values(cart),
-          totals: { subtotal: t.subtotal, promo: t.promoDiscount, delivery: deliveryFee, total: totalAmount },
-          ts: nowIso()
+          name, phone, email, type, address, lat, lon, date, time, note,
+          cart: cartLines,
+          totals: { subtotal: totals.subtotal, delivery: deliveryFee, promo: totals.promoDiscount, total: totalAmount },
+          ts: new Date().toISOString()
         };
-        try { localStorage.setItem(LAST_ORDER_KEY, JSON.stringify(order)); localStorage.setItem(SHOW_CONFIRM_KEY, '1'); } catch(e){}
-        // clear cart and reload so confirmation modal shows
-        clearCart();
+        try {
+          localStorage.setItem('wrap_last_order', JSON.stringify(fakeOrder));
+          localStorage.setItem('wrap_show_confirmation', '1');
+        } catch (e) {}
+        // clear cart and show confirmation after reload
+        window.cart = {};
+        saveCart();
+        renderCart();
         closeCheckoutPage();
         window.location.reload();
         return;
       }
 
-      // paystack inline if available (global PaystackPop)
-      const PAYSTACK_PUBLIC_KEY = window.PAYSTACK_PUBLIC_KEY || 'pk_test_297586e51710e83d3c159bfe71ff45c7e23411fa'; // default set earlier in page
-      if (pm === 'paystack' && window.PaystackPop && PAYSTACK_PUBLIC_KEY) {
-        const ref = 'PSK-' + Date.now() + '-' + Math.floor(Math.random()*9999);
-        const handler = window.PaystackPop.setup({
-          key: PAYSTACK_PUBLIC_KEY,
-          email,
-          amount: totalAmount * 100,
-          currency: 'GHS',
-          ref,
-          onClose: function() {
-            alert('Payment cancelled');
+      // Paystack flow (inline) — if PaystackPop available and key set
+      try {
+        if (paymethod === 'paystack' && PAYSTACK_PUBLIC_KEY && window.PaystackPop) {
+          const ref = 'PSK-' + Date.now() + '-' + Math.floor(Math.random() * 10000);
+          const handler = window.PaystackPop.setup({
+            key: PAYSTACK_PUBLIC_KEY,
+            email: email,
+            amount: Math.round(totalAmount * 100),
+            currency: 'GHS',
+            ref,
+            onClose: function () {
+              alert('Payment cancelled');
+              submitBtn.disabled = false;
+            },
+            callback: function (response) {
+              // treat as success for frontend-only flow
+              const order = {
+                reference: response.reference || ref,
+                name, phone, email, type, address, lat, lon, date, time, note,
+                cart: cartLines,
+                totals: { subtotal: totals.subtotal, delivery: deliveryFee, promo: totals.promoDiscount, total: totalAmount },
+                ts: new Date().toISOString()
+              };
+              try {
+                localStorage.setItem('wrap_last_order', JSON.stringify(order));
+                localStorage.setItem('wrap_show_confirmation', '1');
+              } catch (e) {}
+              window.cart = {};
+              saveCart();
+              renderCart();
+              closeCheckoutPage();
+              window.location.reload();
+            }
+          });
+          handler.openIframe();
+          return;
+        }
+
+        // If Paystack not available, confirm simulation
+        if (paymethod === 'paystack') {
+          const simulate = confirm('Paystack not available. Simulate successful payment for testing? (No money will be charged)');
+          if (!simulate) {
+            alert('Payment cancelled. To use real Paystack, ensure Paystack script and key are available.');
             submitBtn.disabled = false;
-          },
-          callback: function(response) {
-            // success
-            const order = {
-              id: response.reference || ref,
-              reference: response.reference || ref,
-              name, phone, email, type, address, lat, lon, note: noteIn?.value||'',
-              cart: Object.values(cart),
-              totals: { subtotal: t.subtotal, promo: t.promoDiscount, delivery: deliveryFee, total: totalAmount },
-              ts: nowIso()
-            };
-            try { localStorage.setItem(LAST_ORDER_KEY, JSON.stringify(order)); localStorage.setItem(SHOW_CONFIRM_KEY, '1'); } catch(e){}
-            clearCart();
-            closeCheckoutPage();
-            window.location.reload();
+            return;
           }
-        });
-        handler.openIframe();
-        return;
+          const order = {
+            reference: 'SIM-' + Date.now(),
+            name, phone, email, type, address, lat, lon, date, time, note,
+            cart: cartLines,
+            totals: { subtotal: totals.subtotal, delivery: deliveryFee, promo: totals.promoDiscount, total: totalAmount },
+            ts: new Date().toISOString()
+          };
+          try {
+            localStorage.setItem('wrap_last_order', JSON.stringify(order));
+            localStorage.setItem('wrap_show_confirmation', '1');
+          } catch (e) {}
+          window.cart = {};
+          saveCart();
+          renderCart();
+          closeCheckoutPage();
+          window.location.reload();
+          return;
+        }
+      } catch (err) {
+        console.error('checkout error', err);
+        alert('Checkout failed: ' + (err.message || err));
+        submitBtn.disabled = false;
       }
-
-      // fallback: ask to simulate payment
-      const simulate = confirm('Paystack not available. Simulate successful payment for testing? (No real charge)');
-      if (!simulate) { submitBtn.disabled=false; return; }
-      const order = {
-        id: 'SIM-' + Date.now(),
-        reference: 'SIM-' + Date.now(),
-        name, phone, email, type, address, lat, lon, note: noteIn?.value||'',
-        cart: Object.values(cart),
-        totals: { subtotal: t.subtotal, promo: t.promoDiscount, delivery: deliveryFee, total: totalAmount },
-        ts: nowIso()
-      };
-      try { localStorage.setItem(LAST_ORDER_KEY, JSON.stringify(order)); localStorage.setItem(SHOW_CONFIRM_KEY, '1'); } catch(e){}
-      clearCart();
-      closeCheckoutPage();
-      window.location.reload();
     });
-  })();
+  }
 
-  // ---------- Order confirmation modal behavior ----------
-  (function setupOrderConfirmation(){
-    if (!orderConfirmationModal) return;
-    const ocRef = $('#oc-ref');
-    const ocName = $('#oc-name');
-    const ocPhone = $('#oc-phone');
-    const ocEmail = $('#oc-email');
-    const ocType = $('#oc-type');
-    const ocAddress = $('#oc-address');
-    const ocNote = $('#oc-note');
-    const ocTs = $('#oc-ts');
-    const ocLines = $('#oc-lines');
-    const ocTotal = $('#oc-total');
+  // expose openCheckoutPage globally
+  window.openCheckoutPage = openCheckoutPage;
 
-    function fillAndShow(order) {
+  /* -------------------------
+     Order confirmation modal wiring (show if localStorage flag present)
+  ------------------------- */
+  function setupOrderConfirmationModal() {
+    const modal = qs('#order-confirmation-modal');
+    if (!modal) return;
+    const btnOk = qs('#oc-ok');
+    const btnClose = qs('#oc-close');
+    const btnPrint = qs('#oc-print');
+
+    function hideModal() {
+      modal.setAttribute('aria-hidden', 'true');
+      modal.style.display = 'none';
+      document.body.style.overflow = '';
+    }
+
+    function showModal(order) {
       if (!order) return;
-      ocRef && (ocRef.innerText = order.reference || ('ref-'+Math.floor(Math.random()*1000000)));
-      ocName && (ocName.innerText = order.name || '-');
-      ocPhone && (ocPhone.innerText = order.phone || '-');
-      ocEmail && (ocEmail.innerText = order.email || '-');
-      ocType && (ocType.innerText = order.type || '-');
-      ocAddress && (ocAddress.innerText = order.address || '-');
-      ocNote && (ocNote.innerText = order.note || '-');
-      ocTs && (ocTs.innerText = new Date(order.ts || Date.now()).toLocaleString());
-      ocTotal && (ocTotal.innerText = `GHC ${Number(order.totals?.total || 0).toFixed(0)}`);
+      qs('#oc-ref').innerText = order.reference || ('ref-' + Math.floor(Math.random() * 1000000));
+      qs('#oc-name').innerText = order.name || '-';
+      qs('#oc-phone').innerText = order.phone || '-';
+      qs('#oc-email').innerText = order.email || '-';
+      qs('#oc-type').innerText = order.type || '-';
+      qs('#oc-address').innerText = order.address || '-';
+      qs('#oc-note').innerText = order.note || '-';
+      qs('#oc-ts').innerText = new Date(order.ts || Date.now()).toLocaleString();
+      qs('#oc-total').innerText = `GHC ${Number(order.totals?.total || 0).toFixed(0)}`;
 
-      // lines
-      ocLines && (ocLines.innerHTML = '');
+      const ocLines = qs('#oc-lines');
+      ocLines.innerHTML = '';
       const lines = Array.isArray(order.cart) ? order.cart : [];
       if (!lines.length) {
-        ocLines && (ocLines.innerHTML = '<div class="small-muted">No lines recorded.</div>');
+        ocLines.innerHTML = '<div class="small-muted">No line items recorded.</div>';
       } else {
         lines.forEach(l => {
           const div = document.createElement('div');
           div.className = 'oc-line';
-          const title = `<strong>${escapeHtml(l.title||'Item')}</strong>`;
-          const extras = (l.meta && l.meta.addons) ? ('<div class="small-muted">' + escapeHtml(l.meta.addons.map(a=>a.label||a.key).join(', ')) + '</div>') : '';
-          const right = `<div style="text-align:right">${Number(l.qty||1)} × GHC ${Number(l.unitPrice||0).toFixed(0)}<div style="font-weight:900;margin-top:4px">GHC ${ (Number(l.qty||1)*Number(l.unitPrice||0)).toFixed(0) }</div></div>`;
-          div.innerHTML = `<div style="flex:1">${title}${extras}</div><div style="min-width:150px">${right}</div>`;
+          const title = escapeHtml(l.title || l.name || 'Item');
+          const qty = Number(l.qty || 1);
+          const unit = Number(l.unitPrice || 0);
+          div.innerHTML = `<div style="flex:1;"><strong>${title}</strong><div class="small-muted">${(l.meta && l.meta.addons) ? 'Extras: ' + l.meta.addons.map(a => escapeHtml(a.label || a.key || a)).join(', ') : ''}</div></div><div style="text-align:right;min-width:120px;">${qty} × GHC ${unit.toFixed(0)}<div style="font-weight:900;margin-top:4px">GHC ${Math.round(qty * unit).toFixed(0)}</div></div>`;
           ocLines.appendChild(div);
         });
       }
-      orderConfirmationModal.style.display = 'flex';
-      orderConfirmationModal.setAttribute('aria-hidden','false');
+
+      modal.setAttribute('aria-hidden', 'false');
+      modal.style.display = 'flex';
       document.body.style.overflow = 'hidden';
     }
-    function hide() {
-      orderConfirmationModal.style.display = 'none';
-      orderConfirmationModal.setAttribute('aria-hidden','true');
-      document.body.style.overflow = '';
-    }
 
-    ocOk && ocOk.addEventListener('click', () => {
+    btnOk && btnOk.addEventListener('click', () => {
       try {
-        localStorage.removeItem(SHOW_CONFIRM_KEY);
-        localStorage.removeItem(LAST_ORDER_KEY);
-        localStorage.removeItem(CART_KEY);
-        cart = {};
+        localStorage.removeItem('wrap_show_confirmation');
+        localStorage.removeItem('wrap_last_order');
+        localStorage.removeItem(CART_STORAGE_KEY);
+        window.cart = {};
+        saveCart();
         renderCart();
-      } catch(e){}
-      hide();
+      } catch (e) {}
+      hideModal();
       window.location.href = window.location.pathname;
     });
-    ocClose && ocClose.addEventListener('click', () => { hide(); });
+    btnClose && btnClose.addEventListener('click', () => {
+      hideModal();
+    });
 
-    ocPrint && ocPrint.addEventListener('click', () => {
-      // Use the localStorage-last order to print (page-level printer)
+    btnPrint && btnPrint.addEventListener('click', () => {
       try {
-        const raw = localStorage.getItem(LAST_ORDER_KEY);
+        const raw = localStorage.getItem('wrap_last_order');
         const order = raw ? JSON.parse(raw) : null;
-        if (!order) { alert('No order to print'); return; }
-        // open a printable window built in earlier code (simple)
-        const w = window.open('', '_blank', 'width=900,height=1100');
-        if (!w) { alert('Popup blocked. Allow popups to print.'); return; }
-        w.document.write(`<html><head><title>Invoice ${order.reference||''}</title></head><body><pre>${escapeHtml(JSON.stringify(order, null, 2))}</pre></body></html>`);
+        if (!order) { alert('No order data available to print.'); return; }
+        // Open a printable window (simplified)
+        const printableHtml = buildPrintableHtml(order);
+        const w = window.open('', '_blank', 'toolbar=0,location=0,menubar=0,width=900,height=1100');
+        if (!w) { alert('Please allow popups to print.'); return; }
+        w.document.open();
+        w.document.write(printableHtml);
         w.document.close();
         w.focus();
-        setTimeout(()=> { try { w.print(); w.close(); } catch(e){} }, 350);
-      } catch(e) { console.warn(e); alert('Could not print.'); }
+        setTimeout(() => { try { w.print(); } catch (e) { console.warn(e); } }, 300);
+      } catch (err) { console.error(err); alert('Print failed'); }
     });
 
-    // On load, if flag set -> show
+    // show modal on load if flag present
     try {
-      const flag = localStorage.getItem(SHOW_CONFIRM_KEY);
-      if (flag === '1') {
-        const raw = localStorage.getItem(LAST_ORDER_KEY);
+      const showFlag = localStorage.getItem('wrap_show_confirmation');
+      if (showFlag === '1') {
+        const raw = localStorage.getItem('wrap_last_order');
         const order = raw ? JSON.parse(raw) : null;
-        setTimeout(()=> fillAndShow(order), 200);
+        setTimeout(() => showModal(order), 220);
       }
-    } catch(e) { console.warn('order confirm load error', e); }
-  })();
+    } catch (e) { console.warn('order confirm show error', e); }
 
-  // ---------- Suppress legacy blocking alerts on checkout triggers ----------
-  (function suppressLegacyAlerts(){
+    function buildPrintableHtml(order) {
+      const escape = escapeHtml;
+      const lines = Array.isArray(order.cart) ? order.cart : [];
+      let linesHtml = '';
+      let computedSubtotal = 0;
+      if (!lines.length) {
+        linesHtml = '<tr><td colspan="4" style="text-align:center;padding:12px 0;color:#666">No line items recorded.</td></tr>';
+      } else {
+        lines.forEach((l) => {
+          const qty = Number(l.qty || 1);
+          const unit = Number(l.unitPrice || 0);
+          const lineTotal = Math.round(qty * unit);
+          computedSubtotal += lineTotal;
+          const metaParts = [];
+          if (l.meta) {
+            if (Array.isArray(l.meta.addons) && l.meta.addons.length) metaParts.push('Extras: ' + l.meta.addons.map(a => escape(a.label || a.key || a)).join(', '));
+            Object.keys(l.meta).forEach(k => {
+              if (k === 'addons') return;
+              const v = l.meta[k];
+              if (!v) return;
+              if (typeof v === 'object') {
+                if (v.text) metaParts.push(`${escape(k)}: ${escape(v.text)}`);
+                else if (v.label) metaParts.push(`${escape(k)}: ${escape(v.label)}`);
+                else metaParts.push(`${escape(k)}: ${escape(JSON.stringify(v))}`);
+              } else metaParts.push(`${escape(k)}: ${escape(String(v))}`);
+            });
+          }
+          const metaHtml = metaParts.length ? `<div style="font-size:12px;color:#444;margin-top:6px;">${metaParts.join(' • ')}</div>` : '';
+          linesHtml += `<tr><td style="padding:10px 8px; vertical-align:top; border-bottom:1px solid #eee;"><strong>${escape(l.title || 'Item')}</strong>${metaHtml}</td><td style="padding:10px 8px; vertical-align:top; border-bottom:1px solid #eee; text-align:center;">${qty}</td><td style="padding:10px 8px; vertical-align:top; border-bottom:1px solid #eee; text-align:right;">GHC ${Number(unit).toFixed(0)}</td><td style="padding:10px 8px; vertical-align:top; border-bottom:1px solid #eee; text-align:right;">GHC ${lineTotal.toFixed(0)}</td></tr>`;
+        });
+      }
+
+      const totals = order.totals || {};
+      const subtotal = (typeof totals.subtotal !== 'undefined') ? Number(totals.subtotal) : computedSubtotal;
+      const delivery = (typeof totals.delivery !== 'undefined') ? Number(totals.delivery || 0) : Number(totals.delivery || 0);
+      const promoDiscount = (typeof totals.promo !== 'undefined') ? Number(totals.promo || 0) : Number(totals.promoDiscount || 0);
+      const total = (typeof totals.total !== 'undefined') ? Number(totals.total) : Math.max(0, subtotal - (promoDiscount || 0) + (delivery || 0));
+
+      const printable = `<!doctype html><html><head><meta charset="utf-8" /><title>Wrap District — Invoice ${escape(order.reference||'')}</title><style>body{font-family:Arial,Helvetica,sans-serif;color:#222;padding:18px}table{width:100%;border-collapse:collapse}th,td{padding:8px;border-bottom:1px solid #eee}th{text-align:left}</style></head><body><div style="display:flex;align-items:center;gap:12px"><div style="background:linear-gradient(135deg,#FF6A00,#ff8c2b);color:#111;padding:6px 10px;border-radius:8px;font-weight:900">WRAP</div><div><h2 style="margin:0">Wrap District</h2><div style="color:#666">Fresh · Hot · Fast — Tema Community 25</div></div></div><div style="margin-top:12px;display:flex;justify-content:space-between"><div><strong>Customer</strong><div>${escape(order.name||'')}</div><div>${escape(order.phone||'')}</div></div><div><strong>Order</strong><div>Ref: ${escape(order.reference||'')}</div><div>Placed: ${escape(new Date(order.ts||Date.now()).toLocaleString())}</div></div></div><table aria-label="Order lines" style="margin-top:14px"><thead><tr><th style="width:60%">Item & options</th><th style="width:10%;text-align:center">Qty</th><th style="width:15%;text-align:right">Unit</th><th style="width:15%;text-align:right">Line</th></tr></thead><tbody>${linesHtml}</tbody></table><div style="max-width:420px;margin-left:auto;margin-top:12px"><div style="display:flex;justify-content:space-between"><div>Subtotal</div><div>GHC ${Number(subtotal).toFixed(0)}</div></div><div style="display:flex;justify-content:space-between"><div>Delivery</div><div>GHC ${Number(delivery||0).toFixed(0)}</div></div><div style="display:flex;justify-content:space-between"><div>Promo</div><div>-GHC ${Number(promoDiscount||0).toFixed(0)}</div></div><div style="display:flex;justify-content:space-between;font-weight:900;margin-top:8px"><div>Total</div><div>GHC ${Number(total).toFixed(0)}</div></div></div></body></html>`;
+      return printable;
+    }
+  }
+
+  /* -------------------------
+     Promo carousel (bottom promo section)
+  ------------------------- */
+  function setupPromoCarousel() {
+    const pcSlides = qsa('.pc-slide');
+    const pcDots = qsa('.pc-dot');
+    const prevBtn = qs('.promo-controls .slide-prev');
+    const nextBtn = qs('.promo-controls .slide-next');
+    if (!pcSlides.length) return;
+    let current = 0;
+    let autoTimer = null;
+    const AUTO_DELAY = 6000;
+
+    function showSlide(idx) {
+      idx = (idx + pcSlides.length) % pcSlides.length;
+      pcSlides.forEach((s, i) => {
+        s.classList.toggle('is-active', i === idx);
+        s.setAttribute('aria-hidden', i === idx ? 'false' : 'true');
+      });
+      pcDots.forEach((d, i) => d.classList.toggle('is-active', i === idx));
+      current = idx;
+    }
+    function nextSlide() { showSlide(current + 1); }
+    function prevSlide() { showSlide(current - 1); }
+    function startAuto() { stopAuto(); autoTimer = setInterval(nextSlide, AUTO_DELAY); }
+    function stopAuto() { if (autoTimer) { clearInterval(autoTimer); autoTimer = null; } }
+
+    nextBtn && nextBtn.addEventListener('click', (e) => { e.preventDefault(); nextSlide(); startAuto(); });
+    prevBtn && prevBtn.addEventListener('click', (e) => { e.preventDefault(); prevSlide(); startAuto(); });
+    pcDots.forEach(d => d.addEventListener('click', (e) => { e.preventDefault(); showSlide(Number(d.dataset.index || d.getAttribute('data-index'))); startAuto(); }));
+
+    showSlide(0);
+    startAuto();
+
+    // promo detail toggles
+    qsa('[data-action="promo-details"]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const target = btn.dataset.target;
+        const more = qs('#promo-more');
+        const moreContent = qs('#promo-more-content');
+        if (!more || !moreContent) return;
+        let text = '';
+        if (target === 'shawarma') text = 'Buy 2 Shawarmas on Tuesdays and get the 3rd free. Add qualifying shawarmas to your cart and the discount will apply automatically at checkout.';
+        else if (target === 'fries') text = 'Loaded Fries promotion: when you purchase qualifying Loaded Fries during promo hours, a free Coke will be added to your cart automatically.';
+        else text = 'Promo details unavailable.';
+        moreContent.innerText = text;
+        more.classList.toggle('hidden');
+        btn.setAttribute('aria-expanded', String(!more.classList.contains('hidden')));
+      });
+    });
+  }
+
+  /* -------------------------
+     Small helpers & initial wiring
+  ------------------------- */
+  function setupMisc() {
+    // footer order button: open cart if has items else scroll to menu
+    const orderBtn = qs('#footer-order');
+    const menuAnchor = qs('#menu');
+    const cartToggle = qs('#cart-toggle');
+    orderBtn && orderBtn.addEventListener('click', (e) => {
+      try {
+        const cartCount = Number((qs('#cart-count') || {}).innerText) || 0;
+        if (cartCount > 0 && cartToggle) cartToggle.click();
+        else if (menuAnchor) menuAnchor.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        else window.location.hash = '#menu';
+      } catch (err) {
+        if (menuAnchor) menuAnchor.scrollIntoView({ behavior: 'smooth' });
+      }
+    });
+
+    // footer locate button: scroll to contact
+    const locBtn = qs('#footer-locate');
+    locBtn && locBtn.addEventListener('click', () => {
+      const contact = qs('#contact');
+      if (contact) contact.scrollIntoView({ behavior: 'smooth' });
+      else window.location.hash = '#contact';
+    });
+
+    // external WA link: ensure noopener noreferrer
+    const wa = qs('#footer-wa');
+    if (wa) wa.setAttribute('rel', 'noopener noreferrer');
+
+    // hamburger mobile nav wiring
+    setupMobileNav();
+
+    // Menu tabs wiring
+    setupMenuTabs();
+
+    // cart drawer
+    setupCartDrawer();
+
+    // add buttons
+    setupMenuAddButtons();
+
+    // product modal
+    setupProductModal();
+
+    // promo countdown + apply
+    setupPromoCountdown();
+
+    // Preorder modal
+    setupPreorderModal();
+
+    // checkout
+    setupCheckoutPage();
+
+    // promo carousel (if present)
+    setupPromoCarousel();
+
+    // order confirmation modal
+    setupOrderConfirmationModal();
+
+    // render persisted cart
+    loadCart();
+    renderCart();
+  }
+
+  /* -------------------------
+     On DOM ready initialize everything
+  ------------------------- */
+  document.addEventListener('DOMContentLoaded', () => {
     try {
-      const _alert = window.alert;
-      const _confirm = window.confirm;
-      window.alert = function(msg){
-        try { if (typeof msg === 'string' && msg.includes('ORDER SUMMARY')) { console.info('Suppressed alert'); return; } } catch(e){}
-        return _alert.apply(this, arguments);
-      };
-      window.confirm = function(msg){
-        try { if (typeof msg === 'string' && msg.includes('ORDER SUMMARY')) { console.info('Suppressed confirm'); return true; } } catch(e){}
-        return _confirm.apply(this, arguments);
-      };
-    } catch(e){}
-  })();
-
-  // ---------- Attach interceptors to checkout triggers (robust) ----------
-  (function attachCheckoutInterceptors(){
-    const selectors = [
-      '#checkout-btn',
-      '#cart-header-checkout',
-      '.cart-header .cart-header-checkout',
-      '[data-action="checkout"]',
-      '[data-action="pay"]',
-      '.cart-footer .btn.primary',
-      '#cart-toggle'
-    ];
-    function safeOpenCheckout() {
-      if (typeof openCheckoutPage === 'function') { try { openCheckoutPage(); return; } catch(e){} }
-      const footer = document.getElementById('checkout-btn');
-      if (footer) { footer.click(); return; }
-      const cart = document.getElementById('cart-drawer');
-      if (cart) { cart.style.display='block'; cart.setAttribute('aria-hidden','false'); document.body.style.overflow='hidden'; }
+      setupMisc();
+    } catch (err) {
+      console.error('Initialization error', err);
     }
-    function attachInterceptor(el){
-      if (!el) return;
-      try { if (el.getAttribute && el.getAttribute('onclick')) el.removeAttribute('onclick'); } catch(e){}
-      el.addEventListener('click', function(ev){
-        ev.preventDefault();
-        ev.stopImmediatePropagation();
-        const oldAlert = window.alert, oldConfirm = window.confirm;
-        try {
-          window.alert = function(){};
-          window.confirm = function(){ return true; };
-          safeOpenCheckout();
-        } catch(e) { console.error(e); }
-        finally { try { window.alert = oldAlert; window.confirm = oldConfirm; } catch(e){} }
-      }, true);
-    }
-    function attachAll() {
-      selectors.forEach(sel => Array.from(document.querySelectorAll(sel)).forEach(el => attachInterceptor(el)));
-    }
-    attachAll();
-    const mo = new MutationObserver(() => attachAll());
-    mo.observe(document.body, { childList: true, subtree: true });
-  })();
-
-  // ---------- Menu item modal + "details" buttons already wired above; Promo apply buttons ----------
-  (function promoApplyWiring(){
-    promoApplyButtons.forEach(b => {
-      b.addEventListener('click', (e) => {
-        const code = b.dataset.promoCode || b.getAttribute('data-promo-code') || 'PROMO';
-        try { localStorage.setItem('wrap_applied_promo', code); } catch(e){}
-        showToast('Promo applied — it will be reflected at checkout');
-        // update UI if necessary
-        renderCart();
-      });
-    });
-  })();
-
-  // ---------- Small helper: initialize rendering and UI on load ----------
-  document.addEventListener('DOMContentLoaded', function(){
-    // initial render
-    renderCart();
-
-    // wire product modal openers and adders were attached earlier, ensure any add buttons in menu run addItemFromMenu if not intercepted
-    // some add buttons might be simple forms — we already attached `.add-btn` clicks earlier
-
-    // wire promo pre-order buttons (in promo details)
-    $$('.promo-cta-row .btn, button[data-action="preorder-promo"]').forEach(b => {
-      b.addEventListener('click', (e) => {
-        const target = document.querySelector('#preorder-modal');
-        if (target) {
-          target.style.display = 'flex';
-          target.setAttribute('aria-hidden','false');
-          document.body.style.overflow = 'hidden';
-        }
-      });
-    });
-
-    // wire footer order: scroll to menu or open cart
-    const footerOrder = $('#footer-order');
-    const menuAnchor = $('#menu');
-    footerOrder && footerOrder.addEventListener('click', (e) => {
-      const ccount = Number($('#cart-count')?.innerText || '0');
-      if (ccount > 0 && cartToggle) cartToggle.click();
-      else if (menuAnchor) menuAnchor.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    });
-
-    // wire footer-locate to scroll to contact
-    const footerLocate = $('#footer-locate');
-    const contact = $('#contact');
-    footerLocate && footerLocate.addEventListener('click', ()=> { if (contact) contact.scrollIntoView({ behavior:'smooth', block:'start' }); });
-
-    // wire footer Whatsapp rel (defensive)
-    const wa = $('#footer-wa');
-    if (wa) wa.setAttribute('rel','noopener noreferrer');
-
-    // ensure renderCart runs on start
-    renderCart();
   });
 
-  // ---------- Utilities that might be referenced globally ----------
+  /* -------------------------
+     Expose a few utilities onto window for compatibility with other inline code
+  ------------------------- */
+  window.openPreorderModal = openPreorderModal;
+  window.openCheckoutPage = openCheckoutPage;
   window.renderCart = renderCart;
-  window.computeCartTotals = computeTotals;
-  window.openCheckoutPage = function(){ const el = document.getElementById('checkout-btn'); if (el) el.click(); else { try { const fn = document.querySelector('#checkout-btn'); } catch(e){} } };
-  window.resetCheckoutScroll = function(){ try { const p = document.getElementById('checkout-page'); if (p) p.scrollTop = 0; const inner = document.getElementById('checkout-inner'); if (inner) inner.scrollTop = 0; } catch(e){} };
+  window.computeCartTotals = computeCartTotals;
+  window.addToCart = addToCart;
 
-  // ---------- small helper for escapeHtml in closures ----------
-  function escapeHtmlLocal(s){ return escapeHtml(s); }
-
-})(); // end unified IIFE
+})(); 
 </script>
 
+  
 </html>
   
