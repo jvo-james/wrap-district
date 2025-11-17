@@ -6074,6 +6074,93 @@ body.cart-open::before {
   });
 })();
 </script>
+<script>
+(function(){
+  document.addEventListener('DOMContentLoaded', function(){
+    const cartToggle = document.getElementById('cart-toggle');
+    const cartDrawer = document.getElementById('cart-drawer');
+    const cartClose  = document.getElementById('cart-close');
+
+    if (!cartToggle || !cartDrawer) return;
+
+    // Open the cart drawer
+    function openCart(){
+      // Ensure visible for CSS to transition
+      cartDrawer.style.display = 'block';
+      // force reflow so transform/opacity transitions run reliably
+      void cartDrawer.offsetWidth;
+      cartDrawer.setAttribute('aria-hidden', 'false');
+      cartDrawer.style.transform = 'translateX(0)';
+      cartDrawer.style.opacity = '1';
+      document.body.style.overflow = 'hidden'; // prevent background scroll
+      cartToggle.setAttribute('aria-expanded','true');
+      // move focus into the drawer for accessibility
+      try { if (cartClose) cartClose.focus(); } catch(e){/*ignore*/ }
+    }
+
+    // Close the cart drawer
+    function closeCart(){
+      cartDrawer.setAttribute('aria-hidden', 'true');
+      cartDrawer.style.transform = 'translateX(110%)';
+      cartDrawer.style.opacity = '0';
+     cartToggle.setAttribute('aria-expanded','false');
+     // after the transition finishes hide the element to restore the original state
+      setTimeout(function(){
+        // only hide if still closed (avoid race)
+        if (cartDrawer.getAttribute('aria-hidden') === 'true') {
+          cartDrawer.style.display = 'none';
+          // remove inline transform/opacity so CSS rules are the source of truth
+          cartDrawer.style.removeProperty('transform');
+          cartDrawer.style.removeProperty('opacity');
+        }
+      }, 480); // matches your CSS transition timings (420ms + small buffer)
+      document.body.style.overflow = '';
+      try { cartToggle.focus(); } catch(e){/*ignore*/ }
+    }
+
+    // Toggle when cart button clicked
+    cartToggle.addEventListener('click', function(ev){
+      ev.stopPropagation();
+      const isOpen = cartDrawer.getAttribute('aria-hidden') === 'false';
+      if (isOpen) closeCart(); else openCart();
+    });
+
+    // Close via close button
+    if (cartClose) cartClose.addEventListener('click', function(ev){
+      ev.stopPropagation();
+      closeCart();
+    });
+
+    // Close on Escape
+    document.addEventListener('keydown', function(ev){
+      if (ev.key === 'Escape' && cartDrawer.getAttribute('aria-hidden') === 'false') {
+        closeCart();
+      }
+    });
+
+    // Close when clicking outside the drawer (capture phase to be robust)
+    document.addEventListener('click', function(ev){
+      if (cartDrawer.getAttribute('aria-hidden') === 'false') {
+        if (!cartDrawer.contains(ev.target) && !cartToggle.contains(ev.target)) {
+          closeCart();
+        }
+      }
+    }, true);
+
+    // Ensure initial state (in case some other script left inline styles)
+    // If aria-hidden is "false" on load, make it visible
+    if (cartDrawer.getAttribute('aria-hidden') === 'false') {
+      // make sure CSS + inline style are consistent
+      cartDrawer.style.display = 'block';
+      cartDrawer.style.transform = 'translateX(0)';
+      cartDrawer.style.opacity = '1';
+      document.body.style.overflow = 'hidden';
+      cartToggle.setAttribute('aria-expanded','true');
+    }
+  });
+})();
+</script>
+
 
 </html>
   
