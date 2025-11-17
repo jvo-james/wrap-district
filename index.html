@@ -2599,9 +2599,9 @@ a:focus, button:focus { outline: 3px solid rgba(255,204,51,0.10); outline-offset
   </div>
 
   <div class="footer-actions" style="margin-left:12px;">
-    <button id="checkout-btn" class="btn primary" data-action="checkout" style="min-width:120px;">
-      <i class="fa fa-credit-card"></i> Pay
-    </button>
+   <button id="checkout-btn" type="button" class="btn primary" data-action="checkout" style="min-width:120px;">
+  <i class="fa fa-credit-card"></i> Pay
+</button>
     <button id="clear-cart" class="btn ghost" data-action="clear" style="min-width:80px;">
       <i class="fa fa-trash"></i>
     </button>
@@ -3176,6 +3176,256 @@ a:focus, button:focus { outline: 3px solid rgba(255,204,51,0.10); outline-offset
 
 .toast.wrap-toast { position:fixed; left:50%; transform:translateX(-50%); bottom:18px; z-index:4000; background:rgba(0,0,0,0.85); color:#fff; padding:10px 14px; border-radius:999px; font-weight:800; display:none; }
 .toast.wrap-toast.show { display:block; animation: toast-in 320ms cubic-bezier(.2,.9,.3,1); }
+
+  /* ========== Cart icon & badge styles ========== */
+.cart-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  position: relative;
+  font: inherit;
+  color: inherit;
+}
+
+.cart-icon-btn:focus { outline: 2px solid rgba(0,0,0,0.12); outline-offset: 2px; }
+
+.cart-icon-svg { width: 20px; height: 20px; display:block; }
+
+.cart-badge {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 18px;
+  text-align: center;
+  background: var(--gold-500, #FFBF00);
+  color: #000;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  transform-origin: center;
+  transition: transform .18s cubic-bezier(.2,.9,.3,1);
+  will-change: transform;
+  pointer-events: none;
+}
+
+/* small pulse when count changes */
+.cart-badge.pulse {
+  transform: scale(1.22);
+}
+
+/* small responsive adjustments */
+@media (max-width: 640px) {
+  .cart-icon-btn { padding: 6px; border-radius: 8px; }
+  .cart-icon-svg { width: 18px; height: 18px; }
+  .cart-badge { top: 3px; right: 3px; min-width:16px; height:16px; font-size:10px; line-height:16px; }
+}
+/* ========== Responsive media: drop-in ========== */
+/* Root responsive variables (safe to override) */
+:root{
+  --hero-padding-lg: 64px;
+  --hero-padding-md: 40px;
+  --hero-padding-sm: 20px;
+  --hero-gap-lg: 36px;
+  --hero-gap-sm: 18px;
+  --hero-max-width: 1200px;
+  --panel-radius: 14px;
+}
+
+/* Smooth responsive type that scales between min and max */
+.hero-title {
+  font-size: clamp(1.6rem, 4vw, 2.6rem); /* adjust to taste */
+  line-height: 1.05;
+  margin: 0 0 0.6rem 0;
+}
+.hero-subtitle {
+  font-size: clamp(1rem, 2.2vw, 1.125rem);
+  line-height: 1.4;
+  margin: 0 0 1rem 0;
+}
+
+/* Hero container (desktop behavior: side-by-side) */
+.hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--hero-gap-lg);
+  padding: var(--hero-padding-lg);
+  max-width: var(--hero-max-width);
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+/* hero content + image blocks */
+.hero .hero-content { flex: 1 1 48%; min-width: 280px; }
+.hero .hero-media   { flex: 1 1 48%; min-width: 250px; display:flex; align-items:center; justify-content:center; }
+
+/* ensure images scale well */
+.hero .hero-media img, .hero .hero-media video {
+  max-width: 100%;
+  height: auto;
+  display:block;
+  border-radius: 12px;
+  object-fit: cover;
+}
+
+/* Call-to-action styling (keeps nice tappable area on mobile) */
+.hero .cta {
+  display:inline-flex;
+  align-items:center;
+  gap:10px;
+  padding: 12px 18px;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 1rem;
+  white-space: nowrap;
+}
+
+/* Prevent overflow of long copy/buttons */
+.hero * { word-break: break-word; }
+
+/* Modal / drawer baseline */
+.modal,
+.drawer {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 1200;
+}
+.modal.open,
+.drawer.open {
+  display: flex;
+}
+.modal .modal-content,
+.drawer .drawer-content {
+  width: min(720px, 96%);
+  max-height: calc(100vh - 48px);
+  overflow: auto;
+  border-radius: var(--panel-radius);
+  padding: 20px;
+  box-sizing: border-box;
+  background: var(--panel, rgba(255,255,255,0.02));
+  -webkit-overflow-scrolling: touch;
+}
+
+/* modal close button */
+.modal .close, .drawer .close {
+  position: absolute;
+  right: 12px;
+  top: 12px;
+  background: transparent;
+  border: none;
+  font-size: 18px;
+  padding: 8px;
+  border-radius: 8px;
+}
+
+/* cart icon adjustments (mobile) */
+.cart-icon-btn {
+  padding: 8px;
+  border-radius: 10px;
+  font-size: 15px;
+}
+.cart-badge {
+  min-width: 18px;
+  height: 18px;
+  font-size: 11px;
+  line-height: 18px;
+  top: 4px;
+  right: 4px;
+}
+
+/* ===== Breakpoints ===== */
+/* Medium tablets / small laptops */
+@media (max-width: 900px) {
+  .hero {
+    padding: var(--hero-padding-md);
+    gap: calc(var(--hero-gap-lg) * 0.7);
+  }
+  .hero .hero-content { padding-right: 12px; }
+  .hero .hero-media   { padding-left: 12px; }
+  .hero-title { font-size: clamp(1.5rem, 5vw, 2.2rem); }
+}
+
+/* Mobile phones: keep layout, just scale down and stack if necessary */
+@media (max-width: 640px) {
+  .hero {
+    /* keep same order visually but stack - looks like desktop but scaled */
+    flex-direction: column-reverse; /* image below content — preserves visual flow on narrow screens */
+    align-items: stretch;
+    gap: var(--hero-gap-sm);
+    padding: var(--hero-padding-sm);
+  }
+
+  /* make the hero look exactly like desktop but smaller:
+     - reduce gaps/paddings, shrink image & text proportionally */
+  .hero .hero-content,
+  .hero .hero-media {
+    flex: 0 0 auto;
+    width: 100%;
+  }
+
+  .hero .hero-media img {
+    border-radius: 10px;
+    max-height: 42vw; /* keeps images from dominating on tall phones */
+    width: 100%;
+    object-fit: cover;
+  }
+
+  .hero .cta {
+    width: 100%;
+    justify-content: center;
+    padding: 12px;
+    font-size: 1rem;
+    border-radius: 10px;
+  }
+
+  /* keep the cart in the header but smaller and tappable */
+  .cart-icon-btn {
+    padding: 6px;
+    border-radius: 8px;
+  }
+  .cart-badge { top: 6px; right: 6px; min-width: 16px; height: 16px; font-size: 10px; }
+
+  /* modals: full-screen friendly on mobile */
+  .modal .modal-content,
+  .drawer .drawer-content {
+    width: 100%;
+    max-height: 100vh;
+    height: 100%;
+    border-radius: 0;
+    padding: calc(env(safe-area-inset-top) + 16px) 16px calc(env(safe-area-inset-bottom) + 20px);
+    align-self: flex-end;
+  }
+
+  /* ensure body isn't pushed by fixed items */
+  html, body { height: 100%; min-height: 100%; }
+}
+
+/* Extra small phones */
+@media (max-width: 420px) {
+  .hero-title { font-size: clamp(1.25rem, 5.5vw, 1.8rem); }
+  .hero-subtitle { font-size: clamp(.95rem, 3.8vw, 1.0rem); }
+  .hero { padding-left: 14px; padding-right: 14px; }
+  .hero .hero-media img { max-height: 48vw; }
+}
+
+/* Accessibility: trap focus visually for modals */
+.modal[aria-hidden="false"] { display:flex; }
 
 </style>
 
@@ -6008,6 +6258,412 @@ body.cart-open::before {
     });
   })();
 
+})();
+</script>
+  <script>
+/* Fix: prevent cart drawer auto-opening on page refresh.
+   Paste this at the end of the body (after your other scripts) */
+(function(){
+  document.addEventListener('DOMContentLoaded', function(){
+    const cart = document.getElementById('cart-drawer');
+    if (!cart) return;
+
+    // Ensure cart is visually hidden and aria state is closed
+    cart.style.display = 'none';
+    cart.setAttribute('aria-hidden','true');
+    // keep transform/opacity consistent with your CSS hidden state
+    cart.style.transform = 'translateX(110%)';
+    cart.style.opacity = '0';
+    // allow page scrolling
+    try { document.body.style.overflow = ''; } catch(e){}
+
+    // Clear any localStorage flags that some flows might use to auto-open the cart
+    try {
+      localStorage.removeItem('wrap_open_cart');
+      localStorage.removeItem('wrap_show_cart');
+      // also remove any order-confirmation auto-open keys you don't want
+      // (only if you know you don't rely on them)
+      // localStorage.removeItem('wrap_show_confirmation');
+    } catch(e){ /* ignore storage errors */ }
+
+    // Defensive: if another script flips aria-hidden to false immediately after load,
+    // revert that automatic change. We stop observing after 350ms so legitimate later opens work.
+    let handled = false;
+    try {
+      const mo = new MutationObserver(function(muts){
+        if (handled) return;
+        muts.forEach(m => {
+          if (m.type === 'attributes') {
+            const ah = cart.getAttribute('aria-hidden');
+            if (ah === 'false') {
+              // revert the unwanted open
+              cart.setAttribute('aria-hidden','true');
+              cart.style.display = 'none';
+              cart.style.transform = 'translateX(110%)';
+              cart.style.opacity = '0';
+              handled = true;
+            }
+          }
+        });
+      });
+      mo.observe(cart, { attributes: true, attributeFilter: ['aria-hidden','style'] });
+      setTimeout(() => { try { mo.disconnect(); } catch(e){} }, 350);
+    } catch (e) { /* MutationObserver not available => skip */ }
+  });
+})();
+</script>
+<script>
+
+(function(){
+  document.addEventListener('DOMContentLoaded', function(){
+
+    function openCheckoutSafe(){
+      // preferred: direct function that builds the in-page checkout
+      if (typeof openCheckoutPage === 'function') {
+        try { openCheckoutPage(); return; } catch(e){ console.warn('openCheckoutPage error', e); }
+      }
+      // fallback: if checkout-full modal exists, open it
+      const checkoutFull = document.getElementById('checkout-full-modal');
+      if (checkoutFull) { checkoutFull.setAttribute('aria-hidden','false'); checkoutFull.style.display = 'flex'; document.body.style.overflow='hidden'; return; }
+
+      // last fallback: open cart drawer so user can at least see cart
+      const cart = document.getElementById('cart-drawer');
+      if (cart) { cart.style.display = 'block'; cart.setAttribute('aria-hidden','false'); document.body.style.overflow = 'hidden'; return; }
+
+      // if nothing else, log for debugging
+      console.warn('openCheckoutSafe: no checkout UI available.');
+      alert('Checkout is not ready. Please try again.');
+    }
+
+    // elements we want to guarantee work
+    const selectors = [
+      '#checkout-btn',                // footer Pay
+      '#cart-header-checkout',        // header checkout (if present)
+      '.cart-footer .btn.primary',    // any primary buttons in cart footer
+      '[data-action="checkout"]',     // fallback selectors
+      '[data-action="pay"]'
+    ];
+
+    selectors.forEach(sel => {
+      Array.from(document.querySelectorAll(sel)).forEach(el => {
+        try {
+          // ensure it behaves like a button
+          if (el.tagName === 'BUTTON' && !el.hasAttribute('type')) el.setAttribute('type','button');
+
+          // remove any inline onclick attribute that might interfere
+          if (el.getAttribute && el.getAttribute('onclick')) el.removeAttribute('onclick');
+
+          // remove prior capturing handlers that might block (defensive)
+          el.addEventListener('click', function handler(e){
+            e.preventDefault();
+            e.stopPropagation && e.stopPropagation();
+            // run the safe opener
+            openCheckoutSafe();
+          }, { passive: false, capture: true });
+        } catch (err) {
+          console.warn('bind checkout btn failed for', sel, err);
+        }
+      });
+    });
+
+    // Also delegate for future elements added dynamically
+    document.body.addEventListener('click', function(e){
+      const t = e.target.closest && e.target.closest(selectors.join(','));
+      if (!t) return;
+      e.preventDefault();
+      e.stopPropagation && e.stopPropagation();
+      openCheckoutSafe();
+    }, { passive: false });
+  });
+})();
+</script>
+
+<script>
+(function(){
+  // ======== Config ========
+  const HEADER_SELECTOR_CANDIDATES = ['.site-header', 'header', '.topbar', '.navbar', '.header'];
+  const CART_DRAWER_IDS = ['cart-drawer', 'cartDrawer', 'drawer-cart', 'cart-drawer-modal'];
+  const POLL_INTERVAL_MS = 1500; // fallback poll interval
+
+  // ======== Utility: robustly get cart count from common places ========
+  function parseCartObjectCount(obj) {
+    try {
+      if (!obj) return 0;
+      // If array of items
+      if (Array.isArray(obj)) return obj.length;
+      // If object with 'items' array
+      if (Array.isArray(obj.items)) {
+        // sum quantities if present
+        return obj.items.reduce((s, it) => s + (Number(it.quantity || it.qty || 1) || 0), 0);
+      }
+      // If object is mapping of id -> qty
+      if (typeof obj === 'object') {
+        const values = Object.values(obj);
+        if (values.every(v => typeof v === 'number')) return values.reduce((a,b)=>a+b,0);
+      }
+    } catch(e){ console.warn('parseCartObjectCount error', e); }
+    return 0;
+  }
+
+  function tryGetCartFromLocalStorage() {
+    const keys = ['cart','cartItems','shoppingCart','CART','myCart'];
+    for (const k of keys) {
+      try {
+        const raw = localStorage.getItem(k);
+        if (!raw) continue;
+        const parsed = JSON.parse(raw);
+        const n = parseCartObjectCount(parsed);
+        if (n > 0) return n;
+      } catch(e){ /* ignore parse errors */ }
+    }
+    return null;
+  }
+
+  function tryCountFromDOM() {
+    // If the app renders cart items into the DOM, count them
+    const selectors = ['.cart-item', '.cart-row', '.cart-list .item', '[data-cart-item]'];
+    for (const s of selectors) {
+      const nodes = document.querySelectorAll(s);
+      if (nodes && nodes.length) return nodes.length;
+    }
+    return 0;
+  }
+
+  function getCartCount() {
+    // 1. If page/app exposes a known accessor
+    try {
+      if (typeof window.getCartCount === 'function') {
+        const r = Number(window.getCartCount());
+        if (!isNaN(r)) return r;
+      }
+      if (window.cart && (Array.isArray(window.cart.items) || typeof window.cart === 'object')) {
+        const v = parseCartObjectCount(window.cart);
+        if (v) return v;
+      }
+      if (window.cartItems && Array.isArray(window.cartItems)) return window.cartItems.length;
+      if (window.CART && window.CART.items) {
+        const v = parseCartObjectCount(window.CART);
+        if (v) return v;
+      }
+      // 2. Try localStorage
+      const ls = tryGetCartFromLocalStorage();
+      if (ls !== null) return ls;
+      // 3. DOM fallback
+      const domCount = tryCountFromDOM();
+      if (domCount) return domCount;
+    } catch (e) {
+      console.warn('getCartCount error', e);
+    }
+    return 0;
+  }
+
+  // ======== Create or find cart button in header ========
+  function createCartButton() {
+    // find header
+    let header = null;
+    for (const sel of HEADER_SELECTOR_CANDIDATES) {
+      header = document.querySelector(sel);
+      if (header) break;
+    }
+    if (!header) {
+      // fallback to top of body
+      header = document.body;
+    }
+
+    // check existing button by id or selector
+    let btn = document.querySelector('#cart-icon-btn') || document.querySelector('.cart-icon-btn') || null;
+    if (btn) return btn;
+
+    // Build button
+    btn = document.createElement('button');
+    btn.id = 'cart-icon-btn';
+    btn.className = 'cart-icon-btn';
+    btn.type = 'button';
+    btn.setAttribute('aria-label', 'Open cart (0)');
+    btn.setAttribute('title', 'Cart');
+    btn.setAttribute('data-role','cart-toggle');
+
+    // Simple cart SVG + badge
+    btn.innerHTML = `
+      <svg class="cart-icon-svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d="M7 4h-2l-1 2h2l2.68 7.39a2 2 0 0 0 1.9 1.36h7.36l.96-3.62A1 1 0 0 0 18.98 10H9.4" stroke="currentColor" stroke-width="1.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="10" cy="20" r="1" />
+        <circle cx="18" cy="20" r="1" />
+      </svg>
+      <span class="cart-badge" aria-hidden="true">0</span>
+    `;
+
+    // Put it into header: prefer end of header
+    try {
+      // try to attach into a right-side container if present
+      const right = header.querySelector('.header-right, .nav-actions, .top-actions, .header-actions');
+      if (right) right.appendChild(btn);
+      else header.appendChild(btn);
+    } catch (e) {
+      document.body.appendChild(btn);
+    }
+
+    return btn;
+  }
+
+  // ======== Open cart drawer / fallback ========
+  function openCartUI() {
+    // preferred: call the site's exposed methods if any
+    const tries = [
+      () => (typeof openCartDrawer === 'function' && openCartDrawer()),
+      () => (typeof openCart === 'function' && openCart()),
+      () => (typeof toggleCart === 'function' && toggleCart()),
+      () => (typeof showCart === 'function' && showCart()),
+    ];
+    for (const fn of tries) {
+      try {
+        const r = fn();
+        if (r !== undefined) return; // assume it worked
+      } catch(e){ /* ignore and continue */ }
+    }
+    // DOM-based attempts
+    for (const id of CART_DRAWER_IDS) {
+      const el = document.getElementById(id);
+      if (el) {
+        el.style.display = 'block';
+        el.setAttribute('aria-hidden','false');
+        el.focus && el.focus();
+        return;
+      }
+    }
+    // fallback: open checkout page if that's available
+    if (typeof openCheckoutPage === 'function') {
+      try { openCheckoutPage(); return; } catch(e){ /* ignore */ }
+    }
+    // last resort: show alert
+    alert('Opening cart...');
+  }
+
+  // ======== Badge update & animation ========
+  let lastCount = -1;
+  let pulseTimeout = null;
+  function updateBadge(elBadge) {
+    if (!elBadge) return;
+    const count = getCartCount();
+    if (count === lastCount) return;
+    lastCount = count;
+    elBadge.textContent = count > 99 ? '99+' : String(count);
+    const btn = elBadge.closest('.cart-icon-btn');
+    if (btn) btn.setAttribute('aria-label', `Open cart (${count})`);
+    // pulse animation
+    elBadge.classList.add('pulse');
+    clearTimeout(pulseTimeout);
+    pulseTimeout = setTimeout(()=> elBadge.classList.remove('pulse'), 220);
+  }
+
+  // ======== Wrap common "add to cart" functions where present to auto-update badge ========
+  function wrapIfFunction(name) {
+    try {
+      const orig = window[name];
+      if (typeof orig === 'function') {
+        window[name] = function wrapped(...args) {
+          const res = orig.apply(this, args);
+          // emit event or call update after a microtask
+          setTimeout(()=> window.dispatchEvent(new CustomEvent('cart:updated')), 20);
+          return res;
+        };
+      }
+    } catch(e){ /* no-op */ }
+  }
+
+  // ======== Initialization ========
+  function initCartIcon() {
+    const btn = createCartButton();
+    const badge = btn.querySelector('.cart-badge');
+
+    // click handler
+    btn.addEventListener('click', function(e){
+      e.preventDefault();
+      openCartUI();
+    }, { passive: false });
+
+    // update on load
+    updateBadge(badge);
+
+    // listen for custom events that your app might dispatch
+    window.addEventListener('cart:updated', ()=> updateBadge(badge));
+    // storage event to catch updates from other tabs
+    window.addEventListener('storage', ()=> updateBadge(badge));
+
+    // attempt to wrap common functions so the badge refreshes
+    ['addToCart','addItemToCart','updateCart','removeFromCart','setCart'].forEach(wrapIfFunction);
+
+    // MutationObserver: if the cart DOM changes, update
+    const observer = new MutationObserver(() => updateBadge(badge));
+    observer.observe(document.body, { childList: true, subtree: true });
+
+    // Poll fallback (in case app doesn't emit events)
+    setInterval(()=> updateBadge(badge), POLL_INTERVAL_MS);
+  }
+
+  // Wait for DOM and then init
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initCartIcon);
+  } else {
+    initCartIcon();
+  }
+})();
+</script>
+<!-- ========== Small JS helper: modal scroll lock & close-by-esc ========== -->
+<script>
+(function(){
+  // Simple helpers if your modal uses .modal and toggles .open / aria-hidden.
+  function lockBody(lock) {
+    if (lock) {
+      document.documentElement.style.overflow = 'hidden';
+      document.body.style.overflow = 'hidden';
+      document.body.style.paddingRight = window.innerWidth - document.documentElement.clientWidth + 'px';
+    } else {
+      document.documentElement.style.overflow = '';
+      document.body.style.overflow = '';
+      document.body.style.paddingRight = '';
+    }
+  }
+
+  document.addEventListener('click', function(e){
+    // close modal on click outside content
+    const modal = e.target.closest('.modal.open, .drawer.open');
+    if (!modal) return;
+    const inside = e.target.closest('.modal .modal-content, .drawer .drawer-content');
+    const isCloseBtn = e.target.closest('.modal .close, .drawer .close, [data-modal-close]');
+    if (!inside || isCloseBtn) {
+      modal.classList.remove('open');
+      modal.setAttribute('aria-hidden','true');
+      lockBody(false);
+    }
+  });
+
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'Escape') {
+      const open = document.querySelector('.modal.open, .drawer.open');
+      if (open) {
+        open.classList.remove('open');
+        open.setAttribute('aria-hidden','true');
+        lockBody(false);
+      }
+    }
+  });
+
+  // If script finds any open modal at init, lock body
+  document.addEventListener('DOMContentLoaded', function(){
+    if (document.querySelector('.modal.open, .drawer.open')) lockBody(true);
+  });
+
+  // when modal opens programmatically, developers can dispatch a custom event:
+  // window.dispatchEvent(new CustomEvent('modal:opened',{detail:{el:myModal}}));
+  window.addEventListener('modal:opened', function(e){
+    lockBody(true);
+    const el = e.detail && e.detail.el;
+    if (el) {
+      el.classList.add('open');
+      el.setAttribute('aria-hidden','false');
+    }
+  });
 })();
 </script>
 
