@@ -4228,6 +4228,24 @@ const PAYSTACK_PUBLIC_KEY = 'pk_test_297586e51710e83d3c159bfe71ff45c7e23411fa';
       document.body.style.overflow = '';
     }
 
+    try {
+      window.openCheckoutPage = openCheckoutPage;
+      window.closeCheckoutPage = closeCheckoutPage;
+      // optional alias for other code that expects openCheckoutFull
+      window.openCheckoutFull = openCheckoutPage;
+      // helper to reset scroll (also referenced elsewhere) — safe to overwrite
+      window.resetCheckoutScroll = window.resetCheckoutScroll || function(){
+        try {
+          const inner = document.getElementById('checkout-inner');
+          if (inner) inner.scrollTop = 0;
+          const left = inner && inner.querySelector('.checkout-left');
+          const right = inner && inner.querySelector('.checkout-right');
+          if (left) left.scrollTop = 0;
+          if (right) right.scrollTop = 0;
+        } catch(e){}
+      };
+    } catch(e) { /* harmless if globals can't be written */ }
+
     // wire openers (override previous handlers so no pre-popup appears)
     const footerPayBtn = document.getElementById('checkout-btn');
     const headerCheckoutBtn = document.getElementById('cart-header-checkout');
@@ -6040,6 +6058,29 @@ body.cart-open::before {
     mo.observe(cartDrawer, { attributes: true });
   });
 })();
+</script>
+<script>
+  // If the real openCheckoutPage hasn't been registered yet, this fallback will open the cart drawer.
+  // Once the real function is defined it will replace this stub (see Patch B).
+  window.openCheckoutPage = window.openCheckoutPage || function() {
+    console.warn('openCheckoutPage stub: opening cart drawer as fallback (real function not yet registered)');
+    const cart = document.getElementById('cart-drawer');
+    if (cart) {
+      cart.style.display = 'block';
+      cart.setAttribute('aria-hidden','false');
+      // make drawer visible and prevent body scroll
+      document.body.style.overflow = 'hidden';
+    } else {
+      // last-resort: scroll to menu
+      const menu = document.getElementById('menu');
+      if (menu) menu.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+  // provide a no-op close until real one is set
+  window.closeCheckoutPage = window.closeCheckoutPage || function() {
+    const cart = document.getElementById('cart-drawer');
+    if (cart) { cart.style.display = 'none'; cart.setAttribute('aria-hidden','true'); document.body.style.overflow = ''; }
+  };
 </script>
 
 
