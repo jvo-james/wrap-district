@@ -6161,6 +6161,190 @@ body.cart-open::before {
 })();
 </script>
 
+<script>
+(() => {
+  'use strict';
+
+  // --- CONFIG: adjust selectors if your markup differs ---
+  const drawerSelector = '#cart-drawer'; // your drawer element id (from console)
+  const openSelectorList = '[data-cart-open], .cart-open, .btn-cart, #cart-open, [aria-controls="cart-drawer"]';
+  const closeSelectorList = '[data-cart-close], #cart-close, .cart-close, .icon-btn#cart-close';
+  const backdropSelector = '.cart-backdrop, .drawer-backdrop'; // optional backdrop element
+
+  // --- utilities ---
+  const el = (sel) => document.querySelector(sel);
+  const els = (sel) => Array.from(document.querySelectorAll(sel));
+  const getFocusable = (container) => {
+    if (!container) return [];
+    const items = Array.from(container.querySelectorAll(
+      'a[href], area[href], input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), button:not([disabled]), iframe, object, embed, [tabindex]:not([tabindex="-1"]), [contenteditable]'
+    ));
+    // filter out invisible
+    return items.filter(i => i.offsetWidth > 0 || i.offsetHeight > 0 || i.getClientRects().length);
+  };
+
+  const cartDrawer = el(drawerSelector);
+  if (!cartDrawer) {
+    console.warn('Cart script: cart-drawer not found using selector:', drawerSelector);
+    return;
+  }
+
+  const openButtons = els(openSelectorList);
+  const closeButtons = els(closeSelectorList);
+  const backdrop = el(backdropSelector);
+
+  // store last focused element to return focus after close
+  let lastFocus = null;
+
+  // focus trap handler
+  function trapTab(e) {
+    if (e.key !== 'Tab') return;
+    const focusable = getFocusable(cartDrawer);
+    if (focusable.length === 0) {
+      e.preventDefault();
+      return;
+    }
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (e.shiftKey) {
+      if (document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      }
+    } else {
+      if (document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    }
+  }
+
+  function safeSetInert(node, value) {
+    try {
+      node.inert = value;
+    } catch (err) {
+      // inert might not be supported; fallback: set aria-hidden and disable tab stops
+      node.setAttribute('aria-hidden', value ? 'true' : 'false');
+      if (value) {
+        // remove focus from any focused descendant
+        const focusedDescendant = node.querySelector(':focus');
+        if (focusedDescendant) focusedDescendant.blur();
+      }
+    }
+  }
+
+  function openCart() {
+    // record who opened it so we can return focus
+    lastFocus = document.activeElement;
+
+    // make visible (if you use CSS transitions rely on class)
+    cartDrawer.classList.add('is-open'); // adjust to your CSS class
+    cartDrawer.style.display = ''; // allow CSS to handle layout; use '' to undo inline none
+    // ensure it's accessible
+    cartDrawer.setAttribute('aria-hidden', 'false');
+    safeSetInert(cartDrawer, false);
+
+    // focus the first meaningful control inside (close button, first input, etc.)
+    const focusable = getFocusable(cartDrawer);
+    if (focusable.length) {
+      focusable[0].focus();
+    } else {
+      // give drawer itself a tabindex so it can receive focus
+      cartDrawer.setAttribute('tabindex', '-1');
+      cartDrawer.focus();
+    }
+
+    // trap keyboard focus
+    document.addEventListener('keydown', trapTab);
+    // close on ESC
+    document.addEventListener('keydown', escClose);
+  }
+
+  function closeCart() {
+    // move focus away from anything inside the drawer BEFORE setting aria-hidden=true
+    // return focus to last focused element (usually the cart button)
+    if (lastFocus && typeof lastFocus.focus === 'function') {
+      lastFocus.focus();
+    } else {
+      // fallback: focus body
+      document.body.focus();
+    }
+
+    // stop trapping
+    document.removeEventListener('keydown', trapTab);
+    document.removeEventListener('keydown', escClose);
+
+    // hide drawer accessibly
+    cartDrawer.setAttribute('aria-hidden', 'true');
+    safeSetInert(cartDrawer, true);
+
+    cartDrawer.classList.remove('is-open');
+
+    // if your CSS animates, delay removing inline display until after animation completes.
+    // adjust timeout to match your CSS transition duration, or keep it if you don't hide via inline style.
+    setTimeout(() => {
+      // If you previously used display:block for visible state, hide now:
+      // Only set inline style if you used one; otherwise leave to CSS.
+      if (!cartDrawer.classList.contains('is-open')) {
+        cartDrawer.style.display = 'none';
+      }
+      // remove temporary tabindex if we added it
+      if (cartDrawer.getAttribute('tabindex') === '-1') cartDrawer.removeAttribute('tabindex');
+    }, 300); // 300ms matches many CSS transitions; adjust if needed
+  }
+
+  function escClose(e) {
+    if (e.key === 'Escape' || e.key === 'Esc') closeCart();
+  }
+
+  // attach events
+  openButtons.forEach(btn => {
+    btn.addEventListener('click', (ev) => {
+      ev.preventDefault();
+      openCart();
+    });
+    // if opener is focusable, ensure it has aria-controls for semantics
+    if (!btn.hasAttribute('aria-controls')) btn.setAttribute('aria-controls', cartDrawer.id || 'cart-drawer');
+  });
+
+  closeButtons.forEach(btn => {
+    btn.addEventListener('click', (ev) => {
+      ev.preventDefault();
+      closeCart();
+    });
+  });
+
+  if (backdrop) {
+    backdrop.addEventListener('click', (e) => {
+      // optional: clicking backdrop closes the drawer
+      if (e.target === backdrop) closeCart();
+    });
+  }
+
+  // If someone programmatically toggles or you want to support data attributes
+  document.addEventListener('click', (e) => {
+    const openAttr = e.target.closest('[data-cart-open]');
+    const closeAttr = e.target.closest('[data-cart-close]');
+    if (openAttr) {
+      e.preventDefault(); openCart(); return;
+    }
+    if (closeAttr) {
+      e.preventDefault(); closeCart(); return;
+    }
+  });
+
+  // INITIAL STATE: ensure drawer starts hidden and inert
+  // If your HTML already sets aria-hidden="true" it's fine; we ensure inert too.
+  if (cartDrawer.getAttribute('aria-hidden') === 'true' || !cartDrawer.classList.contains('is-open')) {
+    safeSetInert(cartDrawer, true);
+    // hide visually if not open
+    if (!cartDrawer.classList.contains('is-open')) cartDrawer.style.display = 'none';
+  } else {
+    safeSetInert(cartDrawer, false);
+  }
+
+})();
+</script>
 
 </html>
   
