@@ -3407,14 +3407,14 @@ if (cartHeader && !document.getElementById('cart-header-total')) {
   }
 
   // When checkout opens make sure it's positioned under the header (safety) and focus first field
-  (function ensureOpenPositioning(){
-    const origOpen = openCheckoutPage;
-    // If openCheckoutPage exists, wrap it to add a scrollIntoView to ensure top visible
+ (function ensureOpenPositioning(){
+    // Guard against referencing undefined global. Only capture/override if function exists.
     if (typeof openCheckoutPage === 'function') {
+      const origOpen = openCheckoutPage;
       window.openCheckoutPage = function() {
+        // call original then ensure checkout dialog is scrolled below the header
         origOpen.apply(this, arguments);
         try {
-          // ensure the checkout dialog is visually scrolled into view (below header)
           const inner = document.getElementById('checkout-inner');
           if (inner) inner.scrollIntoView({ behavior: 'auto', block: 'start' });
         } catch(e){}
@@ -5979,6 +5979,68 @@ body.cart-open::before {
 }
 </style>
 
+<script>
+(function(){
+  document.addEventListener('DOMContentLoaded', function(){
+    const cartToggle = document.getElementById('cart-toggle');
+    const cartClose = document.getElementById('cart-close');
+    const cartDrawer = document.getElementById('cart-drawer');
+
+    if (!cartToggle || !cartDrawer) return;
+
+    function openCart() {
+      cartDrawer.style.display = 'block';
+      cartDrawer.setAttribute('aria-hidden', 'false');
+      // focus first focusable in drawer, fallback to cartClose
+      try {
+        const focusable = cartDrawer.querySelector('button, [tabindex], a, input');
+        (focusable || cartClose || cartToggle).focus();
+      } catch(e){}
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeCart() {
+      try {
+        // If active element is inside cart, move focus to cart toggle first
+        const active = document.activeElement;
+        if (cartDrawer.contains(active)) {
+          try { cartToggle.focus(); } catch(e){}
+        }
+      } catch(e){}
+      cartDrawer.style.display = 'none';
+      cartDrawer.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+    }
+
+    cartToggle.addEventListener('click', function(e){
+      const hidden = cartDrawer.getAttribute('aria-hidden') === 'true' || cartDrawer.style.display === 'none';
+      if (hidden) openCart(); else closeCart();
+    });
+
+    cartClose && cartClose.addEventListener('click', function(e){ closeCart(); });
+
+    // clicking backdrop (cart-drawer itself) should close
+    cartDrawer.addEventListener('click', function(e){
+      if (e.target === cartDrawer) closeCart();
+    });
+
+    // If some other script toggles aria-hidden directly, ensure focus isn't trapped inside
+    const mo = new MutationObserver((mutations) => {
+      for (const m of mutations) {
+        if (m.attributeName === 'aria-hidden') {
+          const val = cartDrawer.getAttribute('aria-hidden');
+          if (val === 'true') {
+            try {
+              if (cartDrawer.contains(document.activeElement)) cartToggle.focus();
+            } catch(e){}
+          }
+        }
+      }
+    });
+    mo.observe(cartDrawer, { attributes: true });
+  });
+})();
+</script>
 
 
 </html>
