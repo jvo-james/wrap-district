@@ -2989,18 +2989,16 @@ a:focus, button:focus { outline: 3px solid rgba(255,204,51,0.10); outline-offset
 
     /* ---------- 2) Cart header: add total + checkout button ---------- */
     const cartHeader = document.querySelector('.cart-header');
-    if (cartHeader && !cartHeader.querySelector('.cart-header-right')) {
-      // create container
+if (cartHeader && !document.getElementById('cart-header-total')) {
+      // create container (guarded: don't add if #cart-header-total is already present)
       const headerRight = document.createElement('div');
       headerRight.className = 'cart-header-right';
 
-      // total display
       const totalWrap = document.createElement('div');
       totalWrap.className = 'cart-header-total';
       totalWrap.id = 'cart-header-total';
       totalWrap.innerText = 'GHC 0';
 
-      // checkout button
       const headerCheckout = document.createElement('button');
       headerCheckout.className = 'cart-header-checkout';
       headerCheckout.id = 'cart-header-checkout';
@@ -3010,24 +3008,8 @@ a:focus, button:focus { outline: 3px solid rgba(255,204,51,0.10); outline-offset
 
       headerRight.appendChild(totalWrap);
       headerRight.appendChild(headerCheckout);
-
       cartHeader.appendChild(headerRight);
-
-      // wire checkout click to existing footer checkout (preferred)
-      headerCheckout.addEventListener('click', () => {
-        // try to reuse modal: if #checkout-btn exists -> trigger click
-        const footerCheckout = document.getElementById('checkout-btn');
-        if (footerCheckout) {
-          footerCheckout.click(); // will open checkout modal already wired
-        } else if (typeof window.openCheckoutModal === 'function') {
-          window.openCheckoutModal(); // fallback if we exposed it earlier
-        } else {
-          // fallback: simulate click on modal opener if present
-          const alt = document.querySelector('[data-action="checkout"], [data-action="pay"]');
-          if (alt) alt.click();
-          else alert('Checkout not available. Please use the Pay button.');
-        }
-      });
+      // wire handlers (existing code)
     }
 
     // Sync header total with computeCartTotals or with #cart-total element
@@ -3978,14 +3960,13 @@ btnPrint && btnPrint.addEventListener('click', () => {
     } catch(e){ console.warn('Could not override alert/confirm', e); }
 
     // 2) Intercept clicks on all checkout/pay triggers so any legacy alert-based flow can't fire.
-    const CHECKOUT_SELECTORS = [
+   const CHECKOUT_SELECTORS = [
       '#checkout-btn',
       '#cart-header-checkout',
       '.cart-header .cart-header-checkout',
       '[data-action="checkout"]',
       '[data-action="pay"]',
-      '.cart-footer .btn.primary',
-      '#cart-toggle'
+      '.cart-footer .btn.primary'
     ];
 
     function safeOpenCheckout() {
@@ -6008,6 +5989,89 @@ body.cart-open::before {
     });
   })();
 
+})();
+</script>
+<script>
+/* === Reliable cart toggle / close handlers ===
+   Add after your other scripts (near end of <body>).
+*/
+(function(){
+  document.addEventListener('DOMContentLoaded', function(){
+
+    function setCartOpen(open){
+      const cart = document.getElementById('cart-drawer');
+      if(!cart) return;
+      if(open){
+        cart.style.display = 'block';
+        cart.setAttribute('aria-hidden','false');
+        document.body.style.overflow = 'hidden';
+        // focus close button for keyboard users
+        setTimeout(()=> { const c = document.getElementById('cart-close'); if(c) c.focus(); }, 60);
+      } else {
+        cart.setAttribute('aria-hidden','true');
+        // keep transition-friendly timing before hiding display
+        setTimeout(()=> { try { cart.style.display = 'none'; } catch(e){} }, 280);
+        document.body.style.overflow = '';
+      }
+    }
+
+    // Toggle via cart icon
+    const cartToggle = document.getElementById('cart-toggle');
+    if(cartToggle){
+      // remove previously attached handlers that may conflict (defensive)
+      try { cartToggle.replaceWith(cartToggle.cloneNode(true)); } catch(e){}
+    }
+    // re-query because we may have replaced node
+    const cartBtn = document.getElementById('cart-toggle');
+    if(cartBtn){
+      cartBtn.addEventListener('click', function(ev){
+        ev.preventDefault();
+        ev.stopPropagation();
+        const cart = document.getElementById('cart-drawer');
+        if(!cart) return;
+        const isOpen = cart.getAttribute('aria-hidden') === 'false';
+        setCartOpen(!isOpen);
+      });
+    }
+
+    // Close button inside drawer
+    const cartClose = document.getElementById('cart-close');
+    if(cartClose){
+      cartClose.addEventListener('click', function(ev){
+        ev.preventDefault();
+        setCartOpen(false);
+      });
+    }
+
+    // Close when clicking outside drawer content (backdrop)
+    const cartDrawer = document.getElementById('cart-drawer');
+    if(cartDrawer){
+      cartDrawer.addEventListener('click', function(e){
+        if(e.target === cartDrawer) setCartOpen(false);
+      });
+    }
+
+    // Escape key closes drawer
+    document.addEventListener('keydown', function(e){
+      if(e.key === 'Escape'){
+        const cart = document.getElementById('cart-drawer');
+        if(cart && cart.getAttribute('aria-hidden') === 'false'){
+          setCartOpen(false);
+        }
+      }
+    });
+
+    // Make sure cart-drawer initial state follows CSS: hide it (defensive)
+    (function ensureInitial(){
+      const cart = document.getElementById('cart-drawer');
+      if(!cart) return;
+      if(cart.getAttribute('aria-hidden') !== 'false'){
+        cart.setAttribute('aria-hidden','true');
+        cart.style.display = 'none';
+      }
+    })();
+
+  });
 })();
 </script>
 
