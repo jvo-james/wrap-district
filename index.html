@@ -5795,6 +5795,189 @@ body.cart-open::before {
   });
 })();
 </script>
+<!-- A: Safe openCheckoutPage wrapper — paste near the end of <body> -->
+<script>
+(function(){
+  // Guarded wrapper: attach after DOM is ready so we don't reference a missing symbol at parse time.
+  document.addEventListener('DOMContentLoaded', function(){
+    try {
+      if (typeof window.openCheckoutPage === 'function') {
+        const origOpen = window.openCheckoutPage;
+        if (!window.__wrapped_openCheckoutPage_for_positioning) {
+          window.__wrapped_openCheckoutPage_for_positioning = true;
+          window.openCheckoutPage = function() {
+            // call original
+            const result = origOpen.apply(this, arguments);
+            // safe positioning effort (no assumptions)
+            try {
+              const inner = document.getElementById('checkout-inner');
+              if (inner) inner.scrollIntoView({ behavior: 'auto', block: 'start' });
+              // also reset checkout scroll helper if available
+              if (typeof window.resetCheckoutScroll === 'function') window.resetCheckoutScroll();
+            } catch (e) { /* ignore */ }
+            return result;
+          };
+        }
+      } else {
+        // If function isn't present yet we skip; other scripts will bind openers to the checkout buttons
+        console.info('openCheckoutPage not available at DOMContentLoaded — skipping wrapper (safe).');
+      }
+    } catch (err) {
+      console.warn('Safe wrapper for openCheckoutPage failed', err);
+    }
+  });
+})();
+</script>
+<!-- B: Cart open/close manager — paste near the end of <body> -->
+<script>
+(function(){
+  document.addEventListener('DOMContentLoaded', function(){
+    const cartDrawer = document.getElementById('cart-drawer');
+    const cartToggle = document.getElementById('cart-toggle');
+    const cartClose  = document.getElementById('cart-close');
+    // defensive: if any of these are missing, abort gracefully
+    if (!cartDrawer || !cartToggle) return;
+
+    // Ensure cart is closed on page load (prevents accidental open on refresh)
+    function forceCloseCartOnLoad() {
+      try {
+        cartDrawer.style.display = 'none';
+        cartDrawer.setAttribute('aria-hidden', 'true');
+        // If any element inside has focus, move focus to body (or to cartToggle) to avoid aria-hidden block
+        if (document.activeElement && cartDrawer.contains(document.activeElement)) {
+          try { document.activeElement.blur(); } catch(e){}
+        }
+      } catch (e) { /* ignore */ }
+    }
+    forceCloseCartOnLoad();
+
+    // Open cart (only when user clicks)
+    function openCart() {
+      try {
+        // make visible for assistive tech first
+        cartDrawer.setAttribute('aria-hidden', 'false');
+        cartDrawer.style.display = 'block';
+        // prevent background scroll
+        document.body.style.overflow = 'hidden';
+        // put focus on close button
+        setTimeout(() => {
+          try {
+            if (cartClose) cartClose.focus();
+            else {
+              // focus first focusable inside drawer if close missing
+              const f = cartDrawer.querySelector('button, a, [tabindex]');
+              if (f) f.focus();
+            }
+          } catch(e){}
+        }, 50);
+      } catch (e) { console.warn('openCart error', e); }
+    }
+
+    // Close cart and manage focus so descendant focus is not hidden
+    function closeCart() {
+      try {
+        // If a child inside the drawer currently has focus, blur it so assistive tech isn't blocked.
+        const active = document.activeElement;
+        if (active && cartDrawer.contains(active)) {
+          try { active.blur(); } catch(e){}
+        }
+        // Move focus back to the cart toggle (so keyboard users don't lose context)
+        try { cartToggle.focus(); } catch(e){}
+      } catch(e){ /* ignore */ }
+
+      // Now hide the drawer
+      try {
+        cartDrawer.setAttribute('aria-hidden', 'true');
+        cartDrawer.style.display = 'none';
+        document.body.style.overflow = '';
+      } catch (err) { console.warn('closeCart hide error', err); }
+    }
+
+    // Toggle handler
+    cartToggle.addEventListener('click', function(e){
+      const hidden = cartDrawer.getAttribute('aria-hidden') === 'true' || cartDrawer.style.display === 'none';
+      if (hidden) openCart();
+      else closeCart();
+    });
+
+    // Close button inside drawer
+    if (cartClose) cartClose.addEventListener('click', function(){ closeCart(); });
+
+    // Close when clicking on backdrop (clicks on #cart-drawer itself)
+    cartDrawer.addEventListener('click', function(e){
+      if (e.target === cartDrawer) closeCart();
+    });
+
+    // Close on Escape key when drawer is open
+    document.addEventListener('keydown', function(e){
+      if (e.key === 'Escape' && cartDrawer.getAttribute('aria-hidden') === 'false') {
+        closeCart();
+      }
+    });
+
+    // Prevent accidental scripts from opening the drawer by setting inline style directly
+    // We observe attribute/style changes and enforce our closed state if aria-hidden="true"
+    const mo = new MutationObserver(function(mutations){
+      mutations.forEach(m => {
+        try {
+          // if some other script sets display:block or aria-hidden false on load,
+          // we only allow it when the user actually clicked (we track via a flag)
+          // simple rule: if drawer is visible but cartToggle wasn't focused or clicked, close it.
+          const isVisible = (cartDrawer.getAttribute('aria-hidden') === 'false' || cartDrawer.style.display === 'block');
+          if (isVisible) {
+            // only allow open if user recently clicked cartToggle (we rely on pointerdown event to set flag)
+            // implement a short-lived flag
+            if (!cartDrawer.__userOpenedRecently) {
+              // auto-close
+              cartDrawer.setAttribute('aria-hidden', 'true');
+              cartDrawer.style.display = 'none';
+            } else {
+              // clear the quick flag after a short period
+              clearTimeout(cartDrawer.___userOpenedTimer);
+              cartDrawer.__userOpenedTimer = setTimeout(()=> { cartDrawer.__userOpenedRecently = false; }, 600);
+            }
+          }
+        } catch(e){}
+      });
+    });
+    mo.observe(cartDrawer, { attributes: true, attributeFilter: ['style','aria-hidden'] });
+
+    // Track user direct open intent (short window)
+    cartToggle.addEventListener('pointerdown', function(){
+      cartDrawer.__userOpenedRecently = true;
+      clearTimeout(cartDrawer.__userOpenedTimer);
+      cartDrawer.__userOpenedTimer = setTimeout(()=> { cartDrawer.__userOpenedRecently = false; }, 800);
+    });
+
+    // If other scripts call cartDrawer.style.display = 'block' or set aria-hidden incorrectly on load,
+    // forceCloseCartOnLoad() already ran. This handler further ensures the drawer remains closed until user click.
+    // Final safety: apply closed state after small timeout (cover late-running scripts)
+    setTimeout(forceCloseCartOnLoad, 220);
+    setTimeout(forceCloseCartOnLoad, 1200);
+  });
+})();
+</script>
+<!-- C: Menu single-column override — paste near the end of your styles or before </body> -->
+<style>
+/* Force menu to always be one item per row (overrides earlier grid rules) */
+.menu-grid {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 14px !important;
+  grid-template-columns: none !important;
+}
+
+/* Extra: ensure .menu-item takes full width */
+.menu-item {
+  width: 100% !important;
+  box-sizing: border-box;
+}
+
+/* Remove accidental two-column grid on intermediate breakpoints */
+@media (min-width: 420px), (min-width: 540px) {
+  .menu-grid { grid-template-columns: none !important; display:flex !important; flex-direction:column !important; }
+}
+</style>
 
 
 
