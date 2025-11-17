@@ -6345,6 +6345,103 @@ body.cart-open::before {
 
 })();
 </script>
+ <script>
+ (function(){
+   document.addEventListener('DOMContentLoaded', function(){
+     const cartToggle = document.getElementById('cart-toggle');
+     const cartDrawer = document.getElementById('cart-drawer');
+     const cartClose = document.getElementById('cart-close');
+
+     if (!cartToggle || !cartDrawer) return;
+
+     function openCart() {
+       cartDrawer.style.display = 'block';
+       cartDrawer.setAttribute('aria-hidden','false');
+       cartToggle.setAttribute('aria-expanded','true');
+       // prevent body scroll while drawer open
+       document.body.style.overflow = 'hidden';
+       // focus the drawer for keyboard users
+       try { cartDrawer.setAttribute('tabindex','-1'); cartDrawer.focus(); } catch(e){}
+     }
+
+     function closeCart() {
+       cartDrawer.style.display = 'none';
+       cartDrawer.setAttribute('aria-hidden','true');
+       cartToggle.setAttribute('aria-expanded','false');
+       document.body.style.overflow = '';
+       try { cartToggle.focus(); } catch(e){}
+     }
+
+     cartToggle.addEventListener('click', function(ev){
+       ev.preventDefault();
+       // toggle
+       if (cartDrawer.getAttribute('aria-hidden') === 'false') closeCart();
+       else openCart();
+     }, { passive: false });
+
+     // close button inside drawer
+     if (cartClose) cartClose.addEventListener('click', function(e){ e.preventDefault(); closeCart(); });
+
+     // close on overlay click (clicking the backdrop area)
+     cartDrawer.addEventListener('click', function(e){
+       if (e.target === cartDrawer) closeCart();
+     });
+     // ESC key closes cart
+     document.addEventListener('keydown', function(e){
+       if (e.key === 'Escape' && cartDrawer.getAttribute('aria-hidden') === 'false') {
+         closeCart();
+       }
+     });
+   });
+ })();
+ </script>
+ <!-- +++ end cart drawer handlers +++ -->
+ <!-- +++ Replace broken promo carousel script with this stable implementation +++ -->
+ <script>
+ (function(){
+   document.addEventListener('DOMContentLoaded', function(){
+     const slides = Array.from(document.querySelectorAll('.pc-slide'));
+     const dots = Array.from(document.querySelectorAll('.pc-dot'));
+     const prev = document.querySelector('.promo-carousel .slide-prev');
+     const next = document.querySelector('.promo-carousel .slide-next');
+     if (!slides.length) return;
+
+     let idx = 0;
+     function show(i){
+       slides.forEach((s, n) => {
+         const active = n === i;
+         s.classList.toggle('is-active', active);
+         s.setAttribute('aria-hidden', String(!active));
+       });
+       dots.forEach((d,n) => d.classList.toggle('is-active', n === i));
+       idx = i;
+     }
+
+     function prevSlide(){ show((idx - 1 + slides.length) % slides.length); }
+     function nextSlide(){ show((idx + 1) % slides.length); }
+
+     if (prev) prev.addEventListener('click', prevSlide);
+     if (next) next.addEventListener('click', nextSlide);
+     dots.forEach(d => d.addEventListener('click', (e) => {
+       const i = Number(d.dataset.index || d.getAttribute('data-index') || 0);
+       show(i);
+     }));
+
+     // Auto-rotate (optional)
+     let auto = setInterval(nextSlide, 6000);
+     // Pause on hover/focus
+     const container = document.querySelector('.promo-carousel');
+     if (container) {
+       container.addEventListener('mouseenter', () => clearInterval(auto));
+       container.addEventListener('mouseleave', () => { auto = setInterval(nextSlide, 6000); });
+     }
+
+     // init
+     show(0);
+   });
+ })();
+ </script>
+ <!-- +++ end promo carousel replacement +++ -->
 
 </html>
   
