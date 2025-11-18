@@ -2576,6 +2576,96 @@ a:focus, button:focus { outline: 3px solid rgba(255,204,51,0.10); outline-offset
 }
 
     </style>
+  <style>
+/* Hero polish for larger screens (drop after your other desktop rules) */
+@media (min-width: 900px) {
+  /* make hero area feel like a composed card */
+  .hero-slideshow { padding: 32px 18px 40px; }
+  .slides { display:flex; gap:28px; align-items:center; height:66vh; min-height:420px; }
+  .slide { display:flex; width:100%; gap:28px; align-items:stretch; border-radius:18px; overflow:visible; }
+
+  .slide-img {
+    width: 58%;
+    height:100%;
+    border-radius: 18px;
+    object-fit:cover;
+    box-shadow: 0 40px 80px rgba(2,6,10,0.7);
+    transform: translateZ(0);
+    transition: transform 420ms cubic-bezier(.2,.9,.3,1), box-shadow 420ms;
+    will-change: transform;
+    border: 1px solid rgba(255,255,255,0.03);
+  }
+
+  .slide-content {
+    width: 42%;
+    padding: 34px;
+    align-self: center;
+    border-radius: 14px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.006));
+    box-shadow: 0 18px 50px rgba(3,6,8,0.6);
+    backdrop-filter: blur(6px) saturate(120%);
+    position: relative;
+    z-index: 20;
+    transition: transform 420ms cubic-bezier(.2,.9,.3,1);
+  }
+
+  .slide-title {
+    font-size: 40px;
+    line-height:1.02;
+    letter-spacing: -0.6px;
+    margin-bottom:8px;
+  }
+
+  .slide-sub { font-size:16px; color: rgba(255,255,255,0.9); margin-bottom:14px; }
+
+  /* decorative animated underline */
+  .slide-title::after{
+    content: '';
+    display:block;
+    height:6px;
+    width:64px;
+    border-radius:6px;
+    margin-top:12px;
+    background: linear-gradient(90deg,var(--accent-1),var(--accent-2));
+    box-shadow: 0 12px 30px rgba(255,106,0,0.12);
+    transform-origin: left center;
+    transform: translateY(2px) scaleX(0.88);
+  }
+
+  /* bigger CTAs */
+  .slide-ctas .btn.primary { padding:14px 18px; font-size:16px; border-radius:12px; box-shadow: 0 18px 36px rgba(255,106,0,0.12); }
+  .slide-ctas .btn.ghost { padding:12px 16px; }
+
+  /* small accent badge on image */
+  .slide .img-badge {
+    position: absolute;
+    left: 6%;
+    top: 12%;
+    background: linear-gradient(90deg,var(--accent-1),var(--accent-2));
+    color:#111;
+    font-weight:900;
+    padding:10px 12px;
+    border-radius:999px;
+    box-shadow: 0 12px 30px rgba(255,106,0,0.12);
+    z-index: 30;
+  }
+
+  /* subtle hover state: lift image + content when cursor inside the slide */
+  .slide:hover .slide-img { transform: translateY(-8px) scale(1.02); box-shadow: 0 50px 120px rgba(2,6,10,0.75); }
+  .slide:hover .slide-content { transform: translateY(-6px); }
+
+  /* ensure decorative art icons remain visible and tasteful */
+  .slide-art { right: 18px; top: 18px; opacity:0.95; }
+
+  /* responsive refinement for very wide screens */
+  @media (min-width: 1400px) {
+    .slide-title { font-size:48px; }
+    .slide-content { padding:44px; }
+    .slide-img { border-radius: 20px; }
+  }
+}
+</style>
+
 </head>
 <body>
   <!-- STICKY HEADER (mobile-first: only logo, cart with badge, hamburger) -->
@@ -7055,6 +7145,33 @@ body.cart-open::before {
     } catch (e) { console.error(e); }
   };
 
+})();
+</script>
+<script>
+/* small parallax on desktop hero slides — non-essential but nice */
+(function(){
+  if (window.matchMedia && !window.matchMedia('(min-width:900px)').matches) return;
+
+  document.querySelectorAll('.slide').forEach(slide => {
+    const img = slide.querySelector('.slide-img');
+    const content = slide.querySelector('.slide-content');
+
+    if (!img || !content) return;
+
+    slide.addEventListener('mousemove', (e) => {
+      const r = slide.getBoundingClientRect();
+      const px = (e.clientX - r.left) / r.width - 0.5;
+      const py = (e.clientY - r.top) / r.height - 0.5;
+      // subtle transforms
+      img.style.transform = `translate(${px * 10}px, ${py * 8}px) scale(1.02)`;
+      content.style.transform = `translate(${px * 6}px, ${py * 4}px)`;
+    });
+
+    slide.addEventListener('mouseleave', () => {
+      img.style.transform = '';
+      content.style.transform = '';
+    });
+  });
 })();
 </script>
 
