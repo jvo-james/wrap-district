@@ -3440,7 +3440,7 @@ if (cartHeader && !document.getElementById('cart-header-total')) {
         <div class="form-row">
           <div class="form-col">
             <label class="small-muted">Full name *</label>
-            <input id="cf-name" class="input" type="text" placeholder="Jane Doe" required />
+            <input id="cf-name" class="input" type="text" placeholder="..." required />
           </div>
           <div class="form-col">
             <label class="small-muted">Phone *</label>
@@ -3481,15 +3481,15 @@ if (cartHeader && !document.getElementById('cart-header-total')) {
         </div>
 
         <div style="margin-top:10px;">
-          <label class="small-muted">Notes (delivery/pickup instructions)</label>
-          <textarea id="cf-note" class="input" rows="3" placeholder="e.g., knock twice, leave at gate"></textarea>
+          <label class="small-muted">Notes </label>
+          <textarea id="cf-note" class="input" rows="3" placeholder="e.g., no vegetables, not too spicy, etc. "></textarea>
         </div>
 
         <div style="margin-top:12px;">
           <label class="small-muted">Payment method</label>
           <select id="cf-paymethod" class="input">
-            <option value="paystack">Pay with Card / Mobile Money (Paystack)</option>
-            <option value="cash">Cash on Delivery</option>
+            <option value="paystack">Pay with Mobile Money / Card (Paystack)</option>
+            <option value="cash" disabled>Cash on Delivery</option>
           </select>
         </div>
 
@@ -3931,6 +3931,98 @@ btnPrint && btnPrint.addEventListener('click', () => {
   });
 })();
 </script>
+  <script>
+    // --- Formspree order sender (paste once near your checkout script)
+function buildOrderText(order) {
+  const escape = s => String(s ?? '').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const lines = (Array.isArray(order.cart) ? order.cart : []).map(l => {
+    const qty = Number(l.qty || 1);
+    const unit = Number(l.unitPrice || l.unit_price || 0);
+    const addons = (l.meta && Array.isArray(l.meta.addons) && l.meta.addons.length)
+      ? 'Extras: ' + l.meta.addons.map(a => (a.label || a.key || a)).join(', ')
+      : '';
+    const otherMeta = (() => {
+      if (!l.meta) return '';
+      return Object.keys(l.meta)
+        .filter(k => k !== 'addons')
+        .map(k => `${k}: ${typeof l.meta[k] === 'object' ? JSON.stringify(l.meta[k]) : l.meta[k]}`)
+        .join(' • ');
+    })();
+    const metaParts = [addons, otherMeta].filter(Boolean).join(' • ');
+    return `${qty} × ${escape(l.title || l.name || 'Item')} — unit: GHC ${Math.round(unit)} — line: GHC ${Math.round(qty * unit)}${metaParts ? ' — ' + metaParts : ''}`;
+  });
+
+  const totals = order.totals || {};
+  return `
+Reference: ${escape(order.reference || '')}
+Placed: ${escape(order.ts || new Date().toISOString())}
+Name: ${escape(order.name || '')}
+Phone: ${escape(order.phone || '')}
+Email: ${escape(order.email || '')}
+Order type: ${escape(order.type || '')}
+Address: ${escape(order.address || '')}
+Notes: ${escape(order.note || '')}
+
+ORDER LINES:
+${lines.length ? lines.join('\n') : '(no lines recorded)'}
+
+Totals:
+  Subtotal: GHC ${Math.round(totals.subtotal || 0)}
+  Delivery: GHC ${Math.round(totals.delivery || 0)}
+  Promo/Discount: -GHC ${Math.round(totals.promo || totals.promoDiscount || 0)}
+  TOTAL: GHC ${Math.round(totals.total || (totals.subtotal || 0) - (totals.promo || 0) + (totals.delivery || 0))}
+
+Raw order JSON (for debugging):
+${JSON.stringify(order, null, 2)}
+`.trim();
+}
+
+function sendOrderToFormspree(order) {
+  // your form endpoint
+  const endpoint = 'https://formspree.io/f/mvglponq';
+
+  // Build a friendly subject and message (will appear in the email)
+  const subject = `New Wrap District order: ${order.reference || 'no-ref'}`;
+  const message = buildOrderText(order);
+
+  // Formspree accepts JSON posts of fields. We'll send several fields so the email contains them clearly.
+  const payload = {
+    _subject: subject,
+    name: order.name || '',
+    email: order.email || '',
+    phone: order.phone || '',
+    address: order.address || '',
+    order_type: order.type || '',
+    reference: order.reference || '',
+    placed_at: order.ts || new Date().toISOString(),
+    subtotal: order.totals?.subtotal ?? '',
+    delivery: order.totals?.delivery ?? '',
+    promo: order.totals?.promo ?? order.totals?.promoDiscount ?? '',
+    total: order.totals?.total ?? '',
+    order_items: (Array.isArray(order.cart) ? order.cart.map(li => `${li.qty || 1}x ${li.title || li.name || 'Item'} (GHC ${li.unitPrice||li.unit_price||0})`).join(' | ') : ''),
+    message // long human readable copy (mirrors the PDF contents)
+  };
+
+  // POST to Formspree, return a Promise so caller can handle success/failure
+  return fetch(endpoint, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json'
+    },
+    body: JSON.stringify(payload)
+  }).then(async res => {
+    // If Formspree returns non-2xx, produce a helpful error
+    if (!res.ok) {
+      const text = await res.text().catch(()=>res.statusText);
+      throw new Error('Formspree error: ' + (text || res.status));
+    }
+    // returns the parsed json when available
+    return res.json().catch(()=>({ ok: true }));
+  });
+}
+
+  </script>
 <script>
 (function(){
   document.addEventListener('DOMContentLoaded', function(){
@@ -6083,78 +6175,7 @@ body.cart-open::before {
   };
 </script>
 
- <script>
- // --- CONFIG: replace with your real Formspree form ID ---
- const FORMSPREE_ENDPOINT = 'https://formspree.io/f/mvglponq';
 
-
- async function sendOrderEmailWithPDF(order, pdfBlob) {
-   if (!order || !pdfBlob) throw new Error('order and pdfBlob required');
-
-   const fd = new FormData();
-   // Basic text fields — Formspree will include these in the email body
-   fd.append('customer_name', order.name || '');
-   fd.append('customer_email', order.email || '');
-   fd.append('order_id', order.id || '');
-   fd.append('order_total', order.total != null ? String(order.total) : '');
-   // human-readable summary — you can format as you like
-   fd.append('order_summary', JSON.stringify(order.items || [], null, 2));
-   if (order.note) fd.append('note', order.note);
-
-   // Attach the PDF blob as a file. Formspree receives file fields sent in multipart/form-data.
-   // Use the field name 'file' (or any name); Formspree will attach it to the email.
-   fd.append('file', pdfBlob, `${order.id || 'order'}.pdf`);
-
-   const resp = await fetch(FORMSPREE_ENDPOINT, { method: 'POST', body: fd });
-   if (!resp.ok) {
-     const text = await resp.text().catch(() => '');
-     const err = new Error('Formspree error: ' + resp.status + ' ' + text);
-     err.response = resp;
-     throw err;
-   }
-   return resp;
- }
-
-
- async function sendOrderEmailWithPDFBase64(order, pdfBlob) {
-   const base64 = await blobToBase64(pdfBlob);
-   const payload = {
-     customer_name: order.name || '',
-     customer_email: order.email || '',
-     order_id: order.id || '',
-     order_total: order.total != null ? String(order.total) : '',
-     order_summary: JSON.stringify(order.items || [], null, 2),
-     pdf_base64: base64.split(',')[1] || base64 // remove data:prefix if present
-   };
-
-   // Send as JSON (Formspree accepts JSON POSTs to the /f/ endpoint too)
-   const resp = await fetch(FORMSPREE_ENDPOINT, {
-     method: 'POST',
-     headers: { 'Content-Type': 'application/json' },
-     body: JSON.stringify(payload)
-   });
-   if (!resp.ok) {
-     const text = await resp.text().catch(() => '');
-     const err = new Error('Formspree error: ' + resp.status + ' ' + text);
-     err.response = resp;
-     throw err;
-   }
-   return resp;
- }
-
- // small helper: blob -> dataURL
- function blobToBase64(blob) {
-   return new Promise((resolve, reject) => {
-     const reader = new FileReader();
-     reader.onload = () => resolve(reader.result);
-     reader.onerror = reject;
-     reader.readAsDataURL(blob);
-  });
-}
-
-
- </script>
- <!-- +++ end Formspree helper +++ -->
 
 </html>
   
