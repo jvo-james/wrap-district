@@ -6316,6 +6316,219 @@ body.cart-open::before {
   };
 </script>
 
+<script>
+/*
+  Auto-send order to Formspree for Wrap District
+  - Detects localStorage.wrap_last_order (set by your checkout flow)
+  - Builds a detailed payload: Reference, name, email, phone, address, items (JSON + text), extras totals, subtotal, promo, delivery, total
+  - Posts to your Formspree endpoint and marks it as sent to avoid duplicates
+  - Non-invasive: doesn't modify your existing checkout handlers; will run when order is saved
+*/
+
+(function () {
+  const FORM_ENDPOINT = 'https://formspree.io/f/mvglponq'; // keep your existing formspree endpoint
+  const SENT_FLAG_KEY = 'wrap_last_order_formspree_sent_ref';
+
+  // small helper: parse "GHC 55" or "55" -> number
+  function parseGhc(text) {
+    if (text == null) return 0;
+    try {
+      return Number(String(text).replace(/[^\d.-]/g, '')) || 0;
+    } catch (e) { return 0; }
+  }
+  function fmtGhc(n) { return `GHC ${Math.round(Number(n)||0)}`; }
+
+  // Build a human-friendly summary and a JSON-safe items array from an "order" object
+  function buildOrderPayload(order) {
+    // order expected shape (based on your checkout): { reference, name, phone, email, type, address, lat, lon, date, time, note, cart: [ { title, qty, unitPrice, meta } ], totals: { subtotal, delivery, promo, total } }
+    const payload = {};
+
+    // create reference if missing
+    const ref = order.reference || ('WD-' + Date.now() + '-' + (Math.floor(Math.random()*9000)+1000));
+    payload.Reference = ref;
+
+    // basics
+    payload.Full_name = order.name || '';
+    payload.Phone_number = order.phone || '';
+    payload.Email = order.email || '';
+    payload.Order_type = order.type || '';
+    payload.Delivery_address = order.address || '';
+    payload.Lat = order.lat || '';
+    payload.Lon = order.lon || '';
+    payload.Date = order.date || '';
+    payload.Time = order.time || '';
+    payload.Notes = order.note || '';
+
+    // Totals (try order.totals first, else try DOM fallbacks)
+    const totals = order.totals || {};
+    payload.Subtotal = Math.round(totals.subtotal || parseGhc(totals.subtotal) || 0);
+    payload.Promo_Discount = Math.round(totals.promo || totals.promoDiscount || parseGhc(totals.promo) || 0);
+    payload.Delivery_Fee = Math.round(totals.delivery || parseGhc(totals.delivery) || 0);
+    payload.Total_Amount = Math.round(totals.total || parseGhc(totals.total) || (payload.Subtotal - payload.Promo_Discount + payload.Delivery_Fee));
+
+    // Build items detail: prefer order.cart (array). If not available, try scanning DOM
+    const items = Array.isArray(order.cart) ? order.cart : [];
+
+    // Normalize items array: ensure fields title, qty, unitPrice, meta/addons
+    const normalized = items.map(it => {
+      const qty = Number(it.qty || it.quantity || 1);
+      const unitPrice = Number(it.unitPrice || it.unit_price || it.price || 0);
+      const addons = Array.isArray(it.meta?.addons) ? it.meta.addons.map(a => ({
+        key: a.key || a.id || (a.label||a),
+        label: a.label || a.key || a,
+        price: Number(a.price || a.value || a.amount || 0)
+      })) : (it.meta && it.meta.addonsText ? (String(it.meta.addonsText).split(',').map(s => ({ key:s.trim(), label:s.trim(), price:0 })) ) : []);
+      const extrasTotal = addons.reduce((s,a)=> s + (Number(a.price)||0), 0);
+      return {
+        id: it.baseId || it.id || '',
+        title: it.title || it.name || 'Item',
+        qty,
+        unitPrice,
+        lineTotal: Math.round(qty * unitPrice + extrasTotal),
+        addons,
+        meta: it.meta || {}
+      };
+    });
+
+    // extras totals & list
+    const extrasTotal = normalized.reduce((s, it) => s + (it.addons ? it.addons.reduce((ss,a) => ss + Number(a.price||0), 0) : 0), 0);
+    const extrasList = normalized.flatMap(it => (it.addons || []).map(a => `${a.label} (${a.price ? 'GHC ' + a.price : 'GHC 0'})`));
+
+    payload.Extras_Total = Math.round(extrasTotal);
+    payload.Extras_List = extrasList.join(' • ');
+
+    // attach items JSON and human-readable summary
+    payload.Order_Items = JSON.stringify(normalized, null, 0); // compact JSON
+    // readable summary
+    const summaryLines = normalized.map(it => {
+      const addonText = (it.addons && it.addons.length) ? ` [+ ${it.addons.map(a=>a.label+' GHC '+a.price).join(', ')}]` : '';
+      return `${it.qty} × ${it.title} (${fmtGhc(it.unitPrice)}) ${addonText} → ${fmtGhc(it.lineTotal)}`;
+    });
+    payload.Order_Items_Summary = summaryLines.join(' ; ');
+
+    // add small meta
+    payload.Order_TS = order.ts || new Date().toISOString();
+
+    return payload;
+  }
+
+  // Send to Formspree via JSON POST (Formspree accepts JSON)
+  async function sendToFormspree(payload) {
+    try {
+      // Formspree expects field names as properties. We'll send JSON.
+      const res = await fetch(FORM_ENDPOINT, {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
+      if (!res.ok) {
+        const text = await res.text().catch(()=> '');
+        console.warn('Formspree returned non-OK:', res.status, text);
+        return { ok: false, status: res.status, text };
+      }
+      return { ok: true, status: res.status };
+    } catch (err) {
+      console.error('Error sending to Formspree:', err);
+      return { ok: false, error: err };
+    }
+  }
+
+  // Small UI toast to show success/failure (non-blocking)
+  function showToast(msg, ok = true) {
+    try {
+      let t = document.getElementById('wrap-formspree-toast');
+      if (!t) {
+        t = document.createElement('div');
+        t.id = 'wrap-formspree-toast';
+        t.className = 'wrap-toast';
+        t.style.cssText = 'position:fixed;left:50%;transform:translateX(-50%);bottom:18px;z-index:9999;padding:10px 14px;border-radius:999px;background:rgba(0,0,0,0.8);color:#fff;font-weight:800;display:none;';
+        document.body.appendChild(t);
+      }
+      t.innerText = msg;
+      t.style.display = 'block';
+      setTimeout(()=> { t.style.display = 'none'; }, 3600);
+    } catch(e){ /* ignore UI failures */ }
+  }
+
+  // Primary watcher function
+  async function trySendIfNewOrder() {
+    try {
+      const raw = localStorage.getItem('wrap_last_order');
+      if (!raw) return;
+      let order;
+      try { order = JSON.parse(raw); } catch (e) { console.warn('wrap_last_order not JSON'); order = { raw }; }
+      const ref = order.reference || order.ref || order.reference_id || ('WD-' + Date.now());
+
+      // if already sent ref recorded, skip
+      const sentRef = localStorage.getItem(SENT_FLAG_KEY);
+      if (sentRef && String(sentRef) === String(ref)) {
+        // already sent
+        return;
+      }
+
+      // Build payload
+      const payload = buildOrderPayload(order);
+
+      // Send
+      const result = await sendToFormspree(payload);
+      if (result && result.ok) {
+        localStorage.setItem(SENT_FLAG_KEY, String(payload.Reference || ref));
+        console.info('Order sent to Formspree:', payload.Reference || ref);
+        showToast('Order sent — confirmation email queued ✔');
+      } else {
+        // if failed, keep retrying next poll but log
+        console.warn('Failed to send order to Formspree', result);
+        showToast('Order NOT sent (Formspree) — will retry', false);
+      }
+    } catch (err) {
+      console.error('formspree auto-sender error', err);
+    }
+  }
+
+  // Poll + storage-event listener so we detect when wrap_last_order is set by other code
+  let lastKnown = localStorage.getItem('wrap_last_order');
+  // run immediately in case it already exists
+  setTimeout(trySendIfNewOrder, 450);
+
+  // Poll every 1.2s for changes (lightweight)
+  setInterval(() => {
+    const now = localStorage.getItem('wrap_last_order');
+    if (now && now !== lastKnown) {
+      lastKnown = now;
+      trySendIfNewOrder();
+    }
+  }, 1200);
+
+  // Also listen to storage events (for other tabs)
+  window.addEventListener('storage', (e) => {
+    if (e.key === 'wrap_last_order') {
+      lastKnown = e.newValue;
+      trySendIfNewOrder();
+    }
+  });
+
+  // Expose a manual sender if you want to call programmatically:
+  window.sendWrapOrderToFormspreeNow = async function(orderOverride) {
+    try {
+      if (orderOverride) {
+        const payload = buildOrderPayload(orderOverride);
+        const res = await sendToFormspree(payload);
+        if (res.ok) {
+          localStorage.setItem(SENT_FLAG_KEY, String(payload.Reference));
+          showToast('Order sent — manual ✔');
+        }
+        return res;
+      } else {
+        await trySendIfNewOrder();
+      }
+    } catch (e) { console.error(e); }
+  };
+
+})();
+</script>
 
 
 </html>
