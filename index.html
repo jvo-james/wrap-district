@@ -2900,6 +2900,132 @@ a:focus, button:focus { outline: 3px solid rgba(255,204,51,0.10); outline-offset
 .menu-item, .slide-ctas .btn, .promo-cta-row .btn { cursor: pointer; }
 
 </style>
+  <style> /* ===== Make HERO identical to PROMO styling =====
+   Paste after your current hero & promo CSS so it overrides older rules
+*/
+
+/* Hero container uses the same glass/panel feel as promo */
+.hero {
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 28px 18px;
+  background: transparent;
+}
+
+/* Inner card that mirrors promo card */
+.hero .hero-panel {
+  width: 100%;
+  max-width: 1200px;            /* same width constraint as promo */
+  border-radius: 18px;          /* rounded like promo */
+  padding: 22px;
+  display: grid;
+  grid-template-columns: 1fr;   /* mobile-first: stacked */
+  gap: 18px;
+  background: var(--panel, rgba(255,255,255,0.02)); /* reuse theme panel var */
+  border: 1px solid rgba(255,255,255,0.04);
+  box-shadow: 0 12px 40px rgba(6,6,6,0.55);
+  align-items: center;
+}
+
+/* content column: copy promo typography & spacing */
+.hero .hero-content {
+  padding: 8px 2px;
+  max-width: 720px;
+}
+
+.hero .hero-title {
+  font-size: 28px;
+  line-height: 1.03;
+  font-weight: 800;
+  margin: 0 0 8px 0;
+  letter-spacing: -0.02em;
+}
+
+.hero .hero-sub {
+  font-size: 15px;
+  line-height: 1.45;
+  color: rgba(255,255,255,0.86);
+  margin: 0 0 14px 0;
+}
+
+/* CTA group uses promo CTA sizing & layout */
+.hero .hero-ctas {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+/* Primary & ghost CTA styling to match promo CTAs */
+.hero .btn {
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-weight: 700;
+  min-height: 44px;
+  min-width: 140px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.45);
+}
+
+/* Primary button: use promo accent colors where available */
+.hero .btn.primary {
+  background: linear-gradient(180deg, var(--gold-400, #ffd46a), var(--gold-500, #ffbf00));
+  color: #111;
+  border: none;
+}
+
+/* Ghost button style */
+.hero .btn.ghost {
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.08);
+  color: rgba(255,255,255,0.92);
+}
+
+/* image/visual column — adopt promo image framing */
+.hero .hero-media {
+  width: 100%;
+  display: block;
+  border-radius: 12px;
+  overflow: hidden;
+  min-height: 160px;
+  align-self: center;
+}
+
+/* image element */
+.hero .hero-media img {
+  display:block;
+  width:100%;
+  height:100%;
+  object-fit: cover;
+}
+
+/* Desktop / laptop: two-column layout like promo row */
+@media (min-width: 1024px) {
+  .hero .hero-panel {
+    grid-template-columns: 1fr 460px; /* content | media (promo-like split) */
+    gap: 26px;
+    padding: 28px;
+  }
+  .hero .hero-title { font-size: 36px; }
+  .hero .hero-sub { font-size: 16px; }
+  .hero .hero-media { min-height: 320px; border-radius: 14px; }
+  .hero .btn { min-width: 160px; padding: 12px 18px; }
+}
+
+/* mid-size laptops */
+@media (min-width: 900px) and (max-width: 1023px) {
+  .hero .hero-panel { grid-template-columns: 1fr 360px; gap: 20px; }
+  .hero .hero-title { font-size: 32px; }
+}
+
+/* small polish: ensure text wraps and no overflow */
+.hero .hero-title, .hero .hero-sub { word-wrap: break-word; hyphens: auto; }
+
+/* Accessibility / focus states match promo */
+.hero .btn:focus { outline: 3px solid rgba(255,223,102,0.18); outline-offset: 2px; }
+</style>
 </head>
 <body>
   <!-- STICKY HEADER (mobile-first: only logo, cart with badge, hamburger) -->
