@@ -2169,6 +2169,234 @@ a:focus, button:focus { outline: 3px solid rgba(255,204,51,0.10); outline-offset
     
 /* ---------- END of remaining UI styles ---------- */
 </style>
+  <style>
+    /* ------------------------
+  DESKTOP / LARGE SCREENS
+  Add after your existing stylesheet (mobile-first)
+  Breakpoints: 900px (laptop), 1200px (desktop), 1440px (wide)
+  ------------------------ */
+
+/* Global container max width for desktop */
+@media (min-width: 900px) {
+  :root { --max-width: 1100px; }
+
+  /* Center header contents and increase horizontal padding */
+  .header-inner {
+    max-width: var(--max-width);
+    padding: 12px 20px;
+    gap: 18px;
+  }
+  .sticky-header { height: calc(72px + var(--safe-top)); padding-top: var(--safe-top); }
+
+  /* Make logo slightly larger */
+  .logo-mark { font-size: 18px; padding:8px 12px; border-radius:10px; }
+  .logo-name { font-size:14px; }
+
+  /* Hide compact hamburger on larger screens (optional) */
+  .ham-btn { display: inline-flex; }
+  /* If you want to hide hamburger and show inline nav, see .desktop-nav below (optional) */
+
+  /* HERO: two-column layout (image left, content right) */
+  .hero-slideshow {
+    max-width: var(--max-width);
+    margin-top: calc(72px + var(--safe-top));
+    padding: 18px;
+  }
+  .slides {
+    height: 56vh;
+    display: grid;
+    grid-template-columns: 1fr 520px; /* image area + content area */
+    gap: 18px;
+    align-items: center;
+  }
+  .slide {
+    position: relative;
+    display: block;
+    grid-column: 1 / -1; /* each slide still covers full grid, but inner layout controlled below */
+  }
+  /* split slide internals: image left, overlay/content to the right */
+  .slide .slide-img {
+    grid-column: 1 / 2;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 12px;
+    box-shadow: 0 30px 70px rgba(0,0,0,0.6);
+  }
+  .slide .slide-overlay {
+    grid-column: 2 / 3;
+    position: relative;
+    inset: auto;
+    align-items: flex-start;
+    padding: 28px;
+    display:flex;
+    justify-content:flex-start;
+  }
+  .slide-content {
+    width: 100%;
+    max-width: 520px;
+    border-radius: 12px;
+    padding: 18px;
+    transform: none;
+  }
+
+  /* Larger typography */
+  .slide-title { font-size: 34px; }
+  .slide-sub { font-size: 16px; }
+
+  /* Slideshow controls reposition */
+  .slideshow-controls { bottom: 18px; left: 50%; transform: translateX(-50%); }
+
+  /* Menu section — wider grid: 2 columns on laptop */
+  .menu-section { max-width: var(--max-width); padding: 0 20px; }
+  .menu-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; }
+
+  /* Menu cards enlarge */
+  .menu-item { padding: 16px; border-radius: 14px; }
+  .item-thumb { width: 140px; height: 110px; flex: 0 0 140px; border-radius: 12px; }
+  .item-title { font-size: 18px; }
+
+  /* Cart drawer: become a right-side panel (sticky) on larger screens */
+  .cart-drawer {
+    width: 420px;
+    max-width: 420px;
+    right: 28px;
+    top: calc(72px + var(--safe-top));
+    height: calc(100vh - (72px + var(--safe-top)) - 28px);
+    border-radius: 12px;
+    transform: translateX(110%); /* still hidden by default */
+    box-shadow: -26px 12px 60px rgba(0,0,0,0.65);
+  }
+
+  /* When pinned (use JS to add .desktop-pinned), show as visible panel */
+  .cart-drawer.desktop-pinned[aria-hidden="false"], .cart-drawer[aria-hidden="false"] {
+    transform: translateX(0);
+    display: block;
+    opacity: 1;
+  }
+
+  .cart-body { height: calc(100% - var(--cart-header-h) - var(--cart-footer-h)); }
+
+  /* Product modal: bigger and centered */
+  #product-modal .modal-inner { max-width: 720px; display:flex; flex-direction:row; gap:0; border-radius:12px; }
+  #product-modal .pm-thumb { width:220px; height:160px; flex:0 0 220px; border-radius:8px; }
+  #product-modal .pm-body { max-height:70vh; overflow:auto; padding:18px; }
+
+  /* Checkout page: use two-column layout (already defined, enhance spacing) */
+  #checkout-inner {
+    max-width: 1100px;
+    grid-template-columns: 1fr 420px;
+    margin-top: calc(72px + var(--safe-top) + 18px);
+    max-height: calc(100vh - (72px + var(--safe-top) + 60px));
+  }
+  .checkout-left { padding: 22px; }
+  .checkout-right { padding: 22px; }
+
+  /* Order confirmation modal bigger */
+  .oc-inner { max-width: 980px; padding: 20px; }
+
+  /* Footer: two columns */
+  .site-footer { max-width: var(--max-width); padding: 18px 20px; display:flex; gap:20px; align-items:flex-start; }
+  .footer-grid { flex-direction:row; gap:24px; }
+  .footer-left, .footer-right { width: 50%; }
+
+  /* Promo carousel: enlarge card and show side-by-side controls */
+  .promo-carousel { max-width: var(--max-width); padding: 8px 18px; }
+  .pc-slides { height: 44vh; min-height: 260px; }
+}
+
+/* Bigger desktop */
+@media (min-width: 1200px) {
+  :root { --max-width: 1280px; }
+
+  /* Header: show more spacing and a slightly larger logo */
+  .header-inner { padding: 16px 28px; gap: 22px; max-width: var(--max-width); }
+  .logo-mark { font-size:20px; padding:8px 14px; }
+
+  /* Hero: heavier two-column emphasis (image bigger) */
+  .slides { grid-template-columns: 1fr 560px; gap: 24px; height: 60vh; }
+  .slide-title { font-size: 40px; letter-spacing: -0.6px; }
+  .slide-sub { font-size: 17px; }
+
+  /* Menu grid: 3 columns if space allows */
+  .menu-grid { grid-template-columns: repeat(3, 1fr); gap: 20px; }
+
+  .item-thumb { width: 160px; height: 120px; flex: 0 0 160px; }
+  .menu-item { padding: 18px; }
+
+  /* Cart: slightly wider */
+  .cart-drawer { width: 480px; max-width: 480px; }
+
+  /* Product modal: full feature view */
+  #product-modal .modal-inner { max-width: 960px; }
+  #product-modal .pm-body { padding: 22px; }
+
+  /* Checkout page: increase right summary column width */
+  #checkout-inner { grid-template-columns: 1fr 480px; max-width: 1280px; }
+  #cf-order-lines { max-height: calc(100vh - (72px + var(--safe-top) + 320px)); }
+}
+
+/* Ultra wide screens */
+@media (min-width: 1440px) {
+  :root { --max-width: 1400px; }
+
+  .header-inner { max-width: var(--max-width); padding: 18px 36px; }
+  .hero-slideshow { padding-left: 28px; padding-right: 28px; }
+  .slides { gap: 32px; height: 64vh; }
+  .slide-title { font-size: 48px; }
+
+  .menu-grid { grid-template-columns: repeat(4, 1fr); gap: 26px; }
+  .menu-item { padding: 22px; border-radius: 16px; }
+
+  /* Cart pinned style suggestion: use .desktop-pinned class to keep cart visible */
+  .cart-drawer.desktop-pinned {
+    position: fixed;
+    right: 36px;
+    transform: translateX(0);
+    top: calc(88px + var(--safe-top));
+    height: calc(100vh - (88px + var(--safe-top) + 36px));
+  }
+}
+
+/* ------------------------
+  Desktop navigation helper (optional)
+  If you add an inline nav inside the header (class .desktop-nav),
+  these styles will show it and hide the hamburger.
+  ------------------------ */
+@media (min-width: 900px) {
+  /* by default keep the hamburger; if you add .desktop-nav show it and hide .ham-btn */
+  .desktop-nav { display: none; }
+  /* Example: if you add <nav class="desktop-nav"><ul class="nav-list">...</ul></nav> into header */
+  .header-inner .desktop-nav[aria-hidden="false"] { display: flex; gap: 18px; align-items:center; margin-left:auto; }
+  .header-inner .desktop-nav .nav-list { display:flex; gap: 12px; align-items:center; }
+  .header-inner .desktop-nav .nav-link { padding:10px 12px; border-radius: 10px; background: transparent; color: var(--muted); border: 1px solid rgba(255,255,255,0.02); }
+  .header-inner .ham-btn { display: inline-flex; } /* keep by default */
+}
+
+/* ------------------------
+  Accessibility & small polish on large screens
+  ------------------------ */
+@media (min-width: 900px) {
+  .btn { min-height: 48px; padding: 12px 16px; border-radius: 12px; font-size: 15px; }
+  .icon-btn { padding: 10px; }
+  .slide-ctas .btn { font-size: 15px; }
+  .menu-tabs .tab-btn { padding: 10px 14px; font-size: 14px; }
+  .cart-header h3 { font-size: 18px; }
+  .cart-footer .footer-actions { min-width: 220px; }
+  /* focus rings more visible on desktop */
+  :focus { outline: 4px solid rgba(255,204,51,0.12); outline-offset: 3px; }
+}
+
+/* ------------------------
+  Print-friendly adjustments for desktop print
+  ------------------------ */
+@media print {
+  .slides, .menu-grid, .cart-drawer, .mobile-nav, .promo-carousel, .site-footer { display: none !important; }
+  #order-confirmation-modal, .oc-inner { display: block !important; position: static !important; visibility: visible !important; }
+}
+
+/* END desktop media CSS */
+</style>
 </head>
 <body>
   <!-- STICKY HEADER (mobile-first: only logo, cart with badge, hamburger) -->
@@ -3435,27 +3663,30 @@ if (cartHeader && !document.getElementById('cart-header-total')) {
           <button id="checkout-close" class="icon-btn" aria-label="Close checkout"><i class="fa fa-times"></i></button>
         </div>
       </div>
-
+<form
+  action="https://formspree.io/f/mvglponq"
+  method="POST"
+>
       <div>
         <div class="form-row">
           <div class="form-col">
             <label class="small-muted">Full name *</label>
-            <input id="cf-name" class="input" type="text" placeholder="..." required />
+            <input id="cf-name" class="input" type="text" name="Full_name" placeholder="..." required />
           </div>
           <div class="form-col">
             <label class="small-muted">Phone *</label>
-            <input id="cf-phone" class="input" type="tel" placeholder="0550xxxxxx" required />
+            <input id="cf-phone" class="input" type="tel" name="Phone_number" placeholder="0550xxxxxx" required />
           </div>
         </div>
 
         <div class="form-row">
           <div class="form-col">
             <label class="small-muted">Email *</label>
-            <input id="cf-email" class="input" type="email" placeholder="you@example.com" required />
+            <input id="cf-email" class="input" type="email" name="Email" placeholder="you@example.com" required />
           </div>
           <div class="form-col">
             <label class="small-muted">Order type *</label>
-            <select id="cf-type" class="input">
+            <select id="cf-type" class="input" name="Order_type">
               <option value="delivery">Delivery</option>
               <option value="pickup">Pickup</option>
             </select>
@@ -3464,7 +3695,7 @@ if (cartHeader && !document.getElementById('cart-header-total')) {
 
         <div style="margin-top:6px;">
           <label class="small-muted">Your Address*</label>
-        <input id="cf-address" class="input" type="text" placeholder="Enter delivery address (only when Delivery selected)" readonly />
+        <input id="cf-address" class="input" type="text" name="Delivery_address" placeholder="Enter delivery address (only when Delivery selected)" readonly />
           <input type="hidden" id="cf-lat" />
           <input type="hidden" id="cf-lon" />
         </div>
@@ -3472,22 +3703,22 @@ if (cartHeader && !document.getElementById('cart-header-total')) {
         <div class="form-row" style="margin-top:10px;">
           <div class="form-col">
             <label class="small-muted">Preferred date</label>
-            <input id="cf-date" class="input" type="date" />
+            <input id="cf-date" class="input" name="Date" type="date" />
           </div>
           <div class="form-col">
             <label class="small-muted">Preferred time</label>
-            <input id="cf-time" class="input" type="time" />
+            <input id="cf-time" class="input" type="time" name="Time" />
           </div>
         </div>
 
         <div style="margin-top:10px;">
           <label class="small-muted">Notes </label>
-          <textarea id="cf-note" class="input" rows="3" placeholder="e.g., no vegetables, not too spicy, etc. "></textarea>
+          <textarea id="cf-note" class="input" rows="3" placeholder="e.g., no vegetables, not too spicy, etc. " name="Notes"></textarea>
         </div>
 
         <div style="margin-top:12px;">
           <label class="small-muted">Payment method</label>
-          <select id="cf-paymethod" class="input">
+          <select id="cf-paymethod" class="input" name="Payment_method">
             <option value="paystack">Pay with Mobile Money / Card (Paystack)</option>
             <option value="cash" disabled>Cash on Delivery</option>
           </select>
@@ -3503,6 +3734,7 @@ if (cartHeader && !document.getElementById('cart-header-total')) {
        </div>
  
       </div>
+</form>
     </div>
 
     <aside class="checkout-right" aria-label="Order summary">
@@ -3931,98 +4163,7 @@ btnPrint && btnPrint.addEventListener('click', () => {
   });
 })();
 </script>
-  <script>
-    // --- Formspree order sender (paste once near your checkout script)
-function buildOrderText(order) {
-  const escape = s => String(s ?? '').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-  const lines = (Array.isArray(order.cart) ? order.cart : []).map(l => {
-    const qty = Number(l.qty || 1);
-    const unit = Number(l.unitPrice || l.unit_price || 0);
-    const addons = (l.meta && Array.isArray(l.meta.addons) && l.meta.addons.length)
-      ? 'Extras: ' + l.meta.addons.map(a => (a.label || a.key || a)).join(', ')
-      : '';
-    const otherMeta = (() => {
-      if (!l.meta) return '';
-      return Object.keys(l.meta)
-        .filter(k => k !== 'addons')
-        .map(k => `${k}: ${typeof l.meta[k] === 'object' ? JSON.stringify(l.meta[k]) : l.meta[k]}`)
-        .join(' • ');
-    })();
-    const metaParts = [addons, otherMeta].filter(Boolean).join(' • ');
-    return `${qty} × ${escape(l.title || l.name || 'Item')} — unit: GHC ${Math.round(unit)} — line: GHC ${Math.round(qty * unit)}${metaParts ? ' — ' + metaParts : ''}`;
-  });
-
-  const totals = order.totals || {};
-  return `
-Reference: ${escape(order.reference || '')}
-Placed: ${escape(order.ts || new Date().toISOString())}
-Name: ${escape(order.name || '')}
-Phone: ${escape(order.phone || '')}
-Email: ${escape(order.email || '')}
-Order type: ${escape(order.type || '')}
-Address: ${escape(order.address || '')}
-Notes: ${escape(order.note || '')}
-
-ORDER LINES:
-${lines.length ? lines.join('\n') : '(no lines recorded)'}
-
-Totals:
-  Subtotal: GHC ${Math.round(totals.subtotal || 0)}
-  Delivery: GHC ${Math.round(totals.delivery || 0)}
-  Promo/Discount: -GHC ${Math.round(totals.promo || totals.promoDiscount || 0)}
-  TOTAL: GHC ${Math.round(totals.total || (totals.subtotal || 0) - (totals.promo || 0) + (totals.delivery || 0))}
-
-Raw order JSON (for debugging):
-${JSON.stringify(order, null, 2)}
-`.trim();
-}
-
-function sendOrderToFormspree(order) {
-  // your form endpoint
-  const endpoint = 'https://formspree.io/f/mvglponq';
-
-  // Build a friendly subject and message (will appear in the email)
-  const subject = `New Wrap District order: ${order.reference || 'no-ref'}`;
-  const message = buildOrderText(order);
-
-  // Formspree accepts JSON posts of fields. We'll send several fields so the email contains them clearly.
-  const payload = {
-    _subject: subject,
-    name: order.name || '',
-    email: order.email || '',
-    phone: order.phone || '',
-    address: order.address || '',
-    order_type: order.type || '',
-    reference: order.reference || '',
-    placed_at: order.ts || new Date().toISOString(),
-    subtotal: order.totals?.subtotal ?? '',
-    delivery: order.totals?.delivery ?? '',
-    promo: order.totals?.promo ?? order.totals?.promoDiscount ?? '',
-    total: order.totals?.total ?? '',
-    order_items: (Array.isArray(order.cart) ? order.cart.map(li => `${li.qty || 1}x ${li.title || li.name || 'Item'} (GHC ${li.unitPrice||li.unit_price||0})`).join(' | ') : ''),
-    message // long human readable copy (mirrors the PDF contents)
-  };
-
-  // POST to Formspree, return a Promise so caller can handle success/failure
-  return fetch(endpoint, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json'
-    },
-    body: JSON.stringify(payload)
-  }).then(async res => {
-    // If Formspree returns non-2xx, produce a helpful error
-    if (!res.ok) {
-      const text = await res.text().catch(()=>res.statusText);
-      throw new Error('Formspree error: ' + (text || res.status));
-    }
-    // returns the parsed json when available
-    return res.json().catch(()=>({ ok: true }));
-  });
-}
-
-  </script>
+ 
 <script>
 (function(){
   document.addEventListener('DOMContentLoaded', function(){
