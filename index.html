@@ -4926,15 +4926,7 @@ btnPrint && btnPrint.addEventListener('click', () => {
 
 (function(){
   document.addEventListener('DOMContentLoaded', () => {
-    // Configurable store coordinates (set your store exact lat/lon here)
-    const STORE_COORDS = { lat: 5.6600, lon: 0.0190 }; // <-- change to your store's lat/lon (Tema Community 25 / Devtraco approx)
-    const DELIVERY_CONFIG = {
-      baseFee: 6,        // base GHC
-      perKm: 2.5,        // GHC per km
-      minFee: 4,         // minimum fee
-      maxFee: 60,        // maximum fee
-      freeWithinKm: 0.8  // free delivery inside this radius (in km)
-    };
+  
 const PAYSTACK_PUBLIC_KEY = 'pk_live_ad7d0e0b164d83ec61bf2bf4fdb2af366c41c0ed';
     // DOM
     const page = document.getElementById('checkout-page');
@@ -5096,66 +5088,11 @@ const PAYSTACK_PUBLIC_KEY = 'pk_live_ad7d0e0b164d83ec61bf2bf4fdb2af366c41c0ed';
       return { subtotal, delivery: 0, promoDiscount: promo, total: subtotal - promo };
     }
 
-    function refreshTotals() {
-      const totals = getTotals();
-      cfSubtotal.innerText = fmtGhc(totals.subtotal || 0);
-      // compute delivery: only if delivery selected and we have coords
-      const type = inpType.value;
-      let deliveryFee = 0;
-      if (type === 'delivery') {
-        const lat = parseFloat(inpLat.value), lon = parseFloat(inpLon.value);
-        if (!isNaN(lat) && !isNaN(lon)) deliveryFee = computeDeliveryFee(lat, lon);
-        else deliveryFee = DELIVERY_CONFIG.baseFee; // fallback
-      }
-      cfDelivery.innerText = fmtGhc(deliveryFee || 0);
-      cfPromo.innerText = `-GHC ${Math.round(totals.promoDiscount || 0)}`;
-      const total = Math.max(0, (totals.subtotal || 0) - (totals.promoDiscount || 0) + (deliveryFee || 0));
-      cfTotal.innerText = fmtGhc(total);
-    }
+ 
 
-    // compute delivery fee using haversine distance
-    function computeDeliveryFee(lat, lon) {
-      if (typeof lat !== 'number' || typeof lon !== 'number' || isNaN(lat) || isNaN(lon)) return DELIVERY_CONFIG.baseFee;
-      const dist = haversineKm(STORE_COORDS.lat, STORE_COORDS.lon, lat, lon);
-      if (dist <= DELIVERY_CONFIG.freeWithinKm) return 0;
-      let fee = DELIVERY_CONFIG.baseFee + (dist * DELIVERY_CONFIG.perKm);
-      fee = Math.max(fee, DELIVERY_CONFIG.minFee);
-      fee = Math.min(fee, DELIVERY_CONFIG.maxFee);
-      return Math.round(fee);
-    }
 
-    // Haversine formula
-    function haversineKm(lat1, lon1, lat2, lon2) {
-      const R = 6371; // km
-      const dLat = toRad(lat2 - lat1);
-      const dLon = toRad(lon2 - lon1);
-      const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon/2) * Math.sin(dLon/2);
-      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-      return R * c;
-    }
-    function toRad(v){ return v * Math.PI / 180; }
 
-    // Address click opens existing map modal (your code already links #cf-address -> #map-modal)
-    inpAddress && inpAddress.addEventListener('click', (e) => {
-     const type = (inpType && inpType.value) || 'delivery';
-      if (type === 'pickup') {
-        // keep it readonly and do nothing
-        e.preventDefault();
-        return;
-      }
-     // Delivery — ensure the field is editable and focus so the user can type
-      inpAddress.removeAttribute('readonly');
-      setTimeout(()=> { try { inpAddress.focus(); } catch(e){} }, 60);
-    });
 
-    // When map selection happens, your existing map-confirm logic already writes cf-address/cf-lat/cf-lon.
-    // We just add a MutationObserver or poll to react to changes and update totals.
-    const latEl = inpLat, lonEl = inpLon;
-    if (latEl && lonEl) {
-      const mo = new MutationObserver(() => { refreshTotals(); });
-      mo.observe(latEl, { attributes:true, childList:true, characterData:true, subtree:true });
-      mo.observe(lonEl, { attributes:true, childList:true, characterData:true, subtree:true });
-    }
 
     // also refresh totals when order type changes or when cart changes
     inpType && inpType.addEventListener('change', refreshTotals);
