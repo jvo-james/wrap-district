@@ -5086,14 +5086,70 @@ const PAYSTACK_PUBLIC_KEY = 'pk_live_ad7d0e0b164d83ec61bf2bf4fdb2af366c41c0ed';
 
     // Totals: prefer computeCartTotals() if available else compute from window.cart or fallback DOM
     function getTotals() {
-      if (typeof computeCartTotals === 'function') return computeCartTotals();
+     // If the app already provides a computeCartTotals() use it (server logic preferred).
+      if (typeof computeCartTotals === 'function') {
+        const t = computeCartTotals() || {};
+        // normalize common fields
+        t.promoDiscount = t.promoDiscount || t.promo || t.promoAmount || 0;
+        t.subtotal = typeof t.subtotal !== 'undefined' ? t.subtotal : (t.subtotal || 0);
+        return t;
+      }
+
       const cartObj = window.cart || {};
-      let subtotal = 0, promo=0;
       const lines = Object.values(cartObj).length ? Object.values(cartObj) : extractCartFromDom();
-      lines.forEach(l => subtotal += (Number(l.unitPrice)||0) * (Number(l.qty)||1));
-      // basic promo detection (if global logic exists it will be used earlier)
-      // delivery will be computed separately
-      return { subtotal, delivery: 0, promoDiscount: promo, total: subtotal - promo };
+     let subtotal = 0;
+      // Build a list of shawarma unit prices (expanded by qty) to compute B2G1 properly
+      const shawarmaUnitPrices = [];
+
+      lines.forEach(l => {
+        const qty = Number(l.qty) || 1;
+        const unit = Number(l.unitPrice || l.unit_price || 0) || 0;
+        subtotal += unit * qty;
+        const title = String(l.title || l.name || '').toLowerCase();
+        const idKeys = [l.baseId, l.id, l.itemId, l.productId].map(x => String(x || '').toLowerCase());
+        // robust detection: either base id equals 'shawarma' or title contains 'shawarma'
+        const isShawarma = idKeys.includes('shawarma') || title.includes('shawarma') || (String(l.sku||'').toLowerCase().includes('shawarma'));
+        if (isShawarma) {
+         for (let i = 0; i < qty; i++) shawarmaUnitPrices.push(unit);
+       }
+     });
+
+     // Promo rules: Buy 2 Get 1 free applies only on Tuesdays (or when user explicitly claimed the promo)
+     const todayIsTuesday = (new Date()).getDay() === 2; // Sunday=0, Monday=1, Tuesday=2
+     const promoClaimed = !!localStorage.getItem('wrap_claimed_promo_TUES-B2G1');
+      let promoDiscount = 0;
+     const freeItems = [];
+
+     if ((todayIsTuesday || promoClaimed) && shawarmaUnitPrices.length >= 3) {
+       // Number of free items is floor(total_shawarmas / 3)
+        const freeCount = Math.floor(shawarmaUnitPrices.length / 3);
+       // discount the cheapest items (common retail pattern)
+        const sorted = shawarmaUnitPrices.slice().sort((a,b) => a - b);
+        const amountsToDiscount = sorted.slice(0, freeCount);
+       promoDiscount = amountsToDiscount.reduce((s, v) => s + Number(v || 0), 0);
+
+       // Add friendly freeLines so invoices and checkout can display them
+        if (promoDiscount > 0) {
+          freeItems.push({
+           id: 'promo-TUES-B2G1',
+           title: 'Shawarma (Free — Promo)',
+           unitPrice: 0,
+            qty: freeCount,
+            meta: { promo: 'TUES-B2G1', originalPricePerItem: amountsToDiscount }  
+          });
+        }
+      }
+
+      const delivery = 0; // your logic sets delivery elsewhere; keep 0 here as before
+     const total = Math.max(0, Math.round(subtotal - promoDiscount + (delivery || 0)));
+
+      return {
+        subtotal: Math.round(subtotal),
+       delivery,
+        promoDiscount: Math.round(promoDiscount),
+        freeItems: freeItems,
+        total
+      };
     }
 
     function refreshTotals() {
