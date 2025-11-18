@@ -5307,41 +5307,119 @@ const PAYSTACK_PUBLIC_KEY = 'pk_live_ad7d0e0b164d83ec61bf2bf4fdb2af366c41c0ed';
       // paymethod === paystack -> call server init endpoint (same pattern as earlier)
     try {
        // If user chose inline Paystack and a public key is provided:
-        if (paymethod === 'paystack' && PAYSTACK_PUBLIC_KEY && window.PaystackPop) {
-          const PUBLIC_KEY = PAYSTACK_PUBLIC_KEY;
-          const ref = 'PSK-' + Date.now() + '-' + Math.floor(Math.random()*10000);
-          const handler = window.PaystackPop.setup({
+        if (paymethod === 'paystack') {
+      // Basic validation
+     if (!PAYSTACK_PUBLIC_KEY) {
+       alert('Paystack public key is not configured. Cannot proceed.');
+        submitBtn.disabled = false;
+        return;
+     }
+      if (typeof totalAmount === 'undefined' || Number(totalAmount) <= 0) {
+       alert('Invalid amount to pay. Please review your cart.');
+       submitBtn.disabled = false;
+       return;
+      }
+
+     // If Paystack script hasn't loaded yet, attempt to load it dynamically (robustness)
+     function ensurePaystackLoaded(cb) {
+       if (window.PaystackPop) return cb(null);
+       const s = document.createElement('script');
+        s.src = 'https://js.paystack.co/v2/inline.js';
+       s.async = true;
+       s.onload = () => cb(null);
+       s.onerror = () => cb(new Error('Could not load Paystack script'));
+        document.head.appendChild(s);
+      }
+
+      // Encapsulated payment opener with safe fallbacks & timeouts
+      function openPaystackInline() {
+       try {
+         const PUBLIC_KEY = PAYSTACK_PUBLIC_KEY;
+         const ref = 'PSK-' + Date.now() + '-' + Math.floor(Math.random() * 10000);
+          const amountInMinor = Math.round(Number(totalAmount) * 100);
+
+          // guard: Paystack requires amount > 0 (in minor units)
+          if (!amountInMinor || amountInMinor <= 0) {
+            alert('Payment amount is zero. Add items to cart before paying.');
+           submitBtn.disabled = false;
+            return;
+          }
+
+         let fallbackTimer = null;
+         const handler = window.PaystackPop.setup({
            key: PUBLIC_KEY,
-           email: email,
-            amount: Math.round(totalAmount * 100),
+            email: email,
+           amount: amountInMinor,
             currency: 'GHS',
             ref,
-            onClose: function() {
-              alert('Payment cancelled');
-              submitBtn.disabled = false;
-            },
-            callback: function(response) {
-             // Inline Paystack returns a reference — we treat callback as success for frontend-only flow
-             const order = {
-                reference: response.reference || ref,
-                name, phone, email, type, address, lat, lon, date, time, note,
-                cart: cartLines,
-               totals: { subtotal: totals.subtotal, delivery, promo: totals.promoDiscount, total: totalAmount },
-                ts: new Date().toISOString()
-             };
+           onClose: function() {
+             // user closed the iframe
+             submitBtn.disabled = false;
+             if (fallbackTimer) clearTimeout(fallbackTimer);
+           },
+          callback: function(response) {
+              // success
+            if (fallbackTimer) clearTimeout(fallbackTimer);
              try {
+               const order = {
+                 reference: response.reference || ref,
+                 name, phone, email, type, address, lat, lon, date, time, note,
+                  cart: cartLines,
+                 totals: { subtotal: totals.subtotal, delivery, promo: totals.promoDiscount, total: Math.round(totalAmount) },
+                  ts: new Date().toISOString()
+               };
                 localStorage.setItem('wrap_last_order', JSON.stringify(order));
-               localStorage.setItem('wrap_show_confirmation', '1');
-              } catch (e) {}
-             try { window.cart = {}; if (typeof renderCart === 'function') renderCart(); } catch(e){}
-             closeCheckoutPage();
-             // reload to show confirmation modal (order data is in localStorage)
-             window.location.reload();
-            }
-         });
-         handler.openIframe();
-          return;
+              localStorage.setItem('wrap_show_confirmation', '1');
+             } catch (e) { /* ignore storage errors */ }
+            try { window.cart = {}; if (typeof renderCart === 'function') renderCart(); } catch (e) { /* ignore */ }
+            closeCheckoutPage();
+            // reload to show confirmation modal (order data is in localStorage)
+            window.location.reload();
+           }
+        });
+
+          // open and set a reasonable fallback in case no UI appears (re-enable submit)
+          try {
+           handler.openIframe();
+         } catch (err) {
+           console.error('Paystack openIframe error', err);
+           alert('Could not open Paystack payment window. Please try again or allow popups/iframes for this site.');
+            submitBtn.disabled = false;
+           return;
+          }
+
+          // fallback timer: re-enable submit button if Paystack UI didn't respond in 25s
+          fallbackTimer = setTimeout(() => {
+            submitBtn.disabled = false;
+           alert('Payment is taking longer than expected. If the Paystack UI did not appear, please check your browser settings (popups/iframes) and try again.');
+         }, 25000);
+       } catch (ex) {
+         console.error('openPaystackInline exception', ex);
+          alert('Payment could not be initiated. See console for details.');
+         submitBtn.disabled = false;
+        }
+     }
+
+     // If page is loaded from file://, warn (Paystack needs http/s)
+      if (window.location.protocol === 'file:') {
+      alert('Paystack inline payments require the page to be served over http(s). Upload to Netlify / GitHub Pages / local dev server and try again.');
+        submitBtn.disabled = false;
+        return;
+     }
+
+     // Ensure Paystack script is available then open
+      ensurePaystackLoaded((err) => {
+       if (err) {
+         console.error(err);
+         alert('Could not load Paystack script. Check your connection or console for details.');
+          submitBtn.disabled = false;
+         return;
        }
+       // slight nextTick to keep UI responsive
+        setTimeout(openPaystackInline, 50);
+      });
+      return;
+   }
 
         // If Paystack public key missing or PaystackPop not loaded: ask user to simulate payment
        if (paymethod === 'paystack') {
