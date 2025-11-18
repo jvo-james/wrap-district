@@ -6083,6 +6083,78 @@ body.cart-open::before {
   };
 </script>
 
+ <script>
+ // --- CONFIG: replace with your real Formspree form ID ---
+ const FORMSPREE_ENDPOINT = 'https://formspree.io/f/mvglponq';
+
+
+ async function sendOrderEmailWithPDF(order, pdfBlob) {
+   if (!order || !pdfBlob) throw new Error('order and pdfBlob required');
+
+   const fd = new FormData();
+   // Basic text fields — Formspree will include these in the email body
+   fd.append('customer_name', order.name || '');
+   fd.append('customer_email', order.email || '');
+   fd.append('order_id', order.id || '');
+   fd.append('order_total', order.total != null ? String(order.total) : '');
+   // human-readable summary — you can format as you like
+   fd.append('order_summary', JSON.stringify(order.items || [], null, 2));
+   if (order.note) fd.append('note', order.note);
+
+   // Attach the PDF blob as a file. Formspree receives file fields sent in multipart/form-data.
+   // Use the field name 'file' (or any name); Formspree will attach it to the email.
+   fd.append('file', pdfBlob, `${order.id || 'order'}.pdf`);
+
+   const resp = await fetch(FORMSPREE_ENDPOINT, { method: 'POST', body: fd });
+   if (!resp.ok) {
+     const text = await resp.text().catch(() => '');
+     const err = new Error('Formspree error: ' + resp.status + ' ' + text);
+     err.response = resp;
+     throw err;
+   }
+   return resp;
+ }
+
+
+ async function sendOrderEmailWithPDFBase64(order, pdfBlob) {
+   const base64 = await blobToBase64(pdfBlob);
+   const payload = {
+     customer_name: order.name || '',
+     customer_email: order.email || '',
+     order_id: order.id || '',
+     order_total: order.total != null ? String(order.total) : '',
+     order_summary: JSON.stringify(order.items || [], null, 2),
+     pdf_base64: base64.split(',')[1] || base64 // remove data:prefix if present
+   };
+
+   // Send as JSON (Formspree accepts JSON POSTs to the /f/ endpoint too)
+   const resp = await fetch(FORMSPREE_ENDPOINT, {
+     method: 'POST',
+     headers: { 'Content-Type': 'application/json' },
+     body: JSON.stringify(payload)
+   });
+   if (!resp.ok) {
+     const text = await resp.text().catch(() => '');
+     const err = new Error('Formspree error: ' + resp.status + ' ' + text);
+     err.response = resp;
+     throw err;
+   }
+   return resp;
+ }
+
+ // small helper: blob -> dataURL
+ function blobToBase64(blob) {
+   return new Promise((resolve, reject) => {
+     const reader = new FileReader();
+     reader.onload = () => resolve(reader.result);
+     reader.onerror = reject;
+     reader.readAsDataURL(blob);
+  });
+}
+
+
+ </script>
+ <!-- +++ end Formspree helper +++ -->
 
 </html>
   
