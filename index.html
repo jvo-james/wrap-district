@@ -7229,6 +7229,73 @@ body.cart-open::before {
 })();
 </script>
 
+<!-- Preload Paystack safely and add debug helpers -->
+<script>
+  (function(){
+    // Ensure Paystack script is present early (preload)
+    if (!window.PaystackPop) {
+      var s = document.createElement('script');
+      s.src = 'https://js.paystack.co/v2/inline.js';
+      s.async = true;
+      s.onload = function(){ console.info('Paystack script loaded'); };
+      s.onerror = function(){ console.error('Paystack script failed to load'); };
+      document.head.appendChild(s);
+    } else {
+      console.info('Paystack already available');
+    }
 
+    // Helper to open Paystack inline (expects payKey + email + amount)
+    window.openPaystackInline = function({ publicKey, email, amountGhc, ref }) {
+      try {
+        console.log('openPaystackInline called', { publicKey, email, amountGhc, ref });
+        if (!window.PaystackPop) {
+          alert('Payment service not ready. Please refresh the page (check console for details).');
+          console.error('PaystackPop not available');
+          return Promise.reject(new Error('PaystackPop not available'));
+        }
+        if (!publicKey) {
+          alert('Payment key not configured.');
+          return Promise.reject(new Error('No public key'));
+        }
+        const amountMinor = Math.round(Number(amountGhc || 0) * 100);
+        if (!amountMinor || amountMinor <= 0) {
+          alert('Invalid payment amount. Add items to cart first.');
+          return Promise.reject(new Error('Invalid amount'));
+        }
+        // create handler synchronously on user gesture
+        const handler = window.PaystackPop.setup({
+          key: publicKey,
+          email: email || 'no-email@example.com',
+          amount: amountMinor,
+          currency: 'GHS',
+          ref: ref || ('PSK-' + Date.now()),
+          onClose: function() {
+            console.warn('Paystack window closed by user');
+          },
+          callback: function(response) {
+            console.info('Paystack success callback', response);
+            // you already persist order + show confirmation in your flow
+            window.location.reload(); // or you can do your normal success flow
+          }
+        });
+
+        // open iframe immediately (this is a synchronous call on the user gesture)
+        handler.openIframe();
+        return Promise.resolve();
+      } catch (err) {
+        console.error('openPaystackInline error', err);
+        alert('Could not open payment window. See console for details.');
+        return Promise.reject(err);
+      }
+    }
+
+    // Small dev helper: test function to run in console
+    window.testPaystackReady = function() {
+      console.log('protocol', location.protocol);
+      console.log('PaystackPop', typeof window.PaystackPop);
+      return typeof window.PaystackPop !== 'undefined';
+    };
+  })();
+</script>
 </html>
   
