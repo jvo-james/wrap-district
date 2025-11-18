@@ -6398,7 +6398,16 @@ body.cart-open::before {
     payload.Extras_List = extrasList.join(' • ');
 
     // attach items JSON and human-readable summary
-    payload.Order_Items = JSON.stringify(normalized, null, 0); // compact JSON
+     function humanizeItem(it){
+     const addonText = (it.addons && it.addons.length)
+        ? ` [+ ${it.addons.map(a => `${a.label} ${fmtGhc(a.price)}`).join(', ')}]`
+        : '';
+      const metaText = it.meta && Object.keys(it.meta).length
+       ? ' • ' + Object.values(it.meta).map(m => (m && m.text) ? m.text : String(m)).join(' • ')
+       : '';
+      return `${it.qty} × ${it.title} — ${fmtGhc(it.unitPrice)} → ${fmtGhc(it.lineTotal)}${addonText}${metaText}`;
+    }
+    payload.Order_Items = normalized.map(humanizeItem).join('\n');
     // readable summary
     const summaryLines = normalized.map(it => {
       const addonText = (it.addons && it.addons.length) ? ` [+ ${it.addons.map(a=>a.label+' GHC '+a.price).join(', ')}]` : '';
