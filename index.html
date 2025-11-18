@@ -5221,237 +5221,224 @@ const PAYSTACK_PUBLIC_KEY = 'pk_live_ad7d0e0b164d83ec61bf2bf4fdb2af366c41c0ed';
     }
 
     // Submit handler: validate fields and assemble payload (same shape as previous modal-based flow)
-    submitBtn && submitBtn.addEventListener('click', async (ev) => {
-      ev.preventDefault();
-      submitBtn.disabled = true;
+    // === REPLACE checkout submit handler with the robust version below ===
+submitBtn && submitBtn.addEventListener('click', async (ev) => {
+  ev.preventDefault();
+  try {
+    // prevent double submit
+    if (submitBtn.dataset.processing === '1') {
+      console.info('Checkout already processing — ignoring duplicate click');
+      return;
+    }
+    submitBtn.dataset.processing = '1';
+    submitBtn.setAttribute('aria-busy', 'true');
+    submitBtn.disabled = true;
+    console.info('Checkout: start processing');
 
-      const name = (inpName.value || '').trim();
-      const phone = (inpPhone.value || '').trim();
-      const email = (inpEmail.value || '').trim();
-      const type = inpType.value;
-      const address = (inpAddress.value || '').trim();
-      const lat = inpLat.value || '';
-      const lon = inpLon.value || '';
-      const date = inpDate.value || '';
-      const time = inpTime.value || '';
-      const note = inpNote.value || '';
-      const paymethod = inpPayMethod.value || 'paystack';
+    // gather inputs
+    const name = (inpName.value || '').trim();
+    const phone = (inpPhone.value || '').trim();
+    const email = (inpEmail.value || '').trim();
+    const type = inpType.value;
+    const address = (inpAddress.value || '').trim();
+    const lat = inpLat.value || '';
+    const lon = inpLon.value || '';
+    const date = inpDate.value || '';
+    const time = inpTime.value || '';
+    const note = inpNote.value || '';
+    const paymethod = inpPayMethod.value || 'paystack';
 
-      if (!name || !phone || !email) {
-        alert('Please complete your name, phone and email.');
-        submitBtn.disabled = false; return;
-      }
-      if (type === 'delivery' && !address) {
-        alert('Please select your address on the map for delivery.');
-        submitBtn.disabled = false; return;
-      }
+    if (!name || !phone || !email) {
+      alert('Please complete your name, phone and email.');
+      return;
+    }
+    if (type === 'delivery' && !address) {
+      alert('Please select your address on the map for delivery.');
+      return;
+    }
 
-      // build cart lines
-      const totals = getTotals(); // prefer computeCartTotals() if present
+    // build/validate cart
+    const baseCartLines = Object.values(window.cart || {});
+    if (!baseCartLines.length) {
+      alert('Your cart is empty. Add items before checkout.');
+      return;
+    }
 
-     // If cart is empty, block checkout
-     const baseCartLines = Object.values(window.cart || {});
-     if (!baseCartLines.length) {
-        alert('Your cart is empty. Add items before checkout.');
-        submitBtn.disabled = false; return;
-     }
-
-     // Build the lines we will save/send (include any free promo items so invoice matches UI)
-     const cartLines = baseCartLines.map(l => ({
-       baseId: l.baseId, title: l.title, unitPrice: Number(l.unitPrice) || 0, qty: Number(l.qty) || 0, meta: l.meta || {}
-     }));
-
-     // If computeCartTotals returned any freeItems (promo), append them as 0-cost lines (so invoice shows them)
-      if (totals && Array.isArray(totals.freeItems) && totals.freeItems.length) {
-        totals.freeItems.forEach(fi => {
-         cartLines.push({
-           baseId: fi.id || 'promo-free',
-           title: fi.title || 'Promo free item',
+    const totals = getTotals();
+    const cartLines = baseCartLines.map(l => ({
+      baseId: l.baseId, title: l.title, unitPrice: Number(l.unitPrice) || 0, qty: Number(l.qty) || 0, meta: l.meta || {}
+    }));
+    if (totals && Array.isArray(totals.freeItems) && totals.freeItems.length) {
+      totals.freeItems.forEach(fi => {
+        cartLines.push({
+          baseId: fi.id || 'promo-free',
+          title: fi.title || 'Promo free item',
           unitPrice: Number(fi.unitPrice || 0),
-           qty: Number(fi.qty || 1),
-            meta: fi.meta || {}
-         });
-       });
-     }
+          qty: Number(fi.qty || 1),
+          meta: fi.meta || {}
+        });
+      });
+    }
 
-     // Delivery is intentionally zero per request (deliveryFee forced to 0 in refreshTotals)
-     const delivery = 0;
-     // Use totals.total (computed by computeCartTotals/getTotals) if available — it's the authoritative final amount
-     const totalAmount = Math.round(typeof totals.total !== 'undefined' ? totals.total : ((totals.subtotal || 0) - (totals.promoDiscount || 0) + delivery));
-      // Save name/phone for convenience
-      try { localStorage.setItem('wrap_user_name', name); localStorage.setItem('wrap_user_phone', phone); } catch(e){}
+    const delivery = 0;
+    const totalAmount = Math.round(typeof totals.total !== 'undefined' ? totals.total : ((totals.subtotal || 0) - (totals.promoDiscount || 0) + delivery));
+    try { localStorage.setItem('wrap_user_name', name); localStorage.setItem('wrap_user_phone', phone); } catch(e){}
 
-     if (paymethod === 'cash') {
-       // simple local "order placed" flow (Cash)
+    // Cash flow (local)
+    if (paymethod === 'cash') {
       const fakeOrder = {
         id: 'local-' + Date.now(),
-          reference: 'CASH-' + Date.now(),
-         name, phone, email, type, address, lat, lon, date, time, note,
-         cart: cartLines,
-         totals: { subtotal: totals.subtotal, delivery, promo: totals.promoDiscount, total: totalAmount },
-          ts: new Date().toISOString()
-       };
-       try {
-          localStorage.setItem('wrap_last_order', JSON.stringify(fakeOrder));
-         localStorage.setItem('wrap_show_confirmation', '1'); // -> triggers confirmation modal on next load
-        } catch (e) { /* ignore storage errors */ }
+        reference: 'CASH-' + Date.now(),
+        name, phone, email, type, address, lat, lon, date, time, note,
+        cart: cartLines,
+        totals: { subtotal: totals.subtotal, delivery, promo: totals.promoDiscount, total: totalAmount },
+        ts: new Date().toISOString()
+      };
+      try {
+        localStorage.setItem('wrap_last_order', JSON.stringify(fakeOrder));
+        localStorage.setItem('wrap_show_confirmation', '1');
+      } catch (e) {}
+      try { window.cart = {}; if (typeof renderCart === 'function') renderCart(); } catch (e) {}
+      closeCheckoutPage();
+      window.location.reload();
+      return;
+    }
 
-       // clear cart, close and reload so confirmation modal appears
-       try { window.cart = {}; if (typeof renderCart === 'function') renderCart(); } catch (e) {}
-        closeCheckoutPage();
-        // reload page (confirmation modal code will read localStorage and show modal)
-       window.location.reload();
-       return;
-     }
-
-      // paymethod === paystack -> call server init endpoint (same pattern as earlier)
-    try {
-       // If user chose inline Paystack and a public key is provided:
-        if (paymethod === 'paystack') {
-      // Basic validation
-     if (!PAYSTACK_PUBLIC_KEY) {
-       alert('Paystack public key is not configured. Cannot proceed.');
-        submitBtn.disabled = false;
+    // Paystack flow
+    if (paymethod === 'paystack') {
+      if (!PAYSTACK_PUBLIC_KEY) {
+        alert('Paystack public key is not configured. Cannot proceed.');
         return;
-     }
+      }
       if (typeof totalAmount === 'undefined' || Number(totalAmount) <= 0) {
-       alert('Invalid amount to pay. Please review your cart.');
-       submitBtn.disabled = false;
-       return;
+        alert('Invalid amount to pay. Please review your cart.');
+        return;
       }
 
-     // If Paystack script hasn't loaded yet, attempt to load it dynamically (robustness)
-     function ensurePaystackLoaded(cb) {
-       if (window.PaystackPop) return cb(null);
-       const s = document.createElement('script');
+      // guard + helpers
+      function ensurePaystackLoaded(cb) {
+        if (window.PaystackPop) return cb(null);
+        const s = document.createElement('script');
         s.src = 'https://js.paystack.co/v2/inline.js';
-       s.async = true;
-       s.onload = () => cb(null);
-       s.onerror = () => cb(new Error('Could not load Paystack script'));
+        s.async = true;
+        s.onload = () => cb(null);
+        s.onerror = () => cb(new Error('Could not load Paystack script'));
         document.head.appendChild(s);
       }
 
-      // Encapsulated payment opener with safe fallbacks & timeouts
-      function openPaystackInline() {
-       try {
-         const PUBLIC_KEY = PAYSTACK_PUBLIC_KEY;
-         const ref = 'PSK-' + Date.now() + '-' + Math.floor(Math.random() * 10000);
-          const amountInMinor = Math.round(Number(totalAmount) * 100);
+      // Wait for Paystack to load and then open the inline UI. Use a promise so we can recover on timeout.
+      await new Promise((resolve, reject) => {
+        let fallbackTimer = null;
+        let paystackOpened = false;
 
-          // guard: Paystack requires amount > 0 (in minor units)
-          if (!amountInMinor || amountInMinor <= 0) {
-            alert('Payment amount is zero. Add items to cart before paying.');
-           submitBtn.disabled = false;
+        ensurePaystackLoaded((err) => {
+          if (err) {
+            console.error('Paystack load error', err);
+            // allow UI to recover
+            reject(err);
             return;
           }
 
-         let fallbackTimer = null;
-         const handler = window.PaystackPop.setup({
-           key: PUBLIC_KEY,
-            email: email,
-           amount: amountInMinor,
-            currency: 'GHS',
-            ref,
-           onClose: function() {
-             // user closed the iframe
-             submitBtn.disabled = false;
-             if (fallbackTimer) clearTimeout(fallbackTimer);
-           },
-          callback: function(response) {
-              // success
-            if (fallbackTimer) clearTimeout(fallbackTimer);
-             try {
-               const order = {
-                 reference: response.reference || ref,
-                 name, phone, email, type, address, lat, lon, date, time, note,
-                  cart: cartLines,
-                 totals: { subtotal: totals.subtotal, delivery, promo: totals.promoDiscount, total: Math.round(totalAmount) },
-                  ts: new Date().toISOString()
-               };
-                localStorage.setItem('wrap_last_order', JSON.stringify(order));
-              localStorage.setItem('wrap_show_confirmation', '1');
-             } catch (e) { /* ignore storage errors */ }
-            try { window.cart = {}; if (typeof renderCart === 'function') renderCart(); } catch (e) { /* ignore */ }
-            closeCheckoutPage();
-            // reload to show confirmation modal (order data is in localStorage)
-            window.location.reload();
-           }
-        });
-
-          // open and set a reasonable fallback in case no UI appears (re-enable submit)
           try {
-           handler.openIframe();
-         } catch (err) {
-           console.error('Paystack openIframe error', err);
-           alert('Could not open Paystack payment window. Please try again or allow popups/iframes for this site.');
-            submitBtn.disabled = false;
-           return;
-          }
+            const PUBLIC_KEY = PAYSTACK_PUBLIC_KEY;
+            const ref = 'PSK-' + Date.now() + '-' + Math.floor(Math.random() * 10000);
+            const amountInMinor = Math.round(Number(totalAmount) * 100);
 
-          // fallback timer: re-enable submit button if Paystack UI didn't respond in 25s
-          fallbackTimer = setTimeout(() => {
-            submitBtn.disabled = false;
-           alert('Payment is taking longer than expected. If the Paystack UI did not appear, please check your browser settings (popups/iframes) and try again.');
-         }, 25000);
-       } catch (ex) {
-         console.error('openPaystackInline exception', ex);
-          alert('Payment could not be initiated. See console for details.');
-         submitBtn.disabled = false;
-        }
-     }
+            if (!amountInMinor || amountInMinor <= 0) {
+              reject(new Error('Payment amount is zero.'));
+              return;
+            }
 
-     // If page is loaded from file://, warn (Paystack needs http/s)
-      if (window.location.protocol === 'file:') {
-      alert('Paystack inline payments require the page to be served over http(s). Upload to Netlify / GitHub Pages / local dev server and try again.');
-        submitBtn.disabled = false;
-        return;
-     }
+            // Setup handler
+            const handler = window.PaystackPop.setup({
+              key: PUBLIC_KEY,
+              email: email,
+              amount: amountInMinor,
+              currency: 'GHS',
+              ref,
+              onClose: function() {
+                console.warn('Paystack inline closed by user');
+                paystackOpened = false;
+                // clear fallback and re-enable UI
+                if (fallbackTimer) clearTimeout(fallbackTimer);
+                submitBtn.disabled = false;
+                submitBtn.dataset.processing = '0';
+                submitBtn.setAttribute('aria-busy', 'false');
+                resolve(new Error('User closed payment window'));
+              },
+              callback: function(response) {
+                // success path: save order & show confirmation
+                console.info('Paystack callback', response);
+                paystackOpened = false;
+                if (fallbackTimer) clearTimeout(fallbackTimer);
+                try {
+                  const order = {
+                    reference: response.reference || ref,
+                    name, phone, email, type, address, lat, lon, date, time, note,
+                    cart: cartLines,
+                    totals: { subtotal: totals.subtotal, delivery, promo: totals.promoDiscount, total: Math.round(totalAmount) },
+                    ts: new Date().toISOString()
+                  };
+                  localStorage.setItem('wrap_last_order', JSON.stringify(order));
+                  localStorage.setItem('wrap_show_confirmation', '1');
+                } catch (e) { console.warn('Could not persist order after payment', e); }
+                try { window.cart = {}; if (typeof renderCart === 'function') renderCart(); } catch (e) {}
+                closeCheckoutPage();
+                // reload (confirmation modal will show)
+                window.location.reload();
+                // resolve — but reload will happen before next tick
+                resolve();
+              }
+            });
 
-     // Ensure Paystack script is available then open
-      ensurePaystackLoaded((err) => {
-       if (err) {
-         console.error(err);
-         alert('Could not load Paystack script. Check your connection or console for details.');
-          submitBtn.disabled = false;
-         return;
-       }
-       // slight nextTick to keep UI responsive
-        setTimeout(openPaystackInline, 50);
-      });
-      return;
-   }
+            // open iframe and set a safety fallback timer
+            try {
+              handler.openIframe();
+              paystackOpened = true;
+            } catch (err) {
+              console.error('Paystack openIframe error', err);
+              reject(err);
+              return;
+            }
 
-        // If Paystack public key missing or PaystackPop not loaded: ask user to simulate payment
-       if (paymethod === 'paystack') {
-         const simulate = confirm('No Paystack public key detected. Do you want to simulate a successful payment locally for testing? (No real money will be charged)');
-          if (!simulate) {
-            alert('Payment cancelled. To use real Paystack, set PAYSTACK_PUBLIC_KEY in the checkout script.');
-            submitBtn.disabled = false;
+            // fallback: re-enable if nothing happens in 30s
+            fallbackTimer = setTimeout(() => {
+              if (paystackOpened) {
+                console.warn('Paystack did not respond within timeout — re-enabling UI');
+                paystackOpened = false;
+                submitBtn.disabled = false;
+                submitBtn.dataset.processing = '0';
+                submitBtn.setAttribute('aria-busy', 'false');
+                alert('Payment is taking longer than expected. If the Paystack UI did not appear, please check your browser settings (popups/iframes) and try again.');
+                resolve(new Error('Paystack timeout'));
+              }
+            }, 30000);
+          } catch (ex) {
+            console.error('openPaystackInline exception', ex);
+            reject(ex);
             return;
           }
-          // Simulate success
-         const order = {
-           reference: 'SIM-' + Date.now(),
-           name, phone, email, type, address, lat, lon, date, time, note,
-           cart: cartLines,
-           totals: { subtotal: totals.subtotal, delivery, promo: totals.promoDiscount, total: totalAmount },
-          ts: new Date().toISOString()
-          };
-         try {
-           localStorage.setItem('wrap_last_order', JSON.stringify(order));
-           localStorage.setItem('wrap_show_confirmation', '1');
-         } catch (e) {}
-          try { window.cart = {}; if (typeof renderCart === 'function') renderCart(); } catch(e){}
-          closeCheckoutPage();
-          window.location.reload();
-         return;
-       }
-      } catch (err) {
-        console.error('checkout error', err);
-        alert('Checkout failed: ' + (err.message || err));
+        }); // ensurePaystackLoaded
+      }); // end promise
+      return;
+    } // end paystack branch
+
+    // if other paymethods added later — ensure UI is reset
+  } catch (err) {
+    console.error('checkout handler error', err);
+    alert('Checkout failed: ' + (err && err.message ? err.message : err));
+  } finally {
+    // If page is navigating/reloading (successful payment path) the finally may not run, but if nothing redirected we must re-enable UI.
+    try {
+      if (submitBtn && submitBtn.dataset.processing === '1') {
+        submitBtn.dataset.processing = '0';
+        submitBtn.setAttribute('aria-busy', 'false');
         submitBtn.disabled = false;
       }
-    });
+    } catch (e) { /* ignore */ }
+    console.info('Checkout: processing ended (UI reset)');
+  }
+});
     
     // small helpers
     function fmtGhc(n){ return `GHC ${Number(n||0).toFixed(0)}`; }
