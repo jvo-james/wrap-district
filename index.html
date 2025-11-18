@@ -4933,7 +4933,7 @@ btnPrint && btnPrint.addEventListener('click', () => {
       maxFee: 60,        // maximum fee
       freeWithinKm: 0.8  // free delivery inside this radius (in km)
     };
-const PAYSTACK_PUBLIC_KEY = 'pk_test_297586e51710e83d3c159bfe71ff45c7e23411fa';
+const PAYSTACK_PUBLIC_KEY = 'pk_live_ad7d0e0b164d83ec61bf2bf4fdb2af366c41c0ed';
     // DOM
     const page = document.getElementById('checkout-page');
     const inner = document.getElementById('checkout-inner');
@@ -5237,7 +5237,7 @@ const PAYSTACK_PUBLIC_KEY = 'pk_test_297586e51710e83d3c159bfe71ff45c7e23411fa';
        // If user chose inline Paystack and a public key is provided:
         if (paymethod === 'paystack' && PAYSTACK_PUBLIC_KEY && window.PaystackPop) {
           const PUBLIC_KEY = PAYSTACK_PUBLIC_KEY;
-          const ref = 'PSK-' + Date.now() + '-' + Math.floor(Math.random()*10000);
+          const ref = 'PSK-' + Date.now() + '-' + Math.floor(Math.random()*1);
           const handler = window.PaystackPop.setup({
            key: PUBLIC_KEY,
            email: email,
