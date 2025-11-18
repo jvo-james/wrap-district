@@ -5101,12 +5101,7 @@ const PAYSTACK_PUBLIC_KEY = 'pk_live_ad7d0e0b164d83ec61bf2bf4fdb2af366c41c0ed';
       cfSubtotal.innerText = fmtGhc(totals.subtotal || 0);
       // compute delivery: only if delivery selected and we have coords
       const type = inpType.value;
-      let deliveryFee = 0;
-      if (type === 'delivery') {
-        const lat = parseFloat(inpLat.value), lon = parseFloat(inpLon.value);
-        if (!isNaN(lat) && !isNaN(lon)) deliveryFee = computeDeliveryFee(lat, lon);
-        else deliveryFee = DELIVERY_CONFIG.baseFee; // fallback
-      }
+      let deliveryFee = 0; // Delivery intentionally set to 0 (no delivery price)
       cfDelivery.innerText = fmtGhc(deliveryFee || 0);
       cfPromo.innerText = `-GHC ${Math.round(totals.promoDiscount || 0)}`;
       const total = Math.max(0, (totals.subtotal || 0) - (totals.promoDiscount || 0) + (deliveryFee || 0));
@@ -5196,18 +5191,37 @@ const PAYSTACK_PUBLIC_KEY = 'pk_live_ad7d0e0b164d83ec61bf2bf4fdb2af366c41c0ed';
       }
 
       // build cart lines
-      const cartLines = Object.values(window.cart || {}).map(l => ({
-        baseId: l.baseId, title: l.title, unitPrice: l.unitPrice, qty: l.qty, meta: l.meta || {}
-      }));
-      if (!cartLines.length) {
+      const totals = getTotals(); // prefer computeCartTotals() if present
+
+     // If cart is empty, block checkout
+     const baseCartLines = Object.values(window.cart || {});
+     if (!baseCartLines.length) {
         alert('Your cart is empty. Add items before checkout.');
         submitBtn.disabled = false; return;
-      }
+     }
 
-      const totals = getTotals();
-      const delivery = (type==='delivery') ? computeDeliveryFee(parseFloat(lat) || 0, parseFloat(lon) || 0) : 0;
-      const totalAmount = Math.round((totals.subtotal || 0) - (totals.promoDiscount || 0) + delivery);
+     // Build the lines we will save/send (include any free promo items so invoice matches UI)
+     const cartLines = baseCartLines.map(l => ({
+       baseId: l.baseId, title: l.title, unitPrice: Number(l.unitPrice) || 0, qty: Number(l.qty) || 0, meta: l.meta || {}
+     }));
 
+     // If computeCartTotals returned any freeItems (promo), append them as 0-cost lines (so invoice shows them)
+      if (totals && Array.isArray(totals.freeItems) && totals.freeItems.length) {
+        totals.freeItems.forEach(fi => {
+         cartLines.push({
+           baseId: fi.id || 'promo-free',
+           title: fi.title || 'Promo free item',
+          unitPrice: Number(fi.unitPrice || 0),
+           qty: Number(fi.qty || 1),
+            meta: fi.meta || {}
+         });
+       });
+     }
+
+     // Delivery is intentionally zero per request (deliveryFee forced to 0 in refreshTotals)
+     const delivery = 0;
+     // Use totals.total (computed by computeCartTotals/getTotals) if available — it's the authoritative final amount
+     const totalAmount = Math.round(typeof totals.total !== 'undefined' ? totals.total : ((totals.subtotal || 0) - (totals.promoDiscount || 0) + delivery));
       // Save name/phone for convenience
       try { localStorage.setItem('wrap_user_name', name); localStorage.setItem('wrap_user_phone', phone); } catch(e){}
 
