@@ -2629,7 +2629,50 @@ a:focus, button:focus { outline: 3px solid rgba(255,204,51,0.10); outline-offset
 }
 
     </style>
+<style>
+  /* ===== MOBILE-FRIENDLY CHECKOUT MODAL =====
+   Replace .checkout-modal/.modal-content/.modal-body with your real classes if different
+   Ensures modal content scrolls on small screens and respects safe-area insets on iOS.
+*/
 
+.checkout-modal { /* outer modal container */
+  display: block; /* or however your modal is shown */
+  padding: 16px;  /* visual gap from top/bottom */
+}
+
+/* the scrollable area of the modal (the part that should scroll) */
+.checkout-modal .modal-content {
+  max-height: calc(100vh - 48px); /* leave a little room above/below */
+  height: auto;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  border-radius: 12px;
+}
+
+/* the body area that should scroll */
+.checkout-modal .modal-body {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch; /* smooth scrolling on iOS */
+  flex: 1 1 auto;
+  padding-bottom: env(safe-area-inset-bottom); /* avoid home indicator overlap on iPhones */
+}
+
+/* ensure order summary/footer remains visible or sticky */
+.checkout-modal .order-summary,
+.checkout-modal .modal-footer {
+  position: sticky;
+  bottom: 0;
+  z-index: 3;
+  background: inherit; /* match modal background so it doesn't show through */
+  padding-bottom: env(safe-area-inset-bottom); /* safe area */
+  /* add a subtle backdrop so sticky footer doesn't cover exactly the same content */
+}
+
+/* if you prefer footer always at bottom but not sticky, use:
+.checkout-modal .modal-footer { flex-shrink: 0; }
+*/
+</style>
 <style>
   /* Make modal appear as a bottom sheet on narrow screens */
   #purchase-history-modal {
@@ -7910,6 +7953,32 @@ body.cart-open::before {
     }
   });
 })();
+</script>
+
+  <script>
+document.addEventListener('DOMContentLoaded', () => {
+  // Adjust selectors to match your markup:
+  const modal = document.querySelector('.checkout-modal');
+  const modalBody = modal && modal.querySelector('.modal-body');
+
+  if (!modal || !modalBody) return;
+
+  // when modal opens, ensure body scroll is available inside modal
+  const observer = new MutationObserver(() => {
+    // if modal becomes visible, ensure scrolling on its body
+    const style = window.getComputedStyle(modal);
+    const visible = style.display !== 'none' && style.visibility !== 'hidden' && style.opacity !== '0';
+    if (visible) {
+      // ensure the scrollable area has touch scrolling enabled
+      modalBody.style.overflowY = 'auto';
+      modalBody.style.webkitOverflowScrolling = 'touch';
+      // small hack: if footer hidden offscreen scroll to bottom (optional)
+      // modalBody.scrollTop = 0; // or modalBody.scrollTop = modalBody.scrollHeight;
+    }
+  });
+
+  observer.observe(modal, { attributes: true, attributeFilter: ['style', 'class'] });
+});
 </script>
 </html>
   
