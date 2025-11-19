@@ -1822,10 +1822,7 @@ select:focus {
 }
   </style>
   <style>
-    /* hide by default */
-.badge promo-badge { display: none; }
-    /* hide by default */
-.badge promo-badge-small { display: none; }
+
 /* =========================
    Wrap District — Remaining UI: Modals, Promo Details, Mobile Nav, Entry Modal,
    Contact/Footer, Global utilities and finishing touches.
@@ -2909,6 +2906,42 @@ a:focus, button:focus { outline: 3px solid rgba(255,204,51,0.10); outline-offset
 */
 
 /* Hero container uses the same glass/panel feel as promo */
+    /* ---------- FIX: Checkout modal scrollability & sticky "Your order" ---------- */
+#checkout-page {
+ /* ensure checkout sits below header and the page can scroll if needed */
+  align-items: flex-start !important;
+  overflow: auto !important;
+ -webkit-overflow-scrolling: touch;
+}
+
+#checkout-inner {
+  /* keep dialog inside safe area and ensure inner columns can scroll independently */
+ margin-top: calc(56px + var(--safe-top,12px) + 12px) !important;
+  max-height: calc(100vh - (56px + var(--safe-top,12px) + 48px)) !important;
+  box-sizing: border-box;
+}
+
+.checkout-right > h4 {
+  /* keep the "Your order" header sticky so users always know which column they're viewing */
+  position: sticky;
+ top: 0;
+  z-index: 6;
+  background: linear-gradient(180deg,#080808,#050505); /* same background as dialog */
+  padding-top: 6px;
+  margin-bottom: 8px;
+}
+
+#cf-order-lines {
+ /* make the order lines scroll, independent of the left form */
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  max-height: calc(60vh); /* adjust if you want more or less space */
+}
+
+/* small mobile tweak */
+@media (max-width:600px){
+  #cf-order-lines { max-height: calc(55vh); }
+}
 .hero {
   width: 100%;
   box-sizing: border-box;
@@ -4706,6 +4739,7 @@ if (cartHeader && !document.getElementById('cart-header-total')) {
 
       <div id="cart-delivery-note" class="small-muted" style="margin-top:8px; padding:10px; border-radius:10px; background: linear-gradient(90deg, rgba(255,160,80,0.04), rgba(255,255,255,0.01)); border:1px solid rgba(255,160,80,0.06);">
          <strong>Important:</strong> The checkout price shown <em>does NOT</em> include delivery fees. Delivery fee will be estimated after checkout based on your address and communicated to you.
+        <p>Processing fee: GHS 2</p>
        </div>
  
       </div>
@@ -4829,6 +4863,7 @@ if (cartHeader && !document.getElementById('cart-header-total')) {
       <div style="margin-top:8px" class="small-muted">
         <p><strong>Important:</strong> Delivery fee is calculated separately and will be communicated after we confirm your exact location. The total shown at checkout did <em>not</em> include delivery unless explicitly shown as added.</p>
         <p>Please keep this reference for inquiries. We will contact you (phone/SMS/WhatsApp) with an estimated delivery fee and ETA.</p>
+     
       </div>
     </div>
 
@@ -7765,21 +7800,63 @@ body.cart-open::before {
     };
   })();
 </script>
-<script>
-(function(){
-  const isTuesday = (new Date()).getDay() === 2; // 0=Sun,1=Mon,2=Tue
-  document.querySelectorAll('.badge promo-badge').forEach(el => {
-    el.style.display = isTuesday ? '' : 'none';
-  });
-})();
-</script>
 
-  
+
 <script>
 (function(){
-  const isTuesday = (new Date()).getDay() === 2; // 0=Sun,1=Mon,2=Tue
-  document.querySelectorAll('.badge promo-badge-small').forEach(el => {
-    el.style.display = isTuesday ? '' : 'none';
+  document.addEventListener('DOMContentLoaded', function(){
+    try {
+      const isTuesday = (new Date()).getDay() === 2; // Sunday=0, Monday=1, Tuesday=2
+
+      // elements that show promo labels / CTA / slide overlays
+      const promoSelectors = [
+        '.promo-badge',
+        '.promo-badge-small',
+        '.promo-cta-row',
+        '.slide-promo',
+        '.promo-countdown',
+        '.promo-countdown-chip',
+        '#entry-promo',       // entry slide-in promo modal
+        '#promo-details .promo-cta-row' // explicit promo CTAs inside promo details
+      ];
+
+      const nodes = document.querySelectorAll(promoSelectors.join(','));
+      nodes.forEach(el => {
+        if (!isTuesday) {
+          // hide everywhere when NOT Tuesday
+          el.dataset._promoHiddenByDay = '1';
+          el.style.display = 'none';
+        } else {
+          // ensure visible on Tuesday (remove any previous inline hide)
+          if (el.dataset._promoHiddenByDay) {
+            el.style.display = '';
+            delete el.dataset._promoHiddenByDay;
+          }
+        }
+      });
+
+      // If you also have server-rendered banners, hide them by data-promo attribute:
+      if (!isTuesday) {
+        document.querySelectorAll('[data-promo]').forEach(el => {
+          // Keep the element in DOM but visually hide.
+          el.dataset._promoHiddenByDay = '1';
+          el.style.display = 'none';
+        });
+      }
+
+      // Accessibility: update aria-hidden on promo blocks
+      if (!isTuesday) {
+        document.querySelectorAll('.promo-badge, .promo-badge-small, .promo-cta-row, .slide-promo').forEach(e => {
+         try { e.setAttribute('aria-hidden', 'true'); } catch (e) {}
+        });
+     } else {
+       document.querySelectorAll('.promo-badge, .promo-badge-small, .promo-cta-row, .slide-promo').forEach(e => {
+         try { e.setAttribute('aria-hidden', 'false'); } catch (e) {}
+        });
+      }
+    } catch (err) {
+      console.warn('Promo show/hide script failed', err);
+    }
   });
 })();
 </script>
