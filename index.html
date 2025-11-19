@@ -1822,6 +1822,10 @@ select:focus {
 }
   </style>
   <style>
+    /* hide by default */
+.badge promo-badge { display: none; }
+    /* hide by default */
+.badge promo-badge-small { display: none; }
 /* =========================
    Wrap District — Remaining UI: Modals, Promo Details, Mobile Nav, Entry Modal,
    Contact/Footer, Global utilities and finishing touches.
@@ -7761,5 +7765,25 @@ body.cart-open::before {
     };
   })();
 </script>
+<script>
+(function(){
+  const isTuesday = (new Date()).getDay() === 2; // 0=Sun,1=Mon,2=Tue
+  document.querySelectorAll('.badge promo-badge').forEach(el => {
+    el.style.display = isTuesday ? '' : 'none';
+  });
+})();
+</script>
+
+  
+<script>
+(function(){
+  const isTuesday = (new Date()).getDay() === 2; // 0=Sun,1=Mon,2=Tue
+  document.querySelectorAll('.badge promo-badge-small').forEach(el => {
+    el.style.display = isTuesday ? '' : 'none';
+  });
+})();
+</script>
+
+  
 </html>
   
