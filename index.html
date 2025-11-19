@@ -578,6 +578,53 @@ a { color: var(--accent-2); text-decoration: none; }
 
 </style>
   <style>
+    /* ===== Checkout scroll & sticky order header fixes =====
+   Paste after your checkout CSS blocks (near end of <body>)
+*/
+#checkout-page {
+  overflow: auto;                 /* allow page-level scrolling on mobile */
+  -webkit-overflow-scrolling: touch;
+}
+
+#checkout-inner {
+  max-height: calc(100vh - (56px + var(--safe-top,12px) + 48px)); /* keep inner dialog inside viewport */
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  gap: 0;
+  margin: calc(56px + var(--safe-top,12px) + 12px) auto 24px;
+}
+
+/* ensure the left and right columns scroll independently */
+.checkout-left,
+.checkout-right {
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  max-height: calc(100vh - (56px + var(--safe-top,12px) + 140px)); /* leaves room for header/footers */
+}
+
+/* keep "Your order" heading visible and pinned while contents scroll */
+.checkout-right > h4 {
+  position: sticky;
+  top: 0;
+  z-index: 6;
+  background: transparent;
+  padding-top: 6px;
+  margin: 0 0 10px 0;
+}
+
+/* make the order lines area scrollable */
+#cf-order-lines {
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  max-height: calc(100vh - (56px + var(--safe-top,12px) + 220px));
+}
+
+/* small screens: ensure stacked layout still scrolls well */
+@media (max-width: 900px) {
+  #checkout-inner { grid-template-columns: 1fr; max-width: 680px; }
+  #cf-order-lines { max-height: calc(60vh); }
+}
 /* =========================
    Wrap District — Cart / Cart Drawer Styling (Mobile-first, gorgeous)
    Complements header & hero styles. Drop into your stylesheet.
@@ -7808,7 +7855,7 @@ body.cart-open::before {
     try {
       const isTuesday = (new Date()).getDay() === 2; // Sunday=0, Monday=1, Tuesday=2
 
-      // elements that show promo labels / CTA / slide overlays
+      // promo-only selectors (safe to hide/show)
       const promoSelectors = [
         '.promo-badge',
         '.promo-badge-small',
@@ -7816,51 +7863,53 @@ body.cart-open::before {
         '.slide-promo',
         '.promo-countdown',
         '.promo-countdown-chip',
-        '#entry-promo',       // entry slide-in promo modal
-        '#promo-details .promo-cta-row' // explicit promo CTAs inside promo details
+        '#entry-promo',
+        '#promo-details .promo-cta-row'
       ];
 
-      const nodes = document.querySelectorAll(promoSelectors.join(','));
-      nodes.forEach(el => {
+      // Hide/show explicit promo elements
+      document.querySelectorAll(promoSelectors.join(',')).forEach(el => {
         if (!isTuesday) {
-          // hide everywhere when NOT Tuesday
           el.dataset._promoHiddenByDay = '1';
           el.style.display = 'none';
+          try { el.setAttribute('aria-hidden', 'true'); } catch(e){}
         } else {
-          // ensure visible on Tuesday (remove any previous inline hide)
           if (el.dataset._promoHiddenByDay) {
             el.style.display = '';
             delete el.dataset._promoHiddenByDay;
           }
+          try { el.setAttribute('aria-hidden', 'false'); } catch(e){}
         }
       });
 
-      // If you also have server-rendered banners, hide them by data-promo attribute:
+      // If you must hide elements marked [data-promo], be careful:
+      // skip any element that is inside a menu/catalog/product container so real menu items aren't hidden.
+      const menuContainerSelectors = '.menu, .catalog, .menu-list, .product-list, .menu-item, .catalog-item, .product-card';
+
       if (!isTuesday) {
         document.querySelectorAll('[data-promo]').forEach(el => {
-          // Keep the element in DOM but visually hide.
+          // skip if this element is inside something that looks like a menu/product
+          if (el.closest(menuContainerSelectors)) return;
           el.dataset._promoHiddenByDay = '1';
           el.style.display = 'none';
+          try { el.setAttribute('aria-hidden', 'true'); } catch(e){}
+        });
+      } else {
+        // restore [data-promo] elements that we hid previously
+        document.querySelectorAll('[data-promo]').forEach(el => {
+          if (el.dataset._promoHiddenByDay) {
+            el.style.display = '';
+            delete el.dataset._promoHiddenByDay;
+          }
+          try { el.setAttribute('aria-hidden', 'false'); } catch(e){}
         });
       }
 
-      // Accessibility: update aria-hidden on promo blocks
-      if (!isTuesday) {
-        document.querySelectorAll('.promo-badge, .promo-badge-small, .promo-cta-row, .slide-promo').forEach(e => {
-         try { e.setAttribute('aria-hidden', 'true'); } catch (e) {}
-        });
-     } else {
-       document.querySelectorAll('.promo-badge, .promo-badge-small, .promo-cta-row, .slide-promo').forEach(e => {
-         try { e.setAttribute('aria-hidden', 'false'); } catch (e) {}
-        });
-      }
     } catch (err) {
       console.warn('Promo show/hide script failed', err);
     }
   });
 })();
 </script>
-
-  
 </html>
   
