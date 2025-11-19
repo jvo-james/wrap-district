@@ -7981,5 +7981,186 @@ document.addEventListener('DOMContentLoaded', () => {
   observer.observe(modal, { attributes: true, attributeFilter: ['style', 'class'] });
 });
 </script>
+
+  <style>
+    /* ===== GLOBAL OVERRIDES FOR MOBILE MODALS (aggressive, use with care) ===== */
+
+/* target common modal/dialog selectors and the role=dialog pattern */
+:is(.modal, .checkout-modal, .cart-modal, .checkout-panel, #checkoutModal, [role="dialog"]) {
+  position: fixed !important;
+  inset: 0 !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  z-index: 99999 !important;
+  pointer-events: auto !important;
+}
+
+/* modal content -> column flex so body can flex-grow and scroll */
+:is(.modal, .checkout-modal, .cart-modal, .checkout-panel, #checkoutModal, [role="dialog"])
+  :is(.modal-content, .dialog, .panel, .checkout-content, .modal-dialog, .dialog-inner) {
+  display: flex !important;
+  flex-direction: column !important;
+  width: min(98vw, 760px) !important;
+  max-height: calc(100vh - 24px) !important; /* leave a breathing gap */
+  overflow: hidden !important;
+  box-sizing: border-box !important;
+}
+
+/* the actual scrollable area - targets common names and data attributes */
+:is(.modal, .checkout-modal, .cart-modal, .checkout-panel, #checkoutModal, [role="dialog"])
+  :is(.modal-body, .dialog-body, .panel-body, .checkout-body, .cart-body, [data-modal-body], [data-checkout-body]) {
+  flex: 1 1 auto !important;
+  min-height: 0 !important; /* critical for flex children to allow scrolling */
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch !important; /* iOS momentum */
+  touch-action: pan-y !important; /* allow vertical scrolling */
+  overscroll-behavior: contain !important; /* avoid parent scroll capture */
+  max-height: calc(100vh - 140px) !important; /* keep footer visible */
+  padding-bottom: env(safe-area-inset-bottom, 16px) !important;
+}
+
+/* make footer/order-summary remain visible (sticky) if present */
+:is(.modal, .checkout-modal, .cart-modal, .checkout-panel, #checkoutModal, [role="dialog"])
+  :is(.modal-footer, .order-summary, .checkout-footer, .cart-footer) {
+  position: sticky !important;
+  bottom: 0 !important;
+  z-index: 2 !important;
+  flex-shrink: 0 !important;
+  background: linear-gradient(transparent, rgba(0,0,0,0.5)) !important; /* subtle visual separation */
+  padding-bottom: env(safe-area-inset-bottom, 12px) !important;
+}
+
+/* ensure overlays/backdrops don't sit above the modal content and steal touches */
+/* we will toggle pointer-events via JS when necessary; setting this lower priority */
+.modal-backdrop,
+[data-modal-backdrop],
+.modal-overlay,
+.dialog-backdrop {
+  z-index: 90000 !important;
+}
+
+/* Safety: ensure body doesn't interfere with inner scrolling */
+html, body {
+  -webkit-text-size-adjust: 100% !important;
+  touch-action: auto !important;
+}
+  </style>
+
+  <script>
+(function () {
+  // selectors for the modal container & the scrollable content inside it
+  const modalSelectors = [
+    '.checkout-modal',
+    '.cart-modal',
+    '.modal',
+    '.checkout-panel',
+    '#checkoutModal',
+    '[role="dialog"]'
+  ];
+
+  const bodySelectors = [
+    '.modal-body',
+    '.dialog-body',
+    '.panel-body',
+    '.checkout-body',
+    '.cart-body',
+    '[data-modal-body]',
+    '[data-checkout-body]'
+  ];
+
+  function isVisible(el) {
+    if (!el) return false;
+    const style = window.getComputedStyle(el);
+    return style.display !== 'none' && style.visibility !== 'hidden' && parseFloat(style.opacity || "1") > 0;
+  }
+
+  // find the scrollable element inside a modal (fallbacks included)
+  function findModalBody(modal) {
+    for (const sel of bodySelectors) {
+      const found = modal.querySelector(sel);
+      if (found) return found;
+    }
+    // fallback: choose the first child content container
+    const candidate = modal.querySelector(':scope > .modal-content, :scope > .dialog, :scope > .panel, :scope > .checkout-content');
+    return candidate || modal;
+  }
+
+  // aggressively enable scrolling styles on the modal and its body
+  function enableModalScroll(modal) {
+    const modalContent = modal.querySelector('.modal-content, .dialog, .panel, .checkout-content, .modal-dialog') || modal;
+    const scrollBody = findModalBody(modal);
+
+    if (modalContent) {
+      modalContent.style.maxHeight = 'calc(100vh - 24px)';
+      modalContent.style.overflow = 'hidden';
+      modalContent.style.display = 'flex';
+      modalContent.style.flexDirection = 'column';
+    }
+
+    if (scrollBody) {
+      scrollBody.style.flex = '1 1 auto';
+      scrollBody.style.minHeight = '0'; // IMPORTANT: allows flex child to scroll
+      scrollBody.style.overflowY = 'auto';
+      scrollBody.style.webkitOverflowScrolling = 'touch';
+      scrollBody.style.touchAction = 'pan-y';
+      scrollBody.style.overscrollBehavior = 'contain';
+      // add attribute to mark we patched it
+      scrollBody.setAttribute('data-scroll-enabled-by', 'override-script');
+    }
+  }
+
+  // enable scroll on all visible modals
+  function enableAllVisibleModals() {
+    const modals = document.querySelectorAll(modalSelectors.join(','));
+    modals.forEach(m => {
+      if (isVisible(m)) enableModalScroll(m);
+    });
+  }
+
+  // Capture-phase touchmove handler:
+  // If the touch occurs inside a patched modal-body, stop propagation so other global handlers
+  // (that might call preventDefault) do not run and block the native scroll.
+  function captureTouchMove(e) {
+    try {
+      const target = e.target;
+      if (!target) return;
+      const modalBody = target.closest('.modal-body, .dialog-body, .panel-body, .checkout-body, .cart-body, [data-modal-body], [data-checkout-body]');
+      if (modalBody && modalBody.getAttribute('data-scroll-enabled-by') === 'override-script') {
+        // allow the scroll but prevent other handlers from interfering
+        e.stopPropagation(); // prevent other handlers from receiving the event
+        // NOTE: do NOT call e.preventDefault() here — let the browser perform the native scroll
+        return;
+      }
+    } catch (err) {
+      // swallow errors - this is a protective override
+      console.warn('touchmove capture handler err', err);
+    }
+  }
+
+  // MutationObserver to catch modals that are inserted/visible later (e.g. SPA)
+  const observer = new MutationObserver(() => {
+    enableAllVisibleModals();
+  });
+
+  document.addEventListener('DOMContentLoaded', () => {
+    enableAllVisibleModals();
+    // observe body for added/removed classes or new modals
+    observer.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['class', 'style'] });
+
+    // Add capture-phase touchmove listener that runs before other bubble listeners.
+    // passive:false so we can stopPropagation if needed.
+    document.addEventListener('touchmove', captureTouchMove, { passive: false, capture: true });
+
+    // Also listen for clicks that open modals in case they enable later
+    document.addEventListener('click', () => {
+      setTimeout(enableAllVisibleModals, 30); // small delay to allow the UI to render
+    }, true);
+  });
+
+  // public method to force-enable (call from console if needed)
+  window.__forceEnableModalScroll = enableAllVisibleModals;
+})();
+</script>
 </html>
   
