@@ -8068,6 +8068,33 @@ document.addEventListener('DOMContentLoaded', () => {
   -webkit-user-select: text !important;
   user-select: text !important;
 }
+  /* Ensure safe offset for checkout modal so the header isn't covered */
+:root {
+  /* default offset fallback (px) */
+  --checkout-top-offset: 12px;
+}
+
+/* apply safe area inset and JS-driven offset */
+#checkout-page {
+  padding-top: env(safe-area-inset-top, 0px) !important;
+}
+
+/* nudge the modal inner container down using computed CSS var */
+#checkout-inner {
+  margin-top: var(--checkout-top-offset) !important;
+  /* keep previous rules intact */
+  box-sizing: border-box !important;
+}
+
+/* also nudge the inner content when modal is full-screen fixed (safety) */
+#checkout-page[data-fixed="true"] #checkout-inner {
+  margin-top: calc(var(--checkout-top-offset) + 2px) !important;
+}
+
+/* small mobile tweak so spacing is not excessive on desktop */
+@media (min-width: 760px) {
+  :root { --checkout-top-offset: 8px; }
+}
 </style>
 <script>
 (function(){
@@ -8141,6 +8168,57 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // convenience for devtools
   window.__fixCheckoutScroll = enableCheckoutScroll;
+})();
+</script>
+  <script>
+(function(){
+  function computeTopOffset() {
+    // visualViewport offsetTop works well on mobile (iOS Safari dynamic toolbar)
+    let viewportOffset = 0;
+    try {
+      if (window.visualViewport && typeof window.visualViewport.offsetTop === 'number') {
+        viewportOffset = Math.max(0, window.visualViewport.offsetTop);
+      }
+    } catch (e) { viewportOffset = 0; }
+
+    // safe-area-inset-top from CSS env (fallback to 0)
+    let safeInset = 0;
+    try {
+      // computedStyle lookup for env() fallback isn't reliable; use CSS env fallback earlier.
+      // We still provide a tiny positive minimum so content doesn't touch the browser header.
+      safeInset = 0;
+    } catch (e) {
+      safeInset = 0;
+    }
+
+    // choose a comfortable minimum (12px) so the modal header is clearly visible
+    const MIN = 12;
+
+    const chosen = Math.max(viewportOffset, safeInset, MIN);
+    document.documentElement.style.setProperty('--checkout-top-offset', chosen + 'px');
+
+    // mark modal as fixed if present (used by CSS above)
+    const modal = document.getElementById('checkout-page');
+    if (modal) modal.setAttribute('data-fixed', 'true');
+  }
+
+  // run on start
+  document.addEventListener('DOMContentLoaded', function(){
+    computeTopOffset();
+
+    // update when viewport changes (dynamic mobile toolbar)
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', computeTopOffset);
+      window.visualViewport.addEventListener('scroll', computeTopOffset);
+    }
+
+    // also on window resize/orientation change
+    window.addEventListener('resize', computeTopOffset);
+    window.addEventListener('orientationchange', computeTopOffset);
+  });
+
+  // expose for debugging
+  window.__adjustCheckoutTop = computeTopOffset;
 })();
 </script>
 </html>
