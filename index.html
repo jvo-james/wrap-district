@@ -7982,92 +7982,79 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 
-<style>
-  /* Checkout modal - targeted overrides for #checkout-page markup */
-#checkout-page {
-  position: fixed !important;
-  inset: 0 !important;
-  display: flex !important;
-  justify-content: center !important;
-  align-items: center !important;
-  z-index: 99999 !important;
-  -webkit-font-smoothing: antialiased !important;
-}
+<script>
+(function(){
+  function enableCheckoutScroll() {
+    const modal = document.getElementById('checkout-page');
+    if (!modal) return;
+    const inner = document.getElementById('checkout-inner');
+    if (!inner) return;
+    const form = inner.querySelector('form');
+    if (!form) return;
 
-/* inner modal container: keep it within viewport and make it a flex layout */
-#checkout-inner {
-  width: min(98vw, 980px) !important;
-  max-height: calc(100vh - 24px) !important;
-  display: flex !important;
-  flex-direction: column !important; /* become row inside the form below */
-  overflow: hidden !important; /* outer should hide overflow; inner scroll areas will handle scrolling */
-  box-sizing: border-box !important;
-  margin: 8px auto !important;
-}
+    // set inline styles as a backup for CSS (helps override inline styles from other scripts)
+    inner.style.maxHeight = 'calc(100vh - 24px)';
+    inner.style.overflow = 'hidden';
+    inner.style.display = 'flex';
+    inner.style.boxSizing = 'border-box';
 
-/* Make the form a two-column flex layout (left inputs + right summary) */
-#checkout-inner form {
-  display: flex !important;
-  flex-direction: row !important;
-  gap: 16px !important;
-  width: 100% !important;
-  min-height: 0 !important; /* critical for children to be able to shrink and scroll */
-  box-sizing: border-box !important;
-}
+    form.style.display = 'flex';
+    form.style.flexDirection = (window.innerWidth <= 760) ? 'column' : 'row';
+    form.style.minHeight = '0';
 
-/* The left column (the big form inputs) — this is the scrollable area */
-#checkout-inner form > div:first-child {
-  flex: 1 1 auto !important;
-  min-height: 0 !important;            /* allow flex child to scroll */
-  overflow-y: auto !important;
-  -webkit-overflow-scrolling: touch !important; /* momentum on iOS */
-  touch-action: pan-y !important;
-  padding-right: 6px !important; /* small space to avoid content touching edge */
-}
+    // left column = the first div child of the form (contains inputs)
+    const left = form.querySelector(':scope > div:first-child');
+    if (left) {
+      left.style.flex = '1 1 auto';
+      left.style.minHeight = '0';
+      left.style.overflowY = (window.innerWidth <= 760) ? 'visible' : 'auto';
+      left.style.webkitOverflowScrolling = 'touch';
+      left.setAttribute('data-checkout-scrollable', 'true');
+    }
 
-/* Order summary aside on the right */
-#checkout-inner aside.checkout-right {
-  flex: 0 0 320px !important;
-  width: 320px !important;
-  max-height: calc(100vh - 80px) !important;
-  overflow-y: auto !important;
-  box-sizing: border-box !important;
-  padding-left: 12px !important;
-  align-self: flex-start !important;
-  position: relative !important; /* keep it visually stable */
-}
-
-/* On narrow screens, stack vertically so user scrolls down to the order summary */
-@media (max-width: 760px) {
-  #checkout-inner {
-    width: min(98vw, 760px) !important;
+    const aside = form.querySelector('aside.checkout-right');
+    if (aside) {
+      aside.style.flex = (window.innerWidth <= 760) ? '0 0 auto' : '0 0 320px';
+      aside.style.width = (window.innerWidth <= 760) ? '100%' : '320px';
+      aside.style.maxHeight = (window.innerWidth <= 760) ? 'none' : 'calc(100vh - 80px)';
+      aside.style.overflowY = 'auto';
+      aside.setAttribute('data-checkout-aside', 'true');
+    }
   }
 
-  #checkout-inner form {
-    flex-direction: column !important;
+  // Stop propagation for touch events that start inside the scrollable left area so global handlers
+  // (that might call preventDefault) don't block the native scroll. We DO NOT call preventDefault().
+  function touchCapture(e) {
+    try {
+      const t = e.target;
+      if (!t || !t.closest) return;
+      // if the touch started inside the area we marked as scrollable, stop propagation
+      const sc = t.closest('[data-checkout-scrollable="true"]');
+      if (sc) {
+        e.stopPropagation();
+        // do not call preventDefault — allow browser native scroll
+      }
+    } catch (err) {
+      // ignore
+    }
   }
 
-  /* inputs first, then order summary */
-  #checkout-inner form > div:first-child {
-    max-height: none !important;
-    overflow-y: visible !important;
-  }
+  document.addEventListener('DOMContentLoaded', function(){
+    enableCheckoutScroll();
+    // re-run on resize (switch between stacked/columns)
+    window.addEventListener('resize', enableCheckoutScroll);
 
-  #checkout-inner aside.checkout-right {
-    width: 100% !important;
-    flex: 0 0 auto !important;
-    max-height: none !important;
-    margin-top: 12px !important;
-  }
-}
+    // Observe for DOM changes (modal libraries often toggle classes/styles)
+    const mo = new MutationObserver(function(){ enableCheckoutScroll(); });
+    mo.observe(document.body, { childList:true, subtree:true, attributes:true, attributeFilter:['class','style'] });
 
-/* safety: ensure no ancestor is capturing/pinning touches unintentionally */
-#checkout-page,
-#checkout-inner,
-#checkout-inner * {
-  -webkit-user-select: text !important;
-  user-select: text !important;
-}
-</style>
+    // Capture-phase touch listener to block external handlers from intercepting touches
+    document.addEventListener('touchmove', touchCapture, { passive:false, capture:true });
+  });
+
+  // convenience for devtools
+  window.__fixCheckoutScroll = enableCheckoutScroll;
+})();
+</script>
 </html>
   
