@@ -4727,6 +4727,11 @@ if (cartHeader && !document.getElementById('cart-header-total')) {
           <div class="small-muted">Promo</div>
           <div id="cf-promo" class="small-muted">-GHC 0</div>
         </div>
+           <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
+          <div class="small-muted">Processing fee</div>
+        <div id="cf-processing" class="small-muted">GHC 0</div>
+       </div>
+
         <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px; font-weight:900; color:#fff;">
           <div>Total</div>
           <div id="cf-total" style="color:var(--accent-2)">GHC 0</div>
@@ -5378,6 +5383,7 @@ btnPrint && btnPrint.addEventListener('click', () => {
       maxFee: 60,        // maximum fee
       freeWithinKm: 0.8  // free delivery inside this radius (in km)
     };
+    const PROCESSING_FEE = 2;
 const PAYSTACK_PUBLIC_KEY = 'pk_live_ad7d0e0b164d83ec61bf2bf4fdb2af366c41c0ed';
     // DOM
     const page = document.getElementById('checkout-page');
@@ -5402,6 +5408,7 @@ const PAYSTACK_PUBLIC_KEY = 'pk_live_ad7d0e0b164d83ec61bf2bf4fdb2af366c41c0ed';
     const cfSubtotal = document.getElementById('cf-subtotal');
     const cfDelivery = document.getElementById('cf-delivery');
     const cfPromo = document.getElementById('cf-promo');
+    const cfProcessing = document.getElementById('cf-processing');
     const cfTotal = document.getElementById('cf-total');
 
     // Map modal already exists (#map-modal) and populates #cf-address/#cf-lat/#cf-lon — reuse it
@@ -5597,14 +5604,20 @@ const PAYSTACK_PUBLIC_KEY = 'pk_live_ad7d0e0b164d83ec61bf2bf4fdb2af366c41c0ed';
 
     function refreshTotals() {
       const totals = getTotals();
-      cfSubtotal.innerText = fmtGhc(totals.subtotal || 0);
-      // compute delivery: only if delivery selected and we have coords
-      const type = inpType.value;
-      let deliveryFee = 0; // Delivery intentionally set to 0 (no delivery price)
-      cfDelivery.innerText = fmtGhc(deliveryFee || 0);
-      cfPromo.innerText = `-GHC ${Math.round(totals.promoDiscount || 0)}`;
-      const total = Math.max(0, (totals.subtotal || 0) - (totals.promoDiscount || 0) + (deliveryFee || 0));
-      cfTotal.innerText = fmtGhc(total);
+   cfSubtotal.innerText = fmtGhc(totals.subtotal || 0);
+    // compute delivery: only if delivery selected and we have coords
+    const type = inpType.value;
+    let deliveryFee = 0; // Delivery intentionally set to 0 (no delivery price by default)
+    cfDelivery.innerText = fmtGhc(deliveryFee || 0);
+    cfPromo.innerText = `-GHC ${Math.round(totals.promoDiscount || 0)}`;
+
+    // Processing fee (fixed) — shown only in checkout
+    const processingFee = (typeof PROCESSING_FEE !== 'undefined') ? Number(PROCESSING_FEE) : 0;
+    if (cfProcessing) cfProcessing.innerText = fmtGhc(processingFee || 0);
+
+    // Final total now includes processing fee
+    const total = Math.max(0, (totals.subtotal || 0) - (totals.promoDiscount || 0) + (deliveryFee || 0) + (processingFee || 0));
+    cfTotal.innerText = fmtGhc(total);
     }
 
     // compute delivery fee using haversine distance
@@ -5706,26 +5719,28 @@ submitBtn && submitBtn.addEventListener('click', async (ev) => {
       alert('Your cart is empty. Add items before checkout.');
       return;
     }
-
-    const totals = getTotals();
+const totals = getTotals();
     const cartLines = baseCartLines.map(l => ({
-      baseId: l.baseId, title: l.title, unitPrice: Number(l.unitPrice) || 0, qty: Number(l.qty) || 0, meta: l.meta || {}
+     baseId: l.baseId, title: l.title, unitPrice: Number(l.unitPrice) || 0, qty: Number(l.qty) || 0, meta: l.meta || {}
     }));
     if (totals && Array.isArray(totals.freeItems) && totals.freeItems.length) {
       totals.freeItems.forEach(fi => {
-        cartLines.push({
+       cartLines.push({
           baseId: fi.id || 'promo-free',
-          title: fi.title || 'Promo free item',
+         title: fi.title || 'Promo free item',
           unitPrice: Number(fi.unitPrice || 0),
-          qty: Number(fi.qty || 1),
-          meta: fi.meta || {}
+         qty: Number(fi.qty || 1),
+         meta: fi.meta || {}
         });
-      });
+     });
     }
 
+    // Delivery value used earlier in this script; keep same logic (0 if not calculated)
     const delivery = 0;
-    const totalAmount = Math.round(typeof totals.total !== 'undefined' ? totals.total : ((totals.subtotal || 0) - (totals.promoDiscount || 0) + delivery));
-    try { localStorage.setItem('wrap_user_name', name); localStorage.setItem('wrap_user_phone', phone); } catch(e){}
+    // Add processing fee to the amount sent to Paystack
+   const processingFee = (typeof PROCESSING_FEE !== 'undefined') ? Number(PROCESSING_FEE) : 0;
+   const totalBase = (typeof totals.total !== 'undefined') ? Number(totals.total) : ((totals.subtotal || 0) - (totals.promoDiscount || 0) + delivery);
+    const totalAmount = Math.round(totalBase + processingFee);    try { localStorage.setItem('wrap_user_name', name); localStorage.setItem('wrap_user_phone', phone); } catch(e){}
 
     // Cash flow (local)
     if (paymethod === 'cash') {
@@ -5817,11 +5832,17 @@ submitBtn && submitBtn.addEventListener('click', async (ev) => {
                 try {
                   const order = {
                     reference: response.reference || ref,
-                    name, phone, email, type, address, lat, lon, date, time, note,
+                   name, phone, email, type, address, lat, lon, date, time, note,
                     cart: cartLines,
-                    totals: { subtotal: totals.subtotal, delivery, promo: totals.promoDiscount, total: Math.round(totalAmount) },
+                    totals: {
+                      subtotal: Math.round(totals.subtotal || 0),
+                     delivery: Number(delivery || 0),
+                      promo: Math.round(totals.promoDiscount || 0),
+                     processing: Number(processingFee || 0),
+                      total: Math.round(totalAmount)
+                    },
                     ts: new Date().toISOString()
-                  };
+                 };
                   localStorage.setItem('wrap_last_order', JSON.stringify(order));
                   localStorage.setItem('wrap_show_confirmation', '1');
                 } catch (e) { console.warn('Could not persist order after payment', e); }
