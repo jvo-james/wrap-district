@@ -4814,23 +4814,7 @@ if (cartHeader && !document.getElementById('cart-header-total')) {
           <textarea id="cf-note" class="input" rows="3" placeholder="e.g., no vegetables, not too spicy, etc. " name="Notes"></textarea>
         </div>
 
-        <div style="margin-top:12px;">
-          <label class="small-muted">Payment method</label>
-          <select id="cf-paymethod" class="input" name="Payment_method">
-            <option value="paystack">Pay with Mobile Money / Card (Paystack)</option>
-            <option value="cash" disabled>Cash on Delivery</option>
-          </select>
-        </div>
-
-        <div class="checkout-actions">
-          <button id="cf-submit" class="btn primary full">Confirm & Pay</button>
-          <button id="cf-cancel" class="btn ghost full">Cancel</button>
-        </div>
-
-      <div id="cart-delivery-note" class="small-muted" style="margin-top:8px; padding:10px; border-radius:10px; background: linear-gradient(90deg, rgba(255,160,80,0.04), rgba(255,255,255,0.01)); border:1px solid rgba(255,160,80,0.06);">
-         <strong>Important:</strong> The checkout price shown <em>does NOT</em> include delivery fees. Delivery fee will be estimated after checkout based on your address and communicated to you.
-        <p>Processing fee: GHS 2</p>
-       </div>
+        
  
       </div>
       <aside class="checkout-right" aria-label="Order summary">
@@ -4846,7 +4830,7 @@ if (cartHeader && !document.getElementById('cart-header-total')) {
         </div>
         <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
           <div class="small-muted">Delivery</div>
-          <div id="cf-delivery" class="small-muted">GHC 0</div>
+          <div id="cf-delivery" class="small-muted"> * </div>
         </div>
         <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
           <div class="small-muted">Promo</div>
@@ -4866,6 +4850,23 @@ if (cartHeader && !document.getElementById('cart-header-total')) {
       <div style="margin-top:12px;" class="small-muted">
         Please confirm your details before proceeding. You will receive an email & SMS after payment.
       </div>
+        <div style="margin-top:12px;">
+          <label class="small-muted">Payment method</label>
+          <select id="cf-paymethod" class="input" name="Payment_method">
+            <option value="paystack">Pay with Mobile Money / Card (Paystack)</option>
+            <option value="cash" disabled>Cash on Delivery</option>
+          </select>
+        </div>
+
+        <div class="checkout-actions">
+          <button id="cf-submit" class="btn primary full">Confirm & Pay</button>
+          <button id="cf-cancel" class="btn ghost full">Cancel</button>
+        </div>
+
+      <div id="cart-delivery-note" class="small-muted" style="margin-top:8px; padding:10px; border-radius:10px; background: linear-gradient(90deg, rgba(255,160,80,0.04), rgba(255,255,255,0.01)); border:1px solid rgba(255,160,80,0.06);">
+         <strong>Important*:</strong> The checkout price shown <em>does NOT</em> include delivery fees. Delivery fee will be estimated after checkout based on your address and communicated to you.
+        
+       </div>
     </aside>
 </form>
     </div>
