@@ -3966,7 +3966,7 @@ a:focus, button:focus { outline: 3px solid rgba(255,204,51,0.10); outline-offset
   </div>
 
   <div class="footer-actions" style="margin-left:12px;">
-    <button id="checkout-btn" class="btn primary" data-action="checkout" style="min-width:120px;">
+    <button type="button" id="checkout-btn" class="btn primary" data-action="checkout" style="min-width:120px;">
       <i class="fa fa-credit-card"></i> Pay
     </button>
     <button id="clear-cart" class="btn ghost" data-action="clear" style="min-width:80px;">
@@ -5699,15 +5699,12 @@ btnPrint && btnPrint.addEventListener('click', () => {
       // clear inline onclick if present (helps some simple use-cases)
       try { if (el.getAttribute && el.getAttribute('onclick')) el.removeAttribute('onclick'); } catch(e){}
 
-      // Add a capture-phase listener that prevents other click handlers from running on this element.
-      // We use capture + stopImmediatePropagation to be robust to duplicate handlers.
+      // Use a normal bubble-phase listener (non-aggressive) so we don't block other scripts/users.
       el.addEventListener('click', function(ev){
         try {
           ev.preventDefault();
-          // stop other handlers attached to this element from executing
-          ev.stopImmediatePropagation();
         } catch(e){}
-        // Temporarily silence alerts/confirm used synchronously by other scripts
+        // Temporarily silence alerts/confirm used synchronously by other scripts (local only)
         const oldAlert = window.alert;
         const oldConfirm = window.confirm;
         try {
@@ -5718,9 +5715,9 @@ btnPrint && btnPrint.addEventListener('click', () => {
         } catch(e){ console.error(e); }
         finally {
           // restore original functions (rest of app behavior unchanged)
-          try { window.alert = oldAlert; window.confirm = oldConfirm; } catch(e){}
+         try { window.alert = oldAlert; window.confirm = oldConfirm; } catch(e){}
         }
-      }, true); // capture = true
+      }, false); // bubble-phase listener (safer)
     }
 
     // Attach interceptors to all matching elements (existing + future)
@@ -8456,225 +8453,91 @@ document.addEventListener('DOMContentLoaded', () => {
   window.__fixCheckoutScroll = enableCheckoutScroll;
 })();
 </script>
-  <style>
-    /* HERO: responsive desktop-first styles */
-/* Put this after your other CSS so it overrides defaults if needed */
-#hero.hero-slideshow {
-  position: relative;
-  width: 100%;
-  box-sizing: border-box;
-  overflow: hidden;
-  background: linear-gradient(180deg, rgba(0,0,0,0.06), rgba(0,0,0,0.12));
-}
-
-/* slides wrapper */
-#hero .slides {
-  position: relative;
-  width: 100%;
-  height: 62vh;           /* mobile-first height */
-  min-height: 380px;
-  max-height: 820px;
-  overflow: hidden;
-  display: block;
-}
-
-/* each slide is absolutely stacked inside .slides so overlaying is reliable */
-#hero .slide {
-  position: absolute;
-  inset: 0;               /* top:0; right:0; bottom:0; left:0; */
-  display: none;         /* JS will toggle display:block on the active slide */
-  box-sizing: border-box;
-  will-change: opacity, transform;
-}
-
-/* make images fill the slide area */
-#hero .slide-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-  vertical-align: middle;
-  user-select: none;
-  -webkit-user-drag: none;
-}
-
-/* overlay that dims the image & holds content */
-#hero .slide-overlay {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;         /* center vertically */
-  justify-content: center;     /* center horizontally by default */
-  padding: 28px;
-  box-sizing: border-box;
-  background: linear-gradient(180deg, rgba(0,0,0,0.12) 0%, rgba(0,0,0,0.48) 70%);
-  z-index: 2;
-}
-
-/* content inside overlay */
-#hero .slide-content {
-  width: 100%;
-  max-width: 980px;        /* overall page constraint */
-  color: var(--text, #fff);
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  align-items: flex-start;
-  text-shadow: 0 10px 30px rgba(0,0,0,0.6);
-}
-
-/* default title sizing for mobile */
-#hero .slide-title { font-size: 22px; line-height:1.02; margin:0; font-weight:900; color:var(--text); }
-#hero .eyebrow { color: var(--accent-2); font-weight:900; font-size:13px; text-transform:uppercase; letter-spacing:0.8px; }
-#hero .slide-sub { color: var(--muted-2); font-size:15px; max-width:60ch; }
-
-/* CTA row */
-#hero .slide-ctas { display:flex; gap:10px; margin-top:8px; flex-wrap:wrap; }
-
-/* slide art (decorative) */
-#hero .slide-art { display:flex; gap:8px; margin-top:10px; }
-#hero .art-icon { color: rgba(255,255,255,0.85); font-size:20px; opacity:0.95; }
-
-/* slideshow controls (place them over the hero) */
-#hero .slideshow-controls {
-  position: absolute;
-  left: 18px;
-  right: 18px;
-  bottom: 18px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:12px;
-  z-index: 6;
-  pointer-events: none; /* allow buttons to be clickable only (they will have pointer-events: auto default) */
-}
-#hero .slideshow-controls .icon-btn,
-#hero .slideshow-controls .dot { pointer-events: auto; }
-
-/* dots (hero) */
-#hero .slide-dots { display:flex; gap:8px; align-items:center; }
-#hero .dot { width:10px; height:10px; border-radius:999px; background: rgba(255,255,255,0.18); border:1px solid rgba(255,255,255,0.04); padding:0; }
-#hero .dot.is-active { width:36px; background: linear-gradient(90deg,var(--accent-1),var(--accent-2)); box-shadow: 0 8px 20px rgba(255,106,0,0.14); border-radius:999px; }
-
-/* ensure hero content sits nicely on large screens */
-@media (min-width: 900px) {
-  #hero .slides { height: 70vh; min-height: 460px; }
-  #hero .slide-overlay { align-items: center; padding: 40px 48px; background: linear-gradient(90deg, rgba(0,0,0,0.18) 0%, rgba(0,0,0,0.55) 68%); justify-content: flex-start;}
-  #hero .slide-content { max-width: 560px; padding-left: 18px; }
-  #hero .slide-title { font-size: 44px; line-height: 1.02; }
-  #hero .slide-sub { font-size: 18px; color: var(--muted-2); }
-  #hero .slide-ctas { margin-top: 14px; }
-  #hero .eyebrow { font-size: 13px; }
-  /* place decorative art to the right and slightly larger on wide screens */
-  #hero .slide-art { position: absolute; right: 48px; bottom: 24px; gap:12px; }
-  #hero .art-icon { font-size:24px; opacity:0.95; }
-}
-
-/* very large desktop tweak */
-@media (min-width: 1400px) {
-  #hero .slide-content { max-width: 720px; padding-left: 28px; }
-  #hero .slide-title { font-size: 56px; }
-}
-
-  </style>
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  const checkoutSelectors = '#checkout-btn, #cart-header-checkout, .cart-header .cart-header-checkout, [data-action="checkout"], [data-action="pay"]';
+  Array.from(document.querySelectorAll(checkoutSelectors)).forEach(btn => {
+    try {
+      // ensure it's a button (prevents accidental submit)
+      if (btn.tagName === 'BUTTON' && !btn.hasAttribute('type')) btn.setAttribute('type','button');
+      // don't add duplicate listeners
+      if (btn.__wrapCheckoutBound) return;
+      btn.__wrapCheckoutBound = true;
+      btn.addEventListener('click', function (e) {
+       try { e && e.preventDefault(); } catch(e){}
+        // prefer the real openCheckoutPage/openCheckoutFull if available
+        if (typeof window.openCheckoutPage === 'function') {
+          try { window.openCheckoutPage(); return; } catch(e){/*ignore*/ }
+        }
+        if (typeof window.openCheckoutFull === 'function') {
+          try { window.openCheckoutFull(); return; } catch(e){/*ignore*/ }
+        }
+        // fallback: open the cart drawer (best-effort)
+        const cart = document.getElementById('cart-drawer');
+        if (cart) { cart.style.display = 'block'; cart.setAttribute('aria-hidden','false'); document.body.style.overflow = 'hidden'; return; }
+        // final fallback: scroll to the menu
+        const menu = document.getElementById('menu');
+        if (menu) menu.scrollIntoView({ behavior:'smooth', block:'start' });
+      }, false);
+    } catch(e){ console.warn('checkout wiring error', e); }
+  });
+});
+</script>
 
 <script>
-/* Scoped hero slideshow — safe override so other carousels won't conflict.
-   Paste this AFTER your existing scripts (before </body>).
-*/
-(function(){
-  document.addEventListener('DOMContentLoaded', function(){
-    const hero = document.getElementById('hero');
-    if (!hero) return;
+document.addEventListener('DOMContentLoaded', function(){
+  try {
+    const slidesWrap = document.getElementById('slides');
+    if (!slidesWrap) return;
+    const slides = Array.from(slidesWrap.querySelectorAll('.slide'));
+    const dots = Array.from(document.querySelectorAll('.slideshow-controls .dot'));
 
-    // scope selectors to #hero only
-    const slides = Array.from(hero.querySelectorAll('.slide'));
-    const prevBtn = hero.querySelector('.slide-prev');
-    const nextBtn = hero.querySelector('.slide-next');
-    // the hero dot container uses id="slide-dots" in your markup
-    const dotContainer = hero.querySelector('#slide-dots') || hero.querySelector('.slide-dots');
-    const dots = dotContainer ? Array.from(dotContainer.querySelectorAll('.dot')) : [];
+    // Ensure each slide has an image src fallback (prevents blank visuals if src is empty)
+    slides.forEach(s => {
+      const img = s.querySelector('.slide-img');
+      if (img && !img.getAttribute('src')) {
+        img.setAttribute('src', 'hero-shawarma-large.jpg'); // fallback — change to an existing file if needed
+      }
+    });
 
-    // Basic guard: nothing to do if no multiple slides
-    if (!slides.length || slides.length === 1) {
-      // make sure single slide is visible
-      if (slides[0]) slides[0].style.display = 'block';
-      return;
-    }
-
-    // show/hide helpers
-    let current = 0;
-    function showSlide(idx) {
-      idx = ((idx % slides.length) + slides.length) % slides.length;
-      slides.forEach((s, i) => {
-        if (i === idx) {
-          s.style.display = 'block';
-          s.setAttribute('aria-hidden','false');
-        } else {
-          s.style.display = 'none';
-          s.setAttribute('aria-hidden','true');
-        }
+    // Ensure a sane initial state: show first slide if none active
+    function setActive(idx) {
+      slides.forEach((sl,i) => {
+        const is = i === idx;
+        sl.style.display = is ? '' : 'none';
+        sl.setAttribute('aria-hidden', String(!is));
       });
-      // update dots
-      if (dots.length) dots.forEach((d,i) => d.classList.toggle('is-active', i === idx));
-      current = idx;
+      dots.forEach((d,i) => d.classList.toggle('is-active', i === idx));
     }
 
-    // attach prev/next
-    prevBtn && prevBtn.addEventListener('click', (e) => { e.preventDefault(); showSlide(current - 1); resetAuto(); });
-    nextBtn && nextBtn.addEventListener('click', (e) => { e.preventDefault(); showSlide(current + 1); resetAuto(); });
+    // Find an active dot / slide (first .is-active dot), else default 0
+    let startIdx = 0;
+    const activeDot = dots.findIndex(d => d.classList.contains('is-active'));
+    if (activeDot >= 0) startIdx = activeDot;
+   setActive(startIdx);
 
-    // attach dots
-    dots.forEach((dot, i) => {
-      dot.addEventListener('click', () => { showSlide(i); resetAuto(); });
-      dot.setAttribute('role','tab');
+    // wire dots
+    dots.forEach(d => {
+      d.addEventListener('click', function(){
+        const idx = Number(this.dataset.index || 0);
+        setActive(idx);
+      }, false);
     });
 
-    // keyboard
-    document.addEventListener('keydown', (ev) => {
-      if (ev.key === 'ArrowRight') { showSlide(current + 1); resetAuto(); }
-      if (ev.key === 'ArrowLeft')  { showSlide(current - 1); resetAuto(); }
-    });
+    // Wire prev/next to respect this mapping (if controls exist)
+    const prev = document.querySelector('.slideshow-controls .slide-prev');
+    const next = document.querySelector('.slideshow-controls .slide-next');
+    if (prev) prev.addEventListener('click', ()=> {
+      const i = slides.findIndex(s => s.style.display !== 'none');
+      setActive((i - 1 + slides.length) % slides.length);
+    }, false);
+    if (next) next.addEventListener('click', ()=> {
+      const i = slides.findIndex(s => s.style.display !== 'none');
+      setActive((i + 1) % slides.length);
+    }, false);
 
-    // auto-rotate
-    let autoTimer = null;
-    const AUTO_DELAY = 6000;
-    function startAuto(){ stopAuto(); autoTimer = setInterval(()=> showSlide(current + 1), AUTO_DELAY); }
-    function stopAuto(){ if (autoTimer) { clearInterval(autoTimer); autoTimer = null; } }
-    function resetAuto(){ stopAuto(); startAuto(); }
-
-    // init
-    showSlide(0);
-    startAuto();
-
-    // Pause rotation on hover/touch
-    hero.addEventListener('mouseenter', stopAuto);
-    hero.addEventListener('mouseleave', startAuto);
-    hero.addEventListener('touchstart', stopAuto, {passive:true});
-    hero.addEventListener('touchend', startAuto, {passive:true});
-
-    /* --- Diagnostic: check image load for slide 3 (index 2) --- */
-    // If slide 3 appears blank check the image is actually loaded (404 or wrong path).
-    // This snippet runs silently; it will log to console only on error.
-    (function checkSlideImage(index){
-      if (!slides[index]) return;
-      const img = slides[index].querySelector('.slide-img');
-      if (!img) return;
-      // if image hasn't loaded, log helpful message
-      setTimeout(()=> {
-        try {
-          const ok = !!img.complete && img.naturalWidth && img.naturalHeight;
-          if (!ok) {
-            console.warn('Hero slide #' + (index+1) + ' image not loaded. Check path:', img.getAttribute('src'));
-          }
-        } catch(e) {
-          // ignore
-        }
-      }, 450);
-    })(2);
-
-  });
-})();
+  } catch (e) { console.warn('hero slideshow patch failed', e); }
+});
 </script>
 
 </html>
