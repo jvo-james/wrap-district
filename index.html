@@ -3241,12 +3241,12 @@ a:focus, button:focus { outline: 3px solid rgba(255,204,51,0.10); outline-offset
           <div class="slide-overlay slide-promo">
             <div class="slide-content">
               <p class="eyebrow"><i class="fa fa-clock"></i> Limited Time</p>
-              <h2 class="slide-title">Tuesday Promo — Buy 2 Shawarmas, Get 1 Free</h2>
-              <p class="slide-sub">Loaded Fries come with a free Coke when ordered during promo hours.</p>
+<h2 class="slide-title">Friday Madness — Buy 2 Shawarmas, Get 1 Free</h2>
+              <p class="slide-sub">Loaded Fries come with a free Coke during Friday promo hours.</p>
 
            <!-- inside your Slide 3 slide-content where promo-cta-row exists -->
 <div class="promo-cta-row">
-  <button class="btn primary" data-action="apply-promo" data-promo-code="TUES-B2G1">
+  <button class="btn primary" data-action="apply-promo" data-promo-code="FRIDAY-B2G1">
     <i class="fa fa-tag"></i> Claim Promo
   </button>
 
@@ -3262,7 +3262,7 @@ a:focus, button:focus { outline: 3px solid rgba(255,204,51,0.10); outline-offset
 
               <div class="promo-urgency">
                 <span class="promo-countdown" id="promo-countdown" aria-live="polite">Promo ends in: <strong id="promo-timer">—</strong></span>
-                <small class="promo-note">Next promo: Tuesdays • Add 2 Shawarmas to auto-apply.</small>
+               <small class="promo-note">Next promo: Fridays • Add 2 Shawarmas to auto-apply.</small>
               </div>
             </div>
           </div>
@@ -3483,6 +3483,42 @@ a:focus, button:focus { outline: 3px solid rgba(255,204,51,0.10); outline-offset
           </div>
         </article>
 
+               <!-- Jungle Jumbo — Fully Loaded Jollof -->
+        <article class="menu-item" id="item-jollof" data-item-id="jollof" data-category="rice" data-friday-price="75" tabindex="0">
+          <div class="item-top">
+            <img class="item-thumb" src="thumb-jollof.jpg" alt="Jungle Jumbo fully loaded jollof thumbnail">
+            <div class="item-meta">
+              <h3 class="item-title">Jungle Jumbo — Fully Loaded Jollof <span class="badge">New</span></h3>
+              <p class="item-desc">Hearty portion with protein & extras. Friday Madness price available on Fridays.</p>
+            </div>
+          </div>
+
+          <div class="item-config">
+            <!-- No selects for simplicity — it's a fixed-price item. -->
+            <div class="item-actions">
+              <div class="price-row">
+                <span class="price-label">Price</span>
+                <!-- main price-value used by existing JS to compute totals (default = normal price) -->
+                <strong class="item-price" data-price-display>GHC <span class="price-value">85</span></strong>
+                <!-- strike/alternate price shown/toggled in JS on Fridays -->
+               <div class="jollof-prices" style="margin-left:10px;">
+                  <span class="normal-price"><del>GHC 85</del></span>
+                  <span class="friday-price hidden" aria-hidden="true">GHC 75</span>
+                </div>
+              </div>
+
+              <div class="action-row">
+                <button class="btn small add-btn" data-action="add" data-item-id="jollof">
+                  <i class="fa fa-plus-circle"></i> Add
+                </button>
+                <button class="btn small remove-btn hidden" data-action="remove" data-item-id="jollof">
+                  <i class="fa fa-minus-circle"></i> Remove
+                </button>
+              </div>
+            </div>
+         </div>
+        </article>
+ 
         <!-- Noodles -->
         <article class="menu-item" id="item-noodles" data-item-id="noodles" data-category="noodles" tabindex="0">
           <div class="item-top">
@@ -3522,11 +3558,11 @@ a:focus, button:focus { outline: 3px solid rgba(255,204,51,0.10); outline-offset
       <div class="container-small">
         <h2 id="promo-heading" class="section-title"><i class="fa fa-gift"></i> Promo</h2>
         <div id="promo-details" class="promo-copy">
-          <p><strong>Buy 2 Shawarmas, Get 1 Free (Tuesdays)</strong> — Promo applies automatically at checkout. Add two qualifying shawarmas and the third will be discounted to free.</p>
+<p><strong>Buy 2 Shawarmas, Get 1 Free (Fridays)</strong> — Promo applies automatically at checkout. Add two qualifying shawarmas and the third will be discounted to free during the Friday Madness window.</p>
           <p><strong>Loaded Fries</strong> — Get a free Coke when purchasing during promo hours. Free item will appear in cart once qualifying product is added.</p>
          <!-- somewhere inside #promo-details (promo-copy) -->
 <div style="margin-top:10px;">
-  <button class="btn primary" data-action="preorder-promo">Preorder for next Tuesday Promo</button>
+  <button class="btn primary" data-action="preorder-promo">Preorder for next Friday Madness</button>
 </div>
           <div class="promo-help">
             <small id="promo-helper" class="muted">Tip: use the "Add missing items" button in cart to reach a promo threshold instantly.</small>
@@ -3598,14 +3634,14 @@ a:focus, button:focus { outline: 3px solid rgba(255,204,51,0.10); outline-offset
     </aside>
 
     <!-- ENTRY PROMO MODAL / SLIDE-IN for new visitors -->
-    <div id="entry-promo" class="entry-promo modal hidden" role="dialog" aria-modal="true" aria-label="Tuesday Promo">
+<div id="entry-promo" class="entry-promo modal hidden" role="dialog" aria-modal="true" aria-label="Friday Madness">
       <div class="modal-inner">
         <button id="entry-close" class="icon-btn modal-close" aria-label="Close promo"><i class="fa fa-times"></i></button>
         <div class="modal-body">
-          <h3><i class="fa fa-gift"></i> Tuesday Promo</h3>
-          <p class="lead">Buy 2 Shawarmas, get one free. Valid Tuesdays. Tap to claim now.</p>
-          <div class="modal-actions">
-            <button class="btn primary" id="claim-promo-entry" data-promo="TUES-B2G1"><i class="fa fa-tag"></i> Claim Promo</button>
+         <h3><i class="fa fa-gift"></i> Friday Madness</h3>
+        <p class="lead">Buy 2 Shawarmas, get one free. Valid Fridays. Tap to claim now.</p>
+        <div class="modal-actions">
+          <button class="btn primary" id="claim-promo-entry" data-promo="FRIDAY-B2G1"><i class="fa fa-tag"></i> Claim Promo</button>
             <label class="dont-show">
               <input type="checkbox" id="dont-show-again" />
               Don't show again
@@ -3706,17 +3742,7 @@ a:focus, button:focus { outline: 3px solid rgba(255,204,51,0.10); outline-offset
   </div>
 </div>
   </main>
-  <!-- ===== Menu tabs + Cart header checkout enhancements ===== -->
-  <!-- Purchase History: header button, mobile nav link, modal, CSS + JS
-     Paste this near the end of your <body> (after existing scripts) or include as a separate file.
-     This script will:
-     - Add a "Purchase history" button to the top header and to the mobile nav
-     - Provide a purchase-history modal that lists saved purchases from localStorage (key: wrap_purchases)
-     - Save an invoice HTML alongside each purchase (so user can Open / Print / Download later)
-     - Auto-saves the last order (wrap_last_order) into history when present (dedup by reference)
-
-IMPORTANT: Browsers cannot reliably create a true PDF file purely client-side without a library or a server (e.g. jsPDF, wkhtmltopdf, or server-side PDF generation). This code saves a printable HTML invoice and offers a convenient "Open printable (then Save as PDF)" flow. If you want automatic PDF creation, add a server endpoint or a client PDF library.
--->
+  
 
 <style>
 /* Purchase history modal (lightweight; reuses your .modal/.modal-inner patterns) */
@@ -5500,12 +5526,7 @@ btnPrint && btnPrint.addEventListener('click', () => {
   
   
 <script>
-/* Checkout page script (Task 3)
-   - Opens in-page checkout (#checkout-page)
-   - Hides other modals/popups before opening
-   - Populates order lines from window.cart or from cart DOM
-   - Computes delivery fee using haversine distance; editable rates below
-*/
+
 
 (function(){
   document.addEventListener('DOMContentLoaded', () => {
@@ -5700,8 +5721,8 @@ const PAYSTACK_PUBLIC_KEY = 'pk_live_ad7d0e0b164d83ec61bf2bf4fdb2af366c41c0ed';
      });
 
      // Promo rules: Buy 2 Get 1 free applies only on Tuesdays (or when user explicitly claimed the promo)
-     const todayIsTuesday = (new Date()).getDay() === 2; // Sunday=0, Monday=1, Tuesday=2
-     const promoClaimed = !!localStorage.getItem('wrap_claimed_promo_TUES-B2G1');
+     const todayIsFriday = (new Date()).getDay() === 5; // Sunday=0, Friday=5
+    const promoClaimed = !!localStorage.getItem('wrap_claimed_promo_FRIDAY-B2G1');
       let promoDiscount = 0;
      const freeItems = [];
 
@@ -5716,7 +5737,7 @@ const PAYSTACK_PUBLIC_KEY = 'pk_live_ad7d0e0b164d83ec61bf2bf4fdb2af366c41c0ed';
        // Add friendly freeLines so invoices and checkout can display them
         if (promoDiscount > 0) {
           freeItems.push({
-           id: 'promo-TUES-B2G1',
+           id: 'promo-FRIDAY-B2G1',
            title: 'Shawarma (Free — Promo)',
            unitPrice: 0,
             qty: freeCount,
@@ -6055,11 +6076,7 @@ const totals = getTotals();
 })();
 </script>
 <script>
-/* Product modal behavior (Task 2)
-   - Opens when user clicks .item-thumb OR .item-title inside a .menu-item
-   - Clones the .item-config into modal and keeps live price updates
-   - On Add, copies selections back into original item's controls and triggers original add-btn
-*/
+
 (function(){
   document.addEventListener('DOMContentLoaded', () => {
     const modal = document.getElementById('product-modal');
@@ -6080,7 +6097,27 @@ const totals = getTotals();
 
     // local price calculation (mirrors your calculateItemPrice)
     function calculatePriceFromContainer(container){
+       try {
+        const menuItem = container.closest('.menu-item');
+        if (menuItem && menuItem.dataset.itemId === 'jollof') {
+          const fridayPrice = Number(menuItem.dataset.fridayPrice || 75);
+          const todayIsFriday = (new Date()).getDay() === 5;
+          // base price = friday or normal (normal is in price-value)
+          const basePrice = todayIsFriday ? fridayPrice : Number(menuItem.querySelector('.price-value')?.innerText || 85);
+          // still include checked addons if any
+          let addonsTotal = 0;
+          container.querySelectorAll('input.addon-checkbox').forEach(cb => { if (cb.checked) addonsTotal += Number(cb.value) || 0; });
+          return Math.round(basePrice + addonsTotal);
+        }
+      } catch (e) { /* ignore and fall back to normal calc */ }
       let total = 0;
+      try {
+        if (itemElement && itemElement.dataset.itemId === 'jollof') {
+          const fridayPrice = Number(itemElement.dataset.fridayPrice || 75);
+          const todayIsFriday = (new Date()).getDay() === 5;
+          total = todayIsFriday ? fridayPrice : Number(itemElement.querySelector('.price-value')?.innerText || 85);
+        }
+      } catch(e){}
       // selects
       const selects = container.querySelectorAll('select');
       selects.forEach(s => { total += Number(s.value) || 0; });
@@ -6330,11 +6367,11 @@ const totals = getTotals();
               <div class="promo-card">
                 <div class="promo-left"><i class="fa fa-fire pc-ico" aria-hidden="true"></i></div>
                 <div class="promo-right">
-                  <div class="promo-eyebrow">Limited • Tuesday</div>
+                   <div class="promo-eyebrow">Limited • Friday</div>
                   <h3 class="promo-title">Buy 2 Shawarmas — Get 1 Free</h3>
                   <div class="promo-desc">Add 2 qualifying shawarmas at checkout on Tuesdays and the third becomes free automatically. Applies per 3 items.</div>
                   <div class="promo-cta-row">
-                    <button class="btn primary" data-action="apply-promo" data-promo-code="TUES-B2G1" aria-label="Claim Shawarma promo"><i class="fa fa-tag"></i> Claim Promo</button>
+                     <button class="btn primary" data-action="apply-promo" data-promo-code="FRIDAY-B2G1" aria-label="Claim Shawarma promo"><i class="fa fa-tag"></i> Claim Promo</button>
                     <button class="btn ghost" data-action="promo-details" data-target="shawarma" aria-expanded="false"><i class="fa fa-info-circle"></i> Details</button>
                     <button class="btn primary" data-action="preorder-promo"><i class="fa fa-calendar-check"></i> Preorder</button>
                   </div>
@@ -6451,7 +6488,7 @@ const totals = getTotals();
     // Details toggles: show more copy in #promo-more-content
     const detailsMap = {
       'shawarma': `<strong>Shawarma Promo (Buy 2 Get 1 Free)</strong><br>
-                   Promo works per 3 Shawarmas. On Tuesdays, the cheapest of each group of 3 will be discounted to free automatically at checkout. Add 2 qualifying shawarmas to your cart and the third will appear as a free line.`,
+                   Promo works per 3 Shawarmas. On Fridays, the cheapest of each group of 3 will be discounted to free automatically at checkout. Add 2 qualifying shawarmas to your cart during Friday Madness and the third will appear as a free line.`,
       'fries': `<strong>Loaded Fries (Free Coke)</strong><br>
                 Buy a qualifying Loaded Fries during promo hours and we will add a free Coke to your cart. If not auto-added, use the "Add missing items" helper inside the cart.`
     };
@@ -6798,9 +6835,9 @@ body.cart-open::before {
     // Expose for other scripts that may read window.cart
     window.cart = cart;
 
-    const promo = {
-      // only active on Tuesdays (day 2). No "claimed" override — user requested Tue-only.
-      activeDays: [2],
+  const promo = {
+     // Friday Madness: active on Fridays (day 5).
+      activeDays: [5],
       isActive() {
         const now = new Date();
         return this.activeDays.includes(now.getDay());
@@ -6832,10 +6869,10 @@ body.cart-open::before {
     entryCloseBtn?.addEventListener('click', () => { entryPromoModal.classList.add('hidden'); });
     claimPromoEntryBtn?.addEventListener('click', () => {
       if (!promo.isActive()) {
-        alert('The Tuesday promo applies only on Tuesdays. You will be able to claim it when it is Tuesday in your local time.');
+        alert('The Tuesday promo applies only on Fridays. You will be able to claim it when it is Tuesday in your local time.');
         return;
       }
-      alert('Promo is active — add qualifying items to see discounts at checkout (Tuesday).');
+      alert('Promo is active — add qualifying items to see discounts at checkout (Fridays).');
     });
     dontShowAgainCheckbox?.addEventListener('change', (e) => {
       if (e.target.checked) { localStorage.setItem('wrap_hide_entry_promo','1'); } else { localStorage.removeItem('wrap_hide_entry_promo'); }
@@ -7029,9 +7066,24 @@ body.cart-open::before {
     function updateItemPriceDisplay(item){
       try {
         const price = calculateItemPrice(item);
-        const displayEl = q('.price-value', item);
-        if (displayEl) displayEl.innerText = Math.round(price);
-        const priceWrap = q('.item-price', item);
+      const displayEl = q('.price-value', item);
+      if (displayEl) displayEl.innerText = Math.round(price);
+
+      // Jollof-specific UI toggle (show strikethrough normal price -> replace with Friday price when Friday)
+      try {
+        if (item.dataset.itemId === 'jollof') {
+          const fridayPrice = Number(item.dataset.fridayPrice || 75);
+          const normalPrice = Number(item.querySelector('.price-value')?.innerText || 85);
+         const isFriday = (new Date()).getDay() === 5;
+         const normalEl = item.querySelector('.normal-price');
+          const fridayEl = item.querySelector('.friday-price');
+          if (normalEl) normalEl.classList.toggle('hidden', isFriday);
+          if (fridayEl) fridayEl.classList.toggle('hidden', !isFriday);
+          // ensure the visible .price-value matches the shown price (above we already set it via calculateItemPrice)
+          if (displayEl) displayEl.innerText = isFriday ? String(fridayPrice) : String(normalPrice);
+        }
+      } catch(e){}
+       const priceWrap = q('.item-price', item);
         if (priceWrap) { priceWrap.classList.add('updated'); setTimeout(()=> priceWrap.classList.remove('updated'), 300); }
       } catch (err) {
         console.error('updateItemPriceDisplay error', err);
