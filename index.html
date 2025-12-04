@@ -8597,6 +8597,80 @@ document.addEventListener('DOMContentLoaded', () => {
  }
 
 </style>
+<style>
+  /* ---------- Option A: grid layout when cart is in-flow ---------- */
+:root {
+  --cart-width: 360px;   /* change to your cart width */
+  --breakpoint-lg: 900px;
+}
 
-</html>
+@media (min-width: var(--breakpoint-lg)) {
+  /* container that wraps hero + cart */
+  .page-layout {
+    display: grid;
+    grid-template-columns: 1fr var(--cart-width); /* hero takes remaining space, cart fixed width */
+    gap: 0;
+    align-items: start;
+  }
+
+  /* hero stretches to fill the left column */
+  .hero-slideshow {
+    width: 100%;
+    max-width: 100%;
+    margin: 0; /* no centering — column controls width */
+  }
+
+  /* keep slide visuals intact and full width of column */
+  .hero-slideshow .slides,
+  .hero-slideshow .slide {
+    width: 100%;
+    height: 100%;
+  }
+
+  /* ensure cart sits at the right column */
+  .cart {
+    width: var(--cart-width);
+  }
+}
+
+</style>
+<style>
+  /* ---------- Option B: fixed/sticky cart on the right ---------- */
+:root{
+  --cart-width: 360px;    /* cart width */
+  --cart-offset: 24px;    /* space from right edge if cart is not flush (adjust) */
+  --breakpoint-lg: 900px;
+}
+
+@media (min-width: var(--breakpoint-lg)) {
+  /* ensure main content doesn't go behind the fixed cart */
+  .main-content, .hero-wrapper {
+    padding-right: calc(var(--cart-width) + var(--cart-offset));
+  }
+
+  /* allow the hero to grow so its right edge aligns with cart left */
+  .hero-slideshow {
+    max-width: calc(100vw - (var(--cart-width) + var(--cart-offset))); /* hero stops where cart begins */
+    margin: 18px auto 0 0; /* adjust vertical spacing as needed */
+    box-sizing: border-box;
+  }
+
+  /* make image fill the hero container */
+  .hero-slideshow .slides,
+  .hero-slideshow .slide-img {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+  }
+
+  /* ensure your fixed cart CSS remains */
+  .cart {
+    position: fixed;
+    right: var(--cart-offset);
+    top: 90px;             /* example — keep your existing positioning */
+    width: var(--cart-width);
+  }
+}
+
+</style></html>
   
