@@ -3373,10 +3373,13 @@ a:focus, button:focus { outline: 3px solid rgba(255,204,51,0.10); outline-offset
           <div class="item-config">
             <label class="label">Portion</label>
             <select class="select portion-select" name="fries-portion" aria-label="Fries portion" data-item="loaded-fries">
+               <option value="" disabled selected hidden>Choose portion</option>
               <option value="60" data-size="regular">Regular — GHC 60</option>
               <option value="70" data-size="large">Large — GHC 75</option>
             </select>
+      
 
+            
             <label class="label">Toppings</label>
             <div class="addons-row">
               <label class="addon">
