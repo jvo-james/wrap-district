@@ -3966,7 +3966,7 @@ a:focus, button:focus { outline: 3px solid rgba(255,204,51,0.10); outline-offset
   </div>
 
   <div class="footer-actions" style="margin-left:12px;">
-    <button type="button" id="checkout-btn" class="btn primary" data-action="checkout" style="min-width:120px;">
+    <button id="checkout-btn" class="btn primary" data-action="checkout" style="min-width:120px;">
       <i class="fa fa-credit-card"></i> Pay
     </button>
     <button id="clear-cart" class="btn ghost" data-action="clear" style="min-width:80px;">
@@ -5699,12 +5699,15 @@ btnPrint && btnPrint.addEventListener('click', () => {
       // clear inline onclick if present (helps some simple use-cases)
       try { if (el.getAttribute && el.getAttribute('onclick')) el.removeAttribute('onclick'); } catch(e){}
 
-      // Use a normal bubble-phase listener (non-aggressive) so we don't block other scripts/users.
+      // Add a capture-phase listener that prevents other click handlers from running on this element.
+      // We use capture + stopImmediatePropagation to be robust to duplicate handlers.
       el.addEventListener('click', function(ev){
         try {
           ev.preventDefault();
+          // stop other handlers attached to this element from executing
+          ev.stopImmediatePropagation();
         } catch(e){}
-        // Temporarily silence alerts/confirm used synchronously by other scripts (local only)
+        // Temporarily silence alerts/confirm used synchronously by other scripts
         const oldAlert = window.alert;
         const oldConfirm = window.confirm;
         try {
@@ -5715,9 +5718,9 @@ btnPrint && btnPrint.addEventListener('click', () => {
         } catch(e){ console.error(e); }
         finally {
           // restore original functions (rest of app behavior unchanged)
-         try { window.alert = oldAlert; window.confirm = oldConfirm; } catch(e){}
+          try { window.alert = oldAlert; window.confirm = oldConfirm; } catch(e){}
         }
-      }, false); // bubble-phase listener (safer)
+      }, true); // capture = true
     }
 
     // Attach interceptors to all matching elements (existing + future)
@@ -6033,12 +6036,21 @@ const PAYSTACK_PUBLIC_KEY = 'pk_live_ad7d0e0b164d83ec61bf2bf4fdb2af366c41c0ed';
     // Totals: prefer computeCartTotals() if available else compute from window.cart or fallback DOM
     function getTotals() {
      // If the app already provides a computeCartTotals() use it (server logic preferred).
-      if (typeof computeCartTotals === 'function') {
-        const t = computeCartTotals() || {};
-        // normalize common fields
-        t.promoDiscount = t.promoDiscount || t.promo || t.promoAmount || 0;
-        t.subtotal = typeof t.subtotal !== 'undefined' ? t.subtotal : (t.subtotal || 0);
-        return t;
+       try {
+       // If the app already provides a computeCartTotals() use it (server logic preferred).
+        if (typeof computeCartTotals === 'function') {
+          const t = computeCartTotals() || {};
+          // normalize common fields
+          t.promoDiscount = t.promoDiscount || t.promo || t.promoAmount || 0;
+          t.subtotal = typeof t.subtotal !== 'undefined' ? t.subtotal : (t.subtotal || 0);
+          return t;
+        }
+
+        // (rest of getTotals logic continues here...)
+      } catch (err) {
+        // If anything goes wrong, don't break the whole site — return a safe fallback totals object.
+        console.warn('getTotals() error — returning fallback totals', err);
+        return { subtotal: 0, delivery: 0, promoDiscount: 0, freeItems: [], total: 0 };
       }
 
       const cartObj = window.cart || {};
@@ -6061,12 +6073,12 @@ const PAYSTACK_PUBLIC_KEY = 'pk_live_ad7d0e0b164d83ec61bf2bf4fdb2af366c41c0ed';
      });
 
      // Promo rules: Buy 2 Get 1 free applies only on Tuesdays (or when user explicitly claimed the promo)
-     const todayIsFriday = (new Date()).getDay() === 5; // Sunday=0, Friday=5
+    const todayIsFriday = (new Date()).getDay() === 5; // Sunday=0, Friday=5
     const promoClaimed = !!localStorage.getItem('wrap_claimed_promo_FRIDAY-B2G1');
       let promoDiscount = 0;
      const freeItems = [];
 
-     if ((todayIsTuesday || promoClaimed) && shawarmaUnitPrices.length >= 3) {
+     if ((todayIsFriday || promoClaimed) && shawarmaUnitPrices.length >= 3) {
        // Number of free items is floor(total_shawarmas / 3)
         const freeCount = Math.floor(shawarmaUnitPrices.length / 3);
        // discount the cheapest items (common retail pattern)
@@ -8453,92 +8465,7 @@ document.addEventListener('DOMContentLoaded', () => {
   window.__fixCheckoutScroll = enableCheckoutScroll;
 })();
 </script>
-<script>
-document.addEventListener('DOMContentLoaded', function(){
-  const checkoutSelectors = '#checkout-btn, #cart-header-checkout, .cart-header .cart-header-checkout, [data-action="checkout"], [data-action="pay"]';
-  Array.from(document.querySelectorAll(checkoutSelectors)).forEach(btn => {
-    try {
-      // ensure it's a button (prevents accidental submit)
-      if (btn.tagName === 'BUTTON' && !btn.hasAttribute('type')) btn.setAttribute('type','button');
-      // don't add duplicate listeners
-      if (btn.__wrapCheckoutBound) return;
-      btn.__wrapCheckoutBound = true;
-      btn.addEventListener('click', function (e) {
-       try { e && e.preventDefault(); } catch(e){}
-        // prefer the real openCheckoutPage/openCheckoutFull if available
-        if (typeof window.openCheckoutPage === 'function') {
-          try { window.openCheckoutPage(); return; } catch(e){/*ignore*/ }
-        }
-        if (typeof window.openCheckoutFull === 'function') {
-          try { window.openCheckoutFull(); return; } catch(e){/*ignore*/ }
-        }
-        // fallback: open the cart drawer (best-effort)
-        const cart = document.getElementById('cart-drawer');
-        if (cart) { cart.style.display = 'block'; cart.setAttribute('aria-hidden','false'); document.body.style.overflow = 'hidden'; return; }
-        // final fallback: scroll to the menu
-        const menu = document.getElementById('menu');
-        if (menu) menu.scrollIntoView({ behavior:'smooth', block:'start' });
-      }, false);
-    } catch(e){ console.warn('checkout wiring error', e); }
-  });
-});
-</script>
 
-<script>
-document.addEventListener('DOMContentLoaded', function(){
-  try {
-    const slidesWrap = document.getElementById('slides');
-    if (!slidesWrap) return;
-    const slides = Array.from(slidesWrap.querySelectorAll('.slide'));
-    const dots = Array.from(document.querySelectorAll('.slideshow-controls .dot'));
-
-    // Ensure each slide has an image src fallback (prevents blank visuals if src is empty)
-    slides.forEach(s => {
-      const img = s.querySelector('.slide-img');
-      if (img && !img.getAttribute('src')) {
-        img.setAttribute('src', 'hero-shawarma-large.jpg'); // fallback — change to an existing file if needed
-      }
-    });
-
-    // Ensure a sane initial state: show first slide if none active
-    function setActive(idx) {
-      slides.forEach((sl,i) => {
-        const is = i === idx;
-        sl.style.display = is ? '' : 'none';
-        sl.setAttribute('aria-hidden', String(!is));
-      });
-      dots.forEach((d,i) => d.classList.toggle('is-active', i === idx));
-    }
-
-    // Find an active dot / slide (first .is-active dot), else default 0
-    let startIdx = 0;
-    const activeDot = dots.findIndex(d => d.classList.contains('is-active'));
-    if (activeDot >= 0) startIdx = activeDot;
-   setActive(startIdx);
-
-    // wire dots
-    dots.forEach(d => {
-      d.addEventListener('click', function(){
-        const idx = Number(this.dataset.index || 0);
-        setActive(idx);
-      }, false);
-    });
-
-    // Wire prev/next to respect this mapping (if controls exist)
-    const prev = document.querySelector('.slideshow-controls .slide-prev');
-    const next = document.querySelector('.slideshow-controls .slide-next');
-    if (prev) prev.addEventListener('click', ()=> {
-      const i = slides.findIndex(s => s.style.display !== 'none');
-      setActive((i - 1 + slides.length) % slides.length);
-    }, false);
-    if (next) next.addEventListener('click', ()=> {
-      const i = slides.findIndex(s => s.style.display !== 'none');
-      setActive((i + 1) % slides.length);
-    }, false);
-
-  } catch (e) { console.warn('hero slideshow patch failed', e); }
-});
-</script>
 
 </html>
   
