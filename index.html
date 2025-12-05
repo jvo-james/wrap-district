@@ -6341,56 +6341,23 @@ const PAYSTACK_PUBLIC_KEY = 'pk_live_ad7d0e0b164d83ec61bf2bf4fdb2af366c41c0ed';
 
     // Totals: prefer computeCartTotals() if available else compute from window.cart or fallback DOM
     function getTotals() {
-     try {
-        // 1) Preferred: use computeCartTotals() if it exists
-       if (typeof computeCartTotals === 'function') {
-         const t = computeCartTotals() || {};
-         const subtotal = Number(t.subtotal || t.subTotal || 0) || 0;
-         const delivery = Number(t.delivery || 0) || 0;
-          const promoDiscount = Number(t.promoDiscount || t.promo || t.promoAmount || 0) || 0;
-          const total = (typeof t.total !== 'undefined') ? Number(t.total || 0) : Math.max(0, subtotal - promoDiscount + delivery);
-          return { subtotal: Math.round(subtotal), delivery: Math.round(delivery), promoDiscount: Math.round(promoDiscount), total: Math.round(total), freeItems: t.freeItems || [] };
+     // If the app already provides a computeCartTotals() use it (server logic preferred).
+       try {
+       // If the app already provides a computeCartTotals() use it (server logic preferred).
+        if (typeof computeCartTotals === 'function') {
+          const t = computeCartTotals() || {};
+          // normalize common fields
+          t.promoDiscount = t.promoDiscount || t.promo || t.promoAmount || 0;
+          t.subtotal = typeof t.subtotal !== 'undefined' ? t.subtotal : (t.subtotal || 0);
+          return t;
         }
 
-       // 2) Fallback: compute from window.cart or the DOM
-       const cartObj = window.cart || {};
-       const lines = Object.values(cartObj).length ? Object.values(cartObj) : extractCartFromDom();
-       let subtotal = 0;
-       const shawarmaUnitPrices = [];
-
-      lines.forEach(l => {
-         const qty = Number(l.qty) || 1;
-          const unit = Number(l.unitPrice || l.unit_price || 0) || 0;
-          subtotal += unit * qty;
-          const title = String(l.title || l.name || '').toLowerCase();
-         const idKeys = [l.baseId, l.id, l.itemId, l.productId].map(x => String(x || '').toLowerCase());
-          const isShawarma = idKeys.includes('shawarma') || title.includes('shawarma') || (String(l.sku||'').toLowerCase().includes('shawarma'));
-         if (isShawarma) for (let i = 0; i < qty; i++) shawarmaUnitPrices.push(unit);
-       });
-
-      // Promo: buy-2-get-1 free (only counts if claimed/active)
-       const todayIsFriday = (new Date()).getDay() === 5;
-        const promoClaimed = !!localStorage.getItem('wrap_claimed_promo_FRIDAY-B2G1');
-        let promoDiscount = 0;
-        const freeItems = [];
-        if ((todayIsFriday || promoClaimed) && shawarmaUnitPrices.length >= 3) {
-          const freeCount = Math.floor(shawarmaUnitPrices.length / 3);
-         const sorted = shawarmaUnitPrices.slice().sort((a,b) => a - b);
-         const amountsToDiscount = sorted.slice(0, freeCount);
-         promoDiscount = amountsToDiscount.reduce((s, v) => s + Number(v || 0), 0);
-         if (promoDiscount > 0) {
-           freeItems.push({ id: 'promo-FRIDAY-B2G1', title: 'Shawarma (Free — Promo)', unitPrice: 0, qty: freeCount, meta: { promo: 'FRIDAY-B2G1', originalPricePerItem: amountsToDiscount } });
-         }
-       }
-
-      const delivery = 0; // delivery is calculated elsewhere (checkout UI)
-       const total = Math.max(0, Math.round(subtotal - promoDiscount + delivery));
-       return { subtotal: Math.round(subtotal), delivery: Math.round(delivery), promoDiscount: Math.round(promoDiscount), total: Math.round(total), freeItems };
-     } catch (err) {
-       console.warn('getTotals() error — returning safe default', err);
-       return { subtotal: 0, delivery: 0, promoDiscount: 0, total: 0, freeItems: [] };
-     }
-   }
+        // (rest of getTotals logic continues here...)
+      } catch (err) {
+        // If anything goes wrong, don't break the whole site — return a safe fallback totals object.
+        console.warn('getTotals() error — returning fallback totals', err);
+        return { subtotal: 0, delivery: 0, promoDiscount: 0, freeItems: [], total: 0 };
+      }
 
       const cartObj = window.cart || {};
       const lines = Object.values(cartObj).length ? Object.values(cartObj) : extractCartFromDom();
