@@ -3842,11 +3842,12 @@ a:focus, button:focus { outline: 3px solid rgba(255,204,51,0.10); outline-offset
               <div class="price-row">
                 <span class="price-label">Price</span>
                 <!-- main price-value used by existing JS to compute totals (default = normal price) -->
-                <strong class="item-price" data-price-display>GHC <span class="price-value">85</span><del>GHC 85</del></strong>
+                  <span class="friday-price hidden" aria-hidden="true" ><del>GHC 85</del></span>
+                <strong class="item-price" data-price-display>GHC <span class="price-value">85</span></strong>
                 <!-- strike/alternate price shown/toggled in JS on Fridays -->
                <div class="jollof-prices" style="margin-left:10px;">
                   <span class="normal-price"><del>GHC 85</del></span>
-                  <span class="friday-price hidden" aria-hidden="true" >GHC 75</span>
+                
                 </div>
               </div>
 
