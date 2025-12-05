@@ -5883,7 +5883,20 @@ btnPrint && btnPrint.addEventListener('click', () => {
       maxFee: 60,        // maximum fee
       freeWithinKm: 0.8  // free delivery inside this radius (in km)
     };
-    const PROCESSING_FEE = 2;
+    const PAYSTACK_PERCENT = 0.0195;
+ const MTN_WITHDRAWAL_PERCENT = 0.01;
+ const PROCESSING_PERCENT = PAYSTACK_PERCENT + MTN_WITHDRAWAL_PERCENT; // 0.0295
+
+ // Helper: compute processing fee (returns value in GHC, rounded to 2 decimals)
+function computeProcessingFee(amountGhc) {
+ if (!amountGhc || isNaN(amountGhc)) return 0;
+ const fee = Number(amountGhc) * PROCESSING_PERCENT;
+  // Round to 2 decimals (we keep cents/pesewa precision for Paystack)
+ return Math.round(fee * 100) / 100;
+ }
+
+// Helper: format GHC with two decimals for checkout display
+function fmtGhc2(n) { return `GHC ${Number(n || 0).toFixed(2)}`; }
 const PAYSTACK_PUBLIC_KEY = 'pk_live_ad7d0e0b164d83ec61bf2bf4fdb2af366c41c0ed';
     // DOM
     const page = document.getElementById('checkout-page');
@@ -6120,13 +6133,15 @@ const PAYSTACK_PUBLIC_KEY = 'pk_live_ad7d0e0b164d83ec61bf2bf4fdb2af366c41c0ed';
     cfDelivery.innerText = fmtGhc(deliveryFee || 0);
     cfPromo.innerText = `-GHC ${Math.round(totals.promoDiscount || 0)}`;
 
-    // Processing fee (fixed) — shown only in checkout
-    const processingFee = (typeof PROCESSING_FEE !== 'undefined') ? Number(PROCESSING_FEE) : 0;
-    if (cfProcessing) cfProcessing.innerText = fmtGhc(processingFee || 0);
+  // Processing fee (dynamic: Paystack % + MTN withdrawal %)
+ const beforeProcessing = Math.max(0, (totals.subtotal || 0) - (totals.promoDiscount || 0) + (deliveryFee || 0));
+const processingFee = computeProcessingFee(beforeProcessing); // GHC, 2-decimal
+if (cfProcessing) cfProcessing.innerText = fmtGhc2(processingFee);
 
-    // Final total now includes processing fee
-    const total = Math.max(0, (totals.subtotal || 0) - (totals.promoDiscount || 0) + (deliveryFee || 0) + (processingFee || 0));
-    cfTotal.innerText = fmtGhc(total);
+// Final total now includes processing fee
+const total = Math.max(0, beforeProcessing + processingFee);
+// show total with 2 decimals in checkout (keeps cents)
+if (cfTotal) cfTotal.innerText = fmtGhc2(total);
     }
 
     // compute delivery fee using haversine distance
@@ -6246,10 +6261,13 @@ const totals = getTotals();
 
     // Delivery value used earlier in this script; keep same logic (0 if not calculated)
     const delivery = 0;
-    // Add processing fee to the amount sent to Paystack
-   const processingFee = (typeof PROCESSING_FEE !== 'undefined') ? Number(PROCESSING_FEE) : 0;
-   const totalBase = (typeof totals.total !== 'undefined') ? Number(totals.total) : ((totals.subtotal || 0) - (totals.promoDiscount || 0) + delivery);
-    const totalAmount = Math.round(totalBase + processingFee);    try { localStorage.setItem('wrap_user_name', name); localStorage.setItem('wrap_user_phone', phone); } catch(e){}
+   // Compute processing fee (dynamic) and final amount to charge
+const totalBase = (typeof totals.total !== 'undefined') ? Number(totals.total) : ((totals.subtotal || 0) - (totals.promoDiscount || 0) + Number(delivery || 0));
+ // processingFee in GHC (2-decimals)
+const processingFee = computeProcessingFee(totalBase);
+// totalAmountCedis keep cents (GHC)
+const totalAmountCedis = Math.round((totalBase + processingFee) * 100) / 100;
+try { localStorage.setItem('wrap_user_name', name); localStorage.setItem('wrap_user_phone', phone); } catch(e){}
 
     // Cash flow (local)
     if (paymethod === 'cash') {
@@ -6309,7 +6327,7 @@ const totals = getTotals();
           try {
             const PUBLIC_KEY = PAYSTACK_PUBLIC_KEY;
             const ref = 'PSK-' + Date.now() + '-' + Math.floor(Math.random() * 10000);
-            const amountInMinor = Math.round(Number(totalAmount) * 100);
+            const amountInMinor = Math.round(Number(totalAmountCedis) * 100);
 
             if (!amountInMinor || amountInMinor <= 0) {
               reject(new Error('Payment amount is zero.'));
@@ -6344,12 +6362,12 @@ const totals = getTotals();
                    name, phone, email, type, address, lat, lon, date, time, note,
                     cart: cartLines,
                     totals: {
-                      subtotal: Math.round(totals.subtotal || 0),
-                     delivery: Number(delivery || 0),
-                      promo: Math.round(totals.promoDiscount || 0),
-                     processing: Number(processingFee || 0),
-                      total: Math.round(totalAmount)
-                    },
+   subtotal: Math.round(totals.subtotal || 0),
+   delivery: Number(delivery || 0),
+   promo: Math.round(totals.promoDiscount || 0),
+   processing: Number(processingFee || 0),      // GHC (2-decimal)
+   total: Number(totalAmountCedis)               // GHC (2-decimal)
+ },
                     ts: new Date().toISOString()
                  };
                   localStorage.setItem('wrap_last_order', JSON.stringify(order));
