@@ -6587,10 +6587,10 @@ try { localStorage.setItem('wrap_user_name', name); localStorage.setItem('wrap_u
         alert('Paystack public key is not configured. Cannot proceed.');
         return;
       }
-      if (typeof totalAmount === 'undefined' || Number(totalAmount) <= 0) {
-        alert('Invalid amount to pay. Please review your cart.');
-        return;
-      }
+      if (typeof totalAmountCedis === 'undefined' || Number(totalAmountCedis) <= 0) {
+             alert('Invalid amount to pay. Please review your cart.');
+              return;
+            }
 
       // guard + helpers
       function ensurePaystackLoaded(cb) {
