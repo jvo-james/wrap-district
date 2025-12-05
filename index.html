@@ -3802,93 +3802,17 @@ a:focus, button:focus { outline: 3px solid rgba(255,204,51,0.10); outline-offset
 
           <div class="item-config">
             <label class="label">Tier</label>
-          <!-- HTML -->
-<div class="custom-select" id="angwamo-select" tabindex="0" aria-label="Angwamo tier">
-  <button class="cs-current" type="button" aria-haspopup="listbox" aria-expanded="false">
-    Basic — <del>GHC 60</del> GHC 55
-  </button>
-  <ul class="cs-options" role="listbox" tabindex="-1" aria-hidden="true">
-    <li role="option" data-value="55" data-price="55" data-tier="basic" class="cs-option">
-      Basic — <del>GHC 60</del> GHC 55
-    </li>
-    <li role="option" data-value="60" data-price="60" data-tier="classic" class="cs-option">
-      Classic — <del>GHC 65</del> GHC 60
-    </li>
-    <li role="option" data-value="75" data-price="75" data-tier="max" class="cs-option">
-      Max (5 proteins) — <del>GHC 85</del> GHC 75
-    </li>
-  </ul>
+            <select class="select tier-select" name="angwamo-tier" aria-label="Angwamo tier" data-item="loaded-angwamo">
+              <option value="55" data-tier="basic">Basic — <s>GHC 60</s> GHC 55</option>
+              <option value="60" data-tier="classic">Classic — <s>GHC 65</s>  GHC 60</option>
+              <option value="75" data-tier="max">Max (5 proteins)— <s>GHC 85</s>  GHC 75</option>
+            </select>
 
-  <!-- hidden input for form submissions -->
-  <input type="hidden" name="angwamo-tier" id="angwamo-tier-input" value="55">
-</div>
-
-<!-- price display -->
-<div class="price-row">
-  <span class="price-label">Total</span>
-  <strong class="item-price" data-price-display>GHC <span class="price-value">55</span></strong>
-</div>
-
-<!-- CSS (keeps it small) -->
-<style>
-.custom-select{position:relative;display:inline-block;font-family:system-ui;}
-.cs-current{background:#fff;border:1px solid #ccc;padding:8px 12px;cursor:pointer;}
-.cs-options{position:absolute;left:0;right:0;margin:4px 0;padding:0;list-style:none;border:1px solid #ccc;background:#fff;max-height:160px;overflow:auto;display:none;z-index:100;}
-.cs-options.show{display:block;}
-.cs-option{padding:8px 12px;cursor:pointer;}
-.cs-option:hover{background:#f2f2f2;}
-.cs-option del{color:#999;margin-right:6px;}
-</style>
-
-<!-- JS -->
-<script>
-(function(){
-  const root = document.getElementById('angwamo-select');
-  const btn = root.querySelector('.cs-current');
-  const list = root.querySelector('.cs-options');
-  const options = Array.from(root.querySelectorAll('.cs-option'));
-  const hidden = document.getElementById('angwamo-tier-input');
-  const priceDisplay = document.querySelector('[data-price-display] .price-value') || document.querySelector('.price-value');
-
-  function open(){ list.classList.add('show'); btn.setAttribute('aria-expanded','true'); list.setAttribute('aria-hidden','false'); }
-  function close(){ list.classList.remove('show'); btn.setAttribute('aria-expanded','false'); list.setAttribute('aria-hidden','true'); }
-  function toggle(){ list.classList.contains('show') ? close() : open(); }
-
-  // set initial
-  function setSelection(optionEl){
-    const text = optionEl.innerHTML;
-    const value = optionEl.getAttribute('data-value');
-    const price = optionEl.getAttribute('data-price');
-    btn.innerHTML = text;
-    hidden.value = value;
-    if(priceDisplay) priceDisplay.textContent = price;
-  }
-
-  // click handlers
-  btn.addEventListener('click', (e)=> { e.stopPropagation(); toggle(); });
-  options.forEach(opt => {
-    opt.addEventListener('click', (e)=> {
-      setSelection(opt);
-      close();
-    });
-  });
-
-  // close when clicking outside
-  document.addEventListener('click', (e)=> {
-    if(!root.contains(e.target)) close();
-  });
-
-  // basic keyboard support
-  root.addEventListener('keydown', (e)=> {
-    const openNow = list.classList.contains('show');
-    if(e.key === 'ArrowDown'){ e.preventDefault(); if(!openNow) open(); else { options[0].focus(); } }
-    if(e.key === 'Escape'){ close(); btn.focus(); }
-  });
-
-  // initialize
-  setSelection(options[0]); // pick first by default
-})();
-</script>
+            <div class="item-actions">
+              <div class="price-row">
+                <span class="price-label">Total</span>
+                <strong class="item-price" data-price-display>GHC <span class="price-value">55</span></strong>
+              </div>
 
               <div class="action-row">
                 <button class="btn small add-btn" data-action="add" data-item-id="loaded-angwamo">
