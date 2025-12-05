@@ -8983,5 +8983,28 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 }
 
-</style></html>
+</style>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const sel = document.querySelector('.portion-select');
+  if (!sel) return;
+
+  // If no selection or value is empty, force the first option
+  if (sel.selectedIndex < 0 || sel.value === '') {
+    sel.selectedIndex = 0;
+    // also set defaultSelected so browser form-restoration respects it
+    Array.from(sel.options).forEach((opt, i) => opt.defaultSelected = (i === 0));
+    // notify any event listeners
+    sel.dispatchEvent(new Event('change', { bubbles: true }));
+  }
+
+  // If you use a custom dropdown wrapper that exposes a JS API (like the custom-select earlier),
+  // keep it in sync by calling its method if present:
+  const custom = document.querySelector('[data-target-select=".portion-select"]');
+  if (custom && custom._select && typeof custom._select.selectIndex === 'function') {
+    custom._select.selectIndex(sel.selectedIndex);
+  }
+});
+</script>
+</html>
   
