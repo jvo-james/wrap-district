@@ -1,11 +1,14 @@
-<!doctype html>
+  <!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>BASILISSA — Radiant Meals</title>
+  <title>Basilissa — Hero Slideshow Demo</title>
 
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <!-- Google Font + Font Awesome -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="" crossorigin="anonymous"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet"/>
@@ -13,1232 +16,520 @@
   <link rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
   <script src='https://kit.fontawesome.com/a076d05399.js' crossorigin='anonymous'></script>
- <style>
-/* =========================
-   BASILISSA — Full Page Styles
-   Purpose: Beautiful, "foody", animated, highly-detailed styling for all sections.
-   Use with the HTML & JS provided earlier.
-   ========================= */
+  <style>
+    /* ---------- Reset & base ---------- */
+    * { box-sizing: border-box; }
+    html,body { margin:0; padding:0; height:100%; font-family: "Inter", Arial, sans-serif; -webkit-font-smoothing:antialiased; background:#fafafa; color:#111; }
+    a { color:inherit; text-decoration:none; }
+    :root{
+      --yellow:#ffd400;
+      --black:#0a0a0a;
+      --muted:#f6f6f6;
+      --accent:#ffcc00;
+      --max-w:1200px;
+      --glass: rgba(255,255,255,0.06);
+    }
 
-/* ---------- Fonts ---------- */
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800;900&family=Playfair+Display:wght@600;700&display=swap');
+    /* ---------- header ---------- */
+    header {
+      background:linear-gradient(180deg,#fff,#fff);
+      border-bottom:1px solid rgba(10,10,10,0.03);
+      position:sticky;
+      top:0;
+      z-index:200;
+    }
+    .topbar {
+      max-width:var(--max-w);
+      margin:0 auto;
+      display:flex;
+      align-items:center;
+      gap:20px;
+      padding:16px;
+    }
+    .brand {
+      display:flex;
+      align-items:center;
+      gap:12px;
+    }
+    .brand img { height:46px; width:auto; border-radius:8px; object-fit:contain; box-shadow:0 6px 18px rgba(0,0,0,0.08); }
+    .brand .title { font-weight:900; font-size:20px; color:#222; letter-spacing:1px; }
+    nav { margin-left:18px; display:flex; gap:16px; align-items:center; font-weight:700; color:#444; text-transform:uppercase; font-size:13px; }
+    nav a { padding:8px 10px; border-radius:8px; }
+    nav a:hover { background:rgba(0,0,0,0.03); }
 
-:root{
-  --max-w: 1250px;
-  --bg: #070505;
-  --panel: #0f0f0f;
-  --muted: #cfcfcf;
-  --white: #ffffff;
-  --red: #e31b23;          /* Basilissa red */
-  --red-deep: #a70f12;
-  --yellow: #ffd400;       /* accent yellow */
-  --accent: #ff8b2f;
-  --glow: rgba(227,27,35,0.12);
-  --glass: rgba(255,255,255,0.04);
-  --card-shadow: 0 14px 48px rgba(2,2,2,0.65);
-  --card-elev: 0 8px 30px rgba(0,0,0,0.55);
-  --radius: 12px;
-  --f-sans: "Poppins", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-  --f-display: "Playfair Display", Georgia, serif;
-}
+    .right-actions { margin-left:auto; display:flex; align-items:center; gap:12px; }
+    .pill { display:inline-flex; gap:8px; align-items:center; padding:8px 12px; background:linear-gradient(90deg,#fff8e6,#fff2d0); border-radius:999px; border:1px solid rgba(0,0,0,0.03); font-weight:800; color:#b06b00; }
+    .icon-btn { display:inline-flex; gap:8px; align-items:center; background:var(--yellow); padding:9px 14px; border-radius:999px; color:#111; font-weight:800; box-shadow:0 8px 28px rgba(0,0,0,0.12); cursor:pointer; }
+    .small-ico { color:#666; font-size:14px; }
 
-/* ---------- Page Base ---------- */
-*{box-sizing:border-box}
-html,body{height:100%;background:linear-gradient(180deg,var(--bg) 0%, #050202 100%);color:var(--white);font-family:var(--f-sans);-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
-body{line-height:1.45;font-size:15px}
-.container{max-width:var(--max-w);margin:0 auto;padding:0 22px}
+    /* ---------- delivery row ---------- */
+    .delivery-row {
+      max-width:var(--max-w);
+      margin:0 auto;
+      display:flex;
+      gap:12px;
+      align-items:center;
+      padding:10px 16px;
+      color:#555;
+      font-weight:700;
+    }
+    .delivery-row .muted { font-weight:600; color:#777; font-size:13px; }
 
-/* ---------- Utility helpers ---------- */
-.hidden{display:none!important}
-.h-1{font-size:var(--h1,72px)}
-.center{text-align:center}
-.flex{display:flex}
-.grid{display:grid}
-.kicker{font-weight:700;color:var(--yellow);text-transform:uppercase;letter-spacing:1px;font-size:13px}
+    /* ---------- hero ---------- */
+    .hero-wrap { background:#0b0b0b; padding:28px 0 60px 0; position:relative; overflow:visible; }
+    .hero { max-width:var(--max-w); margin:0 auto; position:relative; height:540px; border-radius:14px; overflow:visible; }
 
-/* ---------- Header ---------- */
-#site-header{position:sticky;top:0;z-index:1100;backdrop-filter: blur(6px);background:linear-gradient(180deg, rgba(10,10,10,0.42), rgba(10,10,10,0.22));border-bottom:1px solid rgba(255,255,255,0.04);transition:transform .42s cubic-bezier(.2,.9,.2,1)}
-.header-inner{display:flex;align-items:center;gap:18px;padding:14px 22px}
-.brand{display:flex;align-items:center;gap:14px}
-.site-logo{width:64px;height:64px;border-radius:10px;object-fit:cover;border:2px solid rgba(255,255,255,0.06);box-shadow:0 10px 30px rgba(0,0,0,0.6)}
-.brand-title{margin:0;font-family:var(--f-display);font-size:22px;color:var(--yellow);letter-spacing:1px}
-.brand-sub{margin:0;font-size:12px;color:var(--muted);margin-top:2px}
+    .slides { position:relative; height:100%; border-radius:14px; overflow:visible; }
 
-/* main nav */
-#main-nav{display:flex;gap:12px;margin-left:8px}
-#main-nav a{display:inline-flex;gap:8px;align-items:center;padding:8px 12px;border-radius:10px;color:rgba(255,255,255,0.92);font-weight:600;transition:all .18s}
-#main-nav a i{opacity:0.95;color:var(--red)}
-#main-nav a:hover{background:var(--glass);transform:translateY(-2px);box-shadow:0 8px 26px rgba(0,0,0,0.45)}
+    .slide {
+      position:absolute;
+      inset:0;
+      display:flex;
+      gap:28px;
+      align-items:center;
+      padding:28px;
+      border-radius:14px;
+      transition: transform 0.8s cubic-bezier(.2,.9,.2,1), opacity 0.6s ease;
+      opacity:0;
+      transform: translateY(20px) scale(0.98);
+      pointer-events:none;
+    }
+    .slide.active { opacity:1; transform: translateY(0) scale(1); z-index:3; pointer-events:auto; }
 
-/* actions */
-.header-cta{margin-left:auto;display:flex;gap:10px;align-items:center}
-.btn{font-weight:700;border-radius:999px;padding:10px 14px;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
-.btn.primary,.btn.order-now{background:linear-gradient(180deg,var(--yellow),#f7c600);color:#111;box-shadow:0 12px 40px rgba(255,205,0,0.12);font-size:15px}
-.btn.menu-toggle{background:transparent;border-radius:10px;padding:8px 10px;color:var(--white);border:1px solid rgba(255,255,255,0.04)}
-.btn.ghost{background:transparent;border:2px solid rgba(255,255,255,0.06);color:var(--white);padding:10px 12px;border-radius:12px}
-.btn.mini{padding:8px 10px;border-radius:10px;font-size:13px;background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);border:1px solid rgba(255,255,255,0.03)}
-.small-link{color:rgba(255,255,255,0.8);font-size:14px;margin-left:8px;display:inline-flex;align-items:center;gap:8px}
-.small-link i{color:var(--accent)}
+    /* Each slide gets a unique style via .slide--1, --2, --3 */
+    .slide--1 { background:
+      linear-gradient(180deg, rgba(10,10,10,0.75), rgba(10,10,10,0.95)),
+      url('hero-shawarma-large.jpg') right center/52% auto no-repeat;
+      color:#fff;
+    }
+    .slide--2 { background:
+      linear-gradient(180deg, rgba(5,5,5,0.75), rgba(5,5,5,0.9)),
+      url('promo-shawarma.jpg') right center/50% auto no-repeat;
+      color:#fff;
+    }
+    .slide--3 { background:
+      linear-gradient(180deg, rgba(8,8,8,0.72), rgba(8,8,8,0.95)),
+      url('thumb-shawarma.jpg') right center/48% auto no-repeat;
+      color:#fff;
+    }
 
-/* ---------- HERO / SLIDES ---------- */
-.hero-slideshow{padding:30px 0 46px}
-.slideshow{position:relative;height:600px;border-radius:16px;overflow:visible;backdrop-filter: blur(6px);background:
-  radial-gradient(600px 200px at 10% 20%, rgba(255,200,60,0.03), transparent 6%),
-  linear-gradient(180deg, rgba(0,0,0,0.64), rgba(4,2,2,0.82));box-shadow:var(--card-shadow);padding:18px}
-.slideshow .slide{position:absolute;inset:0;padding:28px;display:flex;gap:28px;align-items:center;opacity:0;pointer-events:none;transform:translateX(24px) scale(.995);transition:all .74s cubic-bezier(.2,.9,.2,1)}
-.slideshow .slide.active{opacity:1;pointer-events:auto;transform:none;z-index:3}
+    /* Left panel content */
+    .announce {
+      width:52%;
+      padding:18px;
+      display:flex;
+      flex-direction:column;
+      gap:14px;
+    }
+    .brandline { display:flex; gap:10px; align-items:center; font-weight:900; color:var(--yellow); }
+    .brandline .bump { background:#111; color:var(--yellow); padding:8px 10px; border-radius:10px; font-weight:900; box-shadow: 0 10px 30px rgba(255,204,0,0.08); }
+    .headline { font-size:56px; margin:0; line-height:0.9; letter-spacing:0.6px; text-transform:uppercase; font-weight:900; color: #fff; text-shadow: 0 10px 30px rgba(0,0,0,0.6); }
+    .sub { font-size:16px; color:rgba(255,255,255,0.86); max-width:520px; }
 
-/* left column */
-.slide-left{width:46%;display:flex;flex-direction:column;gap:12px;justify-content:center}
-.slide .eyebrow{display:inline-flex;align-items:center;gap:8px;background:linear-gradient(90deg,var(--accent),var(--red));color:#111;padding:8px 12px;border-radius:12px;font-weight:900;letter-spacing:0.6px}
-.slide-title{margin:0;font-family:var(--f-display);font-weight:800;font-size:72px;line-height:0.9;color:var(--yellow);text-transform:uppercase;letter-spacing:0.6px;text-shadow:0 12px 40px rgba(0,0,0,0.6)}
-.slide-title span{display:block;font-size:36px;margin-top:6px;color:#fff;text-shadow:none}
-.slide-copy{color:rgba(255,255,255,0.9);font-size:18px;max-width:460px}
+    .pricebox { display:flex; gap:18px; align-items:baseline; margin-top:6px; }
+    .pricebox .price { font-size:92px; font-weight:900; color:var(--yellow); line-height:0.9; }
+    .pricebox .meta { font-size:14px; color:rgba(255,255,255,0.9); font-weight:800; }
 
-/* price & meta */
-.slide-meta{display:flex;align-items:center;gap:18px;margin-top:6px}
-.price-badge{background:linear-gradient(180deg,var(--yellow),#ffd000);color:#111;padding:10px 18px;border-radius:12px;font-weight:900;font-size:20px;box-shadow:0 20px 60px rgba(255,200,0,0.12);display:inline-flex;align-items:center;gap:10px}
-.price-badge .currency{font-size:12px;opacity:0.9}
-.price-badge .amount{font-size:34px}
-.features{display:flex;gap:10px}
-.features .feat{display:inline-flex;align-items:center;gap:8px;padding:8px 10px;border-radius:10px;background:rgba(255,255,255,0.03);font-weight:700;color:var(--white);font-size:14px}
-.features .feat i{color:var(--red)}
+    .cta-row { display:flex; gap:12px; margin-top:18px; align-items:center; }
+    .btn { padding:12px 18px; border-radius:999px; font-weight:900; cursor:pointer; border:0; }
+    .btn.primary { background:var(--yellow); color:#111; box-shadow:0 12px 36px rgba(255,204,0,0.16); }
+    .btn.ghost { background:transparent; border:1px solid rgba(255,255,255,0.12); color:#fff; }
 
-/* actions / CTA */
-.slide-actions{display:flex;align-items:center;gap:12px;margin-top:14px}
-.slide-actions .btn{box-shadow:0 18px 60px rgba(0,0,0,0.5)}
-.slide-actions .btn.primary{background:linear-gradient(180deg,var(--red),var(--red-deep));color:#fff}
-.slide-actions .btn.ghost{border:2px solid rgba(255,255,255,0.06)}
+    /* Right panel: floating product card area (the given image is the background but we add layers) */
+    .hero-media { width:48%; position:relative; display:flex; align-items:center; justify-content:center; overflow:visible; }
+    .media-decor {
+      width:520px; height:360px; position:relative; border-radius:12px; overflow:visible;
+      display:flex; align-items:center; justify-content:center;
+      transform: translateX(10px);
+    }
 
-/* decorative icons next to content */
-.decor-icons{display:flex;gap:10px;margin-top:18px}
-.decor-icons .icon{width:46px;height:46px;border-radius:999px;background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));display:inline-flex;align-items:center;justify-content:center;font-size:18px;color:var(--red);box-shadow:0 8px 30px rgba(0,0,0,0.55)}
+    /* decorative overlays and ornaments */
+    .ribbon { position:absolute; left:12px; top:12px; background:var(--yellow); color:#111; padding:10px 14px; font-weight:900; border-radius:8px; box-shadow:0 12px 40px rgba(0,0,0,0.35); transform: rotate(-6deg); }
+    .sparkles { position:absolute; right:24px; top:20px; display:flex; gap:6px; transform:scale(0.98); }
+    .sparkles i { background:rgba(255,255,255,0.06); padding:10px; border-radius:8px; width:40px; height:40px; display:flex; align-items:center; justify-content:center; font-size:18px; color:var(--yellow); box-shadow:0 10px 30px rgba(0,0,0,0.4); }
 
-/* right column (product) */
-.slide-right{width:54%;display:flex;align-items:center;justify-content:center;position:relative;overflow:visible}
-.product-composite{position:relative;width:560px;height:440px;border-radius:18px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));display:flex;align-items:flex-end;justify-content:center;padding:18px;box-shadow:var(--card-elev);transition:transform .6s cubic-bezier(.2,.9,.2,1),opacity .5s ease}
-.product-composite .product-image{width:auto;max-width:520px;height:auto;border-radius:12px;object-fit:cover;display:block;transition:transform .6s cubic-bezier(.2,.9,.2,1),filter .6s}
+    .badge { position:absolute; left:18px; bottom:22px; background:rgba(0,0,0,0.6); color:#fff; padding:10px 14px; border-radius:10px; font-weight:900; display:inline-flex; gap:10px; align-items:center; }
+    .glass-shape { position:absolute; right:8px; bottom:8px; width:180px; height:120px; border-radius:10px; background:linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.03)); box-shadow: 0 30px 50px rgba(0,0,0,0.6); transform:rotate(-6deg); display:flex; align-items:center; justify-content:center; color:#fff; font-weight:800; }
 
-/* ribbons & stickers */
-.ribbon{position:absolute;top:18px;left:18px;background:linear-gradient(90deg,var(--red),var(--red-deep));padding:8px 12px;border-radius:8px;color:#fff;font-weight:900;box-shadow:0 10px 30px rgba(163,20,20,0.25);transform:translateY(-10px);opacity:0}
-.ribbon i{margin-right:8px}
-.ribbon-top-right{right:18px;left:auto;background:linear-gradient(90deg,var(--accent),#ff6b2b)}
-.sticker{position:absolute;background:linear-gradient(180deg,#ffefbd,#ffd27a);color:#111;padding:8px 10px;border-radius:10px;font-weight:800;box-shadow:0 8px 28px rgba(0,0,0,0.45);opacity:0;transform:translateY(8px)}
-.sticker-bottom-right{bottom:18px;right:22px}
-.sticker-left{left:14px;top:18px}
-.sticker-bottom{bottom:18px;left:22px}
+    /* animated geometric blobs */
+    .blob { position:absolute; border-radius:22px; filter:blur(28px); opacity:0.18; transform-origin:center; }
+    .blob.b1 { width:180px; height:180px; left:-60px; top:-30px; background: linear-gradient(180deg,#ffdf7a,#ffb84d); animation: floaty 6s ease-in-out infinite; }
+    .blob.b2 { width:140px; height:140px; right:40px; top:80px; background: linear-gradient(180deg,#ffecb2,#ffd36b); animation: floaty 5s ease-in-out infinite reverse; }
+    .blob.b3 { width:120px; height:120px; right:120px; bottom:40px; background: linear-gradient(180deg,#fff4cc,#ffd36b); animation: floaty 7s ease-in-out infinite; }
 
-/* steam layers (small vertical blurred shapes) */
-.steam-layer{position:absolute;left:20%;top:12%;pointer-events:none}
-.steam{display:inline-block;position:absolute;background:rgba(255,255,255,0.06);border-radius:8px;width:8px;height:40px;filter:blur(2px);opacity:0}
+    @keyframes floaty { 0% { transform:translateY(0) scale(1); } 50% { transform:translateY(-10px) scale(1.02); } 100% { transform:translateY(0) scale(1); } }
 
-/* svg flairs behind product */
-.flair{position:absolute;z-index:2;opacity:0.95;filter:blur(0.6px)}
-.left-flair{left:-40px;bottom:8px;width:260px;height:80px;transform:rotate(-6deg)}
-.right-flair{right:-40px;bottom:12px;width:220px;height:70px}
-.big-flair{left:-60px;bottom:-6px;width:340px;height:120px}
+    /* slide labels (small stacked boxes) */
+    .stacked-label { display:flex; gap:8px; align-items:center; margin-top:6px; }
+    .label-pill { background:rgba(255,255,255,0.06); color:#fff; padding:8px 10px; border-radius:8px; font-weight:800; display:inline-flex; gap:8px; align-items:center; }
 
-/* orbit icons (absolute icons that orbit around product) */
-.orbit-icons{position:absolute;z-index:6;pointer-events:none;left:50%;top:40%}
-.orbit-icons i{position:absolute;font-size:18px;color:var(--white);background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);padding:8px;border-radius:999px;border:1px solid rgba(255,255,255,0.04);box-shadow:0 12px 30px rgba(0,0,0,0.6)}
+    /* slide-specific embellishments */
+    .slide--1 .headline { color:#fff; }
+    .slide--2 .headline { color:#fff; text-shadow: 0 6px 18px rgba(0,0,0,0.6); }
+    .slide--3 .headline { color:#fff; }
 
-/* ---------- slideshow controls ---------- */
-.slideshow-controls{position:absolute;left:50%;transform:translateX(-50%);bottom:-36px;display:flex;align-items:center;gap:12px;z-index:99}
-.slideshow-controls .ctrl{width:48px;height:48px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.04);cursor:pointer;box-shadow:0 8px 24px rgba(0,0,0,0.36)}
-.slideshow-controls .dots{display:flex;gap:10px}
-.slideshow-controls .dot{width:12px;height:12px;border-radius:50%;background:rgba(255,255,255,0.08);border:2px solid rgba(255,255,255,0.02);cursor:pointer}
-.slideshow-controls .dot.active{width:16px;height:16px;background:linear-gradient(180deg,var(--accent),var(--red));box-shadow:0 10px 26px rgba(255,120,60,0.12)}
+    /* dots & arrows */
+    .controls { position:absolute; left:50%; transform:translateX(-50%); bottom:-36px; display:flex; gap:12px; align-items:center; z-index:80; }
+    .dots { display:flex; gap:10px; }
+    .dot { width:12px; height:12px; border-radius:50%; background:rgba(255,255,255,0.18); box-shadow:0 8px 20px rgba(0,0,0,0.28); cursor:pointer; }
+    .dot.active { background:var(--yellow); width:16px; height:16px; box-shadow:0 14px 40px rgba(255,204,0,0.18); }
+    .arrow { width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.06); color:#fff; cursor:pointer; border:1px solid rgba(255,255,255,0.06); }
 
-/* ---------- QUICK ACTIONS ---------- */
-.quick-actions{padding:28px 0}
-.qa-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
-.qa-card{display:flex;flex-direction:column;align-items:flex-start;gap:12px;padding:18px;border-radius:12px;background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));box-shadow:var(--card-elev);text-decoration:none;color:var(--white)}
-.qa-card i{font-size:20px;color:var(--red);background:rgba(255,255,255,0.02);padding:8px;border-radius:8px}
-.qa-card h4{margin:0;font-size:16px}
-.qa-card p{margin:0;color:rgba(255,255,255,0.75);font-size:13px}
+    /* ---------- section below hero (cards with icons) ---------- */
+    .section { max-width:var(--max-w); margin:40px auto; padding:0 18px; }
+    .section h2 { font-size:22px; font-weight:900; letter-spacing:0.6px; margin-bottom:12px; }
+    .cards { display:grid; grid-template-columns: repeat(4, 1fr); gap:18px; }
+    .card { background:#fff; border-radius:12px; padding:16px; box-shadow:0 8px 28px rgba(12,12,12,0.06); display:flex; gap:12px; align-items:center; }
+    .card i { font-size:28px; color:var(--yellow); width:60px; text-align:center; }
+    .card .meta { font-weight:800; color:#222; }
+    .card .desc { color:#666; font-size:13px; margin-top:6px; }
 
-/* ---------- OFFERS / CARDS ---------- */
-.offers{padding:26px 0}
-.offers-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
-.offer-card{display:flex;flex-direction:column;border-radius:12px;overflow:hidden;background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));box-shadow:var(--card-elev)}
-.offer-media{height:160px;background-size:cover;background-position:center}
-.offer-body{padding:14px;display:flex;flex-direction:column;gap:10px}
-.offer-body h3{margin:0;font-size:18px}
-.offer-body .tag{background:var(--red);color:#fff;font-weight:900;padding:6px 8px;border-radius:8px;font-size:12px;margin-left:8px}
+    /* responsiveness */
+    @media (max-width: 1100px) {
+      .announce { width:55%; }
+      .media-decor { width:420px; height:300px; }
+    }
+    @media (max-width: 860px) {
+      .hero { height:720px; }
+      .slide { flex-direction:column-reverse; padding:18px; gap:14px; }
+      .announce, .hero-media { width:100%; }
+      .cards { grid-template-columns: repeat(2,1fr); }
+    }
+    @media (max-width: 520px) {
+      nav { display:none; }
+      .brand .title { display:none; }
+      .pricebox .price { font-size:48px; }
+      .headline { font-size:36px; }
+      .cards { grid-template-columns: 1fr; }
+    }
 
-/* card foot */
-.card-foot{display:flex;align-items:center;justify-content:space-between;gap:10px}
-.price{font-weight:900;color:var(--accent);font-size:18px}
+    /* subtle entrance animations on slide children */
+    .announce .brandline, .announce .headline, .announce .sub, .pricebox, .cta-row, .badge, .ribbon, .glass-shape {
+      transform-origin:left center;
+      opacity:0;
+      transform: translateX(-14px);
+      transition: all 650ms cubic-bezier(.2,.9,.2,1);
+    }
+    .slide.active .announce .brandline { opacity:1; transform:translateX(0); transition-delay:120ms; }
+    .slide.active .announce .headline { opacity:1; transform:translateX(0); transition-delay:220ms; }
+    .slide.active .announce .sub { opacity:1; transform:translateX(0); transition-delay:340ms; }
+    .slide.active .pricebox { opacity:1; transform:translateX(0); transition-delay:420ms; }
+    .slide.active .cta-row { opacity:1; transform:translateX(0); transition-delay:520ms; }
+    .slide.active .badge, .slide.active .ribbon, .slide.active .glass-shape { opacity:1; transform:translateX(0); transition-delay:650ms; }
 
-/* ---------- GALLERY ---------- */
-.gallery{padding:32px 0}
-.gallery-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
-.g-item{border-radius:10px;overflow:hidden;background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);box-shadow:var(--card-elev)}
-.g-item img{width:100%;height:200px;object-fit:cover;display:block}
-.g-item figcaption{text-align:center;padding:8px;color:rgba(255,255,255,0.8);font-weight:700}
+    /* small decorative animated arrows on right image area */
+    .chev { position:absolute; right:12px; top:50%; transform:translateY(-50%); display:flex; flex-direction:column; gap:8px; z-index:8; }
+    .chev i { background:rgba(255,255,255,0.05); padding:8px; border-radius:999px; color:var(--yellow); width:42px; height:42px; display:flex; align-items:center; justify-content:center; box-shadow:0 12px 30px rgba(0,0,0,0.45); animation: pulse 1.8s infinite; }
+    .chev i:nth-child(2){ animation-delay:0.2s; }
+    .chev i:nth-child(3){ animation-delay:0.4s; }
+    @keyframes pulse { 0%{ transform:scale(1);}50%{transform:scale(1.06);}100%{transform:scale(1);} }
 
-/* ---------- RESERVATION / FORM ---------- */
-.reserve{padding:32px 0}
-.reserve-grid{display:grid;grid-template-columns:1fr 360px;gap:22px;align-items:start}
-.form-card{padding:18px;border-radius:12px;background:linear-gradient(180deg,rgba(0,0,0,0.45),rgba(0,0,0,0.28));box-shadow:var(--card-elev)}
-.form-row{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
-.form-row label{font-weight:700;font-size:13px;color:var(--muted)}
-.form-row input,.form-row select{padding:10px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);background:rgba(0,0,0,0.45);color:var(--white)}
-.form-actions{display:flex;gap:12px;align-items:center;margin-top:8px}
-.reserve-info{padding:18px;border-radius:12px;background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);box-shadow:var(--card-elev);font-size:14px}
-.promo-list{list-style:none;padding:0;margin:8px 0 0 0}
-.promo-list li{display:flex;gap:8px;align-items:center;padding:6px 0;color:rgba(255,255,255,0.85)}
-.promo-list li i{color:var(--red)}
-
-/* ---------- TESTIMONIALS ---------- */
-.testimonials{padding:28px 0}
-.testi-slider{position:relative;padding:12px;min-height:120px}
-.testi{max-width:760px;margin:0;background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);padding:18px;border-radius:12px;box-shadow:var(--card-elev);display:block}
-.testi p{margin:0 0 10px 0;font-style:italic;color:rgba(255,255,255,0.9)}
-.testi cite{display:block;color:var(--muted);font-weight:700}
-
-/* ---------- PARTNERS ---------- */
-.partners{padding:26px 0}
-.partners-row{display:flex;gap:18px;flex-wrap:wrap}
-.partner{display:flex;gap:8px;align-items:center;padding:10px 12px;border-radius:10px;background:rgba(255,255,255,0.02);font-weight:700;color:var(--muted)}
-.partner i{font-size:20px;color:var(--red)}
-
-/* ---------- LOCATIONS ---------- */
-.locations{padding:28px 0}
-.locations-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
-.loc-card{padding:16px;border-radius:12px;background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);box-shadow:var(--card-elev)}
-.loc-card h4{margin:0}
-
-/* ---------- NEWSLETTER ---------- */
-.newsletter{padding:28px 0}
-.newsletter-inner{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:18px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.12));box-shadow:var(--card-elev)}
-.newsletter-form{display:flex;gap:10px}
-.newsletter-form input{padding:12px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:var(--white)}
-
-/* ---------- FOOTER ---------- */
-#site-footer{padding:28px 0;border-top:1px solid rgba(255,255,255,0.03);margin-top:36px;background:linear-gradient(180deg,rgba(0,0,0,0.2),transparent)}
-.footer-top{display:flex;gap:22px;padding:18px 0;align-items:flex-start}
-.footer-col{flex:1;min-width:180px}
-.footer-logo{width:80px;border-radius:10px}
-.footer-col h4{margin-top:0;color:var(--yellow)}
-.footer-col .socials{display:flex;gap:12px;margin-top:12px}
-.footer-col .socials a{display:inline-flex;width:40px;height:40px;align-items:center;justify-content:center;border-radius:8px;background:rgba(255,255,255,0.02);color:var(--white)}
-.footer-bottom{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-top:1px solid rgba(255,255,255,0.02);margin-top:12px}
-
-/* ---------- Modal / Lightbox ---------- */
-#basilissa-lightbox{transition:opacity .26s ease;display:flex;align-items:center;justify-content:center}
-#basilissa-lightbox .lb-inner img{border-radius:10px;box-shadow:0 30px 80px rgba(0,0,0,0.7)}
-
-/* ---------- Accessibility & Keyboard focus ---------- */
-.using-keyboard :focus{outline:3px solid rgba(255,200,0,0.24);outline-offset:3px;border-radius:8px}
-a:focus,button:focus,input:focus{outline:none;box-shadow:0 8px 24px rgba(255,200,0,0.06)}
-
-/* ---------- Fancy small touches: food drip, sauce smear (pseudo elements) ---------- */
-.hero-slideshow::before{
-  content:"";
-  position:absolute;
-  left:0;right:0;top:0;height:180px;
-  background:radial-gradient(600px 180px at 20% 0%, rgba(255,40,0,0.06), transparent 10%);
-  pointer-events:none;z-index:1;mix-blend-mode:screen;
-}
-.offer-card::after, .offer-card::before{
-  content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent);
-  mix-blend-mode:overlay;opacity:0.8
-}
-
-/* ---------- Responsive ---------- */
-@media (max-width:1100px){
-  .slide-title{font-size:54px}
-  .product-composite{width:480px;height:360px}
-  .offers-grid{grid-template-columns:repeat(2,1fr)}
-  .gallery-grid{grid-template-columns:repeat(2,1fr)}
-  .qa-grid{grid-template-columns:repeat(2,1fr)}
-}
-@media (max-width:760px){
-  .header-inner{padding:12px}
-  #main-nav{display:none}
-  .slideshow{min-height:520px;height:auto;padding:14px}
-  .slideshow .slide{position:relative;opacity:1;transform:none;display:block;padding:16px;flex-direction:column}
-  .slide-left,.slide-right{width:100%}
-  .product-composite{width:94%;height:auto;padding:10px;margin:8px auto}
-  .slide-title{font-size:36px}
-  .offers-grid{grid-template-columns:1fr}
-  .gallery-grid{grid-template-columns:1fr}
-  .qa-grid{grid-template-columns:1fr 1fr}
-  .reserve-grid{grid-template-columns:1fr}
-  .locations-grid{grid-template-columns:repeat(2,1fr)}
-  .container{padding:0 16px}
-  .slideshow-controls{bottom:-18px}
-}
-
-/* ---------- Small animations on load (polish) ---------- */
-@keyframes entranceUp { from{opacity:0; transform:translateY(12px)} to{opacity:1; transform:none} }
-.container > * { animation: entranceUp .6s ease both; }
-
-/* ---------- Cart & mini components (styled generically) ---------- */
-.cart-panel{position:fixed;right:18px;bottom:18px;width:360px;border-radius:14px;background:linear-gradient(180deg,#0b0b0b, #0b0606);box-shadow:0 40px 120px rgba(0,0,0,0.7);padding:12px;border:1px solid rgba(255,255,255,0.03)}
-.cart-panel h4{margin:0 0 8px 0}
-.cart-item{display:flex;gap:12px;align-items:center;padding:10px;border-radius:10px;background:rgba(255,255,255,0.02);margin-bottom:8px}
-.cart-item img{width:72px;height:64px;object-fit:cover;border-radius:8px}
-.cart-item .meta{flex:1}
-.qty{display:inline-flex;gap:6px;align-items:center;background:rgba(255,255,255,0.03);padding:6px;border-radius:8px}
-.cart-footer{display:flex;align-items:center;justify-content:space-between;margin-top:12px}
-
-/* ---------- small helpers for debugging & content hooks ---------- */
-[data-animate="pop"]{transform-origin:center center}
-[data-animate="slideInLeft"]{transform:translateX(-10px);opacity:0}
-[data-animate="slideInRight"]{transform:translateX(10px);opacity:0}
-[data-animate="bounce"]{transform:translateY(6px);opacity:0}
-
-/* ---------- End of style sheet ---------- */
-</style>
-
+  </style>
 </head>
 <body>
 
-  <!-- ===== HEADER ===== -->
-  <header id="site-header" role="banner" aria-label="Basilissa site header">
-    <div class="header-inner container">
-      <div class="brand">
-        <!-- replace logo.png with your real logo file -->
-        <img src="logo.png" alt="Basilissa logo" class="site-logo" onerror="this.style.display='none'">
-        <div class="brand-text">
-          <h1 class="brand-title">BASILISSA</h1>
-          <p class="brand-sub">Good Food. Great Mood.</p>
+  <!-- HEADER -->
+  <header role="banner" aria-label="Site header">
+    <div class="topbar">
+      <div class="brand" aria-hidden="false">
+        <!-- Replace 'logo.png' with your own Basilissa logo path. -->
+        <img src="logo.png" alt="Basilissa logo" id="logo-img">
+        <div>
+          <div class="title">BASILISSA</div>
+          <div class="small-ico" style="font-weight:700;">Fresh • Fast • Flavorful</div>
         </div>
       </div>
 
-      <nav id="main-nav" role="navigation" aria-label="Main navigation">
-        <a href="#menu"><i class="fa fa-cutlery"></i> Menu</a>
-        <a href="#offers"><i class="fa fa-star"></i> Offers</a>
-        <a href="#locations"><i class="fa fa-map-marker"></i> Locations</a>
-        <a href="#about"><i class="fa fa-info-circle"></i> About</a>
-        <a href="#contact"><i class="fa fa-phone"></i> Contact</a>
+      <nav aria-label="Main navigation">
+        <a href="#"><i class="fa fa-utensils"></i> Menu</a>
+        <a href="#"><i class="fa fa-map-marker-alt"></i> Locations</a>
+        <a href="#"><i class="fa fa-tags"></i> Offers</a>
+        <a href="#"><i class="fa fa-phone"></i> Contact</a>
       </nav>
 
-      <div class="header-cta">
-        <button class="btn order-now" aria-label="Order now"><i class="fa fa-shopping-bag"></i> Order</button>
-        <button class="btn menu-toggle" aria-label="Open menu"><i class="fa fa-bars"></i></button>
+      <div class="right-actions">
+        <div class="pill"><i class="fa fa-truck"></i> Delivery</div>
+        <button class="icon-btn" aria-label="Order now"><i class="fa fa-motorcycle"></i> Order</button>
       </div>
     </div>
   </header>
 
+  <!-- DELIVERY ROW -->
+  <div class="delivery-row" role="region" aria-label="Delivery info">
+    <div class="muted"><i class="fa fa-clock"></i> Open now • 9am — 11pm</div>
+    <div class="muted"><i class="fa fa-phone"></i> +233 24 000 0000</div>
+    <div style="margin-left:auto; font-weight:800; color:#222;"><i class="fa fa-map-pin"></i> Accra • Ghana</div>
+  </div>
 
-  <main id="main" role="main">
+  <!-- HERO / SLIDESHOW -->
+  <section class="hero-wrap" aria-label="Promotions">
+    <div class="hero" role="region" aria-roledescription="carousel" aria-label="Hero slideshow">
 
-    <section id="hero" class="hero-slideshow" aria-label="Featured meals">
-      <div class="container">
+      <div class="slides" id="slides">
 
-        <!-- slideshow wrapper -->
-        <div class="slideshow" id="slideshow" aria-live="polite" data-autoplay="true" data-interval="5200">
-
-          <!-- Slide 1: Happy Meal (first image) -->
-          <article class="slide active" data-index="0" role="group" aria-roledescription="slide" aria-label="Happy Meal — Slide 1">
-            <div class="slide-left">
-              <div class="eyebrow"><i class="fa fa-fire"></i> Hot</div>
-              <h2 class="slide-title">HAPPY <span>MEAL</span></h2>
-              <p class="slide-copy">8pcs B-special wings • Fries • 1 Coke — glazed, crunchy, and irresistible.</p>
-
-              <div class="slide-meta">
-                <div class="price-badge" data-animate="pop"><span class="currency">GHC</span> <strong class="amount">69</strong></div>
-                <div class="features">
-                  <span class="feat"><i class="fa fa-cutlery"></i> Shareable</span>
-                  <span class="feat"><i class="fa fa-thumbs-up"></i> Chef's pick</span>
-                </div>
-              </div>
-
-              <div class="slide-actions">
-                <button class="btn primary"><i class="fa fa-phone"></i> Call & Order</button>
-                <button class="btn ghost"><i class="fa fa-truck"></i> Delivery</button>
-                <a class="small-link" href="#menu"><i class="fa fa-list"></i> See full menu</a>
-              </div>
-
-              <!-- small animated decorative icons (will be animated by CSS/JS) -->
-              <div class="decor-icons">
-                <span class="icon" data-anim="float"><i class="fa fa-lemon-o"></i></span>
-                <span class="icon" data-anim="spin"><i class="fa fa-star"></i></span>
-                <span class="icon" data-anim="pulse"><i class="fa fa-fire"></i></span>
-              </div>
+        <!-- Slide 1: uses image 1 -->
+        <article class="slide slide--1 active" data-index="0" role="group" aria-roledescription="slide" aria-label="Happy Meal slide">
+          <div class="announce" aria-hidden="false">
+            <div class="brandline">
+              <div class="bump">B</div>
+              <div>Basilissa Specials <i class="fa fa-star" style="margin-left:8px;color:#fff;"></i></div>
             </div>
 
-            <div class="slide-right">
-              <!-- main product composition image (exact image from user) -->
-              <div class="product-composite" data-parallax="true" aria-hidden="false">
-                <img src="promo-shawarma.jpg" alt="Happy Meal - wings fries and coke" class="product-image">
+            <h2 class="headline">HAPPY<br>MEAL</h2>
+            <div class="sub">8pcs B-special wings, fries and a chilled drink — juicy wings glazed and sprinkled for crunch. Perfect for sharing.</div>
 
-                <!-- layered design elements around image -->
-                <div class="ribbon ribbon-top-left" data-animate="slideInLeft"><i class="fa fa-bolt"></i> Limited</div>
-                <div class="sticker sticker-bottom-right" data-animate="bounce"><i class="fa fa-star"></i> Hot</div>
-                <div class="steam-layer" aria-hidden="true" data-anim-layer>
-                  <!-- multiple steam/particle placeholders; style/animate with CSS -->
-                  <span class="steam s1"></span>
-                  <span class="steam s2"></span>
-                  <span class="steam s3"></span>
-                </div>
-
-                <!-- decorative SVG curve behind product for 'foody' energy -->
-                <svg class="flair left-flair" viewBox="0 0 200 60" preserveAspectRatio="none" aria-hidden="true">
-                  <path d="M0,40 C40,10 120,10 200,40 L200,60 L0,60 Z" fill="rgba(255,0,0,0.06)"></path>
-                </svg>
-
-                <!-- tiny badges/icons orbiting the product image -->
-                <div class="orbit-icons">
-                  <i class="fa fa-heart" data-anim="orbit"></i>
-                  <i class="fa fa-cutlery" data-anim="orbit" data-delay="120"></i>
-                  <i class="fa fa-thumbs-up" data-anim="orbit" data-delay="260"></i>
-                </div>
-              </div>
-            </div>
-          </article>
-
-          <!-- Slide 2: Happy Shawarma Meal (second image) -->
-          <article class="slide" data-index="1" role="group" aria-roledescription="slide" aria-label="Happy Shawarma — Slide 2">
-            <div class="slide-left">
-              <div class="eyebrow"><i class="fa fa-star"></i> Favourite</div>
-              <h2 class="slide-title">HAPPY <span>SHAWARMA</span> MEAL</h2>
-              <p class="slide-copy">1 shawarma • Fries • 1 Coke — rolled fresh, hot and zesty.</p>
-
-              <div class="slide-meta">
-                <div class="price-badge" data-animate="pop"><span class="currency">GHC</span> <strong class="amount">85</strong></div>
-                <div class="features">
-                  <span class="feat"><i class="fa fa-leaf"></i> Fresh</span>
-                  <span class="feat"><i class="fa fa-clock-o"></i> Ready in 5 mins</span>
-                </div>
-              </div>
-
-              <div class="slide-actions">
-                <button class="btn primary"><i class="fa fa-cutlery"></i> Order Now</button>
-                <button class="btn ghost"><i class="fa fa-heart-o"></i> Add to Favourites</button>
-                <a class="small-link" href="#offers"><i class="fa fa-ticket"></i> Get coupon</a>
-              </div>
-
-              <div class="decor-icons">
-                <span class="icon" data-anim="float"><i class="fa fa-leaf"></i></span>
-                <span class="icon" data-anim="spin"><i class="fa fa-circle-o-notch"></i></span>
-                <span class="icon" data-anim="pulse"><i class="fa fa-smile-o"></i></span>
-              </div>
+            <div class="pricebox" aria-hidden="true">
+              <div class="price">69</div>
+              <div class="meta">GHC <br><span style="font-size:12px; opacity:0.9;">8pcs wings • fries • 1 coke</span></div>
             </div>
 
-            <div class="slide-right">
-              <div class="product-composite" data-parallax="true" aria-hidden="true">
-                <img src="thumb-fries.jpg" alt="Happy Shawarma Meal - shawarma fries and coke" class="product-image">
-
-                <div class="ribbon ribbon-top-right" data-animate="slideInRight"><i class="fa fa-thumbs-up"></i> Popular</div>
-                <div class="sticker sticker-left" data-animate="pulse"><i class="fa fa-star"></i> 5★</div>
-
-                <svg class="flair right-flair" viewBox="0 0 200 60" preserveAspectRatio="none" aria-hidden="true">
-                  <path d="M0,40 C40,10 120,10 200,40 L200,60 L0,60 Z" fill="rgba(255,40,0,0.04)"></path>
-                </svg>
-
-                <div class="orbit-icons">
-                  <i class="fa fa-smile-o" data-anim="orbit"></i>
-                  <i class="fa fa-bolt" data-anim="orbit" data-delay="120"></i>
-                </div>
-              </div>
-            </div>
-          </article>
-
-          <!-- Slide 3: Happy Burger Meal (third image) -->
-          <article class="slide" data-index="2" role="group" aria-roledescription="slide" aria-label="Happy Burger — Slide 3">
-            <div class="slide-left">
-              <div class="eyebrow"><i class="fa fa-cutlery"></i> Signature</div>
-              <h2 class="slide-title">HAPPY <span>BURGER</span> MEAL</h2>
-              <p class="slide-copy">Beef burger • Fries • 1 Coke — juicy patty, melted cheese, perfect bun.</p>
-
-              <div class="slide-meta">
-                <div class="price-badge" data-animate="pop"><span class="currency">GHC</span> <strong class="amount">90</strong></div>
-                <div class="features">
-                  <span class="feat"><i class="fa fa-fire"></i> Flame grilled</span>
-                  <span class="feat"><i class="fa fa-cutlery"></i> Cheese oozing</span>
-                </div>
-              </div>
-
-              <div class="slide-actions">
-                <button class="btn primary"><i class="fa fa-shopping-cart"></i> Add to cart</button>
-                <button class="btn ghost"><i class="fa fa-tags"></i> See combo</button>
-                <a class="small-link" href="#menu"><i class="fa fa-info"></i> Nutrition</a>
-              </div>
-
-              <div class="decor-icons">
-                <span class="icon" data-anim="float"><i class="fa fa-heart"></i></span>
-                <span class="icon" data-anim="spin"><i class="fa fa-circle"></i></span>
-                <span class="icon" data-anim="pulse"><i class="fa fa-star"></i></span>
-              </div>
+            <div class="stacked-label">
+              <div class="label-pill"><i class="fa fa-bolt"></i> Hot & Fresh</div>
+              <div class="label-pill"><i class="fa fa-shield-alt"></i> Hygienic Prep</div>
             </div>
 
-            <div class="slide-right">
-              <div class="product-composite" data-parallax="true" aria-hidden="true">
-                <img src="hero-fries-large.jpg" alt="Happy Burger Meal - burger fries and coke" class="product-image">
-
-                <div class="ribbon ribbon-top-left" data-animate="slideInLeft"><i class="fa fa-fire"></i> New</div>
-                <div class="sticker sticker-bottom" data-animate="bounce"><i class="fa fa-star-o"></i> Chef's</div>
-
-                <svg class="flair big-flair" viewBox="0 0 260 80" preserveAspectRatio="none" aria-hidden="true">
-                  <path d="M0,50 C60,10 180,10 260,50 L260,80 L0,80 Z" fill="rgba(255,0,0,0.05)"></path>
-                </svg>
-
-                <div class="orbit-icons">
-                  <i class="fa fa-cutlery" data-anim="orbit"></i>
-                  <i class="fa fa-heart" data-anim="orbit" data-delay="100"></i>
-                </div>
-              </div>
+            <div class="cta-row">
+              <button class="btn primary"><i class="fa fa-shopping-cart"></i> Order Now</button>
+              <button class="btn ghost"><i class="fa fa-info-circle"></i> View Details</button>
             </div>
-          </article>
-
-        </div> <!-- /slideshow -->
-
-        <!-- Slideshow controls (to be wired in JS later) -->
-        <div class="slideshow-controls" aria-hidden="false">
-          <button class="ctrl prev" id="slide-prev" aria-label="Previous slide"><i class="fa fa-chevron-left"></i></button>
-          <div class="dots" role="tablist" aria-label="Slides">
-            <button class="dot active" data-dot="0" aria-label="Slide 1"></button>
-            <button class="dot" data-dot="1" aria-label="Slide 2"></button>
-            <button class="dot" data-dot="2" aria-label="Slide 3"></button>
           </div>
-          <button class="ctrl next" id="slide-next" aria-label="Next slide"><i class="fa fa-chevron-right"></i></button>
-        </div>
 
-      </div>
-    </section>
+          <div class="hero-media" aria-hidden="true">
+            <div class="media-decor" role="img" aria-label="Happy Meal image">
+              <div class="blob b1"></div>
+              <div class="blob b2"></div>
 
-    <!-- ===== FAST FEATURES / QUICK ACTIONS ===== -->
-    <section id="quick-actions" class="quick-actions container" aria-label="Quick actions">
-      <div class="qa-grid">
-        <a class="qa-card" href="#order"><i class="fa fa-bolt"></i><h4>Quick Order</h4><p>Fast checkout for repeat orders</p></a>
-        <a class="qa-card" href="#reserve"><i class="fa fa-calendar"></i><h4>Reserve Table</h4><p>Book a table in seconds</p></a>
-        <a class="qa-card" href="#locations"><i class="fa fa-map-marker"></i><h4>Find Us</h4><p>Multiple branches across Accra</p></a>
-        <a class="qa-card" href="#loyalty"><i class="fa fa-gift"></i><h4>Loyalty</h4><p>Earn points, get perks</p></a>
-      </div>
-    </section>
+              <div class="ribbon"><i class="fa fa-fire"></i> Best Seller</div>
+              <div class="sparkles" aria-hidden="true">
+                <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i>
+              </div>
 
-    <!-- ===== FEATURED OFFERS / MENU PREVIEW ===== -->
-    <section id="offers" class="offers container" aria-labelledby="offers-heading">
-      <h2 id="offers-heading"><i class="fa fa-star-o"></i> Today's Specials</h2>
-      <div class="offers-grid" role="list">
-        <!-- offer cards (images used from user where appropriate) -->
-        <article class="offer-card" role="listitem">
-          <div class="offer-media" style="background-image:url('hero-friedrice-large.jpg');" role="img" aria-label="Wings combo"></div>
-          <div class="offer-body">
-            <h3>Happy Wings Combo <span class="tag">Best Seller</span></h3>
-            <p>8pcs wings, fries and 1 Coke — perfect for sharing.</p>
-            <div class="card-foot">
-              <span class="price">GHC 69</span>
-              <button class="btn mini"><i class="fa fa-shopping-cart"></i> Add</button>
+              <div class="badge"><i class="fa fa-tags"></i> Limited Offer</div>
+              <div class="glass-shape"><i class="fa fa-heart"></i> Loved by Many</div>
+
+              <div class="chev" aria-hidden="true">
+                <i class="fa fa-chevron-right"></i>
+                <i class="fa fa-chevron-right"></i>
+                <i class="fa fa-chevron-right"></i>
+              </div>
             </div>
           </div>
         </article>
 
-        <article class="offer-card" role="listitem">
-          <div class="offer-media" style="background-image:url('thumb-shawarma.jpg');" role="img" aria-label="Shawarma combo"></div>
-          <div class="offer-body">
-            <h3>Shawarma Meal</h3>
-            <p>Wrapped fresh with house sauce, served with fries & coke.</p>
-            <div class="card-foot">
-              <span class="price">GHC 85</span>
-              <button class="btn mini"><i class="fa fa-shopping-cart"></i> Add</button>
+        <!-- Slide 2: uses image 2 -->
+        <article class="slide slide--2" data-index="1" role="group" aria-roledescription="slide" aria-label="Shawarma meal slide">
+          <div class="announce">
+            <div class="brandline">
+              <div class="bump">B</div>
+              <div>Street Food Vibes <i class="fa fa-pepper-hot" style="margin-left:8px;color:#fff;"></i></div>
+            </div>
+
+            <h2 class="headline">HAPPY<br>SHAWARMA<br>MEAL</h2>
+            <div class="sub">One packed shawarma, crisp fries and a cool coke — wrapped & grilled to perfection. Spice options available.</div>
+
+            <div class="pricebox">
+              <div class="price">85</div>
+              <div class="meta">GHC <br><span style="font-size:12px; opacity:0.9;">1 shawarma • fries • 1 coke</span></div>
+            </div>
+
+            <div class="stacked-label">
+              <div class="label-pill"><i class="fa fa-utensils"></i> Hand Wrapped</div>
+              <div class="label-pill"><i class="fa fa-wifi"></i> Order Online</div>
+            </div>
+
+            <div class="cta-row">
+              <button class="btn primary"><i class="fa fa-bolt"></i> Hot & Fast</button>
+              <button class="btn ghost"><i class="fa fa-map-marker-alt"></i> Find Branch</button>
+            </div>
+          </div>
+
+          <div class="hero-media" aria-hidden="true">
+            <div class="media-decor">
+              <div class="blob b2"></div>
+              <div class="ribbon" style="left:auto; right:14px; transform:rotate(6deg);"><i class="fa fa-bell"></i> New Pack</div>
+              <div class="badge"><i class="fa fa-check-circle"></i> 100% Fresh</div>
+              <div class="glass-shape" style="right:8px; left:auto; transform:rotate(6deg);"><i class="fa fa-star"></i> Top Rated</div>
+
+              <div style="position:absolute; left:18px; bottom:8px; display:flex; gap:10px;">
+                <div class="label-pill"><i class="fa fa-lemon"></i> Zesty Sauce</div>
+                <div class="label-pill"><i class="fa fa-bread-slice"></i> Fresh Wrap</div>
+              </div>
+
+              <div class="chev" aria-hidden="true" style="right:0;">
+                <i class="fa fa-chevron-right"></i>
+                <i class="fa fa-chevron-right"></i>
+                <i class="fa fa-chevron-right"></i>
+              </div>
             </div>
           </div>
         </article>
 
-        <article class="offer-card" role="listitem">
-          <div class="offer-media" style="background-image:url('hero-angwamo-large.jpg');" role="img" aria-label="Burger combo"></div>
-          <div class="offer-body">
-            <h3>Basilissa Burger</h3>
-            <p>Juicy double patty, melted cheese and crispy fries.</p>
-            <div class="card-foot">
-              <span class="price">GHC 90</span>
-              <button class="btn mini"><i class="fa fa-shopping-cart"></i> Add</button>
+        <!-- Slide 3: uses image 3 -->
+        <article class="slide slide--3" data-index="2" role="group" aria-roledescription="slide" aria-label="Burger meal slide">
+          <div class="announce">
+            <div class="brandline">
+              <div class="bump">B</div>
+              <div>Stacked Goodness <i class="fa fa-hamburger" style="margin-left:8px;color:#fff;"></i></div>
+            </div>
+
+            <h2 class="headline">HAPPY<br>BURGER<br>MEAL</h2>
+            <div class="sub">A double patty, melty cheese, crisp lettuce, fries and a chilled Coke. Built for serious appetite satisfaction.</div>
+
+            <div class="pricebox">
+              <div class="price">90</div>
+              <div class="meta">GHC <br><span style="font-size:12px; opacity:0.9;">1 beef burger • fries • 1 coke</span></div>
+            </div>
+
+            <div class="stacked-label">
+              <div class="label-pill"><i class="fa fa-cheese"></i> Extra Cheese</div>
+              <div class="label-pill"><i class="fa fa-people-arrows"></i> Shareable</div>
+            </div>
+
+            <div class="cta-row">
+              <button class="btn primary"><i class="fa fa-star"></i> Try Now</button>
+              <button class="btn ghost"><i class="fa fa-phone"></i> Call & Collect</button>
+            </div>
+          </div>
+
+          <div class="hero-media" aria-hidden="true">
+            <div class="media-decor">
+              <div class="blob b3"></div>
+              <div class="ribbon" style="left:12px; top:12px; transform:rotate(-4deg);"><i class="fa fa-award"></i> Chef's Pick</div>
+              <div class="badge" style="left:auto; right:22px;"><i class="fa fa-fire"></i> Hot</div>
+              <div class="glass-shape" style="left:20px; bottom:18px;"><i class="fa fa-thumbs-up"></i> Crowd Favorite</div>
+
+              <div class="chev" aria-hidden="true">
+                <i class="fa fa-chevron-right"></i>
+                <i class="fa fa-chevron-right"></i>
+                <i class="fa fa-chevron-right"></i>
+              </div>
             </div>
           </div>
         </article>
 
-        <article class="offer-card" role="listitem">
-          <div class="offer-media" style="background-image:url('hero-shawarma-large.jpg');" role="img" aria-label="Family feast"></div>
-          <div class="offer-body">
-            <h3>Family Feast</h3>
-            <p>Mix-and-match bundle for the whole family.</p>
-            <div class="card-foot">
-              <span class="price">GHC 220</span>
-              <button class="btn mini"><i class="fa fa-shopping-cart"></i> Add</button>
-            </div>
+      </div> <!-- slides -->
+
+      <!-- controls (dots & arrows) -->
+      <div class="controls" aria-hidden="false">
+        <div class="arrow" id="prev" title="Previous" aria-label="Previous slide"><i class="fa fa-chevron-left"></i></div>
+        <div class="dots" id="dots" role="tablist" aria-label="Slide navigation">
+          <div class="dot active" data-dot="0" role="tab" aria-selected="true" aria-controls="slide-0"></div>
+          <div class="dot" data-dot="1" role="tab" aria-selected="false" aria-controls="slide-1"></div>
+          <div class="dot" data-dot="2" role="tab" aria-selected="false" aria-controls="slide-2"></div>
+        </div>
+        <div class="arrow" id="next" title="Next" aria-label="Next slide"><i class="fa fa-chevron-right"></i></div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- FEATURES / OFFERS -->
+  <section class="section" aria-labelledby="offers">
+    <div class="container">
+      <h2 id="offers"><i class="fa fa-gift"></i> Today at Basilissa</h2>
+      <div class="cards" role="list">
+        <article class="card" role="listitem">
+          <i class="fa fa-truck"></i>
+          <div>
+            <div class="meta">Fast Delivery</div>
+            <div class="desc">Hot meals delivered in 30–45 mins.</div>
           </div>
         </article>
-      </div>
-    </section>
 
-    <!-- ===== GALLERY / FOOD MOOD ===== -->
-    <section id="gallery" class="gallery container" aria-label="Gallery — food mood">
-      <h2><i class="fa fa-camera"></i> Food Gallery</h2>
-      <div class="gallery-grid">
-        <figure class="g-item"><img src="hero-fries-large.jpg" alt="Wings and fries"><figcaption>8pcs wings & fries</figcaption></figure>
-        <figure class="g-item"><img src="hero-shawarma-large.jpg" alt="Shawarma and fries"><figcaption>Fresh shawarma</figcaption></figure>
-        <figure class="g-item"><img src="thumb-fries.jpg" alt="Burger and fries"><figcaption>Signature burger</figcaption></figure>
-        <figure class="g-item"><img src="thumb-shawarma.jpg" alt="Meal combo"><figcaption>Combo goodness</figcaption></figure>
-      </div>
-    </section>
-
-    <!-- ===== RESERVATION & ORDER FORM (structure only) ===== -->
-    <section id="reserve" class="reserve container" aria-labelledby="reserve-heading">
-      <h2 id="reserve-heading"><i class="fa fa-calendar-check-o"></i> Reserve a table / Pre-order</h2>
-
-      <div class="reserve-grid">
-        <form id="reserve-form" class="form-card" aria-label="Reservation form" data-validate="true">
-          <div class="form-row">
-            <label for="res-name">Name</label>
-            <input id="res-name" name="name" type="text" placeholder="Your name" required>
+        <article class="card" role="listitem">
+          <i class="fa fa-percent"></i>
+          <div>
+            <div class="meta">Weekly Deals</div>
+            <div class="desc">New limited offers every week.</div>
           </div>
-          <div class="form-row">
-            <label for="res-phone">Phone</label>
-            <input id="res-phone" name="phone" type="tel" placeholder="+233 24 000 0000" required>
+        </article>
+
+        <article class="card" role="listitem">
+          <i class="fa fa-lemon"></i>
+          <div>
+            <div class="meta">Fresh Ingredients</div>
+            <div class="desc">Locally sourced produce & spices.</div>
           </div>
-          <div class="form-row">
-            <label for="res-date">Date & Time</label>
-            <input id="res-date" name="datetime" type="datetime-local" required>
+        </article>
+
+        <article class="card" role="listitem">
+          <i class="fa fa-user-friends"></i>
+          <div>
+            <div class="meta">Catering</div>
+            <div class="desc">Events, parties & bulk orders.</div>
           </div>
-          <div class="form-row">
-            <label for="res-people">People</label>
-            <select id="res-people" name="people">
-              <option>1</option><option>2</option><option>3</option><option>4</option><option>5+</option>
-            </select>
-          </div>
-
-          <div class="form-actions">
-            <button class="btn primary" type="submit"><i class="fa fa-check"></i> Reserve</button>
-            <button class="btn ghost" type="button"><i class="fa fa-phone"></i> Call to confirm</button>
-          </div>
-        </form>
-
-        <aside class="reserve-info">
-          <h3><i class="fa fa-truck"></i> Delivery & Pick-up</h3>
-          <p>Choose delivery or pick-up at checkout. We partner with local riders for fast service.</p>
-
-          <h3><i class="fa fa-percent"></i> Promotions</h3>
-          <ul class="promo-list">
-            <li><i class="fa fa-tag"></i> Weekday lunch deals</li>
-            <li><i class="fa fa-gift"></i> Loyalty rewards</li>
-            <li><i class="fa fa-credit-card"></i> Secure payments</li>
-          </ul>
-
-          <div class="small-note"><i class="fa fa-clock-o"></i> Opening hours: 8:00 — 23:00 daily</div>
-        </aside>
-      </div>
-    </section>
-
-    <!-- ===== TESTIMONIALS ===== -->
-    <section id="testimonials" class="testimonials container" aria-label="Customer testimonials">
-      <h2><i class="fa fa-users"></i> What people say</h2>
-      <div class="testi-slider" data-autoplay="true" data-interval="7000">
-        <blockquote class="testi">
-          <p>"The wings are insanely good — crispy, saucy and perfect. We always order the Happy Meal!"</p>
-          <cite>— Ama, Accra</cite>
-        </blockquote>
-        <blockquote class="testi">
-          <p>"Quick delivery, friendly staff and the burger melts in your mouth. 10/10."</p>
-          <cite>— Kofi, East Legon</cite>
-        </blockquote>
-        <blockquote class="testi">
-          <p>"Great vibes, fam-friendly and tasty food. The shawarma is a must-try."</p>
-          <cite>— Evelyn, Osu</cite>
-        </blockquote>
-      </div>
-    </section>
-
-    <!-- ===== PARTNERS / DELIVERY ===== -->
-    <section id="partners" class="partners container" aria-label="Delivery partners">
-      <h2><i class="fa fa-handshake-o"></i> Delivery partners</h2>
-      <div class="partners-row">
-        <div class="partner"><i class="fa fa-motorcycle"></i><span>Local Riders</span></div>
-        <div class="partner"><i class="fa fa-truck"></i><span>In-house Delivery</span></div>
-        <div class="partner"><i class="fa fa-map"></i><span>Pick-up counters</span></div>
-        <div class="partner"><i class="fa fa-globe"></i><span>Online Ordering</span></div>
-      </div>
-    </section>
-
-    <!-- ===== CONTACT & LOCATIONS ===== -->
-    <section id="locations" class="locations container" aria-label="Locations & contact">
-      <h2><i class="fa fa-map-marker"></i> Find Basilissa</h2>
-      <div class="locations-grid">
-        <div class="loc-card">
-          <h4>Accra Mall</h4>
-          <p>Shop 14, Accra Mall — Near the north entrance</p>
-          <div class="loc-meta"><i class="fa fa-phone"></i> +233 24 000 0000</div>
-        </div>
-        <div class="loc-card">
-          <h4>Dansoman</h4>
-          <p>Main St — Dansoman Central</p>
-          <div class="loc-meta"><i class="fa fa-phone"></i> +233 24 000 0001</div>
-        </div>
-        <div class="loc-card">
-          <h4>Tema</h4>
-          <p>Harbour Rd — Tema Central</p>
-          <div class="loc-meta"><i class="fa fa-phone"></i> +233 24 000 0002</div>
-        </div>
-        <div class="loc-card">
-          <h4>Kotoka</h4>
-          <p>Airport Link Rd — Near Terminal</p>
-          <div class="loc-meta"><i class="fa fa-phone"></i> +233 24 000 0003</div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ===== NEWSLETTER / PROMO SIGNUP ===== -->
-    <section id="newsletter" class="newsletter container" aria-label="Newsletter signup">
-      <div class="newsletter-inner">
-        <div class="newsletter-left">
-          <h3><i class="fa fa-envelope-o"></i> Get tasty deals</h3>
-          <p>Sign up for exclusive promos, early access and weekday meal deals.</p>
-        </div>
-
-        <form id="newsletter-form" class="newsletter-form" aria-label="Newsletter form" data-async="true">
-          <input type="email" name="email" id="nl-email" placeholder="you@something.com" required>
-          <button class="btn primary" type="submit"><i class="fa fa-paper-plane"></i> Subscribe</button>
-        </form>
-      </div>
-    </section>
-
-  </main>
-
-  <!-- ===== FOOTER ===== -->
-  <footer id="site-footer" role="contentinfo" aria-label="Footer">
-    <div class="footer-top container">
-      <div class="footer-col about">
-        <img src="logo.png" alt="Basilissa logo" class="footer-logo" onerror="this.style.display='none'">
-        <p>Basilissa is all about bold flavours, fresh ingredients and meals that bring people together.</p>
-
-        <div class="socials">
-          <a href="#" aria-label="Instagram"><i class="fa fa-instagram"></i></a>
-          <a href="#" aria-label="Facebook"><i class="fa fa-facebook"></i></a>
-          <a href="#" aria-label="Twitter/X"><i class="fa fa-twitter"></i></a>
-        </div>
-      </div>
-
-      <div class="footer-col links">
-        <h4>Quick links</h4>
-        <ul>
-          <li><a href="#menu"><i class="fa fa-cutlery"></i> Menu</a></li>
-          <li><a href="#offers"><i class="fa fa-star"></i> Offers</a></li>
-          <li><a href="#reserve"><i class="fa fa-calendar"></i> Reservations</a></li>
-          <li><a href="#locations"><i class="fa fa-map-marker"></i> Locations</a></li>
-        </ul>
-      </div>
-
-      <div class="footer-col contact">
-        <h4>Contact</h4>
-        <p><i class="fa fa-phone"></i> <a href="tel:+233240000000">+233 24 000 0000</a></p>
-        <p><i class="fa fa-envelope"></i> <a href="mailto:hello@basilissa.com">hello@basilissa.com</a></p>
-
-        <!-- WhatsApp CTA: replace data-whatsapp value with your number (international format without +) -->
-        <p class="whatsapp-cta">
-          <a href="https://wa.me/" class="whatsapp-link" data-whatsapp="" aria-label="WhatsApp Basilissa">
-            <i class="fa fa-whatsapp"></i> WhatsApp us
-          </a>
-        </p>
+        </article>
       </div>
     </div>
+  </section>
 
-    <div class="footer-bottom container">
-      <small>&copy; <span id="year"></span> Basilissa. All rights reserved.</small>
-      <nav class="legal">
-        <a href="#privacy">Privacy</a>
-        <a href="#terms">Terms</a>
-      </nav>
-    </div>
-  </footer>
+  <script>
+    // Slideshow logic: uses dots/arrows; sets active classes; triggers animations via CSS (presence of .active)
+    (function(){
+      const slidesEl = document.getElementById('slides');
+      const slides = Array.from(slidesEl.querySelectorAll('.slide'));
+      const dotsEl = document.getElementById('dots');
+      const dots = Array.from(dotsEl.querySelectorAll('.dot'));
+      const prev = document.getElementById('prev');
+      const next = document.getElementById('next');
 
-  
-  <script>document.getElementById('year')?.replaceWith(document.createElement('span')).textContent = new Date().getFullYear();</script>
-<script>
-/* Basilissa — interactive scripts for slideshow, animations, forms, gallery, testimonials, and misc UI.
-   All vanilla JS, no external dependencies. Designed to work with the HTML structure you provided.
-*/
+      let current = 0;
+      let timer = null;
+      const interval = 5200;
 
-/* ====== Utilities ====== */
-const $ = (sel, root = document) => root.querySelector(sel);
-const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
-const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
-const now = () => (performance && performance.now()) || Date.now();
-
-/* ====== Helpful safe DOM helpers ====== */
-function tryCatch(fn){ try{ fn(); } catch(e){ console.error(e); } }
-
-/* ====== Update copyright year (safe) ====== */
-tryCatch(() => {
-  const yearEl = document.getElementById('year');
-  if (yearEl) yearEl.textContent = new Date().getFullYear();
-});
-
-/* ====== TOAST (temporary messages) ====== */
-(function(){
-  const toast = document.createElement('div');
-  toast.id = 'basilissa-toast';
-  toast.style.cssText = 'position:fixed;right:18px;bottom:18px;z-index:9999;padding:12px 16px;border-radius:10px;background:rgba(0,0,0,0.8);color:#fff;font-weight:700;box-shadow:0 8px 30px rgba(0,0,0,0.6);opacity:0;transform:translateY(8px);transition:all .35s;';
-  document.body.appendChild(toast);
-  let tTimer = null;
-  window.showToast = (msg, timeout = 3000) => {
-    toast.textContent = msg;
-    toast.style.opacity = '1';
-    toast.style.transform = 'translateY(0)';
-    if (tTimer) clearTimeout(tTimer);
-    tTimer = setTimeout(() => {
-      toast.style.opacity = '0';
-      toast.style.transform = 'translateY(8px)';
-    }, timeout);
-  };
-})();
-
-/* ====== Simple fade helper for elements ====== */
-function fadeIn(el, duration=420){
-  el.style.transition = `opacity ${duration}ms ease, transform ${duration}ms ease`;
-  el.style.opacity = 0;
-  el.style.transform = 'translateY(6px)';
-  requestAnimationFrame(()=> {
-    el.style.opacity = 1;
-    el.style.transform = 'translateY(0)';
-  });
-}
-function fadeOut(el, duration=320){
-  el.style.transition = `opacity ${duration}ms ease, transform ${duration}ms ease`;
-  el.style.opacity = 1;
-  el.style.transform = 'translateY(0)';
-  requestAnimationFrame(()=> {
-    el.style.opacity = 0;
-    el.style.transform = 'translateY(6px)';
-  });
-}
-
-/* ====== SLIDESHOW ====== */
-const Slideshow = (function(){
-  const root = $('#slideshow');
-  if (!root) return null;
-
-  const slides = $$('.slide', root);
-  const dots = $$('.slideshow-controls .dot') || $$('.dot', root);
-  const prevBtn = $('#slide-prev') || $('.slideshow-controls .prev') || $('.ctrl.prev');
-  const nextBtn = $('#slide-next') || $('.slideshow-controls .next') || $('.ctrl.next');
-
-  let current = 0;
-  let interval = parseInt(root.dataset.interval || root.getAttribute('data-interval') || 5200, 10) || 5200;
-  let timer = null;
-  let isPaused = false;
-
-  function setActive(index, manual=false){
-    index = (index + slides.length) % slides.length;
-    if (index === current && !manual) return;
-    // Deactivate old
-    slides.forEach((s,i) => {
-      const active = (i === index);
-      s.classList.toggle('active', active);
-      s.setAttribute('aria-hidden', active ? 'false' : 'true');
-
-      // animate elements inside each slide when activated
-      const product = $('.product-composite', s);
-      const ribbon = s.querySelectorAll('.ribbon, .sticker, .price-badge, .orbit-icons i, .decor-icons .icon');
-      if (active){
-        // entrance: pop price, reveal ribbons, start orbit icons
-        if (product) {
-          product.style.transition = 'transform 700ms cubic-bezier(.22,.9,.2,1), opacity 500ms ease';
-          product.style.opacity = '1';
-          product.style.transform = 'translateY(0) scale(1)';
-        }
-        ribbon.forEach((el, idx) => {
-          el.style.transition = `transform ${420 + idx*70}ms cubic-bezier(.2,.9,.2,1), opacity ${420 + idx*70}ms ease`;
-          el.style.opacity = '1';
-          el.style.transform = 'translateY(0) scale(1)';
+      function goTo(index, manual=false) {
+        index = (index + slides.length) % slides.length;
+        slides.forEach((s,i) => {
+          if(i===index) {
+            s.classList.add('active');
+            s.setAttribute('aria-hidden','false');
+          } else {
+            s.classList.remove('active');
+            s.setAttribute('aria-hidden','true');
+          }
         });
-        // price pop
-        const price = $('.price-badge', s);
-        if (price) {
-          price.style.transform = 'scale(1.02)';
-          setTimeout(()=> price.style.transform = 'scale(1)', 420);
-        }
-      } else {
-        if (product) {
-          product.style.transition = 'transform 420ms ease, opacity 320ms ease';
-          product.style.opacity = '0.0';
-          product.style.transform = 'translateY(14px) scale(.98)';
-        }
-        ribbon.forEach(el => {
-          el.style.transition = 'transform 320ms ease, opacity 320ms ease';
-          el.style.opacity = '0';
-          el.style.transform = 'translateY(8px) scale(.96)';
+        dots.forEach((d,i) => {
+          d.classList.toggle('active', i===index);
+          d.setAttribute('aria-selected', i===index ? 'true' : 'false');
         });
+        current = index;
+        if(manual) restartTimer();
       }
-    });
 
-    // dots
-    dots && dots.forEach((d,i) => {
-      d.classList.toggle('active', i === index);
-      d.setAttribute('aria-selected', i === index ? 'true' : 'false');
-    });
+      function nextSlide() { goTo(current + 1, false); }
+      function prevSlide() { goTo(current - 1, false); }
 
-    current = index;
-    // restart timer on manual
-    if (manual) restart();
-  }
+      // hook events
+      dots.forEach(d => d.addEventListener('click', (e)=> {
+        const idx = Number(e.currentTarget.dataset.dot);
+        goTo(idx, true);
+      }));
+      next.addEventListener('click', ()=> { goTo(current+1, true); });
+      prev.addEventListener('click', ()=> { goTo(current-1, true); });
 
-  function next(){
-    setActive(current + 1);
-  }
-  function prev(){
-    setActive(current - 1);
-  }
-
-  function start(){
-    if (timer) return;
-    timer = setInterval(()=> { if(!isPaused) next(); }, interval);
-  }
-  function stop(){
-    if (timer){ clearInterval(timer); timer = null; }
-  }
-  function restart(){
-    stop();
-    start();
-  }
-
-  // event hooks
-  if (dots && dots.length){
-    dots.forEach(d => d.addEventListener('click', (ev) => {
-      const idx = parseInt(d.dataset.dot || d.getAttribute('data-dot') || Array.from(dots).indexOf(d), 10);
-      setActive(idx, true);
-    }));
-  }
-
-  prevBtn && prevBtn.addEventListener('click', ()=> { setActive(current - 1, true); });
-  nextBtn && nextBtn.addEventListener('click', ()=> { setActive(current + 1, true); });
-
-  // keyboard
-  document.addEventListener('keydown', (e)=> {
-    if (e.key === 'ArrowLeft') { setActive(current - 1, true); }
-    if (e.key === 'ArrowRight') { setActive(current + 1, true); }
-  });
-
-  // pause on hover or focus
-  root.addEventListener('mouseenter', ()=> isPaused = true);
-  root.addEventListener('mouseleave', ()=> isPaused = false);
-  root.addEventListener('focusin', ()=> isPaused = true);
-  root.addEventListener('focusout', ()=> isPaused = false);
-
-  // init: prepare slide children initial transform states for smooth anims
-  slides.forEach((s, i) => {
-    const product = $('.product-composite', s);
-    if (product){
-      product.style.opacity = (i === current ? '1' : '0');
-      product.style.transform = (i === current ? 'translateY(0) scale(1)' : 'translateY(12px) scale(.98)');
-    }
-    const ribbons = s.querySelectorAll('.ribbon, .sticker, .price-badge, .orbit-icons i, .decor-icons .icon');
-    ribbons.forEach(el => {
-      el.style.opacity = (i === current ? '1' : '0');
-      el.style.transform = (i === current ? 'translateY(0) scale(1)' : 'translateY(8px) scale(.96)');
-    });
-  });
-
-  // start autoplay if requested
-  if (String(root.dataset.autoplay || root.getAttribute('data-autoplay') || 'true').toLowerCase() !== 'false'){
-    start();
-  }
-
-  // expose for debugging
-  return { start, stop, next, prev, setActive, getCurrent: ()=>current };
-})();
-
-/* ====== PARALLAX TILT FOR PRODUCT IMAGES ====== */
-(function(){
-  const composites = $$('.product-composite');
-  composites.forEach(comp => {
-    const img = $('.product-image', comp) || comp.querySelector('img');
-    if (!img) return;
-    // enable pointer events for movement
-    comp.style.willChange = 'transform';
-    // subtle transform on mousemove over the parent slide
-    const slide = comp.closest('.slide');
-    let raf = null;
-    slide && slide.addEventListener('mousemove', (ev) => {
-      const r = comp.getBoundingClientRect();
-      const cx = r.left + r.width/2;
-      const cy = r.top + r.height/2;
-      let dx = (ev.clientX - cx) / (r.width/2); // -1..1
-      let dy = (ev.clientY - cy) / (r.height/2);
-      dx = clamp(dx, -1, 1);
-      dy = clamp(dy, -1, 1);
-      // target transforms
-      const tx = dx * 10; // px
-      const ty = dy * -12; // px (invert for nicer effect)
-      const rz = dx * 3; // deg
-      cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(()=> {
-        comp.style.transform = `translate3d(${tx}px, ${ty}px, 0) rotateZ(${rz}deg)`;
-        img.style.transform = `translate3d(${tx*0.25}px, ${ty*0.25}px, 0) rotate(${rz*0.25}deg) scale(1.02)`;
-        img.style.transition = 'transform 220ms linear';
+      // keyboard support
+      document.addEventListener('keydown', (e)=> {
+        if(e.key === 'ArrowRight') { goTo(current+1, true); }
+        if(e.key === 'ArrowLeft') { goTo(current-1, true); }
       });
-    });
-    slide && slide.addEventListener('mouseleave', ()=> {
-      cancelAnimationFrame(raf);
-      comp.style.transition = 'transform 420ms cubic-bezier(.2,.9,.2,1)';
-      comp.style.transform = '';
-      img.style.transition = 'transform 420ms cubic-bezier(.2,.9,.2,1)';
-      img.style.transform = '';
-      setTimeout(()=> {
-        comp.style.transition = '';
-        img.style.transition = '';
-      }, 500);
-    });
-  });
-})();
 
-/* ====== ORBIT ICONS (tiny icons that orbit items) ====== */
-(function(){
-  const orbitContainers = $$('.orbit-icons');
-  orbitContainers.forEach(container => {
-    const icons = Array.from(container.children).filter(n => n.tagName.toLowerCase() === 'i' || n.tagName.toLowerCase() === 'span' || n.tagName.toLowerCase() === 'div');
-    if (!icons.length) return;
-    const rect = container.getBoundingClientRect();
-    const cx = rect.width / 2;
-    const cy = rect.height / 2;
-    // store per icon params
-    const items = icons.map((el, idx) => {
-      const delay = parseInt(el.dataset.delay || 0, 10) || 0;
-      const radius = 36 + (idx * 8); // px
-      const speed = 0.0016 + (idx * 0.0006);
-      el.style.position = 'absolute';
-      el.style.left = `${cx}px`;
-      el.style.top = `${cy}px`;
-      el.style.transform = `translate(-50%,-50%)`;
-      el.style.opacity = '0.98';
-      return { el, radius, speed, phase: (now()/1000)* (0.2 + idx*0.1) + (delay/1000) };
-    });
+      function startTimer() { timer = setInterval(()=> goTo(current+1, false), interval); }
+      function stopTimer() { if(timer) { clearInterval(timer); timer = null; } }
+      function restartTimer() { stopTimer(); startTimer(); }
 
-    let rafId = null;
-    function frame(t){
-      const ts = t || now();
-      items.forEach((it, i) => {
-        it.phase += it.speed * 16;
-        const x = Math.cos(it.phase + i) * it.radius;
-        const y = Math.sin(it.phase + i*1.3) * (it.radius * 0.6);
-        it.el.style.transform = `translate(${x}px, ${y}px) rotate(${(it.phase*40)%360}deg)`;
-      });
-      rafId = requestAnimationFrame(frame);
-    }
-    rafId = requestAnimationFrame(frame);
-    // store for cleanup if needed
-    container._orbitRAF = rafId;
-  });
-})();
+      // pause on hover
+      slidesEl.addEventListener('mouseenter', stopTimer);
+      slidesEl.addEventListener('mouseleave', startTimer);
 
-/* ====== STEAM / PARTICLE ANIM ====== */
-(function(){
-  const steamLayers = $$('[data-anim-layer] .steam').concat($$('.steam'));
-  if (!steamLayers || !steamLayers.length) return;
-  steamLayers.forEach((s, idx) => {
-    s.style.display = 'inline-block';
-    s.style.position = 'absolute';
-    s.style.width = `${6 + (idx%3)*4}px`;
-    s.style.height = `${18 + (idx%3)*8}px`;
-    s.style.borderRadius = '6px';
-    s.style.background = 'rgba(255,255,255,0.08)';
-    s.style.left = `${6 + (idx*12)%80}%`;
-    s.style.bottom = `${6 + (idx*12)%18}%`;
-    s.style.opacity = '0';
-    s._phase = Math.random()*Math.PI*2;
-  });
+      // make slides accessible by assigning ids
+      slides.forEach((s,i)=> s.id = 'slide-' + i);
 
-  let raf = null;
-  function step(time){
-    steamLayers.forEach((s, i) => {
-      s._phase += 0.016 + (i%3)*0.002;
-      const y = Math.sin(s._phase) * 18; // vertical bob
-      const o = 0.2 + (Math.sin(s._phase*1.6)+1)/2 * 0.8; // 0.2..1
-      s.style.transform = `translateY(${ -Math.abs(y) }px) scale(${1 + (Math.abs(Math.sin(s._phase))/8)})`;
-      s.style.opacity = String(clamp(o, 0, 1));
-      s.style.filter = `blur(${1 + (Math.abs(Math.sin(s._phase))*1.8)}px)`;
-    });
-    raf = requestAnimationFrame(step);
-  }
-  raf = requestAnimationFrame(step);
-})();
+      // initialize
+      goTo(0);
+      startTimer();
 
-/* ====== DECOR ICONS (float, spin, pulse) ====== */
-(function(){
-  const icons = $$('.decor-icons .icon, .glow-icon, [data-anim]');
-  icons.forEach((el, idx) => {
-    const anim = el.dataset.anim || el.getAttribute('data-anim') || (el.classList.contains('spin') ? 'spin' : 'float');
-    el.style.willChange = 'transform, opacity';
-    let t0 = now() + (parseInt(el.dataset.delay || 0, 10) || 0);
-    if (anim === 'spin'){
-      el.animate([{ transform: 'rotate(0deg)' },{ transform: 'rotate(360deg)' }], {duration: 9000 + (idx*400), iterations: Infinity, easing: 'linear'});
-    } else if (anim === 'pulse'){
-      el.animate([{ transform: 'scale(1)', opacity: 1 },{ transform: 'scale(1.12)', opacity: 0.92 },{ transform: 'scale(1)', opacity: 1 }], {duration: 1600 + (idx*120), iterations: Infinity, easing: 'ease-in-out'});
-    } else { // float
-      const dur = 3000 + (idx*150);
-      el.animate([{ transform: 'translateY(0px) rotate(0deg)', opacity: 1 },{ transform: 'translateY(-10px) rotate(4deg)', opacity: 0.95 },{ transform: 'translateY(0px) rotate(0deg)', opacity: 1 }], {duration: dur, iterations: Infinity, easing: 'ease-in-out'});
-    }
-  });
-})();
-
-/* ====== PRICE BADGE subtle pulse on hover & pop on activation ====== */
-(function(){
-  $$('.price-badge').forEach(el => {
-    el.style.transition = 'transform 340ms cubic-bezier(.2,.9,.2,1), box-shadow 340ms ease';
-    el.addEventListener('mouseenter', ()=> { el.style.transform = 'scale(1.06)'; el.style.boxShadow = '0 12px 36px rgba(255,170,20,0.12)'; });
-    el.addEventListener('mouseleave', ()=> { el.style.transform = 'scale(1)'; el.style.boxShadow = ''; });
-  });
-})();
-
-/* ====== TESTIMONIALS slider (simple) ====== */
-(function(){
-  const testiRoot = $('#testimonials .testi-slider') || $('.testimonials .testi-slider');
-  if (!testiRoot) return;
-  const items = Array.from(testiRoot.querySelectorAll('.testi'));
-  let i = 0;
-  items.forEach((it, idx) => {
-    it.style.display = idx === 0 ? 'block' : 'none';
-    it.style.opacity = idx === 0 ? '1' : '0';
-    it.style.transition = 'opacity 420ms ease';
-  });
-  setInterval(()=> {
-    const a = items[i];
-    const b = items[(i+1)%items.length];
-    if(!b) return;
-    a.style.opacity = '0';
-    setTimeout(()=> { a.style.display = 'none'; b.style.display = 'block'; b.style.opacity = '0'; setTimeout(()=> b.style.opacity = '1', 20); }, 420);
-    i = (i+1) % items.length;
-  }, parseInt(testiRoot.dataset.interval || 7000, 10) || 7000);
-})();
-
-/* ====== GALLERY lightbox (simple modal) ====== */
-(function(){
-  const gallery = $('#gallery') || $('.gallery');
-  if (!gallery) return;
-  const items = $$('.g-item img', gallery);
-  // create modal
-  const modal = document.createElement('div');
-  modal.id = 'basilissa-lightbox';
-  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.86);display:flex;align-items:center;justify-content:center;padding:32px;z-index:10050;opacity:0;pointer-events:none;transition:opacity .26s ease;';
-  modal.innerHTML = '<div class="lb-inner" style="max-width:92vw;max-height:92vh;overflow:hidden;border-radius:12px;position:relative"><img style="max-width:100%;max-height:80vh;display:block;"/><div class="lb-caption" style="color:#fff;padding:12px 14px;font-weight:700"></div><button class="lb-close" aria-label="Close" style="position:absolute;right:8px;top:8px;background:rgba(255,255,255,0.06);border:none;color:#fff;padding:8px;border-radius:8px;font-size:16px;cursor:pointer"><i class="fa fa-times"></i></button></div>';
-  document.body.appendChild(modal);
-  const lbImg = $('img', modal);
-  const lbCaption = $('.lb-caption', modal);
-  const lbClose = $('.lb-close', modal);
-  function open(img, caption){
-    lbImg.src = img.src || img.dataset.src || '';
-    lbCaption.textContent = caption || img.alt || '';
-    modal.style.pointerEvents = 'auto';
-    modal.style.opacity = '1';
-    setTimeout(()=> modal.classList.add('open'), 10);
-  }
-  function close(){
-    modal.style.opacity = '0';
-    modal.style.pointerEvents = 'none';
-  }
-  items.forEach(it => {
-    it.style.cursor = 'zoom-in';
-    it.addEventListener('click', (e)=> open(it, it.getAttribute('alt') || it.closest('figure')?.querySelector('figcaption')?.textContent));
-  });
-  modal.addEventListener('click', (e)=> { if(e.target === modal || e.target === lbClose) close(); });
-  document.addEventListener('keydown', (e)=> { if(e.key === 'Escape') close(); });
-})();
-
-/* ====== Reservation & Newsletter form handling (frontend only) ====== */
-(function(){
-  // helper to serialize form
-  function serialize(form){
-    const data = {};
-    new FormData(form).forEach((v,k) => { data[k] = v; });
-    return data;
-  }
-
-  // Reservation form
-  const resForm = document.getElementById('reserve-form');
-  if (resForm){
-    resForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const data = serialize(resForm);
-      // basic validation
-      if (!data.name || !data.phone || !data.datetime) {
-        showToast('Please complete the reservation form');
-        return;
-      }
-      // fake async success
-      const submitBtn = resForm.querySelector('button[type="submit"]');
-      submitBtn && (submitBtn.disabled = true);
-      showToast('Reserving your table...');
-      setTimeout(()=> {
-        submitBtn && (submitBtn.disabled = false);
-        showToast('Reservation confirmed — check WhatsApp or email for details', 4500);
-        resForm.reset();
-      }, 1100 + Math.random()*900);
-    });
-  }
-
-  // Newsletter
-  const nlForm = document.getElementById('newsletter-form');
-  if (nlForm){
-    nlForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const data = serialize(nlForm);
-      const email = data.email || nlForm.querySelector('input[type="email"]').value;
-      if (!email || !/@/.test(email)){
-        showToast('Please enter a valid email');
-        return;
-      }
-      const btn = nlForm.querySelector('button[type="submit"]');
-      btn && (btn.disabled = true);
-      showToast('Subscribing...');
-      setTimeout(()=> {
-        btn && (btn.disabled = false);
-        nlForm.reset();
-        showToast('Subscribed! Check your inbox for a welcome coupon.', 4200);
-      }, 900 + Math.random()*700);
-    });
-  }
-
-})();
-
-/* ====== Simple sticky header show/hide on scroll (food-y effect) ====== */
-(function(){
-  const header = document.getElementById('site-header') || document.querySelector('header');
-  if (!header) return;
-  let last = window.scrollY;
-  let ticking = false;
-  window.addEventListener('scroll', ()=> {
-    if (ticking) return;
-    ticking = true;
-    requestAnimationFrame(()=> {
-      const y = window.scrollY;
-      if (y > last && y > 60){
-        // scrolling down -> hide
-        header.style.transform = 'translateY(-100%)';
-      } else {
-        // scrolling up -> show
-        header.style.transform = 'translateY(0)';
-      }
-      last = y;
-      ticking = false;
-    });
-  });
-})();
-
-/* ====== Accessibility: focus outlines for keyboard users and skip links support ====== */
-(function(){
-  let usingKeyboard = false;
-  window.addEventListener('keydown', (e) => {
-    if (e.key === 'Tab') { usingKeyboard = true; document.documentElement.classList.add('using-keyboard'); }
-  });
-  window.addEventListener('mousedown', () => {
-    usingKeyboard = false; document.documentElement.classList.remove('using-keyboard');
-  });
-})();
-
-/* ====== Simple onboarding: show a quick toast to highlight features (first visit per session) ====== */
-tryCatch(() => {
-  if (!sessionStorage.getItem('basilissa_intro')){
-    showToast('Tip: Use arrows or dots to browse meals. Click images to zoom.', 4200);
-    sessionStorage.setItem('basilissa_intro', '1');
-  }
-});
-
-/* ====== End of script ====== */
-</script>
+    })();
+  </script>
 
 </body>
-
 </html>
