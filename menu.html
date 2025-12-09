@@ -8,1006 +8,1836 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
 <!-- Font Awesome for icons -->
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-<style>
-  :root{
-    --bg:#071014;
-    --panel:#0b1216;
-    --muted:#98a8b1;
-    --basil:#0F6B3A;        /* basil green */
-    --accent:#F6C342;       /* warm yellow */
-    --cta:#d7262f;          /* strong pill CTA (red) */
-    --white:#ffffff;
-    --glass:rgba(255,255,255,0.03);
-    --glass-2:rgba(255,255,255,0.02);
-    --radius:16px;
-    --shadow: 0 18px 60px rgba(2,6,12,0.6);
-    font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-  }
-  *{box-sizing:border-box}
-  html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg) 0%, #041214 100%);color:var(--white);-webkit-font-smoothing:antialiased}
-  a{color:inherit}
-  img{display:block;max-width:100%}
-  .container{max-width:1240px;margin:0 auto;padding:22px}
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="" crossorigin="anonymous"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+ <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet"/>
+<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+  <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <script src='https://kit.fontawesome.com/a076d05399.js' crossorigin='anonymous'></script>
+  <style>
 
-  /* ---------- FIXED HEADER ---------- */
-  header {
-    position:fixed; left:0; right:0; top:0; z-index:999;
-    backdrop-filter: blur(8px);
-    background: linear-gradient(180deg, rgba(7,12,14,0.9), rgba(7,12,14,0.6));
-    border-bottom: 1px solid rgba(255,255,255,0.04);
-  }
-  .nav {
-    display:flex; align-items:center; justify-content:space-between; gap:12px;
-    max-width:1240px; margin:0 auto; padding:12px 20px;
-  }
-  .brand {display:flex; gap:12px; align-items:center}
-  .logo {
-    width:64px; height:64px; border-radius:12px;
-    display:grid; place-items:center; font-weight:900; font-size:20px;
-    background: linear-gradient(135deg,var(--basil), #0b9a5a); box-shadow: 0 8px 34px rgba(15,107,58,0.18);
-  }
-  .brand .title {font-weight:900; letter-spacing:0.6px; font-size:18px;}
-  .brand .sub {font-size:12px; color:var(--muted)}
 
-  nav.primary {display:flex; gap:18px}
-  nav.primary a {color:var(--muted); font-weight:700; padding:8px 10px; border-radius:8px}
-  nav.primary a:hover{background:var(--glass); color:var(--white)}
+/* ---------- Theme tokens ---------- */
+:root{
+  --bg-900: #071014;        /* deep background */
+  --bg-800: #0b1216;
+  --card: #0f1618;
+  --muted: #9fb0b6;
+  --text: #fffdfa;
+  --accent-red: #d7262f;
+  --accent-red-2: #ff4d4d;
+  --accent-gold: #ffd166;
+  --green: #0b9a5a;
+  --glass: rgba(255,255,255,0.03);
+  --glass-2: rgba(255,255,255,0.02);
+  --shadow-lg: 0 30px 80px rgba(2,6,12,0.7);
+  --shadow-md: 0 12px 40px rgba(0,0,0,0.5);
+  --radius-lg: 14px;
+  --radius-md: 10px;
+  --ease: cubic-bezier(.16,.84,.24,1);
+  --max-w: 1240px;
+  --ui-z: 9999;
+}
 
-  .nav-actions {display:flex; gap:12px; align-items:center}
-  .order-pill {
-    background: linear-gradient(90deg,var(--cta), #b21a26);
-    color:white; padding:12px 30px; border-radius:999px; font-weight:900; border:none; cursor:pointer;
-    box-shadow: 0 16px 40px rgba(199,35,44,0.18);
-    transform:translateZ(0);
-  }
-  .order-pill:active{transform:translateY(1px)}
-  .nav-icon {
-    width:62px; height:62px; border-radius:10px; display:grid; place-items:center; background:var(--glass);
-    color:var(--white); border:none; cursor:pointer; position:relative;
-  }
-  .cart-badge {
-    position:absolute; top:6px; right:6px; min-width:26px; height:26px; padding:0 8px; border-radius:999px;
-    background:linear-gradient(90deg,#ff6b6b,#ff3b3b); color:white; font-weight:900; font-size:13px; display:flex; align-items:center; justify-content:center;
-    box-shadow:0 8px 18px rgba(255,59,59,0.18);
-  }
+/* ---------- Reset & base ---------- */
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg-900) 0%, #041214 100%);color:var(--text);font-family:Inter, "Montserrat", system-ui, -apple-system, "Segoe UI", Roboto, Arial;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+img{display:block;max-width:100%;height:auto}
+.container{max-width:var(--max-w);margin:0 auto;padding:20px}
 
-  /* ---------- HERO BANNER (big food image) ---------- */
-  .hero {
-    margin-top:100px; /* header height */
-    display:grid; grid-template-columns:1fr 380px; gap:26px; align-items:start;
-    padding:20px 0;
-  }
-  .hero-left {
-    border-radius:20px; overflow:hidden; position:relative; box-shadow:var(--shadow);
-    background: linear-gradient(135deg, rgba(255,255,255,0.02), rgba(0,0,0,0.05));
-  }
-  .hero-image {
-    width:100%; height:420px; object-fit:cover; display:block; transition:transform .9s ease;
-    will-change:transform;
-    filter: contrast(1.05) saturate(1.12);
-    transform-origin:center center;
-  }
-  .hero-left:hover .hero-image { transform: scale(1.03); filter: contrast(1.08) saturate(1.18); }
+/* Visual helpers */
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+.muted{color:var(--muted)}
+.small{font-size:13px}
 
-  .hero-overlay {
-    position:absolute; left:28px; bottom:28px; color:var(--white); text-shadow: 0 6px 20px rgba(2,6,12,0.6);
-    max-width:60%;
-  }
-  .hero-overlay .tag { display:inline-block; background:var(--accent); color:#071014; padding:8px 12px; border-radius:999px; font-weight:900; margin-bottom:10px;}
-  .hero-overlay h1 { font-size:48px; margin:6px 0 10px; letter-spacing: -0.6px; }
-  .hero-overlay p { color:var(--muted); margin:0 0 16px; max-width:480px; }
-  .hero-ctas { display:flex; gap:12px; align-items:center }
+/* Focus ring for keyboard users */
+.user-is-tabbing :focus{outline:3px solid rgba(255,200,140,0.16);outline-offset:3px;border-radius:8px}
 
-  /* slideshow inside hero (top-left) */
-  .promo-carousel{position:relative; display:flex; overflow:hidden;}
-  .promo-slide { display:flex; gap:18px; align-items:center; padding:28px; min-height:420px; }
-  .promo-left { flex:1 }
-  .promo-right { width:420px; display:flex; align-items:center; justify-content:center; }
-  .promo-image { width:420px; height:320px; object-fit:cover; border-radius:12px; box-shadow:0 12px 40px rgba(0,0,0,0.5) }
+/* ---------- Header ---------- */
+.site-header{
+  position:sticky;top:0;z-index:1200;
+  background:linear-gradient(180deg, rgba(7,12,14,0.94), rgba(7,12,14,0.82));
+  border-bottom:1px solid rgba(255,255,255,0.03);
+  backdrop-filter: blur(8px);
+}
+.header-inner{display:flex;align-items:center;gap:18px;height:76px;max-width:var(--max-w);margin:0 auto;padding:0 20px}
+.brand{display:flex;gap:14px;align-items:center}
+.logo-wrap img,#logo-img{height:54px;width:auto;border-radius:10px;box-shadow:0 8px 28px rgba(0,0,0,0.6)}
+.brand-title{font-weight:900;letter-spacing:1px;font-size:18px;color:var(--accent-red)}
+.brand-sub{font-size:12px;color:var(--muted);font-weight:700}
 
-  .dots { position:absolute; bottom:18px; left:24px; display:flex; gap:8px }
-  .dot { width:12px; height:12px; border-radius:999px; background:rgba(255,255,255,0.14); cursor:pointer; }
-  .dot.active { background: linear-gradient(90deg,var(--cta), #e03a3a); transform:scale(1.15) }
+/* nav */
+.main-nav{display:flex;gap:12px;margin-left:6px;align-items:center}
+.main-nav a{display:inline-flex;gap:8px;align-items:center;padding:8px 10px;border-radius:10px;color:var(--muted);font-weight:800;font-size:13px;transition:all .18s var(--ease)}
+.main-nav a:hover{background:rgba(255,255,255,0.02);color:var(--text);transform:translateY(-2px)}
 
-  /* hero right column (quick menu & app links) */
-  .hero-right { display:flex; flex-direction:column; gap:12px; position:relative; }
-  .quick-card { background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent); padding:16px; border-radius:14px; box-shadow:0 10px 30px rgba(2,6,12,0.45)}
-  .quick-item { display:flex; gap:12px; align-items:center }
-  .quick-item img { width:84px; height:64px; object-fit:cover; border-radius:8px; }
+/* header CTAs */
+.header-ctas{margin-left:auto;display:flex;gap:10px;align-items:center}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:999px;border:0;cursor:pointer;font-weight:900}
+.btn.small{padding:6px 10px;border-radius:8px}
+.btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--text)}
+.btn.primary{background:linear-gradient(90deg,var(--accent-red),var(--accent-red-2));color:#fff;box-shadow:0 14px 40px rgba(215,40,40,0.12);transform:translateZ(0)}
+.icon{display:inline-flex;align-items:center;justify-content:center}
+.circle{width:46px;height:46px;border-radius:12px;background:var(--glass);display:grid;place-items:center;color:var(--text);border:1px solid rgba(255,255,255,0.03)}
+.cart-count{background:linear-gradient(90deg,#ff6b6b,#ff3b3b);min-width:28px;height:28px;padding:0 8px;border-radius:999px;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:13px;margin-left:6px;box-shadow:0 10px 30px rgba(255,60,60,0.12)}
 
-  /* offers strip */
-  .offers { margin-top:18px; display:flex; gap:12px; overflow:auto; padding-bottom:6px; }
-  .offer-card { min-width:260px; background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); padding:12px; border-radius:12px; box-shadow:0 10px 30px rgba(2,6,12,0.4); transition:transform .2s; }
-  .offer-card:hover{ transform: translateY(-6px) }
+/* ---------- HERO / Carousel ---------- */
+.hero{margin-top:18px;display:grid;grid-template-columns:1fr 360px;gap:24px;align-items:start;padding:10px 0}
+.hero-left{position:relative;border-radius:18px;overflow:visible;box-shadow:var(--shadow-lg);background:linear-gradient(180deg, rgba(0,0,0,0.28), rgba(255,255,255,0.02));padding:14px}
+.slides{position:relative;min-height:420px;overflow:visible}
+.slide{position:absolute;inset:0;display:flex;gap:24px;align-items:center;padding:18px;border-radius:14px;opacity:0;transform:translateY(12px) scale(.99);pointer-events:none;transition:all .52s var(--ease)}
+.slide.is-active{opacity:1;transform:none;pointer-events:auto;z-index:5}
+.slide-copy{width:55%;padding:14px}
+.badge-pill{display:inline-flex;gap:10px;align-items:center;padding:8px 12px;border-radius:999px;background:linear-gradient(90deg,var(--accent-gold), #ffb703);color:#2b1f00;font-weight:900;box-shadow:0 12px 30px rgba(255,180,60,0.08)}
+.slide-copy h2{font-size:34px;margin:12px 0 8px;line-height:1;letter-spacing:-0.6px;color:var(--text);text-transform:capitalize}
+.lead{color:rgba(255,255,255,0.88);font-weight:600;margin:0 0 12px}
+.cta-row{display:flex;gap:12px;margin-top:12px}
+.cta-row .btn{font-size:14px;padding:10px 14px}
+.quick-icons{display:flex;gap:10px;list-style:none;margin-top:14px;padding:0}
+.quick-icons li{display:flex;gap:8px;align-items:center;font-weight:800;color:var(--muted);background:rgba(255,255,255,0.02);padding:8px 10px;border-radius:999px}
 
-  /* ---------- MENU LAYOUT ---------- */
-  .menu-wrap { margin-top:26px; display:grid; grid-template-columns: 260px 1fr; gap:22px; align-items:start; }
-  /* left sidebar categories */
-  .sidebar { position:sticky; top:110px; align-self:start; background: linear-gradient(180deg, rgba(255,255,255,0.01), transparent); padding:12px; border-radius:12px; box-shadow:0 10px 30px rgba(2,6,12,0.35) }
-  .sidebar h4 { margin:4px 0 8px; }
-  .cat-list { display:flex; flex-direction:column; gap:8px; list-style:none; padding:0; margin:0 }
-  .cat-btn { background:transparent; border:0; color:var(--muted); font-weight:800; padding:10px; border-radius:10px; cursor:pointer; text-align:left; }
-  .cat-btn.active { background:var(--glass); color:var(--white); transform:translateX(2px) }
+/* Slide media: layered images for appetite */
+.slide-media{width:45%;position:relative;display:flex;align-items:center;justify-content:center}
+.media-main{width:92%;border-radius:12px;box-shadow:var(--shadow-md);transform-origin:center;transition:transform .8s var(--ease),filter .6s var(--ease)}
+.media-layer{position:absolute;right:6%;top:8%;width:36%;transform-origin:center;border-radius:12px;filter:drop-shadow(0 30px 60px rgba(0,0,0,0.45));transition:transform .9s var(--ease)}
+.media-overlay{position:absolute;left:6%;top:6%;width:60%;opacity:.95;pointer-events:none}
+.media-badges{position:absolute;left:12px;bottom:12px;display:flex;flex-direction:column;gap:8px;z-index:20}
+.pill{display:inline-flex;gap:8px;align-items:center;padding:8px 10px;border-radius:10px;background:rgba(0,0,0,0.6);color:#fff;font-weight:900}
 
-  /* main menu column */
-  .menu-sections { display:flex; flex-direction:column; gap:18px }
-  .section { padding:16px; background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent); border-radius:12px; box-shadow:0 8px 30px rgba(2,6,12,0.25); animation:fadeInUp .6s ease both; }
-  .section h3 { margin:0 0 8px; display:flex; justify-content:space-between; align-items:center; gap:12px; }
-  .section .sub { color:var(--muted); font-size:13px; }
+/* micro animations */
+@keyframes floaty {0%{transform:translateY(0)}50%{transform:translateY(-8px)}100%{transform:translateY(0)}}
+@keyframes popin {0%{transform:scale(.92);opacity:0}70%{transform:scale(1.06);opacity:1}100%{transform:scale(1)}}
+.js-pop{animation:popin .72s var(--ease) both}
+.layer-fries{animation:floaty 6s ease-in-out infinite}
 
-  .items-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:12px }
-  .food-card { display:grid; grid-template-columns:140px 1fr 140px; gap:12px; align-items:center; padding:12px; border-radius:12px; background:linear-gradient(180deg, rgba(255,255,255,0.015), transparent); transition: transform .18s ease, box-shadow .18s ease; }
-  .food-card:hover { transform:translateY(-6px); box-shadow:0 18px 40px rgba(0,0,0,0.45) }
-  .food-photo { width:140px; height:100px; object-fit:cover; border-radius:10px; filter: contrast(1.05) saturate(1.08); }
-  .food-meta h4 { margin:0 0 6px; font-size:16px }
-  .food-meta p { margin:0; font-size:13px; color:var(--muted) }
-  .price-area { text-align:right }
-  .price-area .price { font-weight:900; color:var(--accent); font-size:18px }
-  .price-area .actions { margin-top:10px; display:flex; gap:8px; justify-content:flex-end }
-  .btn-add { background:linear-gradient(90deg,var(--basil), #0b9a5a); border:0; color:white; padding:8px 12px; border-radius:10px; cursor:pointer; font-weight:800; display:inline-flex; gap:8px; align-items:center }
-  .btn-options { background:transparent; border:1px solid rgba(255,255,255,0.04); color:var(--muted); padding:8px 10px; border-radius:10px; cursor:pointer; }
+/* carousel controls */
+.carousel-controls{position:absolute;left:50%;transform:translateX(-50%);bottom:-36px;display:flex;gap:12px;align-items:center;z-index:60}
+.arrow{width:46px;height:46px;border-radius:999px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.03);display:inline-flex;align-items:center;justify-content:center;color:var(--text);cursor:pointer;box-shadow:0 12px 30px rgba(0,0,0,0.4)}
+.dot{width:12px;height:12px;border-radius:999px;background:rgba(255,255,255,0.08);box-shadow:0 6px 18px rgba(0,0,0,0.24)}
+.dot.active{width:18px;height:18px;background:linear-gradient(90deg,var(--accent-gold),var(--accent-red-2));box-shadow:0 12px 30px rgba(214,40,40,0.12)}
 
-  /* pizza grid special */
-  .pizza-grid { display:grid; grid-template-columns: 1fr; gap:10px }
-  .pizza-row { display:flex; justify-content:space-between; align-items:center; gap:12px; padding:10px; border-radius:10px; background:rgba(255,255,255,0.01) }
+/* hero-right */
+.hero-right{display:flex;flex-direction:column;gap:14px}
+.quick-card{background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);padding:12px;border-radius:12px;box-shadow:var(--shadow-md)}
+.quick-grid{display:grid;grid-template-columns:1fr;gap:10px}
+.quick-grid li{display:flex;gap:10px;align-items:center}
+.quick-grid img{width:72px;height:56px;object-fit:cover;border-radius:10px}
 
-  /* sides / beverages */
-  .list-rows { display:flex; flex-direction:column; gap:8px }
-  .list-row { display:flex; justify-content:space-between; align-items:center; padding:10px; border-radius:8px; background:rgba(255,255,255,0.01) }
+/* offers */
+.offers-strip{margin-top:6px}
+.offer-tiles{display:flex;flex-direction:column;gap:10px}
+.offer-tile{display:flex;gap:12px;align-items:center;padding:10px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent);box-shadow:0 12px 36px rgba(0,0,0,0.45)}
+.offer-tile img{width:78px;height:78px;object-fit:cover;border-radius:10px}
+.offer-tile .info{display:flex;flex-direction:column}
 
-  /* cart panel */
-  .cart-panel { position:fixed; right:20px; bottom:20px; width:380px; max-height:80vh; overflow:auto; border-radius:12px; background:linear-gradient(180deg,#071018,#071214); padding:14px; box-shadow:0 30px 80px rgba(0,0,0,0.7); z-index:1200; transform:translateY(30px); opacity:0; transition:all .28s cubic-bezier(.2,.9,.2,1) }
-  .cart-panel.open { transform:translateY(0); opacity:1 }
-  .cart-panel h4 { margin:0 0 6px }
-  .cart-item { display:flex; gap:10px; align-items:center; padding:8px 0; border-bottom:1px dashed rgba(255,255,255,0.03) }
-  .cart-item .mini { width:56px; height:40px; object-fit:cover; border-radius:8px }
-  .cart-footer { margin-top:8px; display:flex; gap:8px; flex-direction:column }
-  .checkout-btn { background:linear-gradient(90deg,var(--cta), #b21a26); color:white; padding:12px; border-radius:10px; border:none; font-weight:900; cursor:pointer }
+/* ---------- Sidebar ---------- */
+.sidebar{position:sticky;top:98px;align-self:start;background:rgba(0,0,0,0.02);padding:14px;border-radius:12px;border:1px solid rgba(255,255,255,0.02);box-shadow:0 12px 30px rgba(0,0,0,0.5)}
+.sidebar h4{margin:0 0 12px 0;font-size:16px}
+.cat-list{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px}
+.cat-btn{display:flex;gap:8px;align-items:center;border:0;background:transparent;padding:10px;border-radius:10px;color:var(--muted);font-weight:800;cursor:pointer;text-align:left}
+.cat-btn img{width:20px;height:20px;opacity:0.9}
+.cat-btn.active{background:linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));color:var(--text);transform:translateX(4px);box-shadow:0 10px 30px rgba(0,0,0,0.45)}
+.search-box{display:flex;gap:8px;margin-top:12px}
+.search-box input{flex:1;padding:10px;border-radius:10px;background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--text)}
+.filters{margin-top:14px}
+.filters h5{margin:12px 0 8px 0;font-size:13px}
+.filter{display:flex;align-items:center;gap:8px;color:var(--muted);font-weight:800;padding:6px 8px;border-radius:8px}
 
-  /* modal for pizza/custom options */
-  .modal-backdrop { position:fixed; inset:0; display:none; align-items:center; justify-content:center; z-index:1400; background:linear-gradient(0deg, rgba(0,0,0,0.6), rgba(0,0,0,0.6)); }
-  .modal { width:100%; max-width:760px; border-radius:12px; background:linear-gradient(180deg,#071016,#08121a); padding:18px; box-shadow:0 30px 90px rgba(0,0,0,0.7) }
-  .variant-row { display:flex; gap:10px; align-items:center; flex-wrap:wrap }
-  .variant { padding:8px 12px; border-radius:8px; background:rgba(255,255,255,0.02); color:var(--muted); cursor:pointer; border:1px solid rgba(255,255,255,0.02) }
-  .variant.active { background:linear-gradient(90deg,var(--basil), #0b9a5a); color:white; border-color:transparent }
+/* ---------- Menu sections & cards ---------- */
+.menu-sections{display:flex;flex-direction:column;gap:18px}
+.menu-section{padding:16px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent);box-shadow:0 12px 36px rgba(0,0,0,0.42);animation:fadeInUp .6s var(--ease) both}
+.section-head{display:flex;flex-direction:column;gap:6px}
+.section-head h2{margin:0;font-size:20px}
+.section-sub{margin:0;color:var(--muted);font-weight:700}
 
-  /* small animations */
-  @keyframes fadeInUp { from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:none;} }
-  @keyframes float { 0%{ transform:translateY(0);} 50%{ transform:translateY(-6px);} 100%{ transform:translateY(0);} }
+/* grid */
+.cards-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.food-card{display:grid;grid-template-columns:140px 1fr 150px;gap:12px;align-items:center;padding:12px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent);transition:transform .22s var(--ease), box-shadow .22s var(--ease);cursor:pointer;position:relative;overflow:visible}
+.food-card:hover{transform:translateY(-8px);box-shadow:0 28px 80px rgba(0,0,0,0.6)}
+.food-media{position:relative;display:flex;align-items:center;justify-content:center}
+.food-photo{width:140px;height:100px;object-fit:cover;border-radius:10px;box-shadow:0 12px 34px rgba(0,0,0,0.48);transition:transform .6s var(--ease)}
+.food-card:hover .food-photo{transform:scale(1.06)}
+.food-badges{position:absolute;left:8px;top:8px;display:flex;flex-direction:column;gap:8px}
+.badge{display:inline-flex;align-items:center;gap:8px;padding:6px 8px;border-radius:8px;font-weight:900;background:rgba(0,0,0,0.6);color:#fff}
+.badge.best{background:linear-gradient(90deg,#ffd166,#ffb703);color:#2b1f00}
+.badge.hot{background:linear-gradient(90deg,#ff6b4a,#ff3b2f)}
+.badge.new{background:linear-gradient(90deg,#ffdede,#ffbcbc);color:#2b1f1f}
 
-  /* responsive */
-  @media (max-width:1024px){
-    .hero { grid-template-columns:1fr; }
-    .promo-right { display:none }
-    .menu-wrap { grid-template-columns:1fr; }
-    .items-grid { grid-template-columns:1fr; }
-    .food-card { grid-template-columns: 120px 1fr 100px; }
-    .nav { padding:8px 14px }
-    .logo { width:52px; height:52px; font-size:18px }
-  }
-  @media (max-width:640px){
-    .nav-primary { display:none }
-    .nav { padding:8px 12px }
-    .logo { width:48px; height:48px }
-    .nav-icon { width:52px; height:52px }
-    .hero-overlay h1 { font-size:28px }
-    .hero-image { height:260px }
-  }
+/* body */
+.food-body{display:flex;flex-direction:column;gap:8px}
+.food-title{margin:0;font-size:16px;font-weight:900}
+.food-desc{margin:0;color:var(--muted);font-size:13px}
+.meta-row{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.meta-left{display:flex;gap:8px;align-items:center}
+.rating{display:inline-flex;gap:6px;align-items:center;color:var(--accent-gold);font-weight:900}
+.calorie{font-weight:700;color:var(--muted);font-size:13px}
+.price-area{text-align:right}
+.price{font-weight:900;color:var(--accent-gold);font-size:18px}
+.actions{display:flex;gap:8px;justify-content:flex-end;align-items:center}
+.btn-add{background:linear-gradient(90deg,var(--green), #0f9a5a);border:0;color:#fff;padding:8px 12px;border-radius:10px;font-weight:900;cursor:pointer;box-shadow:0 12px 30px rgba(15,155,90,0.12)}
+.btn-options{background:transparent;border:1px solid rgba(255,255,255,0.04);padding:8px 10px;border-radius:10px;color:var(--muted);cursor:pointer}
 
-  /* helpers */
-  .muted{color:var(--muted)}
-  .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+/* pizza grid */
+.pizza-grid{display:grid;grid-template-columns:1fr;gap:12px}
+.pizza-card{display:flex;gap:12px;align-items:center;padding:12px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent)}
+.pizza-media img{width:160px;height:120px;object-fit:cover;border-radius:12px}
+.pizza-actions{display:flex;gap:10px}
+
+/* sides */
+.sides-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.side-card{display:flex;gap:12px;align-items:center;padding:10px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent)}
+.side-card img{width:120px;height:88px;object-fit:cover;border-radius:10px}
+
+/* ---------- Gallery (masonry) ---------- */
+.gallery-section{padding:22px 0}
+.masonry{column-count:3;column-gap:14px}
+.masonry-item{break-inside:avoid;margin-bottom:14px;border-radius:12px;overflow:hidden}
+.masonry-item img{width:100%;height:auto;display:block;border-radius:12px;transition:transform .5s var(--ease)}
+.masonry-item:hover img{transform:scale(1.04)}
+
+/* ---------- Testimonials ---------- */
+.testimonials{display:flex;gap:12px;margin-top:10px}
+.testimonial{flex:1;background:linear-gradient(180deg,#0f1718,#0b1112);padding:12px;border-radius:12px;box-shadow:var(--shadow-md);display:flex;gap:12px;align-items:flex-start}
+.testimonial img{width:56px;height:56px;border-radius:999px;object-fit:cover}
+.testimonial p{margin:6px 0;font-weight:700}
+.testimonial cite{color:var(--muted);font-size:13px}
+
+/* ---------- FAQ / Contact ---------- */
+.faq-grid{display:grid;grid-template-columns:1fr 420px;gap:18px}
+.faq-panel details{background:linear-gradient(180deg,#071014,#071214);padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,0.02);margin-bottom:8px}
+.contact-card{display:flex;gap:10px;align-items:center;background:linear-gradient(180deg,#071014,#071216);padding:10px;border-radius:10px}
+
+/* ---------- Floating CTAs ---------- */
+.floating-ctas{position:fixed;right:18px;bottom:18px;display:flex;flex-direction:column;gap:12px;z-index:12000}
+.fab{width:56px;height:56px;border-radius:999px;display:inline-flex;align-items:center;justify-content:center;color:#fff;background:linear-gradient(90deg,var(--accent-red),var(--accent-red-2));box-shadow:0 18px 60px rgba(215,40,40,0.12);border:0;cursor:pointer}
+.fab.wa-fab{background:linear-gradient(90deg,#25D366,#1ebea5)}
+.fab .count{position:absolute;right:-6px;top:-6px;background:rgba(255,255,255,0.12);padding:4px 8px;border-radius:999px;font-weight:900}
+
+/* ---------- Cart Drawer ---------- */
+.cart-drawer{position:fixed;right:0;top:0;height:100%;width:420px;max-width:96vw;background:linear-gradient(180deg,#071016,#08121a);box-shadow:-28px 0 80px rgba(0,0,0,0.85);transform:translateX(110%);transition:transform .38s var(--ease);z-index:11999;border-left:1px solid rgba(255,255,255,0.03);display:flex;flex-direction:column}
+.cart-drawer[aria-hidden="false"]{transform:translateX(0)}
+.drawer-head{display:flex;justify-content:space-between;align-items:center;padding:18px;border-bottom:1px solid rgba(255,255,255,0.02)}
+.drawer-body{padding:12px;overflow:auto;flex:1}
+.drawer-foot{padding:12px;border-top:1px solid rgba(255,255,255,0.02)}
+.drawer-body .empty-cart{color:var(--muted);font-weight:700}
+
+/* ---------- Product Modal ---------- */
+.modal-backdrop{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:linear-gradient(180deg, rgba(0,0,0,0.64), rgba(0,0,0,0.75));z-index:12001;padding:20px}
+.modal-backdrop[aria-hidden="false"]{display:flex}
+.modal-panel{width:100%;max-width:1100px;border-radius:14px;background:linear-gradient(180deg,#071416,#0b1a1e);padding:18px;box-shadow:0 40px 120px rgba(0,0,0,0.8);display:flex;flex-direction:column;gap:12px}
+.modal-head{display:flex;justify-content:space-between;align-items:center}
+.modal-grid{display:grid;grid-template-columns:420px 1fr;gap:14px}
+.modal-media{background:linear-gradient(180deg,#071416,#08161a);padding:12px;border-radius:12px;display:flex;flex-direction:column;gap:12px;align-items:center}
+.modal-carousel{width:100%;display:flex;flex-direction:column;gap:8px;align-items:center}
+.modal-img.main{width:100%;height:320px;object-fit:cover;border-radius:12px;box-shadow:0 30px 80px rgba(0,0,0,0.7)}
+.modal-thumbs{display:flex;gap:8px;overflow:auto;width:100%}
+.modal-thumbs img.thumb{width:78px;height:58px;object-fit:cover;border-radius:8px;border:2px solid transparent;cursor:pointer;transition:transform .18s,var(--ease)}
+.modal-thumbs img.thumb:hover{transform:translateY(-4px);border-color:rgba(255,255,255,0.06)}
+
+/* modal body */
+.modal-body{display:flex;flex-direction:column;gap:12px;padding:6px}
+.modal-meta{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.modal-price{font-size:22px;font-weight:900;color:var(--accent-gold)}
+.modal-rating{color:var(--muted);font-weight:800}
+.modal-section{background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);padding:10px;border-radius:10px}
+.options-row{display:flex;gap:8px;flex-wrap:wrap}
+.variant{padding:8px 12px;border-radius:10px;background:rgba(255,255,255,0.02);color:var(--muted);border:1px solid rgba(255,255,255,0.02);cursor:pointer;font-weight:800}
+.variant.active{background:linear-gradient(90deg,var(--green),#0f9a5a);color:#fff;border-color:transparent;box-shadow:0 12px 36px rgba(15,155,90,0.12)}
+.options-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.nutrition-row{display:flex;gap:12px;align-items:center}
+.allergens span{display:inline-flex;gap:6px;align-items:center;padding:6px;border-radius:8px;background:rgba(255,255,255,0.02);margin-right:6px}
+.pairings{display:flex;gap:8px;flex-wrap:wrap}
+.pair{display:inline-flex;gap:8px;align-items:center;padding:8px;border-radius:8px;background:rgba(255,255,255,0.02);cursor:pointer}
+.qty-controls{display:inline-flex;align-items:center;gap:6px}
+.qty-controls input{width:56px;text-align:center;background:transparent;border:1px solid rgba(255,255,255,0.04);padding:6px;border-radius:8px;color:var(--text)}
+.modal-actions{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:12px}
+.add-row{display:flex;gap:8px;align-items:center}
+
+/* modal reviews */
+.review-list{display:flex;flex-direction:column;gap:8px}
+.review{background:linear-gradient(180deg,#071316,#071516);padding:8px;border-radius:8px}
+
+/* Modal close button */
+.modal-close{background:transparent;border:0;color:var(--muted);font-weight:900;cursor:pointer}
+
+/* ---------- Toast ---------- */
+.bs-toast{position:fixed;right:22px;bottom:90px;background:linear-gradient(90deg,var(--green),#0f6b3a);color:#fff;padding:10px 14px;border-radius:10px;box-shadow:0 12px 40px rgba(0,0,0,0.5);z-index:13000}
+
+/* ---------- Footer ---------- */
+.site-footer{padding:24px 20px;margin-top:28px;background:linear-gradient(180deg,#0b0b0b,#0a0a0a);border-top:1px solid rgba(255,255,255,0.02)}
+.footer-grid{display:grid;grid-template-columns:1fr 280px 220px;gap:18px;align-items:start}
+.logo-footer{height:48px}
+.footer-gallery img{width:64px;height:64px;object-fit:cover;border-radius:8px;margin:6px}
+
+/* ---------- Small utilities & animations ---------- */
+@keyframes fadeInUp {from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+/* subtle shimmer for CTAs */
+.shimmer{background:linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.06) 40%, rgba(255,255,255,0.02));background-size:200% 100%;animation:shimmer 2.6s linear infinite}
+@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+
+/* small hover micro-animations for images and badges */
+.food-photo:hover{filter:brightness(1.06) contrast(1.06)}
+.pill:hover, .badge:hover{transform:translateY(-4px) scale(1.02);transition:transform .28s var(--ease)}
+
+/* ---------- Responsive ---------- */
+@media (max-width:1100px){
+  .hero{grid-template-columns:1fr;align-items:stretch}
+  .modal-grid{grid-template-columns:1fr}
+  .masonry{column-count:2}
+  .footer-grid{grid-template-columns:1fr 1fr}
+  .cards-grid{grid-template-columns:repeat(2,1fr)}
+}
+@media (max-width:760px){
+  .header-inner{height:auto;padding:10px}
+  .main-nav{display:none}
+  .hero-left{padding:12px}
+  .slide-copy h2{font-size:26px}
+  .slide-media{display:none}
+  .cards-grid{grid-template-columns:1fr}
+  .masonry{column-count:1}
+  .sidebar{position:static;top:auto}
+  .modal-panel{padding:12px}
+  .modal-img.main{height:220px}
+  .modal-grid{grid-template-columns:1fr}
+  .cart-drawer{width:100vw}
+}
+
+/* Preserve crispness for icons */
+.fa, .fas, i {font-weight:900;}
+
+/* End of stylesheet */
 </style>
+
 </head>
-<body>
+<body class="menu-page theme-red" id="page-body">
   <a class="sr-only" href="#menu-main">Skip to content</a>
 
-  <!-- HEADER -->
-  <header>
-    <div class="nav">
+  <!-- ====== HEADER (compact, image-ready) ====== -->
+  <header class="site-header" role="banner" aria-label="Basilissa header">
+    <div class="header-inner container">
       <div class="brand" aria-hidden="false">
-        <div class="logo">B</div>
-        <div>
-          <div class="title">BASILISSA</div>
-          <div class="sub">Taste the Special</div>
+        <picture class="logo-wrap">
+          <source srcset="images/logo@2x.png 2x, images/logo.png 1x" />
+          <img src="images/logo.png" alt="Basilissa logo" id="logo-img">
+        </picture>
+
+        <div class="brand-text">
+          <h1 class="brand-title">BASILISSA</h1>
+          <p class="brand-sub">Fresh • Fast • Flavorful</p>
         </div>
       </div>
 
-      <nav class="primary" aria-label="Main Navigation">
-        <a href="#burgers">Burgers</a>
-        <a href="#chicken">Chicken</a>
-        <a href="#pizza">Pizza</a>
-        <a href="#beverages">Drinks</a>
+      <nav class="main-nav" aria-label="Main Navigation">
+        <a href="#menu-main"><i class="fa fa-utensils"></i><span>Menu</span></a>
+        <a href="#offers"><i class="fa fa-tags"></i><span>Offers</span></a>
+        <a href="#gallery"><i class="fa fa-images"></i><span>Gallery</span></a>
+        <a href="#locations"><i class="fa fa-map-marker-alt"></i><span>Locations</span></a>
       </nav>
 
-      <div class="nav-actions" role="toolbar" aria-label="Site actions">
-        <button class="nav-icon" id="cartButton" aria-label="Open cart" title="Open cart">
-          <i class="fa fa-shopping-cart" style="font-size:20px"></i>
-          <div class="cart-badge" id="cartCount">0</div>
+      <div class="header-ctas">
+        <button class="btn ghost" id="searchToggle" aria-label="Search menu"><i class="fa fa-search"></i></button>
+        <button class="btn" id="downloadPDF" aria-label="Download Menu"><i class="fa fa-file-pdf"></i></button>
+        <a class="btn primary order-now" href="#cart" aria-label="Order now"><i class="fa fa-motorcycle"></i> Order</a>
+        <button class="icon circle cart-btn" id="cartBtn" aria-label="Open cart">
+          <i class="fa fa-shopping-bag"></i>
+          <span class="cart-count" id="globalCartCount" aria-live="polite">0</span>
         </button>
-        <button class="order-pill" id="orderBtn">ORDER NOW</button>
       </div>
     </div>
   </header>
 
-  <main class="container" id="menu-main" role="main">
-    <!-- HERO WITH PROMO CAROUSEL -->
-    <section class="hero">
-      <div class="hero-left" aria-label="Featured promotions">
-        <div class="promo-carousel" id="promoCarousel">
-          <!-- Slide 1 -->
-          <div class="promo-slide" data-index="0" style="display:flex">
-            <div class="promo-left">
-              <div class="hero-overlay" style="bottom:28px;left:28px">
-                <div class="tag">LIMITED</div>
-                <h1>SHITO IS BACK — Streetwise Wings Meal</h1>
-                <p class="muted">3 pcs wings + jollof rice or fries. Add special shito for GHS 5. Hot, smoky & unforgettable.</p>
-                <div class="hero-ctas">
-                  <button class="order-pill" onclick="scrollToSection('chicken')">ORDER NOW</button>
-                  <button class="btn-options" onclick="openPizzaModalSample()"> Customize Pizza</button>
-                </div>
-              </div>
+  <!-- ====== TOP PROMO / HERO (image-heavy animated slideshow placeholders) ====== -->
+  <section id="hero" class="hero container" aria-label="Featured promotions">
+    <div class="hero-left" role="region" aria-label="Promotional carousel" data-animate="carousel">
+      <!-- Slide set: each slide visually distinct — JS will rotate these -->
+      <div class="slides" aria-live="polite">
+        <article class="slide slide-1 is-active" data-slide="0" aria-roledescription="slide" aria-label="Shawarma special">
+          <div class="slide-copy">
+            <span class="badge-pill"><i class="fa fa-fire"></i> Limited</span>
+            <h2>Shito Wings Meal — Smoky & Hot</h2>
+            <p class="lead">3 pcs wings + choice of jollof or fries. Add our signature shito for GHS 5. Perfectly charred, intensely smoky.</p>
+            <div class="cta-row">
+              <button class="btn primary" data-action="order" data-item="Shito Wings Meal">Order Now</button>
+              <button class="btn ghost" data-action="customize" data-item="Shito Wings Meal">Customize</button>
             </div>
-            <div class="promo-right" aria-hidden="true">
-              <img class="promo-image" src="/assets/hero-shito.jpg" alt="Shito wings with rice and fries" />
+
+            <ul class="quick-icons">
+              <li><i class="fa fa-leaf"></i> Fresh herbs</li>
+              <li><i class="fa fa-bolt"></i> Ready in 12m</li>
+              <li><i class="fa fa-users"></i> Great for sharing</li>
+            </ul>
+          </div>
+
+          <div class="slide-media" aria-hidden="true">
+            <!-- layered images for appetite effect -->
+            <img src="images/hero/shawarma-main.jpg" alt="Shito wings plated" class="media-main" data-animate="pop">
+            <img src="images/hero/shawarma-fries.png" alt="Fries" class="media-layer layer-fries" data-animate="float">
+            <img src="images/hero/steam.png" alt="" class="media-overlay steam" aria-hidden="true">
+            <div class="media-badges">
+              <span class="pill best"><i class="fa fa-award"></i> Best Seller</span>
+              <span class="pill hot"><i class="fa fa-fire"></i> Hot</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="slide slide-2" data-slide="1" aria-roledescription="slide" aria-label="Family bucket">
+          <div class="slide-copy">
+            <span class="badge-pill gold"><i class="fa fa-users"></i> Family</span>
+            <h2>Family Feast — Share & Save</h2>
+            <p class="lead">Big buckets for 4 — wings, shawarma slices, rice & sides. Bring everyone together.</p>
+            <div class="cta-row">
+              <button class="btn primary" data-action="order" data-item="Family Feast">Order Family Pack</button>
+              <button class="btn ghost" data-action="view" data-item="Family Feast">View Details</button>
+            </div>
+
+            <div class="feature-photos">
+              <img src="images/hero/feast-1.jpg" alt="Feast image 1">
+              <img src="images/hero/feast-2.jpg" alt="Feast image 2">
+              <img src="images/hero/feast-3.jpg" alt="Feast image 3">
             </div>
           </div>
 
-          <!-- Slide 2 -->
-          <div class="promo-slide" data-index="1" style="display:none">
-            <div class="promo-left">
-              <div class="hero-overlay">
-                <div class="tag">FAMILY</div>
-                <h1>Family Feast — Share & Save</h1>
-                <p class="muted">Bucket meals for 4 with sides & drinks. Perfect for gatherings.</p>
-                <div class="hero-ctas">
-                  <button class="order-pill" onclick="scrollToSection('combos')">ORDER NOW</button>
-                  <button class="btn-options" onclick="addToCart('Festive Bucket',180)">Add to cart</button>
-                </div>
-              </div>
+          <div class="slide-media">
+            <img src="images/hero/family-bucket.jpg" alt="Family bucket" class="media-main" data-animate="pop">
+            <svg class="sauce-splash" viewBox="0 0 120 60" aria-hidden="true"><path d="M10 40 Q40 5 110 30" stroke="rgba(255,120,60,0.9)" stroke-width="6" fill="none" stroke-linecap="round"/></svg>
+          </div>
+        </article>
+
+        <article class="slide slide-3" data-slide="2" aria-roledescription="slide" aria-label="Burgers special">
+          <div class="slide-copy">
+            <span class="badge-pill new"><i class="fa fa-star"></i> New</span>
+            <h2>Stacked Burgers — Melted & Juicy</h2>
+            <p class="lead">Double patties, melty cheese & proprietary house sauce. Built for big appetites.</p>
+            <div class="cta-row">
+              <button class="btn primary" data-action="order" data-item="Stacked Burger">Try Now</button>
+              <button class="btn ghost" data-action="customize" data-item="Stacked Burger">Customize</button>
             </div>
-            <div class="promo-right" aria-hidden="true">
-              <img class="promo-image" src="/assets/hero-family.jpg" alt="Family feast bucket" />
+
+            <div class="mini-gallery">
+              <img src="images/hero/burger-side1.jpg" alt="burger closeup">
+              <img src="images/hero/burger-side2.jpg" alt="cheese pull">
             </div>
           </div>
 
-          <!-- Slide 3 -->
-          <div class="promo-slide" data-index="2" style="display:none">
-            <div class="promo-left">
-              <div class="hero-overlay">
-                <div class="tag">NEW</div>
-                <h1>Mango & Basil Smoothie — Limited</h1>
-                <p class="muted">A bright, creamy blend with fresh mangoes and basil notes. Try one today.</p>
-                <div class="hero-ctas">
-                  <button class="order-pill" onclick="scrollToSection('beverages')">ORDER</button>
-                  <button class="btn-options" onclick="addToCart('Mango Smoothie',18)">Add to cart</button>
-                </div>
-              </div>
-            </div>
-            <div class="promo-right" aria-hidden="true">
-              <img class="promo-image" src="/assets/hero-smoothie.jpg" alt="Mango basil smoothie" />
-            </div>
+          <div class="slide-media">
+            <img src="images/hero/burger-main.jpg" alt="Stacked burger" class="media-main" data-animate="pop">
+            <div class="media-ornament"><i class="fa fa-heart"></i> Crowd Favorite</div>
           </div>
-
-        </div>
-
-        <div class="dots" id="promoDots" role="tablist" aria-label="Slide navigation">
-          <div class="dot active" data-dot="0" tabindex="0" aria-label="Slide 1"></div>
-          <div class="dot" data-dot="1" tabindex="0" aria-label="Slide 2"></div>
-          <div class="dot" data-dot="2" tabindex="0" aria-label="Slide 3"></div>
-        </div>
+        </article>
       </div>
 
-      <aside class="hero-right">
-        <div class="quick-card">
-          <div style="display:flex;justify-content:space-between;align-items:center">
-            <strong>Order & Pickup</strong>
-            <div class="muted">Ready in 12–20 mins</div>
-          </div>
-          <div style="height:12px"></div>
-          <div class="quick-item" style="margin-bottom:10px">
-            <img src="/assets/menu/shawarma-thumb.jpg" alt="Special Shawarma" />
-            <div>
-              <div style="font-weight:900">Special Shawarma</div>
-              <div class="muted">GHS 28 — Garlicky & smoky</div>
-            </div>
-          </div>
-          <div class="quick-item">
-            <img src="/assets/menu/pizza-thumb.jpg" alt="Basilissa Special Pizza" />
-            <div>
-              <div style="font-weight:900">Basilissa Special Pizza</div>
-              <div class="muted">GHS 75 — double cheese</div>
-            </div>
-          </div>
-
-          <div style="display:flex;gap:8px;margin-top:12px">
-            <button class="order-pill" style="flex:1" onclick="scrollToSection('menu-main')">Order</button>
-            <button class="btn-options" onclick="openCart()">View Cart</button>
-          </div>
-
-          <div style="display:flex;gap:8px;align-items:center;justify-content:center;margin-top:14px">
-            <img src="/assets/appstore.png" alt="App Store" style="height:36px" />
-            <img src="/assets/playstore.png" alt="Play Store" style="height:36px" />
-          </div>
+      <!-- dots & arrows (JS-controlled) -->
+      <div class="carousel-controls" aria-hidden="false">
+        <button class="arrow prev" aria-label="Previous slide"><i class="fa fa-chevron-left"></i></button>
+        <div class="dots" role="tablist" aria-label="Slide navigation">
+          <button class="dot active" data-dot="0" role="tab" aria-selected="true" aria-controls="slide-0"></button>
+          <button class="dot" data-dot="1" role="tab" aria-selected="false" aria-controls="slide-1"></button>
+          <button class="dot" data-dot="2" role="tab" aria-selected="false" aria-controls="slide-2"></button>
         </div>
+        <button class="arrow next" aria-label="Next slide"><i class="fa fa-chevron-right"></i></button>
+      </div>
+    </div>
 
-        <div class="offers" aria-hidden="false">
-          <div class="offer-card">
-            <img src="/assets/offer1.jpg" alt="Festive bucket" style="border-radius:10px; height:120px; width:100%; object-fit:cover" />
-            <div style="margin-top:8px; font-weight:900">Festive Bucket</div>
-            <div class="muted">Bucket for 4 — GHS 180</div>
-            <div style="margin-top:8px"><button class="btn-add" onclick="addToCart('Festive Bucket',180)"><i class="fa fa-cart-plus"></i> Add</button></div>
-          </div>
-
-          <div class="offer-card">
-            <img src="/assets/offer2.jpg" alt="Loaded fries" style="border-radius:10px; height:120px; width:100%; object-fit:cover" />
-            <div style="margin-top:8px; font-weight:900">Loaded Fries</div>
-            <div class="muted">Cheesy fries — GHS 38</div>
-            <div style="margin-top:8px"><button class="btn-add" onclick="addToCart('Loaded Fries',38)"><i class="fa fa-cart-plus"></i> Add</button></div>
-          </div>
-        </div>
-
-      </aside>
-    </section>
-
-    <!-- MENU: categories left / items right -->
-    <section class="menu-wrap" aria-label="Full menu">
-      <aside class="sidebar" aria-label="Categories">
-        <h4>Categories</h4>
-        <ul class="cat-list" id="catList">
-          <li><button class="cat-btn active" data-cat="all">All</button></li>
-          <li><button class="cat-btn" data-cat="burgers">Burgers</button></li>
-          <li><button class="cat-btn" data-cat="shawarma">Shawarma</button></li>
-          <li><button class="cat-btn" data-cat="hotdog">Hotdog</button></li>
-          <li><button class="cat-btn" data-cat="chicken">Chicken</button></li>
-          <li><button class="cat-btn" data-cat="combos">Combos</button></li>
-          <li><button class="cat-btn" data-cat="pizza">Pizza</button></li>
-          <li><button class="cat-btn" data-cat="sides">Side Menu</button></li>
-          <li><button class="cat-btn" data-cat="bev">Beverage & Snacks</button></li>
+    <!-- hero-right: quick links, app badges, featured micro-cards (all image heavy) -->
+    <aside class="hero-right" aria-label="Quick actions & featured items">
+      <div class="quick-card" data-animate="float">
+        <h4>Quick Picks</h4>
+        <ul class="quick-grid">
+          <li>
+            <img src="images/picks/shawarma-thumb.jpg" alt="Shawarma">
+            <div class="meta"><strong>Special Shawarma</strong><span>GHS 75</span></div>
+          </li>
+          <li>
+            <img src="images/picks/burger-thumb.jpg" alt="Burger">
+            <div class="meta"><strong>Double Burger</strong><span>GHS 110</span></div>
+          </li>
+          <li>
+            <img src="images/picks/fries-thumb.jpg" alt="Fries">
+            <div class="meta"><strong>Loaded Fries</strong><span>GHS 38</span></div>
+          </li>
         </ul>
 
-        <div style="height:18px"></div>
-        <div style="display:flex;flex-direction:column;gap:8px">
-          <input id="search" type="search" placeholder="Search menu (e.g. shawarma)" style="padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.03);background:transparent;color:var(--white)">
-          <button class="btn-options" onclick="resetFilters()">Reset</button>
+        <div class="app-links">
+          <img src="images/app/appstore.png" alt="App Store">
+          <img src="images/app/playstore.png" alt="Play Store">
+        </div>
+      </div>
+
+      <div class="offers-strip" aria-live="polite">
+        <h5>Hot Offers</h5>
+        <div class="offer-tiles">
+          <article class="offer-tile">
+            <img src="images/offers/offer-bucket.jpg" alt="Bucket offer">
+            <div class="info"><strong>Festive Bucket</strong><span>GHS 180</span></div>
+            <button class="btn small" data-action="add" data-item="Festive Bucket" data-price="180"><i class="fa fa-cart-plus"></i> Add</button>
+          </article>
+          <article class="offer-tile">
+            <img src="images/offers/offer-fries.jpg" alt="Fries offer">
+            <div class="info"><strong>Cheesy Fries</strong><span>GHS 38</span></div>
+            <button class="btn small" data-action="add" data-item="Loaded Fries" data-price="38"><i class="fa fa-cart-plus"></i> Add</button>
+          </article>
+        </div>
+      </div>
+    </aside>
+  </section>
+
+  <!-- ====== MENU: categories + items (image-heavy, organized) ====== -->
+  <main id="menu-main" class="container" role="main" aria-label="All menu items">
+    <section class="menu-wrap" aria-label="Full menu">
+      <!-- left: category nav + search -->
+      <aside class="sidebar" role="navigation" aria-label="Menu categories">
+        <h4>Browse by category</h4>
+        <ul class="cat-list" id="catList" role="list">
+          <!-- Each category shows a thumbnail image on hover (CSS) -->
+          <li role="listitem"><button class="cat-btn active" data-cat="all"><i class="fa fa-th-large"></i> All</button></li>
+          <li role="listitem"><button class="cat-btn" data-cat="burgers"><img src="images/icons/burger.png" alt=""> Burgers</button></li>
+          <li role="listitem"><button class="cat-btn" data-cat="shawarma"><img src="images/icons/shawarma.png" alt=""> Shawarma</button></li>
+          <li role="listitem"><button class="cat-btn" data-cat="chicken"><img src="images/icons/chicken.png" alt=""> Chicken</button></li>
+          <li role="listitem"><button class="cat-btn" data-cat="pizza"><img src="images/icons/pizza.png" alt=""> Pizza</button></li>
+          <li role="listitem"><button class="cat-btn" data-cat="sides"><img src="images/icons/fries.png" alt=""> Sides</button></li>
+          <li role="listitem"><button class="cat-btn" data-cat="bev"><img src="images/icons/drink.png" alt=""> Drinks</button></li>
+          <li role="listitem"><button class="cat-btn" data-cat="combos"><img src="images/icons/combo.png" alt=""> Combos</button></li>
+        </ul>
+
+        <div class="search-box" role="search" aria-label="Search menu">
+          <label for="menuSearch" class="sr-only">Search menu</label>
+          <input id="menuSearch" type="search" placeholder="Search (e.g. shawarma, burger)" />
+          <button class="btn ghost" id="clearSearch" aria-label="Clear search"><i class="fa fa-times"></i></button>
+        </div>
+
+        <div class="filters" aria-hidden="false">
+          <h5>Filters</h5>
+          <label class="filter"><input type="checkbox" name="veg" /> <i class="fa fa-leaf"></i> Vegetarian</label>
+          <label class="filter"><input type="checkbox" name="spicy" /> <i class="fa fa-pepper-hot"></i> Spicy</label>
+          <label class="filter"><input type="checkbox" name="popular" /> <i class="fa fa-star"></i> Popular</label>
+        </div>
+
+        <div class="promo-tiles" aria-hidden="true">
+          <img src="images/sidebar/promo-1.jpg" alt="promo 1">
+          <img src="images/sidebar/promo-2.jpg" alt="promo 2">
         </div>
       </aside>
 
-      <div class="menu-sections" id="menuSections">
-        <!-- Burgers -->
-        <section class="section" data-cat="burgers" id="burgers">
-          <h3>Burgers <span class="sub">Burgers & sandwiches</span></h3>
-          <div class="items-grid">
-            <!-- each .food-card -->
-            <article class="food-card" data-name="Accra Crispy Chicken" data-cat="burgers">
-              <img class="food-photo" src="/assets/menu/accra-crispy-chicken.jpg" alt="Accra Crispy Chicken">
-              <div class="food-meta">
-                <h4>Accra Crispy Chicken</h4>
-                <p class="muted">Crunchy fried chicken with special sauce and lettuce.</p>
-                <div class="muted">Shop special</div>
+      <!-- right: menu sections -->
+      <div class="menu-sections" id="menuSections" aria-live="polite">
+        <!-- SECTION: Burgers -->
+        <section class="menu-section" data-cat="burgers" id="burgers">
+          <header class="section-head">
+            <h2>Burgers</h2>
+            <p class="section-sub">Flame-grilled patties, house sauces & signature buns</p>
+          </header>
+
+          <div class="cards-grid" role="list">
+            <!-- Food card (image-heavy) — each has rich data- attributes for modal -->
+            <article class="food-card" role="listitem"
+                     data-name="Accra Crispy Chicken"
+                     data-price="85"
+                     data-cat="burgers"
+                     data-images="images/menu/accra-crispy-chicken-1.jpg|images/menu/accra-crispy-chicken-2.jpg|images/menu/accra-crispy-chicken-3.jpg"
+                     data-options='{"sizes":{"Regular":85,"Large":110},"extras":["Extra cheese","Bacon","Double patty"],"cal":650,"allergens":["gluten","dairy"]}'
+                     aria-label="Accra Crispy Chicken — GHS 85">
+              <div class="food-media">
+                <img src="images/menu/accra-crispy-chicken-1.jpg" alt="Accra Crispy Chicken" class="food-photo">
+                <div class="food-badges">
+                  <span class="badge spicy" title="Spicy"><i class="fa fa-pepper-hot"></i></span>
+                  <span class="badge chef" title="Chef pick"><i class="fa fa-award"></i></span>
+                </div>
               </div>
-              <div class="price-area">
-                <div class="price">GHS 85</div>
-                <div class="actions">
-                  <button class="btn-options" onclick="openOptions(this, 'Accra Crispy Chicken', 85, ['Extra cheese','No onion'])"><i class="fa fa-ellipsis-h"></i> Options</button>
-                  <button class="btn-add" onclick="addToCart('Accra Crispy Chicken',85)"><i class="fa fa-cart-plus"></i> Add</button>
+
+              <div class="food-body">
+                <h3 class="food-title">Accra Crispy Chicken</h3>
+                <p class="food-desc">Crunchy fried chicken, house aioli, pickles & lettuce tucked in a toasted brioche.</p>
+
+                <div class="meta-row">
+                  <div class="meta-left">
+                    <span class="rating"><i class="fa fa-star"></i> 4.8</span>
+                    <span class="calorie"><i class="fa fa-fire"></i> 650 kcal</span>
+                  </div>
+                  <div class="meta-right">
+                    <div class="price">GHS <strong>85</strong></div>
+                    <div class="actions">
+                      <button class="btn ghost" data-action="view" data-modal-target="productModal" aria-haspopup="dialog">View</button>
+                      <button class="btn primary" data-action="add" data-item="Accra Crispy Chicken" data-price="85">Add</button>
+                    </div>
+                  </div>
                 </div>
               </div>
             </article>
 
-            <article class="food-card" data-name="Chicken Cheese" data-cat="burgers">
-              <img class="food-photo" src="/assets/menu/chicken-cheese.jpg" alt="Chicken Cheese">
-              <div class="food-meta">
-                <h4>Chicken Cheese</h4>
-                <p class="muted">Melted cheese, chicken patty, pickles.</p>
+            <article class="food-card"
+                     data-name="Double Beef Cheese"
+                     data-price="110"
+                     data-cat="burgers"
+                     data-images="images/menu/double-beef-cheese-1.jpg|images/menu/double-beef-cheese-2.jpg"
+                     data-options='{"sizes":{"Single":75,"Double":110},"extras":["Extra cheese","Onion rings"],"cal":920}'
+                     aria-label="Double Beef Cheese — GHS 110">
+              <div class="food-media">
+                <img src="images/menu/double-beef-cheese-1.jpg" alt="Double Beef Cheese" class="food-photo">
+                <div class="food-badges"><span class="badge best"><i class="fa fa-thumbs-up"></i></span></div>
               </div>
-              <div class="price-area">
-                <div class="price">GHS 90</div>
-                <div class="actions">
-                  <button class="btn-add" onclick="addToCart('Chicken Cheese',90)"><i class="fa fa-cart-plus"></i> Add</button>
+
+              <div class="food-body">
+                <h3 class="food-title">Double Beef Cheese</h3>
+                <p class="food-desc">Two flame-grilled patties, melted cheddar & smoky house sauce.</p>
+                <div class="meta-row">
+                  <div class="meta-left"><span class="rating"><i class="fa fa-star"></i> 4.9</span></div>
+                  <div class="meta-right">
+                    <div class="price">GHS <strong>110</strong></div>
+                    <div class="actions">
+                      <button class="btn ghost" data-action="view" data-modal-target="productModal">View</button>
+                      <button class="btn primary" data-action="add" data-item="Double Beef Cheese" data-price="110">Add</button>
+                    </div>
+                  </div>
                 </div>
               </div>
             </article>
 
-            <article class="food-card" data-name="BBQ Grilled Single Beef" data-cat="burgers">
-              <img class="food-photo" src="/assets/menu/bbq-grilled-beef.jpg" alt="BBQ Grilled Single Beef">
-              <div class="food-meta">
-                <h4>BBQ Grilled Single Beef</h4>
-                <p class="muted">Smoky BBQ sauce & caramelized onion.</p>
+            <!-- more burger cards (copy pattern) -->
+            <article class="food-card"
+                     data-name="Bacon & Beef Burger"
+                     data-price="115"
+                     data-cat="burgers"
+                     data-images="images/menu/bacon-beef-1.jpg|images/menu/bacon-beef-2.jpg"
+                     data-options='{"extras":["Extra bacon","Egg"],"cal":870}'
+                     aria-label="Bacon & Beef Burger — GHS 115">
+              <div class="food-media">
+                <img src="images/menu/bacon-beef-1.jpg" alt="Bacon & Beef Burger" class="food-photo">
+                <div class="food-badges"><span class="badge new"><i class="fa fa-star"></i></span></div>
               </div>
-              <div class="price-area">
-                <div class="price">GHS 80</div>
-                <div class="actions">
-                  <button class="btn-add" onclick="addToCart('BBQ Grilled Single Beef',80)"><i class="fa fa-cart-plus"></i> Add</button>
+
+              <div class="food-body">
+                <h3 class="food-title">Bacon & Beef Burger</h3>
+                <p class="food-desc">Smoky bacon, beef patty & caramelised onions.</p>
+                <div class="meta-row">
+                  <div class="meta-left"></div>
+                  <div class="meta-right">
+                    <div class="price">GHS <strong>115</strong></div>
+                    <div class="actions">
+                      <button class="btn ghost" data-action="view" data-modal-target="productModal">View</button>
+                      <button class="btn primary" data-action="add" data-item="Bacon & Beef Burger" data-price="115">Add</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </article>
+          </div> <!-- cards-grid -->
+        </section> <!-- Burgers -->
+
+        <!-- SECTION: Shawarma -->
+        <section class="menu-section" data-cat="shawarma" id="shawarma">
+          <header class="section-head">
+            <h2>Shawarma</h2>
+            <p class="section-sub">Hand-wrapped, thin-sliced meat & house sauces</p>
+          </header>
+
+          <div class="cards-grid">
+            <!-- Chicken Shawarma -->
+            <article class="food-card"
+                     data-name="Chicken Shawarma"
+                     data-price="75"
+                     data-cat="shawarma"
+                     data-images="images/menu/shawarma-chicken-1.jpg|images/menu/shawarma-chicken-2.jpg"
+                     data-options='{"extras":["Extra sauce","No garlic"],"cal":520}'
+                     aria-label="Chicken Shawarma — GHS 75">
+              <div class="food-media">
+                <img src="images/menu/shawarma-chicken-1.jpg" alt="Chicken Shawarma" class="food-photo">
+                <div class="food-badges"><span class="badge popular"><i class="fa fa-heart"></i></span></div>
+              </div>
+              <div class="food-body">
+                <h3 class="food-title">Chicken Shawarma</h3>
+                <p class="food-desc">Garlic sauce, fresh veg & warm flatbread.</p>
+                <div class="meta-row">
+                  <div class="meta-left"><span class="rating"><i class="fa fa-star"></i> 4.7</span></div>
+                  <div class="meta-right">
+                    <div class="price">GHS <strong>75</strong></div>
+                    <div class="actions">
+                      <button class="btn ghost" data-action="view" data-modal-target="productModal">View</button>
+                      <button class="btn primary" data-action="add" data-item="Chicken Shawarma" data-price="75">Add</button>
+                    </div>
+                  </div>
                 </div>
               </div>
             </article>
 
-            <article class="food-card" data-name="Double Beef Cheese" data-cat="burgers">
-              <img class="food-photo" src="/assets/menu/double-beef-cheese.jpg" alt="Double Beef Cheese">
-              <div class="food-meta">
-                <h4>Double Beef Cheese</h4>
-                <p class="muted">Two patties & double cheese for the hungry.</p>
-              </div>
-              <div class="price-area">
-                <div class="price">GHS 110</div>
-                <div class="actions">
-                  <button class="btn-add" onclick="addToCart('Double Beef Cheese',110)"><i class="fa fa-cart-plus"></i> Add</button>
+            <!-- Beef Shawarma -->
+            <article class="food-card"
+                     data-name="Beef Shawarma"
+                     data-price="75"
+                     data-cat="shawarma"
+                     data-images="images/menu/shawarma-beef-1.jpg|images/menu/shawarma-beef-2.jpg"
+                     data-options='{"extras":["Tahini","Spicy sauce"],"cal":560}'
+                     aria-label="Beef Shawarma — GHS 75">
+              <div class="food-media"><img src="images/menu/shawarma-beef-1.jpg" alt="Beef Shawarma" class="food-photo"></div>
+              <div class="food-body">
+                <h3 class="food-title">Beef Shawarma</h3>
+                <p class="food-desc">Spiced beef, tahini, pickles & fresh wrap.</p>
+                <div class="meta-row">
+                  <div class="meta-left"></div>
+                  <div class="meta-right">
+                    <div class="price">GHS <strong>75</strong></div>
+                    <div class="actions">
+                      <button class="btn ghost" data-action="view" data-modal-target="productModal">View</button>
+                      <button class="btn primary" data-action="add" data-item="Beef Shawarma" data-price="75">Add</button>
+                    </div>
+                  </div>
                 </div>
               </div>
             </article>
 
-            <article class="food-card" data-name="Bacon & Beef Burger" data-cat="burgers">
-              <img class="food-photo" src="/assets/menu/bacon-beef.jpg" alt="Bacon and Beef Burger">
-              <div class="food-meta">
-                <h4>Bacon & Beef Burger</h4>
-                <p class="muted">Smoky bacon, beef patty, house sauce.</p>
-              </div>
-              <div class="price-area">
-                <div class="price">GHS 115</div>
-                <div class="actions">
-                  <button class="btn-add" onclick="addToCart('Bacon & Beef Burger',115)"><i class="fa fa-cart-plus"></i> Add</button>
+            <!-- Basilissa Special Shawarma -->
+            <article class="food-card"
+                     data-name="Basilissa Special Shawarma"
+                     data-price="80"
+                     data-cat="shawarma"
+                     data-images="images/menu/shawarma-special-1.jpg|images/menu/shawarma-special-2.jpg|images/menu/shawarma-special-3.jpg"
+                     data-options='{"extras":["Shito"],"cal":600}'
+                     aria-label="Basilissa Special Shawarma — GHS 80">
+              <div class="food-media"><img src="images/menu/shawarma-special-1.jpg" alt="Special Shawarma" class="food-photo"></div>
+              <div class="food-body">
+                <h3 class="food-title">Basilissa Special</h3>
+                <p class="food-desc">Signature spice blend, special sauce & toasted wrap.</p>
+                <div class="meta-row">
+                  <div class="meta-left"><span class="badge chef"><i class="fa fa-award"></i></span></div>
+                  <div class="meta-right">
+                    <div class="price">GHS <strong>80</strong></div>
+                    <div class="actions">
+                      <button class="btn ghost" data-action="view" data-modal-target="productModal">View</button>
+                      <button class="btn primary" data-action="add" data-item="Basilissa Special Shawarma" data-price="80">Add</button>
+                    </div>
+                  </div>
                 </div>
               </div>
             </article>
           </div>
-        </section>
+        </section> <!-- Shawarma -->
 
-        <!-- Shawarma -->
-        <section class="section" data-cat="shawarma" id="shawarma">
-          <h3>Shawarma <span class="sub">Popular wraps</span></h3>
-          <div class="items-grid">
-            <article class="food-card" data-name="Chicken Shawarma" data-cat="shawarma">
-              <img class="food-photo" src="/assets/menu/shawarma-chicken.jpg" alt="Chicken Shawarma">
-              <div class="food-meta">
-                <h4>Chicken Shawarma</h4>
-                <p class="muted">Garlic sauce, fresh veg, warm wrap.</p>
-              </div>
-              <div class="price-area">
-                <div class="price">GHS 75</div>
-                <div class="actions">
-                  <button class="btn-add" onclick="addToCart('Chicken Shawarma',75)"><i class="fa fa-cart-plus"></i> Add</button>
+        <!-- SECTION: Chicken -->
+        <section class="menu-section" data-cat="chicken" id="chicken">
+          <header class="section-head">
+            <h2>Chicken</h2>
+            <p class="section-sub">Crispy, grilled & saucy — choose your size</p>
+          </header>
+
+          <div class="cards-grid">
+            <article class="food-card"
+                     data-name="Crispy Chicken (Full)"
+                     data-price="190"
+                     data-cat="chicken"
+                     data-images="images/menu/crispy-full-1.jpg|images/menu/crispy-full-2.jpg"
+                     data-options='{"sizes":{"Full":190,"Half":120,"Quarter":75},"cal":1200}'
+                     aria-label="Crispy Chicken — multiple sizes">
+              <div class="food-media"><img src="images/menu/crispy-full-1.jpg" alt="Crispy Chicken" class="food-photo"></div>
+              <div class="food-body">
+                <h3 class="food-title">Crispy Chicken</h3>
+                <p class="food-desc">Classic fried chicken with our secret buttermilk batter.</p>
+                <div class="meta-row">
+                  <div class="meta-left"></div>
+                  <div class="meta-right">
+                    <div class="price">GHS <strong>190</strong> / 120 / 75</div>
+                    <div class="actions">
+                      <button class="btn ghost" data-action="sizes" data-item="Crispy Chicken" data-sizes='{"Full":190,"1/2":120,"1/4":75}'>Sizes</button>
+                      <button class="btn primary" data-action="add" data-item="Crispy Chicken (Full)" data-price="190">Add</button>
+                    </div>
+                  </div>
                 </div>
               </div>
             </article>
 
-            <article class="food-card" data-name="Beef Shawarma" data-cat="shawarma">
-              <img class="food-photo" src="/assets/menu/shawarma-beef.jpg" alt="Beef Shawarma">
-              <div class="food-meta">
-                <h4>Beef Shawarma</h4>
-                <p class="muted">Spiced beef, tahini, pickles.</p>
-              </div>
-              <div class="price-area">
-                <div class="price">GHS 75</div>
-                <div class="actions">
-                  <button class="btn-add" onclick="addToCart('Beef Shawarma',75)"><i class="fa fa-cart-plus"></i> Add</button>
-                </div>
-              </div>
-            </article>
-
-            <article class="food-card" data-name="Vegetable Shawarma" data-cat="shawarma">
-              <img class="food-photo" src="/assets/menu/shawarma-veg.jpg" alt="Vegetable Shawarma">
-              <div class="food-meta">
-                <h4>Vegetable Shawarma</h4>
-                <p class="muted">Grilled veg, hummus, crisp lettuce.</p>
-              </div>
-              <div class="price-area">
-                <div class="price">GHS 70</div>
-                <div class="actions">
-                  <button class="btn-add" onclick="addToCart('Vegetable Shawarma',70)"><i class="fa fa-cart-plus"></i> Add</button>
-                </div>
-              </div>
-            </article>
-
-            <article class="food-card" data-name="Basilissa Special Shawarma" data-cat="shawarma">
-              <img class="food-photo" src="/assets/menu/shawarma-special.jpg" alt="Basilissa Special Shawarma">
-              <div class="food-meta">
-                <h4>Basilissa Special</h4>
-                <p class="muted">Signature spices & special sauce.</p>
-              </div>
-              <div class="price-area">
-                <div class="price">GHS 80</div>
-                <div class="actions">
-                  <button class="btn-add" onclick="addToCart('Basilissa Special Shawarma',80)"><i class="fa fa-cart-plus"></i> Add</button>
+            <!-- Spicy Wings -->
+            <article class="food-card"
+                     data-name="Spicy Wings"
+                     data-price="90"
+                     data-cat="chicken"
+                     data-images="images/menu/spicy-wings-1.jpg|images/menu/spicy-wings-2.jpg"
+                     data-options='{"tiers":{"8":90,"16":160,"24":220},"cal":820}'
+                     aria-label="Spicy Wings">
+              <div class="food-media"><img src="images/menu/spicy-wings-1.jpg" alt="Spicy Wings" class="food-photo"></div>
+              <div class="food-body">
+                <h3 class="food-title">Spicy Wings</h3>
+                <p class="food-desc">8 / 16 / 24 pieces — tossed in our signature spicy glaze.</p>
+                <div class="meta-row">
+                  <div class="meta-left"></div>
+                  <div class="meta-right">
+                    <div class="price">GHS <strong>90</strong> / 160 / 220</div>
+                    <div class="actions">
+                      <button class="btn ghost" data-action="sizes" data-item="Spicy Wings" data-sizes='{"8":90,"16":160,"24":220}'>Choose</button>
+                    </div>
+                  </div>
                 </div>
               </div>
             </article>
           </div>
-        </section>
+        </section> <!-- Chicken -->
 
-        <!-- Hotdog -->
-        <section class="section" data-cat="hotdog" id="hotdog">
-          <h3>Hotdog <span class="sub">Street snacks</span></h3>
-          <div class="items-grid">
-            <article class="food-card" data-name="Korean Hotdog" data-cat="hotdog">
-              <img class="food-photo" src="/assets/menu/korean-hotdog.jpg" alt="Korean Hotdog">
-              <div class="food-meta">
-                <h4>Korean Hotdog</h4>
-                <p class="muted">Crispy battered hotdog with sauce.</p>
-              </div>
-              <div class="price-area">
-                <div class="price">GHS 45</div>
-                <div class="actions"><button class="btn-add" onclick="addToCart('Korean Hotdog',45)"><i class="fa fa-cart-plus"></i> Add</button></div>
-              </div>
-            </article>
-          </div>
-        </section>
+        <!-- SECTION: Pizza (grid with large imagery for each row) -->
+        <section class="menu-section" data-cat="pizza" id="pizza">
+          <header class="section-head">
+            <h2>Pizza</h2>
+            <p class="section-sub">Stone-baked, bubbling cheese & signature toppings</p>
+          </header>
 
-        <!-- Chicken -->
-        <section class="section" data-cat="chicken" id="chicken">
-          <h3>Chicken <span class="sub">Crispy • Spicy • Grilled</span></h3>
-          <div class="items-grid">
-            <article class="food-card" data-name="Crispy Chicken" data-cat="chicken">
-              <img class="food-photo" src="/assets/menu/crispy-chicken.jpg" alt="Crispy Chicken">
-              <div class="food-meta">
-                <h4>Crispy Chicken</h4>
-                <p class="muted">Classic fried chicken — choose size.</p>
-              </div>
-              <div class="price-area">
-                <div class="price">GHS 190 / 120 / 75</div>
-                <div class="actions">
-                  <button class="btn-options" onclick="openSizeModal('Crispy Chicken',{Full:190,'1/2':120,'1/4':75})"><i class="fa fa-caret-down"></i> Sizes</button>
-                </div>
-              </div>
-            </article>
-
-            <article class="food-card" data-name="Spicy Chicken" data-cat="chicken">
-              <img class="food-photo" src="/assets/menu/spicy-chicken.jpg" alt="Spicy Chicken">
-              <div class="food-meta">
-                <h4>Spicy Chicken</h4>
-                <p class="muted">Hot & spicy seasoned chicken — choose size.</p>
-              </div>
-              <div class="price-area">
-                <div class="price">GHS 190 / 120 / 75</div>
-                <div class="actions">
-                  <button class="btn-options" onclick="openSizeModal('Spicy Chicken',{Full:190,'1/2':120,'1/4':75})"><i class="fa fa-caret-down"></i> Sizes</button>
-                </div>
-              </div>
-            </article>
-
-            <article class="food-card" data-name="Spicy Wings" data-cat="chicken">
-              <img class="food-photo" src="/assets/menu/spicy-wings.jpg" alt="Spicy Wings">
-              <div class="food-meta">
-                <h4>Spicy Wings</h4>
-                <p class="muted">8pcs • 16pcs • 24pcs</p>
-              </div>
-              <div class="price-area">
-                <div class="price">GHS 90 / 160 / 220</div>
-                <div class="actions"><button class="btn-options" onclick="openSizeModal('Spicy Wings',{8:90,16:160,24:220})"><i class="fa fa-caret-down"></i> Choose</button></div>
-              </div>
-            </article>
-          </div>
-        </section>
-
-        <!-- Combos -->
-        <section class="section" data-cat="combos" id="combos">
-          <h3>Combos <span class="sub">Chicken with chips or fried rice</span></h3>
-          <div class="items-grid">
-            <article class="food-card" data-name="Crispy Combo" data-cat="combos">
-              <img class="food-photo" src="/assets/menu/combo-crispy.jpg" alt="Crispy combo">
-              <div class="food-meta">
-                <h4>Crispy Combo</h4>
-                <p class="muted">Served with chips or rice. 1/2 • 1/4 options</p>
-              </div>
-              <div class="price-area">
-                <div class="price">GHS 150 / 100</div>
-                <div class="actions"><button class="btn-options" onclick="openSizeModal('Crispy Combo',{ '1/2':150, '1/4':100 })">Choose</button></div>
-              </div>
-            </article>
-
-            <article class="food-card" data-name="Spicy Combo" data-cat="combos">
-              <img class="food-photo" src="/assets/menu/combo-spicy.jpg" alt="Spicy combo">
-              <div class="food-meta">
-                <h4>Spicy Combo</h4>
-                <p class="muted">Served with chips or rice.</p>
-              </div>
-              <div class="price-area">
-                <div class="price">GHS 150 / 100</div>
-                <div class="actions"><button class="btn-add" onclick="openSizeModal('Spicy Combo',{ '1/2':150, '1/4':100 })">Choose</button></div>
-              </div>
-            </article>
-          </div>
-        </section>
-
-        <!-- Pizza -->
-        <section class="section" data-cat="pizza" id="pizza">
-          <h3>Pizza <span class="sub">Small • Medium • Large</span></h3>
           <div class="pizza-grid">
-            <!-- each row: name + price tiers + add -->
-            <div class="pizza-row">
-              <div style="font-weight:800">Ham</div>
-              <div class="pizza-prices">
-                <div class="muted">GHS 180</div>
-                <div class="muted">GHS 210</div>
-                <div class="muted">GHS 270</div>
-                <button class="btn-add" onclick="openSizeModal('Ham',{Small:180,Medium:210,Large:270})"><i class="fa fa-pizza-slice"></i> Customize</button>
-              </div>
-            </div>
-
-            <div class="pizza-row">
-              <div style="font-weight:800">Pepperoni</div>
-              <div class="pizza-prices">
-                <div class="muted">GHS 180</div>
-                <div class="muted">GHS 210</div>
-                <div class="muted">GHS 270</div>
-                <button class="btn-add" onclick="openSizeModal('Pepperoni',{Small:180,Medium:210,Large:270})"><i class="fa fa-pizza-slice"></i> Customize</button>
-              </div>
-            </div>
-
-            <div class="pizza-row">
-              <div style="font-weight:800">Basilissa Special</div>
-              <div class="pizza-prices">
-                <div class="muted">GHS 210</div>
-                <div class="muted">GHS 260</div>
-                <div class="muted">GHS 310</div>
-                <button class="btn-add" onclick="openSizeModal('Basilissa Special',{Small:210,Medium:260,Large:310})"><i class="fa fa-pizza-slice"></i> Customize</button>
-              </div>
-            </div>
-
-            <!-- more pizzas... (for brevity some are left out, replicate structure as needed) -->
-          </div>
-        </section>
-
-        <!-- Side Menu -->
-        <section class="section" data-cat="sides" id="sides">
-          <h3>Side Menu <span class="sub">Chips, rice & kids</span></h3>
-          <div class="list-rows">
-            <div class="list-row"><div>Vege Fried Rice</div><div><span class="muted">GHS 85</span>&nbsp;<button class="btn-add" onclick="addToCart('Vege Fried Rice',85)"><i class="fa fa-cart-plus"></i> Add</button></div></div>
-            <div class="list-row"><div>Beef Fried Rice</div><div><span class="muted">GHS 90</span>&nbsp;<button class="btn-add" onclick="addToCart('Beef Fried Rice',90)"><i class="fa fa-cart-plus"></i> Add</button></div></div>
-            <div class="list-row"><div>Chips</div><div><span class="muted">GHS 70</span>&nbsp;<button class="btn-add" onclick="addToCart('Chips',70)"><i class="fa fa-cart-plus"></i> Add</button></div></div>
-            <div class="list-row"><div>Kids Meal (2pc + rice/chips)</div><div><span class="muted">GHS 75</span>&nbsp;<button class="btn-add" onclick="addToCart('Kids Meal',75)"><i class="fa fa-cart-plus"></i> Add</button></div></div>
-          </div>
-        </section>
-
-        <!-- Beverages -->
-        <section class="section" data-cat="bev" id="beverages">
-          <h3>Beverage & Snacks <span class="sub">Juices • Smoothies • Coffee • Pastries</span></h3>
-          <div class="items-grid">
-            <article class="food-card" data-name="Mango Smoothie" data-cat="bev">
-              <img class="food-photo" src="/assets/menu/smoothie-mango.jpg" alt="Mango Smoothie">
-              <div class="food-meta">
-                <h4>Mango Smoothie</h4>
-                <p class="muted">Fresh mango, yogurt, honey.</p>
-              </div>
-              <div class="price-area">
-                <div class="price">GHS 50</div>
-                <div class="actions"><button class="btn-add" onclick="addToCart('Mango Smoothie',50)"><i class="fa fa-cart-plus"></i> Add</button></div>
+            <article class="pizza-card" data-name="Basilissa Special Pizza" data-cat="pizza"
+                     data-images="images/menu/pizza-special-1.jpg|images/menu/pizza-special-2.jpg"
+                     data-options='{"sizes":{"Small":210,"Medium":260,"Large":310},"toppings":["Extra cheese","Pepperoni","Mushrooms"]}'>
+              <div class="pizza-media"><img src="images/menu/pizza-special-1.jpg" alt="Basilissa Special Pizza"></div>
+              <div class="pizza-body">
+                <h3>Basilissa Special</h3>
+                <p class="food-desc">Roasted peppers, pepperoni, fresh basil & bubbling mozzarella.</p>
+                <div class="pizza-actions">
+                  <button class="btn ghost" data-action="view" data-modal-target="productModal">Preview</button>
+                  <button class="btn primary" data-action="customize" data-item="Basilissa Special Pizza">Customize</button>
+                </div>
               </div>
             </article>
 
-            <article class="food-card" data-name="Gelato" data-cat="bev">
-              <img class="food-photo" src="/assets/menu/gelato.jpg" alt="Gelato">
-              <div class="food-meta">
-                <h4>Gelato (any flavour)</h4>
-                <p class="muted">Creamy scoops of gelato.</p>
-              </div>
-              <div class="price-area">
-                <div class="price">GHS 45</div>
-                <div class="actions"><button class="btn-add" onclick="addToCart('Gelato',45)"><i class="fa fa-cart-plus"></i> Add</button></div>
-              </div>
-            </article>
-
-            <article class="food-card" data-name="Espresso" data-cat="bev">
-              <img class="food-photo" src="/assets/menu/coffee.jpg" alt="Espresso">
-              <div class="food-meta">
-                <h4>Espresso</h4>
-                <p class="muted">Strong & aromatic.</p>
-              </div>
-              <div class="price-area">
-                <div class="price">GHS 30</div>
-                <div class="actions"><button class="btn-add" onclick="addToCart('Espresso',30)"><i class="fa fa-cart-plus"></i> Add</button></div>
+            <!-- smaller pizza rows -->
+            <article class="pizza-card" data-name="Pepperoni" data-cat="pizza" data-images="images/menu/pizza-pepperoni.jpg" data-options='{"sizes":{"Small":180,"Medium":210,"Large":270}}'>
+              <div class="pizza-media"><img src="images/menu/pizza-pepperoni.jpg" alt="Pepperoni"></div>
+              <div class="pizza-body">
+                <h3>Pepperoni</h3>
+                <div class="pizza-actions">
+                  <button class="btn ghost" data-action="view">Preview</button>
+                  <button class="btn primary" data-action="customize" data-item="Pepperoni Pizza">Customize</button>
+                </div>
               </div>
             </article>
           </div>
-        </section>
-      </div>
+        </section> <!-- Pizza -->
+
+        <!-- SECTION: Sides -->
+        <section class="menu-section" data-cat="sides" id="sides">
+          <header class="section-head">
+            <h2>Sides</h2>
+            <p class="section-sub">Shareable sides & add-ons</p>
+          </header>
+
+          <div class="sides-grid">
+            <article class="side-card" data-name="Loaded Fries" data-price="38" data-images="images/menu/loaded-fries-1.jpg">
+              <img src="images/menu/loaded-fries-1.jpg" alt="Loaded Fries">
+              <div class="side-body">
+                <h4>Loaded Fries</h4>
+                <p class="muted">Cheesy, peppered & herbed — perfect with burgers.</p>
+                <div class="actions"><button class="btn primary" data-action="add" data-item="Loaded Fries" data-price="38">Add</button></div>
+              </div>
+            </article>
+
+            <article class="side-card" data-name="Chips" data-price="25" data-images="images/menu/chips.jpg">
+              <img src="images/menu/chips.jpg" alt="Chips">
+              <div class="side-body">
+                <h4>Chips</h4>
+                <p class="muted">Crispy salted chips.</p>
+                <div class="actions"><button class="btn primary" data-action="add" data-item="Chips" data-price="25">Add</button></div>
+              </div>
+            </article>
+          </div>
+        </section> <!-- Sides -->
+
+        <!-- SECTION: Beverages -->
+        <section class="menu-section" data-cat="bev" id="beverages">
+          <header class="section-head">
+            <h2>Beverages & Desserts</h2>
+            <p class="section-sub">Juices, smoothies, coffee & sweet treats</p>
+          </header>
+
+          <div class="cards-grid">
+            <article class="food-card"
+                     data-name="Mango & Basil Smoothie"
+                     data-price="50"
+                     data-cat="bev"
+                     data-images="images/menu/smoothie-mango-1.jpg|images/menu/smoothie-mango-2.jpg"
+                     data-options='{"cal":320}' aria-label="Mango Smoothie — GHS 50">
+              <div class="food-media"><img src="images/menu/smoothie-mango-1.jpg" alt="Mango Smoothie" class="food-photo"></div>
+              <div class="food-body">
+                <h3 class="food-title">Mango & Basil Smoothie</h3>
+                <p class="food-desc">Fresh mangoes, basil & yogurt for a bright finish.</p>
+                <div class="meta-row">
+                  <div class="meta-left"></div>
+                  <div class="meta-right">
+                    <div class="price">GHS <strong>50</strong></div>
+                    <div class="actions">
+                      <button class="btn ghost" data-action="view" data-modal-target="productModal">View</button>
+                      <button class="btn primary" data-action="add" data-item="Mango Smoothie" data-price="50">Add</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </article>
+
+            <article class="food-card"
+                     data-name="Gelato Scoop"
+                     data-price="45"
+                     data-cat="bev"
+                     data-images="images/menu/gelato-1.jpg|images/menu/gelato-2.jpg"
+                     data-options='{"flavours":["Vanilla","Chocolate","Mango"],"cal":180}'>
+              <div class="food-media"><img src="images/menu/gelato-1.jpg" alt="Gelato" class="food-photo"></div>
+              <div class="food-body">
+                <h3 class="food-title">Gelato (any flavour)</h3>
+                <p class="food-desc">Creamy scoops of gelato made in-house.</p>
+                <div class="meta-row">
+                  <div class="meta-left"></div>
+                  <div class="meta-right">
+                    <div class="price">GHS <strong>45</strong></div>
+                    <div class="actions">
+                      <button class="btn ghost" data-action="view">View</button>
+                      <button class="btn primary" data-action="add" data-item="Gelato" data-price="45">Add</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </article>
+          </div>
+        </section> <!-- Beverages -->
+      </div> <!-- menu-sections -->
     </section>
   </main>
 
-  <!-- CART PANEL -->
-  <div class="cart-panel" id="cartPanel" aria-hidden="true" role="dialog" aria-label="Cart">
-    <div style="display:flex;justify-content:space-between;align-items:center">
-      <h4>Your cart</h4>
-      <button onclick="toggleCart()" style="background:transparent;border:0;color:var(--muted);font-weight:800;cursor:pointer"><i class="fa fa-times"></i></button>
+  <!-- ====== GALLERY: lots of images (masonry placeholders) ====== -->
+  <section id="gallery" class="container gallery-section" aria-label="Food gallery">
+    <h2>Mouthwatering Moments</h2>
+    <div class="masonry">
+      <figure class="masonry-item"><img src="images/gallery/1.jpg" alt="Wings closeup"></figure>
+      <figure class="masonry-item"><img src="images/gallery/2.jpg" alt="Shawarma wrap"></figure>
+      <figure class="masonry-item"><img src="images/gallery/3.jpg" alt="Loaded fries"></figure>
+      <figure class="masonry-item"><img src="images/gallery/4.jpg" alt="Pizza pull"></figure>
+      <figure class="masonry-item"><img src="images/gallery/5.jpg" alt="Family dining"></figure>
+      <figure class="masonry-item"><img src="images/gallery/6.jpg" alt="Desserts"></figure>
     </div>
-    <div id="cartItemsList" style="margin-top:12px;max-height:420px;overflow:auto"></div>
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px">
-      <div class="muted">Subtotal</div>
-      <div id="cartTotal" style="font-weight:900">GHS 0</div>
+  </section>
+
+  <!-- ====== TESTIMONIALS / TRUST ====== -->
+  <section id="social-proof" class="container testimonials" aria-label="Customer testimonials">
+    <h2>Why people love Basilissa</h2>
+    <div class="testimonials">
+      <blockquote class="testimonial"><img src="images/customers/1.jpg" alt="Customer"><p>"Fast delivery and the shawarma tastes home-made!"</p><cite>— Ama S.</cite></blockquote>
+      <blockquote class="testimonial"><img src="images/customers/2.jpg" alt="Customer"><p>"The family bucket is perfect for parties. Great value."</p><cite>— Daniel K.</cite></blockquote>
+      <blockquote class="testimonial"><img src="images/customers/3.jpg" alt="Customer"><p>"Consistent quality and amazing flavors every time."</p><cite>— Sarah N.</cite></blockquote>
     </div>
-    <div class="cart-footer">
-      <button class="checkout-btn" onclick="checkout()">Checkout</button>
+  </section>
+
+  <!-- ====== FAQ / Contact quick ====== -->
+  <section id="faq-contact" class="container faq-section" aria-label="FAQ and contact">
+    <div class="faq-grid">
+      <div class="faq-panel">
+        <h3>Frequently Asked</h3>
+        <details open><summary>Do you deliver?</summary><p>Yes — we deliver across Accra and surrounding areas. Delivery fees apply.</p></details>
+        <details><summary>Event & catering?</summary><p>Yes — book our catering team for events. Contact sales@basilissa.com.</p></details>
+        <details><summary>Allergens & dietary</summary><p>We label common allergens in each product — check the product modal for details.</p></details>
+      </div>
+
+      <div class="contact-panel">
+        <h3>Quick Contact</h3>
+        <div class="contact-cards">
+          <div class="contact-card">
+            <img src="images/contact/store.jpg" alt="Store">
+            <div><strong>Accra Mall</strong><p class="muted">Open daily 9:00 – 23:00</p></div>
+          </div>
+          <div class="contact-card">
+            <img src="images/contact/catering.jpg" alt="Catering">
+            <div><strong>Catering</strong><p class="muted">events@basilissa.com</p></div>
+          </div>
+        </div>
+
+        <form class="contact-mini" action="#" aria-label="Contact form">
+          <label class="sr-only" for="quickName">Name</label>
+          <input id="quickName" name="name" placeholder="Your name" />
+          <label class="sr-only" for="quickPhone">Phone</label>
+          <input id="quickPhone" name="phone" placeholder="Phone or WhatsApp" />
+          <button class="btn primary" type="submit">Send</button>
+        </form>
+      </div>
     </div>
+  </section>
+
+  <!-- ====== FLOATING CTAS: cart + whatsapp + order ====== -->
+  <div class="floating-ctas" aria-hidden="false">
+    <button class="fab cart-fab" id="floatingCart" aria-label="Open cart"><i class="fa fa-shopping-bag"></i><span class="count" id="fabCount">0</span></button>
+    <a class="fab wa-fab" href="https://wa.me/233240000000" aria-label="Order on WhatsApp" target="_blank" rel="noopener"><i class="fa fa-whatsapp"></i></a>
+    <button class="fab quick-order" aria-label="Quick order" data-action="quick-order"><i class="fa fa-bolt"></i></button>
   </div>
 
-  <!-- MODAL: options & pizza customizer -->
-  <div class="modal-backdrop" id="modalBackdrop" aria-hidden="true">
-    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-      <div style="display:flex;justify-content:space-between;align-items:center">
-        <h3 id="modalTitle">Customize</h3>
-        <button onclick="closeModal()" style="background:transparent;border:0;color:var(--muted);font-weight:800;cursor:pointer"><i class="fa fa-times"></i></button>
-      </div>
-      <div id="modalBody" style="margin-top:12px"></div>
-      <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:12px">
-        <button class="btn-options" onclick="closeModal()">Cancel</button>
-        <button class="btn-add" id="modalAddBtn"><i class="fa fa-cart-plus"></i> Add to cart</button>
-      </div>
+  <!-- ====== CART DRAWER (skeleton) ====== -->
+  <aside id="cartDrawer" class="cart-drawer" aria-hidden="true" role="dialog" aria-label="Shopping cart">
+    <header class="drawer-head">
+      <h3>Your Order</h3>
+      <button class="close-drawer" aria-label="Close cart"><i class="fa fa-times"></i></button>
+    </header>
+    <div class="drawer-body" id="drawerItems" tabindex="0" aria-live="polite">
+      <!-- JS will populate items -->
+      <div class="empty-cart">Your cart is empty — add something tasty!</div>
     </div>
-  </div>
-
-<script>
-/* ---------------------------
-   Promo carousel
----------------------------- */
-(function promo(){
-  const slides = Array.from(document.querySelectorAll('.promo-slide'));
-  const dots = Array.from(document.querySelectorAll('.dot'));
-  let idx = 0, timer = null;
-  function show(n){
-    slides.forEach((s,i)=> s.style.display = i === n ? 'flex' : 'none');
-    dots.forEach((d,i)=> d.classList.toggle('active', i===n));
-    idx = n;
-  }
-  function next(){ show((idx+1)%slides.length); }
-  dots.forEach(d => d.addEventListener('click', ()=> { show(Number(d.dataset.dot)); reset(); }));
-  timer = setInterval(next, 4500);
-  function reset(){ clearInterval(timer); timer = setInterval(next,4500); }
-  show(0);
-})();
-
-/* ---------------------------
-   Basic cart (client-side)
----------------------------- */
-const cart = { items: [] };
-const cartCountEl = document.getElementById('cartCount');
-const cartPanel = document.getElementById('cartPanel');
-function updateCartBadge(){
-  const count = cart.items.reduce((s,i)=>s.qty + s,0);
-  cartCountEl.textContent = count;
-  cartCountEl.style.display = count === 0 ? 'none' : 'flex';
-  // subtle pulse
-  cartCountEl.animate([{transform:'scale(1)'},{transform:'scale(1.12)'},{transform:'scale(1)'}],{duration:350});
-}
-function addToCart(name, price, opts){
-  const found = cart.items.find(i => i.name === name && JSON.stringify(i.opts||{}) === JSON.stringify(opts||{}));
-  if(found) found.qty += 1; else cart.items.push({name, price, qty:1, opts: opts || {}});
-  renderCart();
-  toast(`${name} added to cart`);
-}
-function renderCart(){
-  const list = document.getElementById('cartItemsList');
-  list.innerHTML = '';
-  if(cart.items.length === 0) list.innerHTML = '<div class="muted">Your cart is empty</div>';
-  cart.items.forEach((it, idx) => {
-    const row = document.createElement('div');
-    row.className = 'cart-item';
-    row.innerHTML = `
-      <img class="mini" src="/assets/menu/placeholder-mini.jpg" style="width:56px;height:40px;border-radius:8px;object-fit:cover;margin-right:8px" alt="">
-      <div style="flex:1">
-        <div style="font-weight:800">${it.name}</div>
-        <div class="muted" style="font-size:13px">${Object.entries(it.opts||{}).map(k=>k.join(': ')).join(' • ') || ''}</div>
+    <footer class="drawer-foot">
+      <div class="totals"><span>Subtotal</span><strong id="drawerSubtotal">GHS 0</strong></div>
+      <div class="drawer-actions">
+        <button class="btn ghost" data-action="save">Save for later</button>
+        <button class="btn primary" data-action="checkout">Checkout</button>
       </div>
-      <div style="text-align:right">
-        <div style="font-weight:900">GHS ${it.price * it.qty}</div>
-        <div style="display:flex;gap:6px;align-items:center;justify-content:flex-end;margin-top:8px">
-          <button onclick="changeQty(${idx}, -1)" class="btn-options">−</button>
-          <div style="min-width:26px;text-align:center">${it.qty}</div>
-          <button onclick="changeQty(${idx}, 1)" class="btn-options">+</button>
+    </footer>
+  </aside>
+
+  <!-- ====== PRODUCT / ITEM MODAL (single reusable modal) ======
+       - Will be populated by JS when user clicks "View" or "Customize".
+       - Contains: image carousel, price + size selectors, toppings toggles, nutrition panel,
+         allergen icons, reviews preview, recommended pairings, quantity, add-to-cart
+  -->
+  <div id="productModal" class="modal-backdrop" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="productModalTitle">
+    <div class="modal-panel" role="document">
+      <header class="modal-head">
+        <h2 id="productModalTitle">Item name</h2>
+        <button class="modal-close" aria-label="Close modal"><i class="fa fa-times"></i></button>
+      </header>
+
+      <div class="modal-grid">
+        <!-- Image carousel (many images) -->
+        <div class="modal-media">
+          <div class="modal-carousel" data-animate="modal-carousel">
+            <img src="images/product-placeholder.jpg" alt="" class="modal-img main" id="modalMainImg">
+            <div class="modal-thumbs">
+              <img src="images/product-placeholder-thumb.jpg" alt="" class="thumb" data-src="">
+              <!-- JS will fill thumbnails -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: details, customizers & actions -->
+        <div class="modal-body" id="modalDetails">
+          <div class="modal-meta">
+            <div class="modal-price" id="modalPrice">GHS 0</div>
+            <div class="modal-rating"><i class="fa fa-star"></i> <span id="modalRating">4.8</span> • <span id="modalReviewCount">124 reviews</span></div>
+          </div>
+
+          <p class="modal-desc" id="modalDesc">Full description goes here — ingredients, story, chef note.</p>
+
+          <!-- size / price selector -->
+          <div class="modal-section">
+            <h4>Size & Price</h4>
+            <div class="options-row" id="modalSizes" role="radiogroup" aria-label="Size options">
+              <!-- JS will render radio buttons for sizes -->
+            </div>
+          </div>
+
+          <!-- toppings / extras -->
+          <div class="modal-section">
+            <h4>Toppings & Extras</h4>
+            <div class="options-grid" id="modalToppings">
+              <!-- JS will render toggles (each shows small image & price) -->
+            </div>
+          </div>
+
+          <!-- nutrition & allergens -->
+          <div class="modal-section nutrition">
+            <h4>Nutrition & Allergens</h4>
+            <div class="nutrition-row">
+              <div class="nut"><strong id="modalCals">520</strong> kcal</div>
+              <div class="allergens" id="modalAllergens">
+                <span title="Contains gluten"><i class="fa fa-bread-slice"></i></span>
+                <span title="Contains dairy"><i class="fa fa-cheese"></i></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- recommended pairings -->
+          <div class="modal-section">
+            <h4>Recommended Pairings</h4>
+            <div class="pairings">
+              <button class="pair" data-item="Loaded Fries" data-price="38"><img src="images/pairings/fries-thumb.jpg" alt=""> Fries <small>GHS 38</small></button>
+              <button class="pair" data-item="Mango Smoothie" data-price="50"><img src="images/pairings/smoothie-thumb.jpg" alt=""> Smoothie <small>GHS 50</small></button>
+            </div>
+          </div>
+
+          <!-- quantity + add -->
+          <div class="modal-actions">
+            <div class="qty">
+              <label for="modalQty" class="sr-only">Quantity</label>
+              <div class="qty-controls">
+                <button class="btn ghost" data-action="dec">−</button>
+                <input id="modalQty" type="number" min="1" value="1" />
+                <button class="btn ghost" data-action="inc">+</button>
+              </div>
+            </div>
+
+            <div class="add-row">
+              <button class="btn ghost" data-action="save-wishlist"><i class="fa fa-heart"></i> Save</button>
+              <button class="btn primary" id="modalAddToCart"><i class="fa fa-cart-plus"></i> Add to cart</button>
+            </div>
+          </div>
+
+          <!-- reviews snapshot -->
+          <div class="modal-section reviews">
+            <h4>Customer Reviews</h4>
+            <div class="review-list">
+              <div class="review"><strong>Ama</strong><span class="muted">• 5.0</span><p>Fantastic flavor — my favorite.</p></div>
+              <div class="review"><strong>Daniel</strong><span class="muted">• 4.8</span><p>Family loved it. Great portions.</p></div>
+              <a href="#reviews" class="muted small">See all reviews</a>
+            </div>
+          </div>
         </div>
       </div>
-    `;
-    list.appendChild(row);
-  });
-  const total = cart.items.reduce((s,i)=> s + i.price*i.qty, 0);
-  document.getElementById('cartTotal').textContent = 'GHS ' + total;
-  updateCartBadge();
-}
-function changeQty(idx, delta){
-  cart.items[idx].qty += delta;
-  if(cart.items[idx].qty <= 0) cart.items.splice(idx,1);
-  renderCart();
-}
-function toggleCart(){ cartPanel.classList.toggle('open'); cartPanel.style.display = cartPanel.classList.contains('open') ? 'block' : 'none'; }
-function openCart(){ cartPanel.classList.add('open'); cartPanel.style.display='block'; }
-function closeCart(){ cartPanel.classList.remove('open'); cartPanel.style.display='none'; }
-document.getElementById('cartButton').addEventListener('click', ()=>{ openCart(); });
-
-function checkout(){
-  if(cart.items.length === 0) { alert('Your cart is empty'); return; }
-  // replace with real checkout integration
-  alert('Proceeding to checkout — integrate payment gateway here.');
-}
-
-/* ---------------------------
-   Toast helper
----------------------------- */
-function toast(msg){
-  const t = document.createElement('div');
-  t.textContent = msg;
-  t.style.position = 'fixed';
-  t.style.right = '22px';
-  t.style.bottom = '110px';
-  t.style.background = 'linear-gradient(90deg,var(--basil), #0b9a5a)';
-  t.style.color = 'white';
-  t.style.padding = '10px 14px';
-  t.style.borderRadius = '8px';
-  t.style.boxShadow = '0 12px 40px rgba(0,0,0,0.4)';
-  t.style.zIndex = 2000;
-  document.body.appendChild(t);
-  t.animate([{opacity:0, transform:'translateY(8px)'},{opacity:1, transform:'translateY(0)'}],{duration:220});
-  setTimeout(()=> { t.animate([{opacity:1},{opacity:0, transform:'translateY(8px)'}],{duration:220}); setTimeout(()=>t.remove(),220); },1400);
-}
-
-/* ---------------------------
-   Add flavour: image fly-to-cart animation
----------------------------- */
-function animateFly(imgEl){
-  if(!imgEl) return;
-  const fly = imgEl.cloneNode(true);
-  const r = imgEl.getBoundingClientRect();
-  fly.style.position = 'fixed';
-  fly.style.left = r.left + 'px';
-  fly.style.top = r.top + 'px';
-  fly.style.width = r.width + 'px';
-  fly.style.height = r.height + 'px';
-  fly.style.borderRadius = getComputedStyle(imgEl).borderRadius;
-  fly.style.opacity = '0.95';
-  fly.style.zIndex = '9999';
-  document.body.appendChild(fly);
-  const cartBtn = document.getElementById('cartButton').getBoundingClientRect();
-  fly.animate([
-    { transform: 'translateZ(0) scale(1)', left: r.left + 'px', top: r.top + 'px', opacity:1 },
-    { transform: `translate(${cartBtn.left - r.left}px, ${cartBtn.top - r.top}px) scale(.2)`, opacity:0.2 }
-  ], { duration: 700, easing: 'cubic-bezier(.2,.8,.2,1)' });
-  setTimeout(()=>fly.remove(),750);
-}
-
-/* ---------------------------
-   Options modal (generic) — used for pizza & other choices
----------------------------- */
-const modalBackdrop = document.getElementById('modalBackdrop');
-const modalBody = document.getElementById('modalBody');
-const modalAddBtn = document.getElementById('modalAddBtn');
-let modalState = { name:'', basePrice:0, chosen: {}, photo: '' };
-
-function openOptions(buttonEl, name, price, options = []){
-  modalState = { name, basePrice: price, chosen: {}, photo: '' };
-  modalBody.innerHTML = `<p class="muted">Options for <strong>${name}</strong></p>`;
-  if(options.length){
-    modalBody.innerHTML += `<div style="margin-top:10px" id="optList"></div>`;
-    const list = document.getElementById('optList');
-    options.forEach(opt => {
-      const btn = document.createElement('button');
-      btn.className = 'variant';
-      btn.textContent = opt;
-      btn.onclick = () => {
-        // toggle single option
-        modalState.chosen[opt] = modalState.chosen[opt] ? false : true;
-        btn.classList.toggle('active', !!modalState.chosen[opt]);
-      };
-      list.appendChild(btn);
-    });
-  } else {
-    modalBody.innerHTML += `<div class="muted">No extra options. Click Add to put in cart.</div>`;
-  }
-  modalAddBtn.onclick = () => {
-    addToCart(modalState.name, modalState.basePrice, modalState.chosen);
-    closeModal();
-  };
-  showModal();
-}
-
-function openPizzaModalSample(){
-  // quick demo pizza customization
-  modalState = { name: 'Basilissa Special Pizza', basePrice: 75, chosen: {}, photo:'' };
-  modalBody.innerHTML = `<p class="muted">Customize your pizza — choose size & toppings</p>
-    <div style="margin-top:12px"><strong>Size</strong>
-      <div class="variant-row" id="sizeOptions"></div>
     </div>
-    <div style="margin-top:12px"><strong>Toppings</strong>
-      <div class="variant-row" id="toppings"></div>
-    </div>`;
-  const sizes = { Small:75, Medium:110, Large:140 };
-  const toppings = ['Extra Cheese','Pepperoni','Mushroom','Onion','Olives','Basil'];
-  const sizeContainer = document.getElementById('sizeOptions');
-  for(const k in sizes){
-    const b = document.createElement('button'); b.className='variant'; b.textContent = `${k} — GHS ${sizes[k]}`;
-    b.onclick = ()=> {
-      document.querySelectorAll('#sizeOptions .variant').forEach(x=>x.classList.remove('active'));
-      b.classList.add('active'); modalState.chosen.size = k; modalState.basePrice = sizes[k];
-      updateModalPrice();
-    };
-    sizeContainer.appendChild(b);
-  }
-  const toppingsContainer = document.getElementById('toppings');
-  toppings.forEach(t => {
-    const b = document.createElement('button'); b.className='variant'; b.textContent = t;
-    b.onclick = ()=> { modalState.chosen[t] = !modalState.chosen[t]; b.classList.toggle('active', !!modalState.chosen[t]); updateModalPrice(); };
-    toppingsContainer.appendChild(b);
-  });
-  modalAddBtn.onclick = () => {
-    // calculate extra toppings cost: 6 per topping
-    const toppingCount = Object.keys(modalState.chosen).filter(k => modalState.chosen[k] && k !== 'size').length;
-    const totalPrice = modalState.basePrice + toppingCount * 6;
-    addToCart(`${modalState.name} (${modalState.chosen.size || 'Medium'})`, totalPrice, { toppings: toppingCount });
-    closeModal();
-  };
-  showModal();
-}
-function openSizeModal(name, options){
-  modalState = { name, basePrice:0, chosen:{}, photo:'' };
-  modalBody.innerHTML = `<p class="muted">Choose a size for <strong>${name}</strong></p><div class="variant-row" id="sizeOpts" style="margin-top:8px"></div>`;
-  const c = document.getElementById('sizeOpts');
-  for(const key in options){
-    const btn = document.createElement('button'); btn.className='variant'; btn.textContent = `${key} — GHS ${options[key]}`;
-    btn.onclick = ()=>{
-      document.querySelectorAll('#sizeOpts .variant').forEach(x=>x.classList.remove('active'));
-      btn.classList.add('active');
-      modalState.chosen.size = key;
-      modalState.basePrice = options[key];
-    };
-    c.appendChild(btn);
-  }
-  modalAddBtn.onclick = ()=> {
-    if(!modalState.chosen.size){ alert('Please choose a size'); return; }
-    addToCart(`${modalState.name} (${modalState.chosen.size})`, modalState.basePrice);
-    closeModal();
-  };
-  showModal();
-}
+  </div>
 
-function showModal(){ modalBackdrop.style.display = 'flex'; modalBackdrop.setAttribute('aria-hidden','false'); document.body.style.overflow='hidden'; }
-function closeModal(){ modalBackdrop.style.display = 'none'; modalBackdrop.setAttribute('aria-hidden','true'); document.body.style.overflow=''; }
+  <!-- ====== FOOTER (image + trust) ====== -->
+  <footer class="site-footer container" role="contentinfo" aria-label="Footer">
+    <div class="footer-grid">
+      <div class="footer-about">
+        <img src="images/logo-white.png" alt="Basilissa" class="logo-footer">
+        <p>We craft craveable food using fresh ingredients and passionate chefs.</p>
+        <div class="trust-logos">
+          <img src="images/trust/visa.svg" alt="Visa">
+          <img src="images/trust/mastercard.svg" alt="Mastercard">
+          <img src="images/trust/gereporter.svg" alt="Local award">
+        </div>
+      </div>
 
-/* ---------------------------
-   Utilities: search, category filters, scroll
----------------------------- */
-document.querySelectorAll('.cat-btn').forEach(btn=>{
-  btn.addEventListener('click', ()=> {
-    document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('active'));
-    btn.classList.add('active');
-    const cat = btn.dataset.cat;
-    document.querySelectorAll('.section').forEach(sec => {
-      if(cat === 'all') sec.style.display = 'block';
-      else sec.style.display = sec.dataset.cat === cat ? 'block' : 'none';
-    });
-    window.scrollTo({top: document.querySelector('#menu-main').offsetTop - 90, behavior:'smooth'});
-  });
-});
+      <div class="footer-gallery">
+        <h4>Instagram</h4>
+        <div class="insta-grid">
+          <img src="images/insta/1.jpg" alt="">
+          <img src="images/insta/2.jpg" alt="">
+          <img src="images/insta/3.jpg" alt="">
+          <img src="images/insta/4.jpg" alt="">
+        </div>
+      </div>
 
-document.getElementById('search').addEventListener('input', e=>{
-  const q = e.target.value.trim().toLowerCase();
-  document.querySelectorAll('.food-card').forEach(card=>{
-    const name = card.dataset.name.toLowerCase();
-    const cat = card.dataset.cat.toLowerCase();
-    const txt = (card.querySelector('.food-meta p')?.textContent || '').toLowerCase();
-    card.style.display = (!q || name.includes(q) || txt.includes(q) || cat.includes(q)) ? 'grid' : 'none';
-  });
-});
-function resetFilters(){ document.getElementById('search').value = ''; document.querySelectorAll('.food-card').forEach(c=>c.style.display='grid'); document.querySelectorAll('.section').forEach(s=>s.style.display='block'); document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('active')); document.querySelector('.cat-btn[data-cat="all"]').classList.add('active'); }
+      <div class="footer-contact">
+        <h4>Contact</h4>
+        <p><i class="fa fa-phone"></i> +233 24 000 0000</p>
+        <p><i class="fa fa-map-marker-alt"></i> Accra Mall, Accra</p>
+        <a class="btn ghost" href="#menu-main">Order Online</a>
+      </div>
+    </div>
 
-function scrollToSection(id){
-  const el = document.getElementById(id);
-  if(!el) return;
-  window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 90, behavior:'smooth' });
-}
+    <div class="footer-legal">
+      <small>© <span id="year">2025</span> Basilissa — All rights reserved.</small>
+      <div class="footer-links"><a href="/privacy">Privacy</a> · <a href="/terms">Terms</a></div>
+    </div>
+  </footer>
 
-/* ---------------------------
-   Small helpers for options & UI
----------------------------- */
-function openModalWithContent(title, html, onConfirm){
-  modalState = {}; modalBody.innerHTML = html; document.getElementById('modalTitle').textContent = title;
-  modalAddBtn.onclick = ()=>{ onConfirm(); closeModal(); };
-  showModal();
-}
 
-/* ---------------------------
-   Init
----------------------------- */
-renderCart();
-updateCartBadge();
-document.addEventListener('keydown', (e)=> { if(e.key === 'Escape') { closeModal(); closeCart(); } });
-
-</script>
 </body>
+  <script>
+
+
+(function () {
+  'use strict';
+
+  /* -----------------------
+     Utility helpers
+  ----------------------- */
+  const $ = (sel, root = document) => root.querySelector(sel);
+  const $$ = (sel, root = document) => Array.from((root || document).querySelectorAll(sel));
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+  function safeJSONParse(str, fallback = null) {
+    try { return JSON.parse(str); } catch (e) { return fallback; }
+  }
+  function elData(el, key) {
+    if (!el) return null;
+    // prefer getAttribute to preserve original JSON formatting
+    return el.getAttribute('data-' + key);
+  }
+
+  /* -----------------------
+     Toast helper
+  ----------------------- */
+  function toast(msg, opts = {}) {
+    const t = document.createElement('div');
+    t.className = 'bs-toast';
+    t.textContent = msg;
+    Object.assign(t.style, {
+      position: 'fixed', right: '22px', bottom: (opts.bottom || 90) + 'px',
+      background: 'linear-gradient(90deg,#0b9a5a,#0f6b3a)', color: '#fff',
+      padding: '10px 14px', borderRadius: '10px', boxShadow: '0 12px 40px rgba(0,0,0,0.4)',
+      zIndex: 99999, fontWeight: 800
+    });
+    document.body.appendChild(t);
+    t.animate([{opacity:0, transform:'translateY(6px)'},{opacity:1, transform:'translateY(0)'}], {duration:220});
+    setTimeout(()=> {
+      t.animate([{opacity:1},{opacity:0, transform:'translateY(6px)'}], {duration:220});
+      setTimeout(()=> t.remove(), 220);
+    }, opts.duration || 1600);
+  }
+
+  /* -----------------------
+     CART (persistent)
+  ----------------------- */
+  const CART_KEY = 'basilissa_menu_cart_v1';
+  let CART = { items: [] };
+  function loadCart() {
+    try {
+      const raw = localStorage.getItem(CART_KEY);
+      CART = raw ? JSON.parse(raw) : { items: [] };
+    } catch (e) {
+      CART = { items: [] };
+    }
+  }
+  function saveCart() {
+    try { localStorage.setItem(CART_KEY, JSON.stringify(CART)); } catch (e) {}
+    renderCartUI();
+  }
+  function cartTotalCount() {
+    return CART.items.reduce((s, it) => s + (it.qty || 1), 0);
+  }
+  function cartTotalPrice() {
+    return CART.items.reduce((s, it) => s + (Number(it.price)||0) * (it.qty||1), 0);
+  }
+  function addItemToCart(item) {
+    // item: { id?, name, price, qty, opts }
+    const key = item.id || (item.name + '|' + JSON.stringify(item.opts || {}));
+    let found = CART.items.find(i => i._key === key);
+    if (found) { found.qty = (found.qty || 1) + (item.qty || 1); }
+    else {
+      CART.items.push(Object.assign({}, item, {_key: key, qty: item.qty || 1}));
+    }
+    saveCart();
+    // UI
+    toast(`${item.name} added to cart`);
+  }
+  function changeCartQty(index, delta) {
+    if (!CART.items[index]) return;
+    CART.items[index].qty = (CART.items[index].qty || 1) + delta;
+    if (CART.items[index].qty <= 0) CART.items.splice(index, 1);
+    saveCart();
+  }
+  function removeCartItem(index) {
+    CART.items.splice(index, 1);
+    saveCart();
+  }
+  function clearCart() { CART.items = []; saveCart(); }
+
+  /* Cart UI elements */
+  const globalCountEl = document.getElementById('globalCartCount');
+  const fabCountEl = document.getElementById('fabCount');
+  const cartBtn = document.getElementById('cartBtn');
+  const cartDrawer = document.getElementById('cartDrawer');
+  const drawerItems = document.getElementById('drawerItems');
+  const drawerSubtotal = document.getElementById('drawerSubtotal');
+  const floatingCart = document.getElementById('floatingCart');
+
+  function renderCartUI() {
+    // counts
+    const count = cartTotalCount();
+    if (globalCountEl) { globalCountEl.textContent = count; globalCountEl.style.display = count ? 'inline-flex' : 'none'; }
+    if (fabCountEl) { fabCountEl.textContent = count; fabCountEl.style.display = count ? 'inline-flex' : 'none'; }
+
+    // drawer
+    if (!drawerItems) return;
+    drawerItems.innerHTML = '';
+    if (!CART.items.length) {
+      const empty = document.createElement('div');
+      empty.className = 'empty-cart';
+      empty.textContent = 'Your cart is empty — add something tasty!';
+      drawerItems.appendChild(empty);
+      drawerSubtotal.textContent = 'GHS 0';
+      return;
+    }
+    CART.items.forEach((it, idx) => {
+      const row = document.createElement('div');
+      row.className = 'cart-row';
+      row.style.display = 'flex';
+      row.style.gap = '12px';
+      row.style.alignItems = 'center';
+      row.style.marginBottom = '12px';
+      row.innerHTML = `
+        <img src="${it.image || 'images/menu/placeholder-mini.jpg'}" alt="${it.name}" style="width:64px;height:52px;object-fit:cover;border-radius:8px">
+        <div style="flex:1">
+          <div style="font-weight:800">${it.name}</div>
+          <div style="color:#bfc7cb;font-size:13px">${Object.entries(it.opts||{}).filter(([k,v])=>v).map(([k,v])=> k + (v===true?'':': '+v)).join(' • ')}</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-weight:900">GHS ${(Number(it.price||0) * (it.qty||1)).toFixed(2)}</div>
+          <div style="display:flex;gap:8px;align-items:center;justify-content:flex-end;margin-top:8px">
+            <button class="btn ghost cart-dec" data-idx="${idx}">−</button>
+            <div style="min-width:26px;text-align:center">${it.qty}</div>
+            <button class="btn ghost cart-inc" data-idx="${idx}">+</button>
+          </div>
+        </div>
+      `;
+      drawerItems.appendChild(row);
+    });
+    drawerSubtotal.textContent = 'GHS ' + cartTotalPrice().toFixed(2);
+
+    // wire inc/dec
+    $$('.cart-inc', drawerItems).forEach(b => b.onclick = () => { changeCartQty(Number(b.dataset.idx), 1); });
+    $$('.cart-dec', drawerItems).forEach(b => b.onclick = () => { changeCartQty(Number(b.dataset.idx), -1); });
+  }
+
+  /* Drawer open / close */
+  function openDrawer() {
+    if (!cartDrawer) return;
+    cartDrawer.setAttribute('aria-hidden', 'false');
+    cartDrawer.style.transform = 'translateX(0)';
+    cartDrawer.style.display = 'block';
+  }
+  function closeDrawer() {
+    if (!cartDrawer) return;
+    cartDrawer.setAttribute('aria-hidden', 'true');
+    cartDrawer.style.transform = 'translateX(110%)';
+    // hide after animation (safe)
+    setTimeout(()=> { cartDrawer.style.display = 'none'; }, 380);
+  }
+
+  /* Init cart */
+  try { loadCart(); } catch (e) { CART = { items: [] }; }
+  renderCartUI();
+
+  // wire drawer openers
+  if (cartBtn) cartBtn.addEventListener('click', (e) => { e.preventDefault(); openDrawer(); });
+  if (floatingCart) floatingCart.addEventListener('click', (e) => { e.preventDefault(); openDrawer(); });
+  // close drawer via close button
+  const closeDrawerBtn = cartDrawer && cartDrawer.querySelector('.close-drawer');
+  if (closeDrawerBtn) closeDrawerBtn.addEventListener('click', closeDrawer);
+
+  /* -----------------------
+     Hero carousel (3s autoplay)
+  ----------------------- */
+  (function heroCarousel() {
+    const slides = $$('.slide', document.querySelector('#hero') || document);
+    const dots = $$('.dot', document.querySelector('#hero') || document);
+    const prev = $('.prev', document.querySelector('#hero')) || null;
+    const next = $('.next', document.querySelector('#hero')) || null;
+    if (!slides.length) return;
+    let current = slides.findIndex(s => s.classList.contains('is-active'));
+    if (current < 0) current = 0;
+    let timer = null;
+    const INTERVAL = 3000;
+
+    function goTo(i, manual = false) {
+      i = (i + slides.length) % slides.length;
+      slides.forEach((s, idx) => {
+        const active = idx === i;
+        s.classList.toggle('is-active', active);
+        s.setAttribute('aria-hidden', active ? 'false' : 'true');
+      });
+      dots.forEach((d, idx) => {
+        d.classList.toggle('active', idx === i);
+        d.setAttribute('aria-selected', idx === i ? 'true' : 'false');
+      });
+      current = i;
+      if (manual) restart();
+      // micro-animations: pop image layers
+      const media = slides[i].querySelectorAll('[data-animate="pop"], .media-main, .media-layer');
+      media.forEach(m => {
+        m.classList.remove('js-pop');
+        void m.offsetWidth;
+        m.classList.add('js-pop');
+        setTimeout(()=> m.classList.remove('js-pop'), 700);
+      });
+    }
+    function nextSlide() { goTo(current + 1); }
+    function prevSlide() { goTo(current - 1); }
+    function start() { stop(); timer = setInterval(nextSlide, INTERVAL); }
+    function stop() { if (timer) { clearInterval(timer); timer = null; } }
+    function restart() { stop(); start(); }
+
+    // wire dots
+    dots.forEach(d => d.addEventListener('click', () => goTo(Number(d.dataset.dot), true)));
+    if (next) next.addEventListener('click', () => goTo(current + 1, true));
+    if (prev) prev.addEventListener('click', () => goTo(current - 1, true));
+    // keyboard
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight') goTo(current + 1, true);
+      if (e.key === 'ArrowLeft') goTo(current - 1, true);
+    });
+    // pause on hover
+    const heroEl = document.getElementById('hero');
+    if (heroEl) {
+      heroEl.addEventListener('mouseenter', stop);
+      heroEl.addEventListener('mouseleave', start);
+    }
+    goTo(current);
+    start();
+  })();
+
+  /* -----------------------
+     Menu categories & search
+  ----------------------- */
+  (function categoriesSearch() {
+    const catBtns = $$('.cat-btn');
+    const sections = $$('.menu-section');
+    const searchInput = $('#menuSearch');
+    const clearSearch = $('#clearSearch');
+
+    function showCategory(cat) {
+      sections.forEach(sec => {
+        if (cat === 'all' || sec.dataset.cat === cat) sec.style.display = '';
+        else sec.style.display = 'none';
+      });
+      // scroll to top of menu
+      const menuMain = document.getElementById('menu-main');
+      if (menuMain) window.scrollTo({ top: menuMain.offsetTop - 84, behavior: 'smooth' });
+    }
+
+    catBtns.forEach(btn => btn.addEventListener('click', (e) => {
+      catBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const cat = btn.dataset.cat || btn.getAttribute('data-cat') || 'all';
+      showCategory(cat);
+    }));
+
+    if (searchInput) {
+      searchInput.addEventListener('input', (e) => {
+        const q = (e.target.value || '').trim().toLowerCase();
+        // reveal all sections to allow searching across them
+        sections.forEach(sec => sec.style.display = '');
+        $$('.food-card').forEach(card => {
+          const name = (card.dataset.name || '').toLowerCase();
+          const desc = (card.querySelector('.food-desc')?.textContent || '').toLowerCase();
+          const cat = (card.dataset.cat || '').toLowerCase();
+          card.style.display = (!q || name.includes(q) || desc.includes(q) || cat.includes(q)) ? '' : 'none';
+        });
+      });
+    }
+    if (clearSearch) clearSearch.addEventListener('click', () => {
+      if (searchInput) searchInput.value = '';
+      $$('.food-card').forEach(c => c.style.display = '');
+    });
+  })();
+
+  /* -----------------------
+     Product modal (populate & behaviors)
+  ----------------------- */
+  const productModal = document.getElementById('productModal');
+  const modalPanel = productModal && productModal.querySelector('.modal-panel');
+  const modalTitle = productModal && productModal.querySelector('#productModalTitle');
+  const modalMainImg = productModal && productModal.querySelector('#modalMainImg');
+  const modalPriceEl = productModal && productModal.querySelector('#modalPrice');
+  const modalDescEl = productModal && productModal.querySelector('#modalDesc');
+  const modalSizesEl = productModal && productModal.querySelector('#modalSizes');
+  const modalToppingsEl = productModal && productModal.querySelector('#modalToppings');
+  const modalCalsEl = productModal && productModal.querySelector('#modalCals');
+  const modalAllergensEl = productModal && productModal.querySelector('#modalAllergens');
+  const modalQtyInput = productModal && productModal.querySelector('#modalQty');
+  const modalAddBtn = productModal && productModal.querySelector('#modalAddToCart');
+  const modalCloseBtn = productModal && productModal.querySelector('.modal-close');
+
+  let modalState = { images: [], sizes: null, toppings: [], chosen: {}, basePrice: 0, name: '', id: null, image: null };
+
+  function showProductModal() {
+    if (!productModal) return;
+    productModal.style.display = 'flex';
+    productModal.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+  }
+  function hideProductModal() {
+    if (!productModal) return;
+    productModal.style.display = 'none';
+    productModal.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+    // clear thumbnail container etc.
+    if (modalSizesEl) modalSizesEl.innerHTML = '';
+    if (modalToppingsEl) modalToppingsEl.innerHTML = '';
+  }
+
+  function populateModalFromCard(cardEl) {
+    if (!cardEl) return;
+    modalState = { images: [], sizes: null, toppings: [], chosen: {}, basePrice: 0, name: '', id: null, image: null };
+
+    const name = cardEl.dataset.name || cardEl.getAttribute('data-name') || cardEl.querySelector('.food-title')?.textContent || 'Item';
+    const priceStr = cardEl.dataset.price || cardEl.getAttribute('data-price') || (cardEl.querySelector('.price strong')?.textContent) || '0';
+    const basePrice = Number(priceStr) || 0;
+    const imagesRaw = cardEl.getAttribute('data-images') || cardEl.dataset.images || '';
+    const optRaw = cardEl.getAttribute('data-options') || cardEl.dataset.options || null;
+    const imagePrimary = cardEl.querySelector('.food-photo')?.src || '';
+
+    modalState.name = name;
+    modalState.basePrice = basePrice;
+    modalState.id = (cardEl.dataset.id) || name;
+    modalState.image = imagePrimary;
+
+    // images (pipe-delimited)
+    modalState.images = imagesRaw ? imagesRaw.split('|').map(s => s.trim()).filter(Boolean) : (imagePrimary ? [imagePrimary] : []);
+    if (!modalState.images.length && imagePrimary) modalState.images = [imagePrimary];
+
+    // options (JSON)
+    const options = safeJSONParse(optRaw, {});
+    // options may include sizes, toppings, extras, tiers etc.
+    if (options && typeof options === 'object') {
+      // sizes or tiers
+      modalState.sizes = options.sizes || options.tiers || null;
+      // extras or toppings
+      modalState.toppings = options.toppings || options.extras || [];
+      // calories / allergens
+      modalState.cal = options.cal || options.calories || null;
+      modalState.allergens = options.allergens || null;
+    }
+
+    // fill UI
+    if (modalTitle) modalTitle.textContent = modalState.name;
+    if (modalMainImg) modalMainImg.src = modalState.images[0] || '';
+    if (modalPriceEl) modalPriceEl.textContent = 'GHS ' + (modalState.basePrice || basePrice).toFixed(2);
+    if (modalDescEl) modalDescEl.textContent = cardEl.querySelector('.food-desc')?.textContent || '';
+
+    // sizes: render radio-like buttons
+    if (modalSizesEl) {
+      modalSizesEl.innerHTML = '';
+      if (modalState.sizes && typeof modalState.sizes === 'object') {
+        Object.entries(modalState.sizes).forEach(([sizeName, sizePrice]) => {
+          const btn = document.createElement('button');
+          btn.className = 'modal-size variant';
+          btn.type = 'button';
+          btn.textContent = `${sizeName} — GHS ${sizePrice}`;
+          btn.dataset.size = sizeName;
+          btn.dataset.price = sizePrice;
+          btn.addEventListener('click', () => {
+            // toggle exclusive
+            modalSizesEl.querySelectorAll('.variant').forEach(v => v.classList.remove('active'));
+            btn.classList.add('active');
+            modalState.chosen.size = sizeName;
+            modalState.basePrice = Number(sizePrice);
+            updateModalPrice();
+          });
+          modalSizesEl.appendChild(btn);
+        });
+      } else {
+        // no size options - show base price selected
+        const span = document.createElement('div');
+        span.className = 'muted';
+        span.textContent = 'Standard size — price shown';
+        modalSizesEl.appendChild(span);
+      }
+    }
+
+    // toppings/extras: toggles
+    if (modalToppingsEl) {
+      modalToppingsEl.innerHTML = '';
+      if (Array.isArray(modalState.toppings) && modalState.toppings.length) {
+        modalState.toppings.forEach(t => {
+          const b = document.createElement('button');
+          b.type = 'button';
+          b.className = 'modal-topping variant';
+          b.textContent = t;
+          b.dataset.topping = t;
+          b.addEventListener('click', () => {
+            modalState.chosen[t] = !modalState.chosen[t];
+            b.classList.toggle('active', !!modalState.chosen[t]);
+            updateModalPrice();
+          });
+          modalToppingsEl.appendChild(b);
+        });
+      } else {
+        modalToppingsEl.innerHTML = '<div class="muted">No extras available</div>';
+      }
+    }
+
+    // nutrition/allergens
+    if (modalCalsEl) modalCalsEl.textContent = modalState.cal || (cardEl.dataset.cal || '');
+    if (modalAllergensEl) {
+      modalAllergensEl.innerHTML = '';
+      if (modalState.allergens && Array.isArray(modalState.allergens)) {
+        modalState.allergens.forEach(a => {
+          const span = document.createElement('span');
+          span.title = a;
+          // small mapping for icons
+          const icon = a.includes('gluten') ? 'fa-bread-slice' : a.includes('dairy') ? 'fa-cheese' : 'fa-exclamation-triangle';
+          span.innerHTML = `<i class="fa ${icon}"></i>`;
+          modalAllergensEl.appendChild(span);
+        });
+      } else {
+        modalAllergensEl.innerHTML = '<span class="muted">—</span>';
+      }
+    }
+
+    if (modalQtyInput) modalQtyInput.value = 1;
+
+    // thumbnails: add click handlers to change main image
+    const thumbsContainer = productModal.querySelector('.modal-thumbs');
+    if (thumbsContainer) {
+      thumbsContainer.innerHTML = '';
+      modalState.images.forEach((src, idx) => {
+        const t = document.createElement('img');
+        t.src = src;
+        t.className = 'thumb';
+        t.alt = modalState.name + ' photo ' + (idx+1);
+        t.style.cursor = 'pointer';
+        t.addEventListener('click', () => {
+          if (modalMainImg) modalMainImg.src = src;
+        });
+        thumbsContainer.appendChild(t);
+      });
+    }
+
+    // set price display
+    updateModalPrice();
+
+    // show modal
+    showProductModal();
+  }
+
+  function updateModalPrice() {
+    if (!modalPriceEl) return;
+    let base = Number(modalState.basePrice || 0);
+    // toppings count => add GHS 6 each (example)
+    const toppingsCount = Object.keys(modalState.chosen || {}).filter(k => modalState.chosen[k] && k !== 'size').length;
+    const total = base + (toppingsCount * 6);
+    modalPriceEl.textContent = 'GHS ' + total.toFixed(2);
+  }
+
+  // handle Add to cart from modal
+  if (modalAddBtn) {
+    modalAddBtn.addEventListener('click', () => {
+      const qty = Number(modalQtyInput?.value) || 1;
+      // compute price again
+      let base = Number(modalState.basePrice || 0);
+      const toppingsCount = Object.keys(modalState.chosen || {}).filter(k => modalState.chosen[k] && k !== 'size').length;
+      const price = base + toppingsCount * 6;
+      const item = {
+        id: modalState.id || modalState.name,
+        name: modalState.name,
+        price: Number(price),
+        qty,
+        opts: Object.assign({}, modalState.chosen),
+        image: modalState.images[0] || modalState.image || ''
+      };
+      addItemToCart(item);
+      // visual: fly image to cart
+      if (modalMainImg) animateFlyToCart(modalMainImg);
+      hideProductModal();
+      openDrawer();
+    });
+  }
+  if (modalCloseBtn) modalCloseBtn.addEventListener('click', hideProductModal);
+  // close modal when clicking backdrop
+  if (productModal) productModal.addEventListener('click', (e) => {
+    if (e.target === productModal) hideProductModal();
+  });
+
+  /* -----------------------
+     Click delegation for menu actions (add/view/customize/etc.)
+  ----------------------- */
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-action]');
+    if (!btn) return;
+    const action = btn.dataset.action;
+    // handle add (from card or offer tile)
+    if (action === 'add') {
+      e.preventDefault();
+      const itemName = btn.dataset.item || btn.getAttribute('data-item') || btn.closest('.food-card')?.dataset.name;
+      const price = Number(btn.dataset.price || btn.getAttribute('data-price') || btn.closest('.food-card')?.dataset.price || 0);
+      const image = btn.closest('.food-card')?.querySelector('.food-photo')?.src || btn.closest('.offer-tile')?.querySelector('img')?.src || '';
+      if (!itemName) return;
+      addItemToCart({ id: itemName, name: itemName, price, qty: 1, opts: {}, image });
+      // animate fly
+      const imgEl = btn.closest('.food-card')?.querySelector('.food-photo') || btn.closest('.offer-tile')?.querySelector('img');
+      if (imgEl) animateFlyToCart(imgEl);
+      return;
+    }
+
+    if (action === 'view') {
+      e.preventDefault();
+      // find nearest food-card
+      const card = btn.closest('.food-card') || btn.closest('.pizza-card') || btn.closest('.offer-tile');
+      if (!card) return;
+      populateModalFromCard(card);
+      return;
+    }
+
+    if (action === 'customize' || action === 'sizes') {
+      e.preventDefault();
+      const card = btn.closest('.food-card') || btn.closest('.pizza-card') || btn.closest('.promo-slide');
+      if (!card) return;
+      populateModalFromCard(card);
+      return;
+    }
+
+    if (action === 'view' && btn.dataset.modalTarget) {
+      // future: open different modal
+    }
+
+    if (action === 'order') {
+      e.preventDefault();
+      // scroll to section or open modal based on dataset-item
+      const target = btn.dataset.item;
+      // if dataset-item and it's in menu, open modal else add to cart
+      const card = $(`[data-name="${target}"]`);
+      if (card) { populateModalFromCard(card); }
+      else if (target) { addItemToCart({ id: target, name: target, price: Number(btn.dataset.price||0), qty:1 }); }
+      return;
+    }
+
+    if (action === 'pair') {
+      e.preventDefault();
+      const name = btn.dataset.item;
+      const price = Number(btn.dataset.price||0);
+      if (name) { addItemToCart({ id:name, name, price, qty:1 }); }
+      return;
+    }
+  });
+
+  /* -----------------------
+     Add "click card" to open modal when clicking anywhere on the food-card
+  ----------------------- */
+  $$('.food-card').forEach(card => {
+    card.addEventListener('click', (e) => {
+      // ignore clicks on buttons/links inside card
+      if (e.target.closest('button, a')) return;
+      populateModalFromCard(card);
+    });
+  });
+
+  /* -----------------------
+     Fly-to-cart animation
+  ----------------------- */
+  function animateFlyToCart(imgEl) {
+    if (!imgEl) return;
+    try {
+      const rect = imgEl.getBoundingClientRect();
+      const clone = imgEl.cloneNode(true);
+      clone.style.position = 'fixed';
+      clone.style.left = rect.left + 'px';
+      clone.style.top = rect.top + 'px';
+      clone.style.width = rect.width + 'px';
+      clone.style.height = rect.height + 'px';
+      clone.style.transition = 'transform 700ms cubic-bezier(.2,.8,.2,1), opacity 700ms';
+      clone.style.zIndex = 99999;
+      clone.style.borderRadius = getComputedStyle(imgEl).borderRadius;
+      document.body.appendChild(clone);
+      // target position (cart button)
+      const targetBtn = cartBtn || document.querySelector('.cart-btn') || document.getElementById('cartButton') || document.getElementById('floatingCart');
+      const targetRect = targetBtn ? targetBtn.getBoundingClientRect() : { left: window.innerWidth - 72, top: 24, width: 40, height: 40 };
+      const dx = targetRect.left + targetRect.width/2 - (rect.left + rect.width/2);
+      const dy = targetRect.top + targetRect.height/2 - (rect.top + rect.height/2);
+      requestAnimationFrame(() => {
+        clone.style.transform = `translate(${dx}px, ${dy}px) scale(0.2) rotate(10deg)`;
+        clone.style.opacity = '0.2';
+      });
+      setTimeout(()=> clone.remove(), 780);
+    } catch (e) {
+      // silent
+    }
+  }
+
+  /* -----------------------
+     Pairings inside modal (delegation)
+  ----------------------- */
+  document.addEventListener('click', (e) => {
+    const pair = e.target.closest('.pair');
+    if (!pair) return;
+    e.preventDefault();
+    const name = pair.dataset.item;
+    const price = Number(pair.dataset.price || 0);
+    if (name) {
+      addItemToCart({ id: name, name, price, qty: 1 });
+      toast(`${name} added`);
+      // optionally animate using thumb inside pair
+      const img = pair.querySelector('img');
+      if (img) animateFlyToCart(img);
+    }
+  });
+
+  /* -----------------------
+     Floating CTAs: quick order
+  ----------------------- */
+  document.addEventListener('click', (e) => {
+    const quick = e.target.closest('[data-action="quick-order"], .quick-order');
+    if (!quick) return;
+    e.preventDefault();
+    // choose top recommended item (first in menu)
+    const firstCard = document.querySelector('.food-card[data-name]');
+    if (firstCard) {
+      const name = firstCard.dataset.name;
+      const price = Number(firstCard.dataset.price || 0);
+      addItemToCart({ id: name, name, price, qty: 1, image: firstCard.querySelector('.food-photo')?.src });
+      toast(`Quick order: ${name}`);
+      animateFlyToCart(firstCard.querySelector('.food-photo'));
+      openDrawer();
+    }
+  });
+
+  /* -----------------------
+     Contact mini form (simulate)
+  ----------------------- */
+  document.querySelectorAll('.contact-mini').forEach(form => {
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name = form.querySelector('input[name="name"], #quickName')?.value || 'Guest';
+      const phone = form.querySelector('input[name="phone"], #quickPhone')?.value || '';
+      toast('Thanks ' + name + '! We will contact you shortly.');
+      form.reset();
+    });
+  });
+
+  /* -----------------------
+     Keyboard: ESC closes modal & drawer
+  ----------------------- */
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      hideProductModal();
+      closeDrawer();
+    }
+  });
+
+  /* -----------------------
+     Simulated Download menu (PDF) — safe fallback
+  ----------------------- */
+  const downloadBtn = document.getElementById('downloadPDF');
+  if (downloadBtn) {
+    downloadBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      toast('Download is not enabled in demo. Export feature can be added.');
+    });
+  }
+
+  /* -----------------------
+     Clicks on section "offer-tiles" add to cart
+  ----------------------- */
+  $$('.offer-tile').forEach(tile => {
+    const add = tile.querySelector('[data-action="add"]');
+    if (add) {
+      add.addEventListener('click', (e) => {
+        e.preventDefault();
+        const name = add.dataset.item || tile.querySelector('.info strong')?.textContent;
+        const price = Number(add.dataset.price || 0);
+        const img = tile.querySelector('img')?.src;
+        addItemToCart({ id: name, name, price, qty:1, image: img });
+        animateFlyToCart(tile.querySelector('img'));
+      });
+    }
+  });
+
+  /* -----------------------
+     Safety: guard against missing UI elements
+  ----------------------- */
+  try {
+    // initial UI state
+    renderCartUI();
+    // hide modal initially
+    if (productModal) { productModal.style.display = 'none'; productModal.setAttribute('aria-hidden', 'true'); }
+    // hide drawer initially
+    if (cartDrawer) { cartDrawer.style.display = 'none'; cartDrawer.setAttribute('aria-hidden', 'true'); cartDrawer.style.transform = 'translateX(110%)'; }
+  } catch (e) {
+    // swallow to avoid uncaught exceptions interfering with page
+    console.error('Init error (non-fatal):', e);
+  }
+
+  /* -----------------------
+     Extra accessibility improvements
+  ----------------------- */
+  (function focusRing() {
+    function handleFirstTab(e) {
+      if (e.key === 'Tab') {
+        document.documentElement.classList.add('user-is-tabbing');
+        window.removeEventListener('keydown', handleFirstTab);
+      }
+    }
+    window.addEventListener('keydown', handleFirstTab);
+  })();
+
+  // expose small debug API
+  window.BasilissaMenu = {
+    addItemToCart,
+    CART,
+    clearCart,
+    openDrawer,
+    closeDrawer,
+    populateModalFromCard
+  };
+
+})(); 
+</script>
+
 </html>
