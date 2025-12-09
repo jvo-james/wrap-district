@@ -1,373 +1,151 @@
-<!doctype html>
+
+
+  <!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>KFC — Replica Hero Slideshow</title>
+  <title>BASILISSA — Radiant Meals</title>
 
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+ <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet"/>
+<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+  <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <script src='https://kit.fontawesome.com/a076d05399.js' crossorigin='anonymous'></script>
   <style>
     /* ---------- Reset & base ---------- */
-    * { box-sizing: border-box; }
-    html,body { margin:0; padding:0; height:100%; font-family: "Inter", "Helvetica Neue", Arial, sans-serif; -webkit-font-smoothing:antialiased; }
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0;height:100%;font-family:Inter, "Helvetica Neue", Arial, sans-serif;background:#0b0b0b;color:#fff}
     :root{
-      --red: #e31b23;
-      --dark: #0b0b0b;
-      --muted: #f4f4f4;
-      --card-shadow: 0 6px 20px rgba(11,11,11,0.08);
-      --max-w: 1250px;
+      --yellow:#ffd400;
+      --accent:#ffcf36;
+      --dark:#0b0b0b;
+      --muted: #efefef;
+      --max-w:1250px;
+      --glass: rgba(255,255,255,0.06);
     }
-    a { color:inherit; text-decoration:none; }
+    a{color:inherit;text-decoration:none}
+    img{max-width:100%;display:block;}
 
-    /* ---------- header ---------- */
-    header {
-      background: white;
-      border-bottom: 1px solid rgba(227,27,35,0.06);
-      position: sticky;
-      top:0;
-      z-index: 40;
-      box-shadow: 0 1px 0 rgba(0,0,0,0.02);
-    }
-    .topbar {
-      max-width: var(--max-w);
-      margin: 0 auto;
-      display:flex;
-      align-items:center;
-      gap:24px;
-      padding:22px 18px;
-    }
-    .logo {
-      font-weight:900;
-      color: var(--red);
-      font-size:44px;
-      letter-spacing:1px;
-    }
-    nav {
-      display:flex;
-      gap:22px;
-      margin-left:12px;
-      align-items:center;
-      font-weight:700;
-      text-transform:uppercase;
-      color:#222;
-    }
-    .right-actions { margin-left:auto; display:flex; align-items:center; gap:14px; }
-    .btn-menu {
-      background: var(--red);
-      color:white;
-      border-radius:28px;
-      padding:10px 18px;
-      font-weight:700;
-      letter-spacing:0.4px;
-    }
+    /* ---------- Header ---------- */
+    header{position:sticky;top:0;z-index:200;background:linear-gradient(180deg,rgba(0,0,0,0.6),rgba(0,0,0,0.4));backdrop-filter:blur(6px);border-bottom:1px solid rgba(255,255,255,0.03)}
+    .topbar{max-width:var(--max-w);margin:0 auto;display:flex;align-items:center;gap:18px;padding:14px}
+    .logo-wrap{display:flex;align-items:center;gap:12px}
+    .logo-img{width:64px;height:64px;border-radius:12px;object-fit:cover;box-shadow:0 8px 30px rgba(0,0,0,0.6);border:2px solid rgba(255,255,255,0.04)}
+    .logo-text{font-weight:900;color:var(--yellow);font-size:28px;letter-spacing:1px}
+    nav{display:flex;gap:18px;margin-left:18px;font-weight:700;text-transform:uppercase;color:#fff;opacity:0.95}
+    nav a{padding:8px 10px;border-radius:8px}
+    nav a:hover{background:rgba(255,255,255,0.03)}
+    .right-actions{margin-left:auto;display:flex;align-items:center;gap:12px}
+    .icon-pill{display:inline-flex;gap:8px;align-items:center;padding:8px 12px;border-radius:999px;background:var(--glass);font-weight:700}
+    .btn-primary{background:var(--yellow);color:#111;padding:10px 16px;border-radius:28px;font-weight:900;box-shadow:0 12px 30px rgba(255,212,0,0.12);cursor:pointer;border:none}
 
-    /* ---------- delivery row ---------- */
-    .delivery-row {
-      max-width: var(--max-w);
-      margin: 0 auto;
-      padding:18px;
-      display:flex;
-      gap:18px;
-      align-items:center;
-      border-bottom: 1px solid rgba(0,0,0,0.04);
-      color:#333;
+    /* ---------- hero ---------- */
+    .hero-wrap{padding:28px 0 56px 0;background:
+      radial-gradient(1200px 200px at 10% 10%, rgba(255,216,72,0.03), transparent 10%),
+      linear-gradient(180deg,#0b0b0b 0%, #070707 100%);
     }
-    .delivery-pill {
-      display:flex;
-      gap:10px;
-      align-items:center;
-      background:linear-gradient(90deg, rgba(227,27,35,0.06), rgba(227,27,35,0.03));
-      padding:10px 14px;
-      border-radius:28px;
-      font-weight:700;
-      color:var(--red);
-      width:160px;
-      justify-content:center;
-    }
-    .del-info { color:#666; font-size:14px; margin-left:6px; }
+    .hero{max-width:var(--max-w);margin:0 auto;position:relative;height:580px;border-radius:14px;overflow:visible;padding:18px}
 
-    /* ---------- hero slideshow ---------- */
-    .hero-wrap {
-      background: var(--dark);
-      padding:26px 0 34px 0;
-    }
-    .hero {
-      max-width: var(--max-w);
-      margin: 0 auto;
-      position:relative;
-      height:460px;
-      border-radius:6px;
-      overflow:visible;
-    }
+    .slides{position:relative;height:100%;overflow:hidden;border-radius:14px;box-shadow: 0 40px 120px rgba(0,0,0,0.7);}
 
-    .slides {
-      height:100%;
-      position:relative;
-      overflow: hidden;
-      border-radius:6px;
-    }
-
-    .slide {
-      position:absolute;
-      inset:0;
-      display:flex;
-      gap:30px;
-      align-items:center;
-      padding:34px;
-      transition: transform 0.7s cubic-bezier(.2,.9,.2,1), opacity 0.7s ease;
-      opacity:0;
-      transform: translateX(30px);
-    }
-    .slide.active { opacity:1; transform: translateX(0); z-index:2; }
-
-    /* Left panel — announcement */
-    .announce {
-      width:48%;
-      color:white;
-      display:flex;
-      flex-direction:column;
-      gap:18px;
-      justify-content:center;
-    }
-    .announce .tag {
-      background:var(--red);
-      padding:12px 16px;
-      display:inline-block;
-      font-weight:900;
-      font-size:22px;
-      border-radius:6px;
-      letter-spacing:1px;
-    }
-    .announce h1 {
-      margin:0;
-      font-size:72px;
-      line-height:0.92;
-      letter-spacing:1px;
-      font-weight:900;
-      text-transform:uppercase;
-    }
-    .announce .desc {
-      font-size:20px;
-      color: #ffdcd5;
-      max-width:440px;
-    }
-    .announce .pricebox {
-      display:flex;
-      align-items:center;
-      gap:20px;
-      margin-top:8px;
-    }
-    .price {
-      font-size:84px;
-      font-weight:900;
-      color:white;
-    }
-    .price small {
-      display:block;
-      font-size:18px;
-      font-weight:700;
-      margin-top:-6px;
-      color:#ffefef;
-    }
-    .cta-row { margin-top:22px; display:flex; gap:12px; align-items:center; }
-
-    .cta {
-      background:var(--red);
-      color:#fff;
-      padding:12px 18px;
-      border-radius:28px;
-      font-weight:800;
-      box-shadow: 0 8px 24px rgba(227,27,35,0.18);
-      cursor:pointer;
-    }
-    .cta.secondary {
-      background:transparent;
-      color:#fff;
-      border:1px solid rgba(255,255,255,0.18);
-    }
-
-    /* Right panel — hero product composition */
-    .hero-media {
-      width:52%;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      position:relative;
-    }
-    .product-stack {
-      width:480px;
-      height:300px;
-      position:relative;
-    }
-
-    /* simple decorative "bucket + wings + rice" using SVG background placeholders */
-    .product-placeholder {
-      position:absolute;
-      right:0;
-      bottom:0;
-      width:420px;
-      height:320px;
-      transform:translateX(10px);
+    .slide{
+      position:absolute;inset:0;display:flex;gap:28px;align-items:center;padding:36px;transition:opacity .8s ease, transform .8s cubic-bezier(.2,.9,.2,1);
+      opacity:0;transform:translateX(40px) scale(.99);
       background-image:
-        radial-gradient(circle at 20% 20%, rgba(255,230,200,0.14), transparent 10%),
-        linear-gradient(180deg,#2b2b2b 0%, #111 100%);
-      border-radius:12px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      overflow:hidden;
-      box-shadow: 0 30px 80px rgba(3,3,3,0.7);
+        linear-gradient(180deg, rgba(0,0,0,0.35), rgba(0,0,0,0.45));
     }
-    .product-placeholder .fake-bucket {
-      width:360px;
-      height:220px;
-      position:relative;
-      display:flex;
-      gap:18px;
-      align-items:flex-end;
-      justify-content:center;
-      padding-bottom:18px;
-    }
-    .bucket {
-      width:210px;
-      height:210px;
-      border-radius:50%;
-      background:linear-gradient(180deg,#fff 0%, #f3f3f3 100%);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      box-shadow: 0 12px 40px rgba(0,0,0,0.45);
-      font-weight:900;
-      color:#c82b2b;
-      font-size:26px;
-    }
-    .wings {
-      width:150px;
-      height:120px;
-      background: radial-gradient(circle at 30% 25%, #ffcf87, #ff8b00 50%, #c85a03 100%);
-      border-radius:18px;
-      transform: translateY(12px) rotate(-12deg);
-      box-shadow: 0 10px 30px rgba(0,0,0,0.6);
-    }
-    .fries {
-      width:110px;
-      height:160px;
-      background:linear-gradient(#ffd36b,#ffb236);
-      border-radius:10px;
-      transform: translateY(-6px) rotate(6deg);
-      box-shadow: 0 10px 30px rgba(0,0,0,0.6);
-    }
+    .slide.active{opacity:1;transform:translateX(0) scale(1);z-index:2}
 
-    /* small badge on product */
-    .badge {
-      position:absolute;
-      left:20px;
-      bottom:22px;
-      background:rgba(0,0,0,0.6);
-      color:#fff;
-      padding:8px 12px;
-      border-radius:8px;
-      font-weight:800;
-      display:inline-flex;
-      gap:8px;
-      align-items:center;
-    }
+    /* left panel content */
+    .announce{width:48%;display:flex;flex-direction:column;gap:12px;justify-content:center;overflow:hidden}
+    .announce .mini{display:inline-flex;gap:10px;align-items:center;padding:10px 14px;border-radius:12px;background:linear-gradient(90deg,var(--yellow),#ffb94a);color:#111;font-weight:900;letter-spacing:1px}
+    .announce h1{margin:0;font-size:72px;line-height:0.9;letter-spacing:1px;font-weight:900;text-transform:uppercase;color:var(--yellow);text-shadow:0 6px 20px rgba(0,0,0,0.7)}
+    .announce h1 span{display:block;font-size:36px;opacity:.95}
+    .desc{color:#ffd;opacity:0.9;font-size:18px;max-width:460px}
+    .pricebox{display:flex;align-items:flex-end;gap:18px;margin-top:6px}
+    .price{font-size:110px;font-weight:900;color:var(--accent);line-height:0.95;transform-origin:left bottom;animation:priceSwing 3s ease-in-out infinite}
+    .price small{display:block;font-size:18px;font-weight:900;margin-top:4px;color:#fff}
+    @keyframes priceSwing{0%{transform:translateY(0)}50%{transform:translateY(-6px) rotate(-2deg)}100%{transform:translateY(0)}}
 
-    /* slide indicator dots & arrows */
-    .controls {
-      position:absolute;
-      left:50%;
-      transform:translateX(-50%);
-      bottom:-14px;
-      display:flex;
-      gap:8px;
-      align-items:center;
-      z-index:60;
-    }
-    .dots { display:flex; gap:8px; }
-    .dot {
-      width:12px; height:12px; border-radius:50%;
-      background:rgba(255,255,255,0.35);
-      border:2px solid rgba(255,255,255,0.12);
-      cursor:pointer;
-    }
-    .dot.active { background:var(--red); box-shadow: 0 6px 20px rgba(227,27,35,0.28); width:14px; height:14px; }
+    .cta-row{display:flex;gap:12px;margin-top:14px;align-items:center}
+    .cta{background:var(--yellow);color:#111;padding:12px 18px;border-radius:30px;font-weight:900;box-shadow:0 12px 40px rgba(255,212,0,0.12);cursor:pointer;border:none}
+    .cta.alt{background:transparent;border:2px solid rgba(255,255,255,0.12);color:#fff}
 
-    .arrow {
-      width:44px; height:44px;
-      border-radius:50%;
-      background: rgba(255,255,255,0.08);
-      display:flex; align-items:center; justify-content:center;
-      backdrop-filter: blur(2px);
-      cursor:pointer;
-      border: 1px solid rgba(255,255,255,0.06);
-      color:white;
-      font-weight:800;
-    }
-    .arrow:hover { background: rgba(255,255,255,0.12); }
+    /* right panel */
+    .hero-media{width:52%;display:flex;align-items:center;justify-content:center;position:relative;overflow:visible}
+    .slide-img-wrap{position:relative;width:520px;height:420px;border-radius:14px;overflow:visible;display:flex;align-items:flex-end;justify-content:center}
+    .slide-img{position:relative;z-index:5;max-width:520px;height:auto;border-radius:10px;object-fit:cover;box-shadow:0 30px 80px rgba(0,0,0,0.65);transform:translateY(0);transition:transform .9s cubic-bezier(.2,.9,.2,1)}
+    .slide-layer{position:absolute;z-index:6;pointer-events:none}
+    .bottle{width:120px;right:24px;bottom:20px;position:absolute;transform-origin:center;animation:floatBottle 4s ease-in-out infinite}
+    @keyframes floatBottle{0%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-8px) rotate(4deg)}100%{transform:translateY(0) rotate(-2deg)}}
 
-    /* ---------- limited time offers ---------- */
-    .section {
-      max-width: var(--max-w);
-      margin: 36px auto;
-      padding: 18px;
-    }
-    .section h2 {
-      font-size:28px;
-      letter-spacing:1px;
-      margin:22px 0;
-      font-weight:900;
-    }
-    .cards {
-      display:grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap:22px;
-    }
-    .card {
-      background:white;
-      border-radius:10px;
-      padding:14px;
-      box-shadow: var(--card-shadow);
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      gap:12px;
-    }
-    .card .img {
-      width:100%;
-      aspect-ratio: 1.6 / 1;
-      border-radius:8px;
-      background: linear-gradient(#fff7f7,#fff);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-weight:800;
-      color:#a94b3f;
-      font-size:18px;
-    }
-    .card h3 { margin:6px 0 0 0; font-size:16px; font-weight:800; text-transform:uppercase; }
-    .card p { margin:0; color:#666; font-size:14px; text-align:center; }
-    .card .price { font-weight:900; margin-top:8px; font-size:20px; color:var(--red); }
+    .fries-float{width:140px;left:28px;bottom:14px;position:absolute;animation:friesPop 3.6s ease-in-out infinite}
+    @keyframes friesPop{0%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-16px) rotate(6deg)}100%{transform:translateY(0) rotate(-2deg)}}
 
-    /* ---------- layout widths ---------- */
-    .container { max-width: var(--max-w); margin:0 auto; padding:0 18px; }
+    /* decorative icons floating */
+    .glow-icon{position:absolute;z-index:9;opacity:.92;font-size:20px;padding:12px;border-radius:999px;background:linear-gradient(180deg,rgba(255,255,255,0.06),rgba(255,255,255,0.02));backdrop-filter:blur(4px)}
+    .glow-icon.spin{animation:spin 9s linear infinite}
+    @keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
 
-    /* ---------- responsive for slightly smaller screens (but user wanted large screen) ---------- */
-    @media (max-width: 1100px) {
-      .announce h1 { font-size:56px; }
-      .price { font-size:66px; }
-      .hero { height:420px; }
-      .cards { grid-template-columns: repeat(2,1fr); }
-    }
-    @media (max-width: 760px) {
-      .topbar { padding:14px; gap:12px; }
-      nav { display:none; }
-      .hero { height:380px; }
-      .slide { flex-direction:column; padding:18px; }
-      .announce { width:100%; text-align:center; }
-      .hero-media { width:100%; margin-top:12px; }
-      .cards { grid-template-columns: 1fr; }
-    }
+    /* controls */
+    .controls{position:absolute;left:50%;transform:translateX(-50%);bottom:-28px;display:flex;gap:12px;align-items:center;z-index:80}
+    .dots{display:flex;gap:8px}
+    .dot{width:12px;height:12px;border-radius:50%;background:rgba(255,255,255,0.12);border:2px solid rgba(255,255,255,0.04);cursor:pointer}
+    .dot.active{background:var(--accent);box-shadow:0 8px 30px rgba(255,203,25,0.12);width:16px;height:16px}
+    .arrow{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.03);cursor:pointer;border:1px solid rgba(255,255,255,0.04)}
+    .arrow:hover{background:rgba(255,255,255,0.06)}
 
+    /* ---------- slide-specific styles (distinct visual language per slide) ---------- */
+
+    /* Slide 1 - HAPPY MEAL (wings+fries+coke) */
+    .slide--0{background-image:
+        radial-gradient(circle at 10% 10%, rgba(255,200,60,0.04), transparent 6%),
+        linear-gradient(180deg,#0b0b0b,#070707);}
+    .slide--0 .announce h1{color:var(--yellow)}
+    .slide--0 .price{color:#ffe066}
+    .slide--0 .slide-img{transform:translateY(6px) rotate(-3deg);filter:drop-shadow(0 40px 60px rgba(0,0,0,0.7))}
+    .slide--0 .glow-icon{right:18%;top:18%;font-size:18px}
+
+    /* Slide 2 - HAPPY SHAWARMA MEAL */
+    .slide--1{background-image:
+        radial-gradient(circle at 90% 10%, rgba(255,120,60,0.03), transparent 6%),
+        linear-gradient(180deg,#0b0b0b,#0c0505);}
+    .slide--1 .announce h1{color:#ffb84d}
+    .slide--1 .price{color:#ffd08a;animation:pricePop 2.8s ease-in-out infinite}
+    @keyframes pricePop{0%{transform:scale(1)}50%{transform:scale(1.04)}100%{transform:scale(1)}}
+    .slide--1 .slide-img{transform:translateY(-6px) rotate(2deg)}
+    .slide--1 .glow-icon{left:12%;top:14%;font-size:20px}
+
+    /* Slide 3 - HAPPY BURGER MEAL */
+    .slide--2{background-image:
+        radial-gradient(circle at 60% 10%, rgba(255,100,100,0.03), transparent 6%),
+        linear-gradient(180deg,#0b0b0b,#050507);}
+    .slide--2 .announce h1{color:#ffd05a}
+    .slide--2 .price{color:#ffd36b;animation:priceBeat 2.6s infinite}
+    @keyframes priceBeat{0%{transform:translateY(0)}50%{transform:translateY(-8px)}100%{transform:translateY(0)}}
+    .slide--2 .slide-img{transform:translateY(0) rotate(0deg)}
+    .slide--2 .glow-icon{right:12%;top:20%}
+
+    /* ---------- cards below hero ---------- */
+    .section{max-width:var(--max-w);margin:36px auto;padding:0 18px 40px 18px}
+    .section h2{font-size:28px;margin-bottom:18px;font-weight:900;color:var(--yellow)}
+    .cards{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+    .card{background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));padding:18px;border-radius:12px;box-shadow:0 12px 40px rgba(0,0,0,0.6);display:flex;flex-direction:column;gap:12px;align-items:flex-start}
+    .card .img{width:100%;height:140px;border-radius:10px;background-size:cover;background-position:center;box-shadow:0 10px 30px rgba(0,0,0,0.5)}
+    .card h3{margin:0;font-size:18px;font-weight:900}
+    .card p{margin:0;color:#ddd}
+    .card .price{margin-top:auto;font-weight:900;color:var(--accent);font-size:18px}
+
+    /* ---------- responsive ---------- */
+    @media (max-width:1100px){.announce h1{font-size:56px}.price{font-size:86px}.hero{height:480px}.cards{grid-template-columns:repeat(2,1fr)}}
+    @media (max-width:760px){
+      nav{display:none}.announce{width:100%;text-align:center}.hero{height:auto;padding-bottom:36px}.slide{position:relative;flex-direction:column;padding:18px}.hero-media{width:100%;margin-top:12px}.cards{grid-template-columns:1fr}
+      .price{font-size:56px}
+    }
   </style>
 </head>
 <body>
@@ -375,144 +153,129 @@
   <!-- HEADER -->
   <header role="banner" aria-label="Site header">
     <div class="topbar">
-      <div style="display:flex;align-items:center;gap:16px;">
-        <div class="logo">KFC</div>
+      <div style="display:flex;align-items:center;gap:12px">
+        <!-- replace logo.png with your actual logo file -->
+        <img src="logo.png" alt="Basilissa logo" class="logo-img" onerror="this.style.display='none'">
+        <div class="logo-text">BASILISSA</div>
         <nav aria-label="Main navigation">
-          <a href="#">Our Menu</a>
-          <a href="#">Store Location</a>
-          <a href="#">Coupon Wallet</a>
+          <a href="#"><i class="fa fa-cutlery"></i>&nbsp; Menu</a>
+          <a href="#"><i class="fa fa-map-marker"></i>&nbsp; Locations</a>
+          <a href="#"><i class="fa fa-star"></i>&nbsp; Offers</a>
+          <a href="#"><i class="fa fa-phone"></i>&nbsp; Contact</a>
         </nav>
       </div>
 
       <div class="right-actions">
-        <div style="color:#777; font-weight:700;">Sign In</div>
-        <button class="btn-menu" aria-label="Open menu">TO MENU</button>
+        <div class="icon-pill"><i class="fa fa-clock-o"></i> Opening: 8am - 11pm</div>
+        <button class="btn-primary"><i class="fa fa-shopping-bag"></i>&nbsp; Order</button>
       </div>
     </div>
   </header>
 
-  <!-- DELIVERY ROW -->
-  <div class="delivery-row">
-    <div class="delivery-pill" aria-hidden="true">DELIVERY</div>
-    <div class="del-info"><strong>From:</strong> KFC AFIENYA ROAD</div>
-    <div class="del-info"><strong>To:</strong> P2V2+93W Ebenezer, hill Road, Tema, Ghana</div>
-  </div>
-
   <!-- HERO / SLIDESHOW -->
   <section class="hero-wrap" aria-label="Promotions">
-    <div class="hero">
+    <div class="hero" role="region" aria-label="Basilissa featured meals">
 
       <div class="slides" id="slides">
 
-        <!-- Slide 0 -->
-        <article class="slide active" data-index="0" role="group" aria-roledescription="slide" aria-label="Slide 1 of 3">
+        <!-- Slide 0: Happy Meal (first image) -->
+        <article class="slide slide--0 active" data-index="0" role="group" aria-roledescription="slide" aria-label="Slide 1 of 3">
           <div class="announce" aria-hidden="false">
-            <div class="tag">SHITO IS BACK</div>
-            <h1>STREETWISE<br>WINGS MEAL</h1>
-            <div class="desc">3 Pcs Wings + Rice. Bold spicy shito sauce available on the side. Enjoy the limited-time combo.</div>
+            <div class="mini"><i class="fa fa-fire"></i> Hot Pick</div>
+            <h1>HAPPY<br><span>MEAL</span></h1>
+            <div class="desc">8pcs B-special wings, fries, and 1 Coke — perfectly seasoned and ready to share. Crisp, saucy, iconic.</div>
 
             <div class="pricebox">
-              <div class="price">47<span style="font-size:24px; margin-left:8px;">GHC</span></div>
-              <div style="color:#fff8f8; font-weight:800;">3 Pcs Wings + Rice</div>
+              <div class="price">69<small>GHC</small></div>
+              <div style="color:#fff;font-weight:800">8pcs wings + fries + 1 coke</div>
             </div>
 
             <div class="cta-row">
-              <button class="cta">Order Now</button>
-              <button class="cta secondary">Add Shito GHC 5</button>
+              <button class="cta"><i class="fa fa-phone"></i>&nbsp; Call & Order</button>
+              <button class="cta alt"><i class="fa fa-map-marker"></i>&nbsp; Find Nearest</button>
             </div>
           </div>
 
           <div class="hero-media" aria-hidden="true">
-            <div class="product-stack">
-              <div class="product-placeholder" role="img" aria-label="KFC meal">
-                <div class="product-placeholder-inner">
-                  <div class="fake-bucket">
-                    <div class="wings" style="width:170px;height:120px"></div>
-                    <div class="bucket">KFC</div>
-                    <div class="fries"></div>
-                  </div>
-                </div>
-                <div class="badge">Add Shito GHC 5</div>
-              </div>
+            <div class="slide-img-wrap" aria-hidden="true">
+              <!-- image you provided -->
+              <img src="/mnt/data/63b5c50e-9e53-4281-9c20-b40ca66eaa32.png" alt="Happy Meal - wings fries coke" class="slide-img">
+              <!-- floating bottle -->
+              <img src="/mnt/data/63b5c50e-9e53-4281-9c20-b40ca66eaa32.png" alt="" class="bottle" style="width:110px;right:8px;bottom:4px;opacity:0.95;filter:drop-shadow(0 12px 30px rgba(0,0,0,0.6));transform:translateY(8px) scale(.92);">
+              <!-- fries floating -->
+              <div class="glow-icon" style="right:6%;top:8%;font-size:18px"><i class="fa fa-cutlery"></i></div>
+              <div class="glow-icon spin" style="left:6%;bottom:8%"><i class="fa fa-star"></i></div>
             </div>
           </div>
         </article>
 
-        <!-- Slide 1 -->
-        <article class="slide" data-index="1" role="group" aria-roledescription="slide" aria-label="Slide 2 of 3">
+        <!-- Slide 1: Happy Shawarma Meal (second image) -->
+        <article class="slide slide--1" data-index="1" role="group" aria-roledescription="slide" aria-label="Slide 2 of 3">
           <div class="announce">
-            <div class="tag">NEW FLAVOUR</div>
-            <h1>CRUNCHY<br>BUCKET</h1>
-            <div class="desc">Get a family bucket with extra crispy pieces — perfect with our signature dips and fries.</div>
+            <div class="mini"><i class="fa fa-thumbs-up"></i> Customer Favourite</div>
+            <h1>HAPPY<br><span>SHAWARMA MEAL</span></h1>
+            <div class="desc">1 shawarma, crispy fries and a coke. Wrap rolled fresh, served hot — the shawarma everyone loves.</div>
 
             <div class="pricebox">
-              <div class="price">78<span style="font-size:24px; margin-left:8px;">GHC</span></div>
-              <div style="color:#ffefef; font-weight:800;">Bucket + Fries</div>
+              <div class="price">85<small>GHC</small></div>
+              <div style="color:#fff;font-weight:800">1 shawarma + fries + 1 coke</div>
             </div>
 
             <div class="cta-row">
-              <button class="cta">View Bucket</button>
-              <button class="cta secondary">Find Store</button>
+              <button class="cta"><i class="fa fa-truck"></i>&nbsp; Delivery</button>
+              <button class="cta alt"><i class="fa fa-star-o"></i>&nbsp; Add to Favourites</button>
             </div>
           </div>
 
           <div class="hero-media" aria-hidden="true">
-            <div class="product-stack">
-              <div class="product-placeholder">
-                <div class="fake-bucket">
-                  <div class="wings" style="width:155px;height:110px; transform: translateY(6px) rotate(-6deg)"></div>
-                  <div class="bucket">KFC</div>
-                  <div class="fries" style="transform: translateY(-10px) rotate(10deg)"></div>
-                </div>
-                <div class="badge">Limited Time</div>
-              </div>
+            <div class="slide-img-wrap">
+              <img src="/mnt/data/e662576e-994c-4496-ab49-d9a80bd040d7.png" alt="Happy Shawarma - fries coke" class="slide-img">
+              <div class="glow-icon" style="left:4%;top:12%"><i class="fa fa-bolt"></i></div>
+              <div class="glow-icon spin" style="right:6%;bottom:6%"><i class="fa fa-heart"></i></div>
             </div>
           </div>
         </article>
 
-        <!-- Slide 2 -->
-        <article class="slide" data-index="2" role="group" aria-roledescription="slide" aria-label="Slide 3 of 3">
+        <!-- Slide 2: Happy Burger Meal (third image) -->
+        <article class="slide slide--2" data-index="2" role="group" aria-roledescription="slide" aria-label="Slide 3 of 3">
           <div class="announce">
-            <div class="tag">FESTIVE</div>
-            <h1>FESTIVE<br>BUCKET</h1>
-            <div class="desc">Celebrate with a bucket for sharing — includes drinks and sides for the whole crew.</div>
+            <div class="mini"><i class="fa fa-star"></i> Signature</div>
+            <h1>HAPPY<br><span>BURGER MEAL</span></h1>
+            <div class="desc">1 beef burger, fries and a coke. Juicy patties, melted cheese and the perfect bun — crowd pleaser.</div>
 
             <div class="pricebox">
-              <div class="price">95<span style="font-size:24px; margin-left:8px;">GHC</span></div>
-              <div style="color:#ffefef; font-weight:800;">Meals for 3-4</div>
+              <div class="price">90<small>GHC</small></div>
+              <div style="color:#fff;font-weight:800">1 beef burger + fries + 1 coke</div>
             </div>
 
             <div class="cta-row">
-              <button class="cta">Get Festive</button>
-              <button class="cta secondary">See Offers</button>
+              <button class="cta"><i class="fa fa-cutlery"></i>&nbsp; Order Now</button>
+              <button class="cta alt"><i class="fa fa-tags"></i>&nbsp; See Combo</button>
             </div>
           </div>
 
           <div class="hero-media" aria-hidden="true">
-            <div class="product-stack">
-              <div class="product-placeholder">
-                <div class="fake-bucket">
-                  <div class="wings" style="width:160px;height:120px; transform: translateY(10px) rotate(-10deg)"></div>
-                  <div class="bucket">KFC</div>
-                  <div class="fries"></div>
-                </div>
-                <div class="badge">Available on App</div>
-              </div>
+            <div class="slide-img-wrap">
+              <img src="/mnt/data/a3612c73-8505-4bd3-aa05-8e82222bb74c.png" alt="Happy Burger - fries coke" class="slide-img">
+              <div class="glow-icon" style="left:8%;top:10%"><i class="fa fa-fire"></i></div>
+              <div class="glow-icon" style="right:12%;top:10%"><i class="fa fa-star"></i></div>
             </div>
           </div>
         </article>
 
       </div> <!-- slides -->
 
-      <!-- controls (dots & arrows) -->
+      <!-- controls -->
       <div class="controls" aria-hidden="false">
-        <div class="arrow" id="prev" title="Previous" aria-label="Previous slide">&lt;</div>
+        <div class="arrow" id="prev" title="Previous" aria-label="Previous slide"><i class="fa fa-chevron-left"></i></div>
+
         <div class="dots" id="dots" role="tablist" aria-label="Slide dots">
           <div class="dot active" data-dot="0" role="tab" aria-selected="true" aria-controls="slide-0"></div>
           <div class="dot" data-dot="1" role="tab" aria-selected="false" aria-controls="slide-1"></div>
           <div class="dot" data-dot="2" role="tab" aria-selected="false" aria-controls="slide-2"></div>
         </div>
-        <div class="arrow" id="next" title="Next" aria-label="Next slide">&gt;</div>
+
+        <div class="arrow" id="next" title="Next" aria-label="Next slide"><i class="fa fa-chevron-right"></i></div>
       </div>
 
     </div>
@@ -521,65 +284,59 @@
   <!-- LIMITED TIME OFFERS -->
   <section class="section" aria-labelledby="offers">
     <div class="container">
-      <h2 id="offers">LIMITED TIME OFFERS</h2>
+      <h2 id="offers"><i class="fa fa-calendar"></i>&nbsp; Limited Time Offers</h2>
       <div class="cards" role="list">
         <article class="card" role="listitem">
-          <div class="img">Festive Bucket</div>
-          <h3>Festive Bucket H&C</h3>
-          <p>Bucket, fries & drink</p>
-          <div class="price">GHC 120</div>
+          <div class="img" style="background-image:url('/mnt/data/63b5c50e-9e53-4281-9c20-b40ca66eaa32.png')"></div>
+          <h3>Happy Wings Combo</h3>
+          <p>8pcs wings, fries & drink — shareable delight.</p>
+          <div class="price">GHC 69</div>
         </article>
 
         <article class="card" role="listitem">
-          <div class="img">Festive Bucket</div>
-          <h3>Festive Bucket Chinchinga</h3>
-          <p>Bucket with spicy skewer</p>
-          <div class="price">GHC 130</div>
+          <div class="img" style="background-image:url('/mnt/data/e662576e-994c-4496-ab49-d9a80bd040d7.png')"></div>
+          <h3>Shawarma Meal</h3>
+          <p>Classic shawarma, fries & coke.</p>
+          <div class="price">GHC 85</div>
         </article>
 
         <article class="card" role="listitem">
-          <div class="img">KFC Loaded Fries</div>
-          <h3>KFC Loaded Fries</h3>
-          <p>Fries topped with cheese</p>
-          <div class="price">GHC 78</div>
+          <div class="img" style="background-image:url('/mnt/data/a3612c73-8505-4bd3-aa05-8e82222bb74c.png')"></div>
+          <h3>Basilissa Burger</h3>
+          <p>Beef burger, fries & coke.</p>
+          <div class="price">GHC 90</div>
         </article>
 
         <article class="card" role="listitem">
-          <div class="img">Festive Bucket</div>
-          <h3>Festive Bucket OR</h3>
-          <p>Family pack</p>
-          <div class="price">GHC 150</div>
+          <div class="img" style="background-image:url('/mnt/data/63b5c50e-9e53-4281-9c20-b40ca66eaa32.png')"></div>
+          <h3>Family Feast</h3>
+          <p>Mix and match for the family.</p>
+          <div class="price">GHC 220</div>
         </article>
       </div>
     </div>
   </section>
 
   <script>
-    // Simple autoplay slideshow with controls and accessibility
+    // Autoplay slideshow with controls & animations (adapted from your original)
     (function(){
       const slidesEl = document.getElementById('slides');
       const slides = Array.from(slidesEl.querySelectorAll('.slide'));
-      const dotsEl = document.getElementById('dots');
-      const dots = Array.from(dotsEl.querySelectorAll('.dot'));
+      const dots = Array.from(document.querySelectorAll('.dot'));
       const prev = document.getElementById('prev');
       const next = document.getElementById('next');
 
       let current = 0;
       let timer = null;
-      const interval = 4500;
+      const interval = 5200;
 
-      function goTo(index, manual=false) {
+      function goTo(index, manual=false){
         index = (index + slides.length) % slides.length;
-        slides.forEach((s,i) => {
-          if(i===index) {
-            s.classList.add('active');
-            s.setAttribute('aria-hidden','false');
-          } else {
-            s.classList.remove('active');
-            s.setAttribute('aria-hidden','true');
-          }
+        slides.forEach((s,i)=> {
+          s.classList.toggle('active', i===index);
+          s.setAttribute('aria-hidden', i===index ? 'false' : 'true');
         });
-        dots.forEach((d,i) => {
+        dots.forEach((d,i)=>{
           d.classList.toggle('active', i===index);
           d.setAttribute('aria-selected', i===index ? 'true' : 'false');
         });
@@ -587,41 +344,47 @@
         if(manual) restartTimer();
       }
 
-      function nextSlide() { goTo(current + 1, false); }
-      function prevSlide() { goTo(current - 1, false); }
+      function nextSlide(){ goTo(current+1, true); }
+      function prevSlide(){ goTo(current-1, true); }
 
-      // hook events
       dots.forEach(d => d.addEventListener('click', (e)=> {
         const idx = Number(e.currentTarget.dataset.dot);
         goTo(idx, true);
       }));
-      next.addEventListener('click', ()=> { goTo(current+1, true); });
-      prev.addEventListener('click', ()=> { goTo(current-1, true); });
+      next.addEventListener('click', ()=> goTo(current+1, true));
+      prev.addEventListener('click', ()=> goTo(current-1, true));
 
-      // keyboard support
       document.addEventListener('keydown', (e)=> {
-        if(e.key === 'ArrowRight') { goTo(current+1, true); }
-        if(e.key === 'ArrowLeft') { goTo(current-1, true); }
+        if(e.key === 'ArrowRight') goTo(current+1, true);
+        if(e.key === 'ArrowLeft') goTo(current-1, true);
       });
 
-      function startTimer() {
-        timer = setInterval(()=> goTo(current+1, false), interval);
-      }
-      function stopTimer() {
-        if(timer) { clearInterval(timer); timer = null; }
-      }
-      function restartTimer() { stopTimer(); startTimer(); }
+      function startTimer(){ timer = setInterval(()=> goTo(current+1, false), interval); }
+      function stopTimer(){ if(timer) { clearInterval(timer); timer = null; } }
+      function restartTimer(){ stopTimer(); startTimer(); }
 
-      // pause on hover
       slidesEl.addEventListener('mouseenter', stopTimer);
       slidesEl.addEventListener('mouseleave', startTimer);
 
-      // initialize
+      // init
       goTo(0);
       startTimer();
 
-      // make slides accessible by setting proper ids
-      slides.forEach((s,i)=> s.id = 'slide-' + i);
+      // small parallax tilt for active slide images on mousemove
+      slides.forEach(slide => {
+        const img = slide.querySelector('.slide-img');
+        slide.addEventListener('mousemove', (ev) => {
+          const r = slide.getBoundingClientRect();
+          const cx = r.left + r.width/2;
+          const cy = r.top + r.height/2;
+          const dx = (ev.clientX - cx) / r.width;
+          const dy = (ev.clientY - cy) / r.height;
+          if(img) img.style.transform = `translateY(${dy*12}px) rotate(${dx*4}deg) scale(1.01)`;
+        });
+        slide.addEventListener('mouseleave', () => {
+          if(img) img.style.transform = '';
+        });
+      });
 
     })();
   </script>
