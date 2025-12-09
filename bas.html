@@ -1,4 +1,4 @@
-  <!doctype html>
+ <!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
@@ -17,519 +17,1532 @@
         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
   <script src='https://kit.fontawesome.com/a076d05399.js' crossorigin='anonymous'></script>
   <style>
-    /* ---------- Reset & base ---------- */
-    * { box-sizing: border-box; }
-    html,body { margin:0; padding:0; height:100%; font-family: "Inter", Arial, sans-serif; -webkit-font-smoothing:antialiased; background:#fafafa; color:#111; }
-    a { color:inherit; text-decoration:none; }
-    :root{
-      --yellow:#ffd400;
-      --black:#0a0a0a;
-      --muted:#f6f6f6;
-      --accent:#ffcc00;
-      --max-w:1200px;
-      --glass: rgba(255,255,255,0.06);
-    }
 
-    /* ---------- header ---------- */
-    header {
-      background:linear-gradient(180deg,#fff,#fff);
-      border-bottom:1px solid rgba(10,10,10,0.03);
-      position:sticky;
-      top:0;
-      z-index:200;
-    }
-    .topbar {
-      max-width:var(--max-w);
-      margin:0 auto;
-      display:flex;
-      align-items:center;
-      gap:20px;
-      padding:16px;
-    }
-    .brand {
-      display:flex;
-      align-items:center;
-      gap:12px;
-    }
-    .brand img { height:46px; width:auto; border-radius:8px; object-fit:contain; box-shadow:0 6px 18px rgba(0,0,0,0.08); }
-    .brand .title { font-weight:900; font-size:20px; color:#222; letter-spacing:1px; }
-    nav { margin-left:18px; display:flex; gap:16px; align-items:center; font-weight:700; color:#444; text-transform:uppercase; font-size:13px; }
-    nav a { padding:8px 10px; border-radius:8px; }
-    nav a:hover { background:rgba(0,0,0,0.03); }
+:root{
+  --primary-red: #d62828;
+  --primary-red-2: #ff4d4d;
+  --accent-yellow: #ffd166;
+  --accent-gold: #ffb703;
+  --muted: #f6f5f3;
+  --card: #ffffff;
+  --glass: rgba(255,255,255,0.06);
+  --text: #111111;
+  --muted-text: #666;
+  --max-w: 1240px;
+  --radius-lg: 14px;
+  --radius-sm: 8px;
+  --shadow-1: 0 6px 24px rgba(9,9,10,0.08);
+  --shadow-2: 0 18px 48px rgba(0,0,0,0.18);
+  --glass-2: rgba(255,255,255,0.04);
+  --easing: cubic-bezier(.16,.84,.25,1);
+}
 
-    .right-actions { margin-left:auto; display:flex; align-items:center; gap:12px; }
-    .pill { display:inline-flex; gap:8px; align-items:center; padding:8px 12px; background:linear-gradient(90deg,#fff8e6,#fff2d0); border-radius:999px; border:1px solid rgba(0,0,0,0.03); font-weight:800; color:#b06b00; }
-    .icon-btn { display:inline-flex; gap:8px; align-items:center; background:var(--yellow); padding:9px 14px; border-radius:999px; color:#111; font-weight:800; box-shadow:0 8px 28px rgba(0,0,0,0.12); cursor:pointer; }
-    .small-ico { color:#666; font-size:14px; }
+/* ---------- Base / Reset ---------- */
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;font-family:Inter, "Montserrat", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; color:var(--text); background:linear-gradient(180deg,#fff,#fff); -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;}
+a{color:inherit;text-decoration:none}
+img{max-width:100%;display:block}
 
-    /* ---------- delivery row ---------- */
-    .delivery-row {
-      max-width:var(--max-w);
-      margin:0 auto;
-      display:flex;
-      gap:12px;
-      align-items:center;
-      padding:10px 16px;
-      color:#555;
-      font-weight:700;
-    }
-    .delivery-row .muted { font-weight:600; color:#777; font-size:13px; }
+/* Focus style only for keyboard (accessibility) */
+.user-is-tabbing button:focus, .user-is-tabbing a:focus, .user-is-tabbing input:focus, .user-is-tabbing textarea:focus {
+  outline:3px solid rgba(255,100,80,0.18);
+  outline-offset:3px;
+  border-radius:8px;
+}
 
-    /* ---------- hero ---------- */
-    .hero-wrap { background:#0b0b0b; padding:28px 0 60px 0; position:relative; overflow:visible; }
-    .hero { max-width:var(--max-w); margin:0 auto; position:relative; height:540px; border-radius:14px; overflow:visible; }
+/* ---------- Page container ---------- */
+.container, .section-inner, .header-inner, .top-info-inner {
+  max-width: var(--max-w);
+  margin: 0 auto;
+  padding: 0 20px;
+}
 
-    .slides { position:relative; height:100%; border-radius:14px; overflow:visible; }
+/* ---------- Header ---------- */
+.site-header{
+  position: sticky; top: 0; z-index: 999;
+  background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(255,255,255,0.95));
+  border-bottom: 1px solid rgba(0,0,0,0.04);
+  backdrop-filter: blur(6px);
+}
+.header-inner{
+  display:flex; align-items:center; gap:16px; height:72px;
+}
+.brand{display:flex; gap:14px; align-items:center}
+.logo-wrap img{height:52px; width:auto; border-radius:10px; box-shadow:var(--shadow-1)}
+.brand-title{font-weight:900; letter-spacing:1.2px; margin:0; font-size:20px; color:var(--primary-red)}
+.brand-sub{margin:0;font-size:12px;color:var(--muted-text);font-weight:700}
 
-    .slide {
-      position:absolute;
-      inset:0;
-      display:flex;
-      gap:28px;
-      align-items:center;
-      padding:28px;
-      border-radius:14px;
-      transition: transform 0.8s cubic-bezier(.2,.9,.2,1), opacity 0.6s ease;
-      opacity:0;
-      transform: translateY(20px) scale(0.98);
-      pointer-events:none;
-    }
-    .slide.active { opacity:1; transform: translateY(0) scale(1); z-index:3; pointer-events:auto; }
+/* Nav */
+.main-nav{margin-left:12px; display:flex; gap:10px; align-items:center; font-weight:700; font-size:13px}
+.main-nav a{display:inline-flex; gap:8px; align-items:center; padding:8px 10px; border-radius:10px; color:var(--muted-text)}
+.main-nav a i{width:18px; text-align:center}
+.main-nav a:hover{background:rgba(0,0,0,0.04); color:var(--text)}
 
-    /* Each slide gets a unique style via .slide--1, --2, --3 */
-    .slide--1 { background:
-      linear-gradient(180deg, rgba(10,10,10,0.75), rgba(10,10,10,0.95)),
-      url('hero-shawarma-large.jpg') right center/52% auto no-repeat;
-      color:#fff;
-    }
-    .slide--2 { background:
-      linear-gradient(180deg, rgba(5,5,5,0.75), rgba(5,5,5,0.9)),
-      url('promo-shawarma.jpg') right center/50% auto no-repeat;
-      color:#fff;
-    }
-    .slide--3 { background:
-      linear-gradient(180deg, rgba(8,8,8,0.72), rgba(8,8,8,0.95)),
-      url('thumb-shawarma.jpg') right center/48% auto no-repeat;
-      color:#fff;
-    }
+/* Header actions */
+.header-actions{margin-left:auto; display:flex; gap:10px; align-items:center}
+.btn{display:inline-flex; align-items:center; gap:8px; padding:10px 14px; border-radius:999px; cursor:pointer; border:0; font-weight:800}
+.btn.small{padding:6px 10px; font-weight:700; border-radius:8px}
+.btn.ghost{background:transparent; border:1px solid rgba(0,0,0,0.06)}
+.btn.primary{background:linear-gradient(90deg,var(--primary-red),var(--primary-red-2)); color:#fff; box-shadow: 0 10px 30px rgba(214,40,40,0.12); transform: translateZ(0)}
+.circle{width:44px;height:44px;border-radius:999px;display:inline-flex;align-items:center;justify-content:center}
 
-    /* Left panel content */
-    .announce {
-      width:52%;
-      padding:18px;
-      display:flex;
-      flex-direction:column;
-      gap:14px;
-    }
-    .brandline { display:flex; gap:10px; align-items:center; font-weight:900; color:var(--yellow); }
-    .brandline .bump { background:#111; color:var(--yellow); padding:8px 10px; border-radius:10px; font-weight:900; box-shadow: 0 10px 30px rgba(255,204,0,0.08); }
-    .headline { font-size:56px; margin:0; line-height:0.9; letter-spacing:0.6px; text-transform:uppercase; font-weight:900; color: #fff; text-shadow: 0 10px 30px rgba(0,0,0,0.6); }
-    .sub { font-size:16px; color:rgba(255,255,255,0.86); max-width:520px; }
+/* small header decor */
+.header-decor .decor-pepper{position:absolute;right:24px;top:8px;opacity:0.12; width:80px}
+.header-decor .decor-swoosh{position:absolute;right:0;top:0;width:240px;opacity:0.18; transform:translateY(-18px)}
 
-    .pricebox { display:flex; gap:18px; align-items:baseline; margin-top:6px; }
-    .pricebox .price { font-size:92px; font-weight:900; color:var(--yellow); line-height:0.9; }
-    .pricebox .meta { font-size:14px; color:rgba(255,255,255,0.9); font-weight:800; }
+/* ---------- Top info row ---------- */
+.top-info{background:linear-gradient(90deg, rgba(255,250,240,0.6), rgba(255,255,255,0.5)); border-bottom:1px solid rgba(0,0,0,0.03)}
+.top-info-inner{display:flex;align-items:center;gap:14px;padding:10px 20px;font-weight:700;color:var(--muted-text)}
+.top-info a{font-weight:900;color:var(--primary-red)}
+.top-cta{margin-left:auto; display:flex; gap:8px; align-items:center}
 
-    .cta-row { display:flex; gap:12px; margin-top:18px; align-items:center; }
-    .btn { padding:12px 18px; border-radius:999px; font-weight:900; cursor:pointer; border:0; }
-    .btn.primary { background:var(--yellow); color:#111; box-shadow:0 12px 36px rgba(255,204,0,0.16); }
-    .btn.ghost { background:transparent; border:1px solid rgba(255,255,255,0.12); color:#fff; }
+/* ---------- HERO / CAROUSEL ---------- */
+.hero-carousel{position:relative;padding:28px 0 80px 0; background: radial-gradient(800px 400px at 10% 10%, rgba(255,180,60,0.06), transparent 12%); overflow:visible}
+.carousel-inner{max-width:var(--max-w); margin:0 auto; height:520px; position:relative}
 
-    /* Right panel: floating product card area (the given image is the background but we add layers) */
-    .hero-media { width:48%; position:relative; display:flex; align-items:center; justify-content:center; overflow:visible; }
-    .media-decor {
-      width:520px; height:360px; position:relative; border-radius:12px; overflow:visible;
-      display:flex; align-items:center; justify-content:center;
-      transform: translateX(10px);
-    }
+/* slide base */
+.carousel-slide{position:absolute; inset:0; display:flex; gap:28px; align-items:center; padding:28px; border-radius:var(--radius-lg); overflow:visible; transform: translateY(20px) scale(.99); opacity:0; pointer-events:none; transition: all 560ms var(--easing); box-shadow:var(--shadow-2)}
+.carousel-slide.is-active{opacity:1; transform:none; pointer-events:auto; z-index:5}
 
-    /* decorative overlays and ornaments */
-    .ribbon { position:absolute; left:12px; top:12px; background:var(--yellow); color:#111; padding:10px 14px; font-weight:900; border-radius:8px; box-shadow:0 12px 40px rgba(0,0,0,0.35); transform: rotate(-6deg); }
-    .sparkles { position:absolute; right:24px; top:20px; display:flex; gap:6px; transform:scale(0.98); }
-    .sparkles i { background:rgba(255,255,255,0.06); padding:10px; border-radius:8px; width:40px; height:40px; display:flex; align-items:center; justify-content:center; font-size:18px; color:var(--yellow); box-shadow:0 10px 30px rgba(0,0,0,0.4); }
+/* slide backgrounds — distinct look */
+.carousel-slide.slide--shawarma{
+  background:
+    linear-gradient(180deg, rgba(33,13,0,0.36), rgba(5,5,5,0.56)),
+    url("images/hero-shawarma-large.jpg") right 8% center/54% auto no-repeat;
+  color:#fff;
+  border: 1px solid rgba(255,80,60,0.06);
+  box-shadow: 0 30px 70px rgba(210,80,60,0.12);
+  transform-origin:center left;
+}
+.carousel-slide.slide--burger{
+  background:
+    linear-gradient(180deg, rgba(10,10,10,0.7), rgba(6,6,6,0.85)),
+    url("images/hero-burger-large.jpg") right top/46% auto no-repeat;
+  color:#fff;
+  border: 1px solid rgba(255,200,80,0.03);
+}
+.carousel-slide.slide--feast{
+  background:
+    linear-gradient(135deg, rgba(255,240,220,0.08), rgba(255,240,230,0.02)),
+    url("images/hero-feast-large.jpg") right center/52% auto no-repeat;
+  color:var(--text);
+  border: 1px solid rgba(0,0,0,0.03);
+}
 
-    .badge { position:absolute; left:18px; bottom:22px; background:rgba(0,0,0,0.6); color:#fff; padding:10px 14px; border-radius:10px; font-weight:900; display:inline-flex; gap:10px; align-items:center; }
-    .glass-shape { position:absolute; right:8px; bottom:8px; width:180px; height:120px; border-radius:10px; background:linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.03)); box-shadow: 0 30px 50px rgba(0,0,0,0.6); transform:rotate(-6deg); display:flex; align-items:center; justify-content:center; color:#fff; font-weight:800; }
+/* left & right panels */
+.hero-left{width:52%; padding:18px; display:flex; flex-direction:column; gap:12px}
+.hero-right{width:48%; display:flex; align-items:center; justify-content:center; position:relative}
 
-    /* animated geometric blobs */
-    .blob { position:absolute; border-radius:22px; filter:blur(28px); opacity:0.18; transform-origin:center; }
-    .blob.b1 { width:180px; height:180px; left:-60px; top:-30px; background: linear-gradient(180deg,#ffdf7a,#ffb84d); animation: floaty 6s ease-in-out infinite; }
-    .blob.b2 { width:140px; height:140px; right:40px; top:80px; background: linear-gradient(180deg,#ffecb2,#ffd36b); animation: floaty 5s ease-in-out infinite reverse; }
-    .blob.b3 { width:120px; height:120px; right:120px; bottom:40px; background: linear-gradient(180deg,#fff4cc,#ffd36b); animation: floaty 7s ease-in-out infinite; }
+/* hero text */
+.eyebrow .badge-pill{background:linear-gradient(90deg,var(--accent-gold),var(--accent-yellow)); color:#202020; padding:6px 10px; border-radius:999px; font-weight:900; display:inline-flex; gap:8px; align-items:center; box-shadow:0 10px 30px rgba(255,180,60,0.08)}
+.hero-title{font-size:44px; line-height:0.92; margin:0; letter-spacing:0.6px; font-weight:900; text-transform:capitalize}
+.hero-title .accent{color:var(--accent-gold); font-weight:900}
+.hero-copy{color:rgba(255,255,255,0.9); max-width:520px}
+.carousel-slide.slide--feast .hero-copy{color:var(--muted-text)}
+.price-block{display:flex; gap:12px; align-items:baseline}
+.price-block .price{font-size:30px;font-weight:900;color:var(--primary-red)}
+.ctas{display:flex; gap:12px; margin-top:6px}
 
-    @keyframes floaty { 0% { transform:translateY(0) scale(1); } 50% { transform:translateY(-10px) scale(1.02); } 100% { transform:translateY(0) scale(1); } }
+/* hero features */
+.feature-list{display:flex; gap:12px; margin-top:12px; padding:0; list-style:none}
+.feature-list li{display:flex; gap:8px; align-items:center; font-weight:800; color:var(--muted-text); padding:6px 10px; background:rgba(255,255,255,0.04); border-radius:10px}
 
-    /* slide labels (small stacked boxes) */
-    .stacked-label { display:flex; gap:8px; align-items:center; margin-top:6px; }
-    .label-pill { background:rgba(255,255,255,0.06); color:#fff; padding:8px 10px; border-radius:8px; font-weight:800; display:inline-flex; gap:8px; align-items:center; }
+/* small-gallery in burger slide */
+.small-gallery{display:flex; gap:8px; margin-top:8px}
+.small-gallery img{width:76px;height:56px; object-fit:cover;border-radius:8px; box-shadow:var(--shadow-1)}
 
-    /* slide-specific embellishments */
-    .slide--1 .headline { color:#fff; }
-    .slide--2 .headline { color:#fff; text-shadow: 0 6px 18px rgba(0,0,0,0.6); }
-    .slide--3 .headline { color:#fff; }
+/* ---------- Image Collage (layers + animations) ---------- */
+.image-collage{position:relative;width:520px;height:360px;border-radius:12px;display:block;overflow:visible; transform:translateZ(0)}
+.image-collage img{position:absolute; left:0; top:0; width:auto; height:100%; object-fit:cover; border-radius:12px; transition: transform 420ms var(--easing), filter 420ms var(--easing)}
+.image-collage .collage-main{position:relative; width:88%; left:6%; top:6%; height:86%; object-fit:cover; box-shadow: 0 30px 60px rgba(0,0,0,0.28); border-radius:16px}
+.image-collage img.layer-fries{width:40%; right:10%; top:42%; transform-origin:center; z-index:6}
+.image-collage img.layer-garnish{width:26%; right:6%; top:12%; z-index:8}
+.image-collage img.layer-drip{width:60%; right:2%; top:22%; z-index:7}
+.image-collage .steam{width:88%; left:6%; top:-6%; opacity:0.9; z-index:9; filter: blur(6px)}
+.floating-badges{position:absolute; left:10px; top:8px; display:flex; gap:8px; flex-direction:column; z-index:12}
+.badge{display:inline-flex; gap:8px; align-items:center; padding:8px 10px; border-radius:12px; font-weight:900; background:rgba(0,0,0,0.48); color:#fff; box-shadow:0 10px 30px rgba(0,0,0,0.28)}
+.badge.best{background:linear-gradient(90deg,#ffd166,#ffb703); color:#2b1f00}
+.badge.hot{background:linear-gradient(90deg,#ff6b4a,#ff3b2f); color:#fff}
+.badge.fresh{background:linear-gradient(90deg,#8cd790,#56c27b); color:#fff}
 
-    /* dots & arrows */
-    .controls { position:absolute; left:50%; transform:translateX(-50%); bottom:-36px; display:flex; gap:12px; align-items:center; z-index:80; }
-    .dots { display:flex; gap:10px; }
-    .dot { width:12px; height:12px; border-radius:50%; background:rgba(255,255,255,0.18); box-shadow:0 8px 20px rgba(0,0,0,0.28); cursor:pointer; }
-    .dot.active { background:var(--yellow); width:16px; height:16px; box-shadow:0 14px 40px rgba(255,204,0,0.18); }
-    .arrow { width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.06); color:#fff; cursor:pointer; border:1px solid rgba(255,255,255,0.06); }
+/* micro pop class triggered by JS */
+.js-anim-pop{animation: pop-scale .72s cubic-bezier(.2,.9,.2,1)}
+@keyframes pop-scale { 0%{transform:scale(.86) translateY(10px); opacity:0} 60%{transform:scale(1.03) translateY(-6px); opacity:1} 100%{transform:scale(1) translateY(0)} }
 
-    /* ---------- section below hero (cards with icons) ---------- */
-    .section { max-width:var(--max-w); margin:40px auto; padding:0 18px; }
-    .section h2 { font-size:22px; font-weight:900; letter-spacing:0.6px; margin-bottom:12px; }
-    .cards { display:grid; grid-template-columns: repeat(4, 1fr); gap:18px; }
-    .card { background:#fff; border-radius:12px; padding:16px; box-shadow:0 8px 28px rgba(12,12,12,0.06); display:flex; gap:12px; align-items:center; }
-    .card i { font-size:28px; color:var(--yellow); width:60px; text-align:center; }
-    .card .meta { font-weight:800; color:#222; }
-    .card .desc { color:#666; font-size:13px; margin-top:6px; }
+/* tiny badge shimmer */
+.badge::after{content:''; position:absolute; left:-40%; top:0; right:-40%; bottom:0; background:linear-gradient(90deg, rgba(255,255,255,0.06), rgba(255,255,255,0.14) 40%, rgba(255,255,255,0.06)); transform:skewX(-20deg) translateX(-120%); pointer-events:none; transition:transform 900ms ease}
+.carousel-slide.is-active .badge::after{transform:skewX(-20deg) translateX(160%)}
 
-    /* responsiveness */
-    @media (max-width: 1100px) {
-      .announce { width:55%; }
-      .media-decor { width:420px; height:300px; }
-    }
-    @media (max-width: 860px) {
-      .hero { height:720px; }
-      .slide { flex-direction:column-reverse; padding:18px; gap:14px; }
-      .announce, .hero-media { width:100%; }
-      .cards { grid-template-columns: repeat(2,1fr); }
-    }
-    @media (max-width: 520px) {
-      nav { display:none; }
-      .brand .title { display:none; }
-      .pricebox .price { font-size:48px; }
-      .headline { font-size:36px; }
-      .cards { grid-template-columns: 1fr; }
-    }
+/* ribbons & topper */
+.ribbon{position:absolute; left:12px; top:12px; background:var(--accent-gold); color:#222; padding:10px 14px; font-weight:900; border-radius:10px; box-shadow:0 12px 40px rgba(0,0,0,0.26); transform:rotate(-6deg)}
+.topper{position:absolute; right:12px; top:12px; background:rgba(0,0,0,0.62); color:#fff; padding:10px 12px; border-radius:8px; font-weight:800}
 
-    /* subtle entrance animations on slide children */
-    .announce .brandline, .announce .headline, .announce .sub, .pricebox, .cta-row, .badge, .ribbon, .glass-shape {
-      transform-origin:left center;
-      opacity:0;
-      transform: translateX(-14px);
-      transition: all 650ms cubic-bezier(.2,.9,.2,1);
-    }
-    .slide.active .announce .brandline { opacity:1; transform:translateX(0); transition-delay:120ms; }
-    .slide.active .announce .headline { opacity:1; transform:translateX(0); transition-delay:220ms; }
-    .slide.active .announce .sub { opacity:1; transform:translateX(0); transition-delay:340ms; }
-    .slide.active .pricebox { opacity:1; transform:translateX(0); transition-delay:420ms; }
-    .slide.active .cta-row { opacity:1; transform:translateX(0); transition-delay:520ms; }
-    .slide.active .badge, .slide.active .ribbon, .slide.active .glass-shape { opacity:1; transform:translateX(0); transition-delay:650ms; }
+/* garnish SVGs */
+.garnish-sparkles{position:absolute; right:4%; top:6%; width:76px; z-index:11; opacity:0.95}
 
-    /* small decorative animated arrows on right image area */
-    .chev { position:absolute; right:12px; top:50%; transform:translateY(-50%); display:flex; flex-direction:column; gap:8px; z-index:8; }
-    .chev i { background:rgba(255,255,255,0.05); padding:8px; border-radius:999px; color:var(--yellow); width:42px; height:42px; display:flex; align-items:center; justify-content:center; box-shadow:0 12px 30px rgba(0,0,0,0.45); animation: pulse 1.8s infinite; }
-    .chev i:nth-child(2){ animation-delay:0.2s; }
-    .chev i:nth-child(3){ animation-delay:0.4s; }
-    @keyframes pulse { 0%{ transform:scale(1);}50%{transform:scale(1.06);}100%{transform:scale(1);} }
+/* chev decoration */
+.chev{position:absolute; right:8px; top:50%; transform:translateY(-50%); display:flex; flex-direction:column; gap:8px; z-index:12}
+.chev i{background:rgba(255,255,255,0.04); padding:8px; border-radius:999px; color:var(--accent-gold); width:42px; height:42px; display:flex; align-items:center; justify-content:center; box-shadow:0 12px 30px rgba(0,0,0,0.35); animation: pulse 1.8s infinite}
+@keyframes pulse{0%{transform:scale(1)}50%{transform:scale(1.06)}100%{transform:scale(1)}}
 
-  </style>
+/* ---------- Controls (dots / arrows) ---------- */
+.carousel-controls{position:absolute; left:50%; transform:translateX(-50%); bottom:-40px; display:flex; align-items:center; gap:14px; z-index:40}
+.control{width:46px;height:46px;border-radius:999px;background:linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02)); border:1px solid rgba(255,255,255,0.06); display:flex; align-items:center; justify-content:center; color:var(--text); box-shadow:var(--shadow-1)}
+.control:hover{transform:translateY(-2px)}
+.dots{display:flex; gap:10px}
+.dot{width:12px;height:12px;border-radius:999px;background:rgba(0,0,0,0.12); box-shadow:0 6px 20px rgba(0,0,0,0.12); border:1px solid rgba(255,255,255,0.02)}
+.dot.active{width:18px;height:18px;background:linear-gradient(90deg,var(--accent-gold),var(--primary-red-2)); box-shadow:0 10px 24px rgba(214,40,40,0.14)}
+
+/* ---------- Highlights / cards ---------- */
+.section { padding: 42px 0; }
+.section h2{font-size:22px;margin:0 0 14px 0;font-weight:900}
+.highlights-grid{display:grid; grid-template-columns: repeat(4, 1fr); gap:18px}
+.highlight-card{background:var(--card); border-radius:12px; overflow:hidden; box-shadow:var(--shadow-1); transition:transform 280ms var(--easing); cursor:pointer}
+.highlight-card:hover{transform:translateY(-6px)}
+.highlight-card img{width:100%; height:160px; object-fit:cover; display:block}
+.highlight-card .card-body{padding:12px}
+.highlight-card i{font-size:20px;color:var(--primary-red); margin-bottom:8px}
+
+/* ---------- Menu grid ---------- */
+.menu-highlights .section-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.menu-grid{display:grid; grid-template-columns: repeat(4, 1fr); gap:18px; margin-top:16px}
+.menu-item{background:var(--card); border-radius:12px; overflow:visible; box-shadow:var(--shadow-1); display:flex; flex-direction:column; transition: transform 300ms var(--easing)}
+.menu-item:hover{transform:translateY(-6px)}
+.item-media{position:relative; height:180px; overflow:hidden; border-top-left-radius:12px; border-top-right-radius:12px}
+.item-media img{width:100%;height:100%;object-fit:cover;transition:transform 420ms var(--easing)}
+.menu-item:hover .item-media img{transform:scale(1.06)}
+.item-overlay{position:absolute; left:10px; top:10px; display:flex; gap:8px; flex-direction:column; z-index:6}
+.price-badge{background:linear-gradient(90deg,var(--accent-gold),var(--accent-yellow)); padding:8px 10px; border-radius:999px; font-weight:900; color:#2b1f00}
+.item-overlay .badge.small{padding:6px 8px; border-radius:8px; background:rgba(0,0,0,0.6); color:#fff}
+.item-body{padding:12px; display:flex; flex-direction:column; gap:8px}
+.item-actions{display:flex; gap:8px; margin-top:auto; align-items:center}
+.item-actions .btn.small{padding:6px 10px; font-weight:800; border-radius:8px}
+
+/* ---------- Promo banner ---------- */
+.promo-banner{position:relative; border-radius:12px; overflow:hidden; margin-top:18px; display:flex; align-items:center; justify-content:center}
+.promo-inner{position:relative; width:100%; height:220px; display:flex; align-items:center; justify-content:flex-start; gap:20px}
+.promo-inner img{width:50%; height:100%; object-fit:cover; filter:brightness(.86)}
+.promo-copy{padding:20px; max-width:520px}
+.promo-copy h2{font-size:26px;color:var(--primary-red)}
+.promo-actions{display:flex; gap:10px; margin-top:8px}
+
+/* ---------- Masonry gallery ---------- */
+.gallery .masonry-grid{column-count:4; column-gap:14px; margin-top:12px}
+.masonry-item{display:inline-block; width:100%; margin:0 0 14px; position:relative; overflow:hidden; border-radius:12px}
+.masonry-item img{width:100%; display:block; transition: transform 420ms var(--easing)}
+.masonry-item:hover img{transform:scale(1.06)}
+.masonry-item .caption{position:absolute; left:8px; bottom:8px; padding:6px 8px; background:linear-gradient(90deg, rgba(0,0,0,0.5), rgba(0,0,0,0.36)); color:#fff; border-radius:8px; font-weight:800; font-size:13px}
+
+/* ---------- Team ---------- */
+.team-grid{display:grid; grid-template-columns: repeat(3, 1fr); gap:18px}
+.team-member{background:var(--card); padding:12px; border-radius:12px; text-align:center; box-shadow:var(--shadow-1)}
+.team-member img{width:100%;height:180px;object-fit:cover;border-radius:12px;margin-bottom:12px}
+.member-info h4{margin:0;font-size:16px}
+.member-info p{margin:6px 0 0 0;color:var(--muted-text)}
+
+/* ---------- Testimonials ---------- */
+.testimonials-slider{display:flex; gap:12px; align-items:center; margin-top:12px}
+.testimonial{background:linear-gradient(180deg,#fff,#fff); border-radius:12px; padding:18px; width:320px; box-shadow:var(--shadow-1); display:flex; gap:12px; align-items:flex-start}
+.testimonial-avatar{width:56px;height:56px;border-radius:999px;object-fit:cover}
+.testimonial .quote{font-weight:700;margin:0 0 8px 0}
+.rating{display:inline-flex; gap:6px; align-items:center; color:var(--accent-gold); font-weight:900}
+
+/* ---------- Locations ---------- */
+.locations-grid{display:grid; grid-template-columns: repeat(3,1fr); gap:18px}
+.location-card img{height:160px; object-fit:cover; border-radius:12px}
+.loc-body{padding:12px}
+
+/* ---------- Contact / FAQ ---------- */
+.contact .split{display:grid; grid-template-columns: 1fr 420px; gap:18px; align-items:start}
+.contact-form input, .contact-form textarea, .newsletter-form input{
+  width:100%; padding:12px 14px; border-radius:10px; border:1px solid #eee; margin-top:8px; font-size:14px
+}
+.contact-form .form-actions{display:flex; gap:8px; margin-top:12px; align-items:center}
+.faq-list{margin-top:10px; padding:0}
+.faq-item{background:linear-gradient(180deg,#fff,#fff); margin-bottom:8px; border-radius:10px; overflow:hidden; box-shadow:var(--shadow-1)}
+.faq-q{width:100%; text-align:left; padding:12px 14px; font-weight:900; border:0; background:transparent; cursor:pointer}
+.faq-a{padding:10px 14px; color:var(--muted-text); border-top:1px solid #f0f0f0}
+
+/* ---------- Newsletter ---------- */
+.newsletter-inner{display:flex; gap:18px; align-items:center; background:linear-gradient(90deg,#fffafb, #fff); padding:16px; border-radius:12px; box-shadow:var(--shadow-1)}
+.newsletter-img{width:180px;height:120px;object-fit:cover;border-radius:12px}
+.newsletter-copy h3{margin:0;margin-bottom:6px}
+
+/* ---------- Floating CTAs ---------- */
+.floating-ctas{position:fixed; right:18px; bottom:18px; display:flex; flex-direction:column; gap:12px; z-index:9999}
+.floating-btn{display:inline-flex; align-items:center; gap:8px; padding:10px 12px; border-radius:999px; box-shadow:var(--shadow-2); background:linear-gradient(90deg,var(--primary-red),var(--primary-red-2)); color:#fff; font-weight:900}
+.floating-btn.wa-fab{background:linear-gradient(90deg,#25D366,#1ebea5)}
+.floating-btn .count{background:rgba(255,255,255,0.12); padding:4px 8px; border-radius:999px; font-weight:900}
+
+/* ---------- Lightbox (bs-lightbox) ---------- */
+.bs-lightbox{position:fixed; inset:0; display:flex; align-items:center; justify-content:center; background:rgba(0,0,0,0.88); z-index:10000}
+.bs-lb-inner{position:relative; max-width:1100px; width:92%; padding:18px; display:flex; gap:12px; align-items:center}
+.bs-lb-img{max-width:100%; max-height:78vh; border-radius:12px; box-shadow: 0 30px 80px rgba(0,0,0,0.6)}
+.bs-lb-close, .bs-lb-prev, .bs-lb-next{position:relative; z-index:10101; background:rgba(255,255,255,0.06); border-radius:999px; width:44px; height:44px; display:inline-flex; align-items:center; justify-content:center; border:0; color:#fff}
+
+/* ---------- Cart Drawer (override / polish) ---------- */
+.bs-cart-drawer{position:fixed;right:0;top:0;height:100%;width:420px;max-width:96vw;background:linear-gradient(180deg,#fff,#fff);box-shadow:-28px 0 60px rgba(0,0,0,0.22);transform:translateX(110%);transition:transform 380ms var(--easing);z-index:10001;border-left:1px solid rgba(0,0,0,0.04)}
+.bs-cart-drawer[aria-hidden="false"]{transform:translateX(0)}
+.bs-cart-head{display:flex;align-items:center;justify-content:space-between;padding:18px;border-bottom:1px solid #f0f0f0}
+.bs-cart-body{padding:12px; overflow:auto}
+.bs-cart-list li{display:flex;gap:10px;padding:10px 6px;border-bottom:1px dashed #f4f4f4;align-items:center}
+.bs-cart-item-qty{font-weight:900;padding:0 6px}
+.bs-cart-foot{padding:12px;border-top:1px solid #f0f0f0;display:flex;align-items:center;justify-content:space-between}
+
+/* cart buttons */
+.bs-cart-actions .btn{padding:8px 12px; border-radius:10px}
+
+/* ---------- small interactions ---------- */
+.btn.primary:active, .control:active{transform:translateY(2px)}
+.menu-item .item-actions .btn.added{transform:scale(.98); box-shadow:0 6px 18px rgba(0,0,0,0.10); opacity:0.92}
+
+/* ---------- Footer ---------- */
+.site-footer{background:linear-gradient(180deg,#110a08,#1c0f0f); color:#fff; padding:28px 0 18px; margin-top:18px}
+.footer-inner{max-width:var(--max-w); margin:0 auto; padding:0 20px; display:flex; gap:24px; align-items:flex-start}
+.footer-about{flex:1}
+.footer-links{min-width:160px}
+.footer-contact{min-width:220px}
+.logo-footer{height:44px}
+.socials a{display:inline-flex; align-items:center; justify-content:center; width:36px; height:36px; border-radius:8px; background:rgba(255,255,255,0.06); color:#fff; margin-right:8px}
+
+/* ---------- Responsive ---------- */
+@media (max-width:1100px){
+  .menu-grid{grid-template-columns: repeat(3, 1fr)}
+  .highlights-grid{grid-template-columns: repeat(2,1fr)}
+  .team-grid{grid-template-columns: repeat(2,1fr)}
+  .carousel-inner{height:640px}
+  .carousel-slide{padding:18px}
+}
+@media (max-width:860px){
+  .header-inner{height:64px}
+  .main-nav{display:none}
+  .carousel-inner{height:auto}
+  .carousel-slide{position:relative; display:block; padding:18px; transform:none; opacity:1}
+  .carousel-slide .hero-left, .carousel-slide .hero-right{width:100%}
+  .carousel-slide .hero-right{margin-top:12px}
+  .menu-grid{grid-template-columns: repeat(2, 1fr)}
+  .masonry-grid{column-count:2}
+  .locations-grid{grid-template-columns: repeat(2,1fr)}
+  .contact .split{grid-template-columns: 1fr}
+}
+@media (max-width:520px){
+  .menu-grid{grid-template-columns: 1fr}
+  .highlights-grid{grid-template-columns: 1fr}
+  .masonry-grid{column-count:1}
+  .carousel-controls{display:none}
+  .hero-title{font-size:28px}
+  .floating-ctas{right:10px; bottom:10px}
+}
+
+/* ---------- Extra subtle animated flourishes ---------- */
+@keyframes floaty { 0%{ transform: translateY(0px) } 50%{ transform: translateY(-8px) } 100%{ transform: translateY(0px) } }
+@keyframes slideInLeft { 0%{ opacity:0; transform:translateX(-18px) } 100%{ opacity:1; transform:none } }
+@keyframes shimmer { 0%{ background-position: -200% 0 } 100%{ background-position: 200% 0 } }
+.section h2{animation: slideInLeft .6s var(--easing) both}
+
+/* ---------- small helpers ---------- */
+.visually-hidden{position:absolute !important; height:1px; width:1px; overflow:hidden; clip:rect(1px,1px,1px,1px); white-space:nowrap}
+.small{font-size:13px}
+
+/* End stylesheet */
+</style>
+
 </head>
-<body>
+<body class="theme-red">
 
-  <!-- HEADER -->
-  <header role="banner" aria-label="Site header">
-    <div class="topbar">
-      <div class="brand" aria-hidden="false">
-        <!-- Replace 'logo.png' with your own Basilissa logo path. -->
-        <img src="logo.png" alt="Basilissa logo" id="logo-img">
-        <div>
-          <div class="title">BASILISSA</div>
-          <div class="small-ico" style="font-weight:700;">Fresh • Fast • Flavorful</div>
+  <!-- ===== HEADER (image logo, nav, CTAs) ===== -->
+  <header class="site-header" role="banner" aria-label="Basilissa header">
+    <div class="header-inner">
+      <div class="brand">
+        <picture class="logo-wrap" aria-hidden="false">
+          <source srcset="images/logo@2x.png 2x, images/logo.png 1x" />
+          <img src="images/logo.png" alt="Basilissa logo" id="logo-img">
+        </picture>
+
+        <div class="brand-text">
+          <h1 class="brand-title">BASILISSA</h1>
+          <p class="brand-sub">Fresh • Fast • Flavorful</p>
         </div>
       </div>
 
-      <nav aria-label="Main navigation">
-        <a href="#"><i class="fa fa-utensils"></i> Menu</a>
-        <a href="#"><i class="fa fa-map-marker-alt"></i> Locations</a>
-        <a href="#"><i class="fa fa-tags"></i> Offers</a>
-        <a href="#"><i class="fa fa-phone"></i> Contact</a>
+      <nav class="main-nav" aria-label="Main navigation">
+        <a href="#menu"><i class="fa fa-utensils"></i><span>Menu</span></a>
+        <a href="#gallery"><i class="fa fa-images"></i><span>Gallery</span></a>
+        <a href="#offers"><i class="fa fa-tags"></i><span>Offers</span></a>
+        <a href="#locations"><i class="fa fa-map-marker-alt"></i><span>Locations</span></a>
+        <a href="#contact"><i class="fa fa-phone"></i><span>Contact</span></a>
       </nav>
 
-      <div class="right-actions">
-        <div class="pill"><i class="fa fa-truck"></i> Delivery</div>
-        <button class="icon-btn" aria-label="Order now"><i class="fa fa-motorcycle"></i> Order</button>
+      <div class="header-actions">
+        <button class="btn pill delivery-btn" aria-label="Delivery options"><i class="fa fa-truck"></i> Delivery</button>
+        <button class="btn primary order-btn" aria-label="Order now"><i class="fa fa-motorcycle"></i> Order</button>
+        <button class="icon circle search-toggle" aria-label="Search"><i class="fa fa-search"></i></button>
       </div>
+    </div>
+
+    <!-- subtle header imagery (can be positioned by CSS) -->
+    <div class="header-decor">
+      <img src="images/pepper-icon.png" alt="" class="decor-pepper" aria-hidden="true">
+      <svg class="decor-swoosh" viewBox="0 0 200 40" aria-hidden="true">
+        <path d="M0 30 Q40 0 200 20 L200 40 L0 40 Z" fill="rgba(255,0,0,0.06)"></path>
+      </svg>
     </div>
   </header>
 
-  <!-- DELIVERY ROW -->
-  <div class="delivery-row" role="region" aria-label="Delivery info">
-    <div class="muted"><i class="fa fa-clock"></i> Open now • 9am — 11pm</div>
-    <div class="muted"><i class="fa fa-phone"></i> +233 24 000 0000</div>
-    <div style="margin-left:auto; font-weight:800; color:#222;"><i class="fa fa-map-pin"></i> Accra • Ghana</div>
+  <!-- ===== DELIVERY / CONTACT ROW ===== -->
+  <div class="top-info" role="region" aria-label="Opening times and contact">
+    <div class="top-info-inner">
+      <div class="open-now"><i class="fa fa-clock"></i> Open today: <strong>9:00 — 23:00</strong></div>
+      <div class="phone"><i class="fa fa-phone"></i> <a href="tel:+233240000000">+233 24 000 0000</a></div>
+      <div class="location"><i class="fa fa-map-pin"></i> Accra • Ghana</div>
+      <div class="top-cta">
+        <a class="btn ghost order-whatsapp" href="https://wa.me/233240000000?text=I'd%20like%20to%20order%20from%20Basilissa" aria-label="Order on WhatsApp">
+          <i class="fa fa-whatsapp"></i> Order on WhatsApp
+        </a>
+        <a class="btn small download-menu" href="menu.pdf" aria-label="Download menu"><i class="fa fa-download"></i> Download Menu</a>
+      </div>
+    </div>
   </div>
 
-  <!-- HERO / SLIDESHOW -->
-  <section class="hero-wrap" aria-label="Promotions">
-    <div class="hero" role="region" aria-roledescription="carousel" aria-label="Hero slideshow">
+  <!-- ===== HERO / SLIDESHOW (lots of layered images & ornaments) ===== -->
+  <main id="main" role="main">
+    <section id="hero" class="hero-carousel" role="region" aria-roledescription="carousel" aria-label="Promotional hero">
+      <div class="carousel-inner" data-carousel="true">
 
-      <div class="slides" id="slides">
+        <!-- SLIDE A (Shawarma collage) -->
+        <article class="carousel-slide slide--shawarma is-active" data-slide="0" role="group" aria-roledescription="slide" aria-label="Shawarma special">
+          <div class="hero-left">
+            <div class="eyebrow"><span class="badge-pill">Chef's Special</span></div>
+            <h2 class="hero-title">Wraps so good<br><span class="accent">they'll steal the show.</span></h2>
+            <p class="hero-copy">Hand-sliced meat, warm flatbread, crisp fries — the Basilissa shawarma is stacked with flavor and finished with our secret zesty sauce.</p>
 
-        <!-- Slide 1: uses image 1 -->
-        <article class="slide slide--1 active" data-index="0" role="group" aria-roledescription="slide" aria-label="Happy Meal slide">
-          <div class="announce" aria-hidden="false">
-            <div class="brandline">
-              <div class="bump">B</div>
-              <div>Basilissa Specials <i class="fa fa-star" style="margin-left:8px;color:#fff;"></i></div>
-            </div>
-
-            <h2 class="headline">HAPPY<br>MEAL</h2>
-            <div class="sub">8pcs B-special wings, fries and a chilled drink — juicy wings glazed and sprinkled for crunch. Perfect for sharing.</div>
-
-            <div class="pricebox" aria-hidden="true">
-              <div class="price">69</div>
-              <div class="meta">GHC <br><span style="font-size:12px; opacity:0.9;">8pcs wings • fries • 1 coke</span></div>
-            </div>
-
-            <div class="stacked-label">
-              <div class="label-pill"><i class="fa fa-bolt"></i> Hot & Fresh</div>
-              <div class="label-pill"><i class="fa fa-shield-alt"></i> Hygienic Prep</div>
-            </div>
-
-            <div class="cta-row">
-              <button class="btn primary"><i class="fa fa-shopping-cart"></i> Order Now</button>
-              <button class="btn ghost"><i class="fa fa-info-circle"></i> View Details</button>
-            </div>
-          </div>
-
-          <div class="hero-media" aria-hidden="true">
-            <div class="media-decor" role="img" aria-label="Happy Meal image">
-              <div class="blob b1"></div>
-              <div class="blob b2"></div>
-
-              <div class="ribbon"><i class="fa fa-fire"></i> Best Seller</div>
-              <div class="sparkles" aria-hidden="true">
-                <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i>
+            <div class="hero-meta">
+              <div class="price-block">
+                <span class="price">GHC <strong>85</strong></span>
+                <span class="meta-small">shawarma • fries • drink</span>
               </div>
 
-              <div class="badge"><i class="fa fa-tags"></i> Limited Offer</div>
-              <div class="glass-shape"><i class="fa fa-heart"></i> Loved by Many</div>
-
-              <div class="chev" aria-hidden="true">
-                <i class="fa fa-chevron-right"></i>
-                <i class="fa fa-chevron-right"></i>
-                <i class="fa fa-chevron-right"></i>
+              <div class="ctas">
+                <button class="btn primary big" aria-label="Order shawarma"><i class="fa fa-shopping-cart"></i> Order Now</button>
+                <a href="#menu" class="btn ghost" aria-label="View menu"><i class="fa fa-list"></i> View Menu</a>
               </div>
             </div>
-          </div>
-        </article>
 
-        <!-- Slide 2: uses image 2 -->
-        <article class="slide slide--2" data-index="1" role="group" aria-roledescription="slide" aria-label="Shawarma meal slide">
-          <div class="announce">
-            <div class="brandline">
-              <div class="bump">B</div>
-              <div>Street Food Vibes <i class="fa fa-pepper-hot" style="margin-left:8px;color:#fff;"></i></div>
-            </div>
-
-            <h2 class="headline">HAPPY<br>SHAWARMA<br>MEAL</h2>
-            <div class="sub">One packed shawarma, crisp fries and a cool coke — wrapped & grilled to perfection. Spice options available.</div>
-
-            <div class="pricebox">
-              <div class="price">85</div>
-              <div class="meta">GHC <br><span style="font-size:12px; opacity:0.9;">1 shawarma • fries • 1 coke</span></div>
-            </div>
-
-            <div class="stacked-label">
-              <div class="label-pill"><i class="fa fa-utensils"></i> Hand Wrapped</div>
-              <div class="label-pill"><i class="fa fa-wifi"></i> Order Online</div>
-            </div>
-
-            <div class="cta-row">
-              <button class="btn primary"><i class="fa fa-bolt"></i> Hot & Fast</button>
-              <button class="btn ghost"><i class="fa fa-map-marker-alt"></i> Find Branch</button>
-            </div>
+            <ul class="feature-list">
+              <li><i class="fa fa-star"></i> Hand-wrapped & grilled</li>
+              <li><i class="fa fa-seedling"></i> Fresh local ingredients</li>
+              <li><i class="fa fa-bolt"></i> Ready in 10–12 mins</li>
+            </ul>
           </div>
 
-          <div class="hero-media" aria-hidden="true">
-            <div class="media-decor">
-              <div class="blob b2"></div>
-              <div class="ribbon" style="left:auto; right:14px; transform:rotate(6deg);"><i class="fa fa-bell"></i> New Pack</div>
-              <div class="badge"><i class="fa fa-check-circle"></i> 100% Fresh</div>
-              <div class="glass-shape" style="right:8px; left:auto; transform:rotate(6deg);"><i class="fa fa-star"></i> Top Rated</div>
+          <div class="hero-right">
+            <!-- layered image collage for strong appetite effect -->
+            <div class="image-collage" aria-hidden="true" data-animate="float">
+              <img src="images/hero-shawarma-main.jpg" alt="Basilissa Shawarma on plate" class="collage-main" loading="lazy">
+              <img src="images/hero-shawarma-side-fries.png" alt="Fries" class="collage-layer layer-fries" loading="lazy">
+              <img src="images/hero-shawarma-garnish.png" alt="Garnish" class="collage-layer layer-garnish" loading="lazy">
+              <img src="images/steam.png" alt="" class="collage-overlay steam" aria-hidden="true" loading="lazy">
+              <!-- SVG garnish flourish -->
+              <svg class="garnish-sparkles" viewBox="0 0 100 100" aria-hidden="true">
+                <circle cx="10" cy="20" r="3" fill="rgba(255,204,0,0.95)"></circle>
+                <circle cx="30" cy="12" r="2" fill="rgba(255,204,0,0.75)"></circle>
+                <path d="M60 30 q15-8 30 0" stroke="rgba(255,80,60,0.9)" stroke-width="2" fill="none"></path>
+              </svg>
 
-              <div style="position:absolute; left:18px; bottom:8px; display:flex; gap:10px;">
-                <div class="label-pill"><i class="fa fa-lemon"></i> Zesty Sauce</div>
-                <div class="label-pill"><i class="fa fa-bread-slice"></i> Fresh Wrap</div>
-              </div>
-
-              <div class="chev" aria-hidden="true" style="right:0;">
-                <i class="fa fa-chevron-right"></i>
-                <i class="fa fa-chevron-right"></i>
-                <i class="fa fa-chevron-right"></i>
+              <div class="floating-badges">
+                <span class="badge hot"><i class="fa fa-fire"></i> HOT</span>
+                <span class="badge best"><i class="fa fa-award"></i> TOP RATED</span>
+                <span class="badge fresh"><i class="fa fa-leaf"></i> FRESH</span>
               </div>
             </div>
           </div>
         </article>
 
-        <!-- Slide 3: uses image 3 -->
-        <article class="slide slide--3" data-index="2" role="group" aria-roledescription="slide" aria-label="Burger meal slide">
-          <div class="announce">
-            <div class="brandline">
-              <div class="bump">B</div>
-              <div>Stacked Goodness <i class="fa fa-hamburger" style="margin-left:8px;color:#fff;"></i></div>
+        <!-- SLIDE B (Burger fiesta) -->
+        <article class="carousel-slide slide--burger" data-slide="1" role="group" aria-roledescription="slide" aria-label="Burger feast">
+          <div class="hero-left">
+            <div class="eyebrow"><span class="badge-pill red">New</span> <span class="mini">Limited Time</span></div>
+            <h2 class="hero-title">Stacked Burgers<br><span class="accent">Melted, juicy, unforgettable.</span></h2>
+            <p class="hero-copy">Double patties, melted cheese, house sauce and a crispy crown of onion rings — designed for big appetites.</p>
+
+            <div class="hero-meta">
+              <div class="price-block">
+                <span class="price">GHC <strong>90</strong></span>
+                <span class="meta-small">double patty • fries • drink</span>
+              </div>
+
+              <div class="ctas">
+                <button class="btn primary big" aria-label="Order burger"><i class="fa fa-hamburger"></i> Try Now</button>
+                <a class="btn ghost" href="#offers" aria-label="View offers"><i class="fa fa-percent"></i> Offers</a>
+              </div>
             </div>
 
-            <h2 class="headline">HAPPY<br>BURGER<br>MEAL</h2>
-            <div class="sub">A double patty, melty cheese, crisp lettuce, fries and a chilled Coke. Built for serious appetite satisfaction.</div>
-
-            <div class="pricebox">
-              <div class="price">90</div>
-              <div class="meta">GHC <br><span style="font-size:12px; opacity:0.9;">1 beef burger • fries • 1 coke</span></div>
-            </div>
-
-            <div class="stacked-label">
-              <div class="label-pill"><i class="fa fa-cheese"></i> Extra Cheese</div>
-              <div class="label-pill"><i class="fa fa-people-arrows"></i> Shareable</div>
-            </div>
-
-            <div class="cta-row">
-              <button class="btn primary"><i class="fa fa-star"></i> Try Now</button>
-              <button class="btn ghost"><i class="fa fa-phone"></i> Call & Collect</button>
+            <div class="small-gallery">
+              <img src="images/burger-side1.jpg" alt="Burger closeup" loading="lazy">
+              <img src="images/onion-rings.jpg" alt="Onion rings" loading="lazy">
+              <img src="images/burger-sauce.jpg" alt="Sauce drip" loading="lazy">
             </div>
           </div>
 
-          <div class="hero-media" aria-hidden="true">
-            <div class="media-decor">
-              <div class="blob b3"></div>
-              <div class="ribbon" style="left:12px; top:12px; transform:rotate(-4deg);"><i class="fa fa-award"></i> Chef's Pick</div>
-              <div class="badge" style="left:auto; right:22px;"><i class="fa fa-fire"></i> Hot</div>
-              <div class="glass-shape" style="left:20px; bottom:18px;"><i class="fa fa-thumbs-up"></i> Crowd Favorite</div>
-
-              <div class="chev" aria-hidden="true">
-                <i class="fa fa-chevron-right"></i>
-                <i class="fa fa-chevron-right"></i>
-                <i class="fa fa-chevron-right"></i>
-              </div>
+          <div class="hero-right">
+            <div class="image-collage" data-animate="pop">
+              <img src="images/hero-burger-main.jpg" alt="Basilissa double burger" class="collage-main" loading="lazy">
+              <img src="images/burger-cheese-drip.png" alt="" class="collage-layer layer-drip" loading="lazy">
+              <div class="ribbon topper"><i class="fa fa-thumbs-up"></i> Crowd Favorite</div>
+              <svg class="sauce-splat" viewBox="0 0 80 80" aria-hidden="true">
+                <circle cx="20" cy="40" r="8" fill="rgba(255,75,60,0.95)"></circle>
+                <circle cx="45" cy="30" r="5" fill="rgba(255,75,60,0.85)"></circle>
+              </svg>
             </div>
           </div>
         </article>
 
-      </div> <!-- slides -->
+        <!-- SLIDE C (Family Feast / Combo plate) -->
+        <article class="carousel-slide slide--feast" data-slide="2" role="group" aria-roledescription="slide" aria-label="Family feast">
+          <div class="hero-left">
+            <div class="eyebrow"><span class="badge-pill gold">Family Pack</span></div>
+            <h2 class="hero-title">Bring Everyone<br><span class="accent">Big plates, bigger smiles.</span></h2>
+            <p class="hero-copy">Shared platters with wings, shawarma slices, fries, rice and dips — perfect for parties and movie nights.</p>
 
-      <!-- controls (dots & arrows) -->
-      <div class="controls" aria-hidden="false">
-        <div class="arrow" id="prev" title="Previous" aria-label="Previous slide"><i class="fa fa-chevron-left"></i></div>
-        <div class="dots" id="dots" role="tablist" aria-label="Slide navigation">
-          <div class="dot active" data-dot="0" role="tab" aria-selected="true" aria-controls="slide-0"></div>
-          <div class="dot" data-dot="1" role="tab" aria-selected="false" aria-controls="slide-1"></div>
-          <div class="dot" data-dot="2" role="tab" aria-selected="false" aria-controls="slide-2"></div>
+            <div class="hero-meta">
+              <div class="price-block">
+                <span class="price">GHC <strong>260</strong></span>
+                <span class="meta-small">feeds 4–6</span>
+              </div>
+
+              <div class="ctas">
+                <button class="btn primary big" aria-label="Order family pack"><i class="fa fa-utensils"></i> Order Family Pack</button>
+                <a class="btn ghost" href="#catering" aria-label="Catering">Catering</a>
+              </div>
+            </div>
+
+            <div class="feature-row">
+              <div class="feature">
+                <img src="images/wing-icon.png" alt="" aria-hidden="true" loading="lazy">
+                <div>8pcs wings</div>
+              </div>
+              <div class="feature">
+                <img src="images/rice-icon.png" alt="" aria-hidden="true" loading="lazy">
+                <div>Big rice pan</div>
+              </div>
+              <div class="feature">
+                <img src="images/dip-icon.png" alt="" aria-hidden="true" loading="lazy">
+                <div>3 dips</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="hero-right">
+            <div class="image-collage collage-grid" data-animate="stagger">
+              <img src="images/feast-main.jpg" alt="Family feast" class="collage-main" loading="lazy">
+              <img src="images/feast-side-salad.jpg" alt="Salad" class="collage-layer layer-salad" loading="lazy">
+              <img src="images/feast-dips.jpg" alt="Dips" class="collage-layer layer-dips" loading="lazy">
+              <div class="badge ribbon-left"><i class="fa fa-gift"></i> Party Pack</div>
+            </div>
+          </div>
+        </article>
+
+      </div> <!-- /.carousel-inner -->
+
+      <!-- carousel controls (no JS here) -->
+      <div class="carousel-controls" aria-hidden="false">
+        <button class="control prev" aria-label="Previous slide"><i class="fa fa-chevron-left"></i></button>
+        <div class="dots" role="tablist" aria-label="Slide navigation">
+          <button class="dot active" role="tab" aria-selected="true" aria-controls="slide-0"></button>
+          <button class="dot" role="tab" aria-selected="false" aria-controls="slide-1"></button>
+          <button class="dot" role="tab" aria-selected="false" aria-controls="slide-2"></button>
         </div>
-        <div class="arrow" id="next" title="Next" aria-label="Next slide"><i class="fa fa-chevron-right"></i></div>
+        <button class="control next" aria-label="Next slide"><i class="fa fa-chevron-right"></i></button>
+      </div>
+    </section>
+
+    <!-- ===== HIGHLIGHTS / QUICK FEATURES (images+icons) ===== -->
+    <section id="highlights" class="section highlights" aria-labelledby="highlights-title">
+      <div class="section-inner">
+        <h2 id="highlights-title">Why people crave Basilissa</h2>
+        <div class="highlights-grid">
+          <article class="highlight-card">
+            <img src="images/highlight-fresh.jpg" alt="Fresh ingredients" loading="lazy">
+            <div class="card-body">
+              <i class="fa fa-leaf"></i>
+              <h3>Local & Fresh</h3>
+              <p>Produce sourced from trusted local farms daily.</p>
+            </div>
+          </article>
+
+          <article class="highlight-card">
+            <img src="images/highlight-speed.jpg" alt="Fast service" loading="lazy">
+            <div class="card-body">
+              <i class="fa fa-bolt"></i>
+              <h3>Fast Service</h3>
+              <p>Hot meals cooked & delivered quickly to your door.</p>
+            </div>
+          </article>
+
+          <article class="highlight-card">
+            <img src="images/highlight-family.jpg" alt="Family friendly" loading="lazy">
+            <div class="card-body">
+              <i class="fa fa-users"></i>
+              <h3>Family Friendly</h3>
+              <p>Meals & combos built for sharing and celebrations.</p>
+            </div>
+          </article>
+
+          <article class="highlight-card">
+            <img src="images/highlight-deals.jpg" alt="Weekly deals" loading="lazy">
+            <div class="card-body">
+              <i class="fa fa-tags"></i>
+              <h3>Weekly Deals</h3>
+              <p>Fresh promos every week — check the offers tab.</p>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== MENU HIGHLIGHTS (grid of dishes; each card has image overlays & badges) ===== -->
+    <section id="menu" class="section menu-highlights" aria-labelledby="menu-title">
+      <div class="section-inner">
+        <div class="section-head">
+          <h2 id="menu-title">Popular on the menu</h2>
+          <a class="btn ghost" href="/full-menu.html">See Full Menu</a>
+        </div>
+
+        <div class="menu-grid">
+          <!-- Repeat for many items -->
+          <article class="menu-item" data-item="shawarma">
+            <div class="item-media">
+              <img src="images/menu-shawarma.jpg" alt="Basilissa Shawarma" loading="lazy">
+              <div class="item-overlay">
+                <span class="price-badge">GHC 85</span>
+                <span class="badge small red">Best seller</span>
+              </div>
+            </div>
+            <div class="item-body">
+              <h3>Classic Shawarma</h3>
+              <p>Spiced meat, house sauce, crisp veggies, wrapped & toasted.</p>
+              <div class="item-actions">
+                <button class="btn small"><i class="fa fa-shopping-cart"></i> Add</button>
+                <button class="btn ghost small"><i class="fa fa-heart"></i></button>
+              </div>
+            </div>
+          </article>
+
+          <article class="menu-item" data-item="burger">
+            <div class="item-media">
+              <img src="images/menu-burger.jpg" alt="Double burger" loading="lazy">
+              <div class="item-overlay">
+                <span class="price-badge">GHC 90</span>
+                <span class="badge small">New</span>
+              </div>
+            </div>
+            <div class="item-body">
+              <h3>Double Cheese Burger</h3>
+              <p>Two patties, double cheese, caramelised onions, house sauce.</p>
+              <div class="item-actions">
+                <button class="btn small"><i class="fa fa-shopping-cart"></i> Add</button>
+                <button class="btn ghost small"><i class="fa fa-star"></i></button>
+              </div>
+            </div>
+          </article>
+
+          <article class="menu-item" data-item="fries">
+            <div class="item-media">
+              <img src="images/menu-fries.jpg" alt="Loaded fries" loading="lazy">
+              <div class="item-overlay">
+                <span class="price-badge">GHC 25</span>
+                <span class="badge small">Crispy</span>
+              </div>
+            </div>
+            <div class="item-body">
+              <h3>Loaded Fries</h3>
+              <p>Cheesy, spicy, topped with herbs — shareable & addictive.</p>
+              <div class="item-actions">
+                <button class="btn small"><i class="fa fa-shopping-cart"></i> Add</button>
+                <button class="btn ghost small"><i class="fa fa-plus"></i></button>
+              </div>
+            </div>
+          </article>
+
+          <article class="menu-item" data-item="pizza">
+            <div class="item-media">
+              <img src="images/menu-pizza.jpg" alt="Pizza" loading="lazy">
+              <div class="item-overlay">
+                <span class="price-badge">GHC 120</span>
+                <span class="badge small gold">Oven-baked</span>
+              </div>
+            </div>
+            <div class="item-body">
+              <h3>Margherita Pizza</h3>
+              <p>Stone-baked with fresh basil, tomatos & bubbling mozzarella.</p>
+              <div class="item-actions">
+                <button class="btn small"><i class="fa fa-shopping-cart"></i> Add</button>
+                <button class="btn ghost small"><i class="fa fa-leaf"></i></button>
+              </div>
+            </div>
+          </article>
+
+          <!-- add more items as needed -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== PROMO / OFFERS BANNER (big image background) ===== -->
+    <section id="offers" class="section promo-banner" aria-labelledby="offers-title">
+      <div class="promo-inner" role="region">
+        <picture>
+          <source srcset="images/promo-large.jpg" media="(min-width:900px)">
+          <img src="images/promo-sm.jpg" alt="Weekend promo image" loading="lazy">
+        </picture>
+        <div class="promo-copy">
+          <h2 id="offers-title">Weekend Feast — 25% off Family Packs</h2>
+          <p>Use code <strong>FEAST25</strong> at checkout or present this offer in-store. Valid this weekend only.</p>
+          <div class="promo-actions">
+            <button class="btn primary"><i class="fa fa-ticket-alt"></i> Redeem Offer</button>
+            <a class="btn ghost" href="#menu">Order Now</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== GALLERY (masonry, each image clickable) ===== -->
+    <section id="gallery" class="section gallery" aria-labelledby="gallery-title">
+      <div class="section-inner">
+        <h2 id="gallery-title">Mouthwatering moments</h2>
+        <div class="masonry-grid">
+          <a href="images/gallery/1.jpg" class="masonry-item" data-lightbox="basilissa" aria-label="Gallery image 1">
+            <img src="images/gallery/thumb-1.jpg" alt="Close up of chicken wings" loading="lazy">
+            <span class="caption">Crispy wings</span>
+          </a>
+          <a href="images/gallery/2.jpg" class="masonry-item" data-lightbox="basilissa" aria-label="Gallery image 2">
+            <img src="images/gallery/thumb-2.jpg" alt="Shawarma wrap opened" loading="lazy">
+            <span class="caption">Perfect wrap</span>
+          </a>
+          <a href="images/gallery/3.jpg" class="masonry-item" data-lightbox="basilissa" aria-label="Gallery image 3">
+            <img src="images/gallery/thumb-3.jpg" alt="Loaded fries" loading="lazy">
+            <span class="caption">Loaded fries</span>
+          </a>
+          <a href="images/gallery/4.jpg" class="masonry-item" data-lightbox="basilissa" aria-label="Gallery image 4">
+            <img src="images/gallery/thumb-4.jpg" alt="Smiling customers" loading="lazy">
+            <span class="caption">Happy customers</span>
+          </a>
+          <a href="images/gallery/5.jpg" class="masonry-item" data-lightbox="basilissa" aria-label="Gallery image 5">
+            <img src="images/gallery/thumb-5.jpg" alt="Burger cross section" loading="lazy">
+            <span class="caption">Juicy burger</span>
+          </a>
+          <a href="images/gallery/6.jpg" class="masonry-item" data-lightbox="basilissa" aria-label="Gallery image 6">
+            <img src="images/gallery/thumb-6.jpg" alt="Pizza slice pull" loading="lazy">
+            <span class="caption">Cheesy pull</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== CHEFS / TEAM (images + short bios) ===== -->
+    <section id="team" class="section team" aria-labelledby="team-title">
+      <div class="section-inner">
+        <h2 id="team-title">Meet the crew</h2>
+        <div class="team-grid">
+          <article class="team-member">
+            <img src="images/chef-1.jpg" alt="Head chef" loading="lazy">
+            <div class="member-info">
+              <h4>Chef Kwame</h4>
+              <p>Head chef & recipe creator — 12 years of kitchen magic.</p>
+            </div>
+          </article>
+
+          <article class="team-member">
+            <img src="images/chef-2.jpg" alt="Sous chef" loading="lazy">
+            <div class="member-info">
+              <h4>Chef Amina</h4>
+              <p>Sous chef — spice master and flavor engineer.</p>
+            </div>
+          </article>
+
+          <article class="team-member">
+            <img src="images/chef-3.jpg" alt="Kitchen manager" loading="lazy">
+            <div class="member-info">
+              <h4>Kofi</h4>
+              <p>Kitchen manager — keeps everything moving fast & clean.</p>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== TESTIMONIALS (image + star rating) ===== -->
+    <section id="testimonials" class="section testimonials" aria-labelledby="testimonials-title">
+      <div class="section-inner">
+        <h2 id="testimonials-title">What people say</h2>
+
+        <div class="testimonials-slider" role="list">
+          <blockquote class="testimonial" role="listitem">
+            <img src="images/customer-1.jpg" alt="Customer" loading="lazy" class="testimonial-avatar">
+            <p class="quote">"Best shawarma in Accra — juicy, fresh and fast. My go-to for lunch!"</p>
+            <cite>— Ama S. <span class="rating"><i class="fa fa-star"></i> <strong>4.8</strong></span></cite>
+          </blockquote>
+
+          <blockquote class="testimonial" role="listitem">
+            <img src="images/customer-2.jpg" alt="Customer" loading="lazy" class="testimonial-avatar">
+            <p class="quote">"Party platter saved my birthday. Everyone loved the flavours."</p>
+            <cite>— Daniel K. <span class="rating"><i class="fa fa-star"></i> <strong>5.0</strong></span></cite>
+          </blockquote>
+
+          <blockquote class="testimonial" role="listitem">
+            <img src="images/customer-3.jpg" alt="Customer" loading="lazy" class="testimonial-avatar">
+            <p class="quote">"Hot meals delivered fast — consistent quality every time."</p>
+            <cite>— Sarah N. <span class="rating"><i class="fa fa-star"></i> <strong>4.7</strong></span></cite>
+          </blockquote>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== BRANCHES / LOCATIONS (each with image & map placeholder) ===== -->
+    <section id="locations" class="section locations" aria-labelledby="locations-title">
+      <div class="section-inner">
+        <h2 id="locations-title">Find a Basilissa near you</h2>
+        <div class="locations-grid">
+          <article class="location-card">
+            <img src="images/location-accra.jpg" alt="Accra Mall branch" loading="lazy">
+            <div class="loc-body">
+              <h4>Accra Mall</h4>
+              <p>Open daily 9:00 — 23:00 • <a href="tel:+233240000000">+233 24 000 0000</a></p>
+              <a class="btn ghost small" href="https://maps.google.com" target="_blank" rel="noopener">View on map</a>
+            </div>
+          </article>
+
+          <article class="location-card">
+            <img src="images/location-tema.jpg" alt="Tema branch" loading="lazy">
+            <div class="loc-body">
+              <h4>Tema City</h4>
+              <p>Open daily 10:00 — 22:30 • <a href="tel:+233240111111">+233 24 011 1111</a></p>
+              <a class="btn ghost small" href="https://maps.google.com" target="_blank" rel="noopener">View on map</a>
+            </div>
+          </article>
+
+          <article class="location-card">
+            <img src="images/location-kasoa.jpg" alt="Kasoa branch" loading="lazy">
+            <div class="loc-body">
+              <h4>Kasoa</h4>
+              <p>Open daily 9:30 — 22:00 • <a href="tel:+233240222222">+233 24 022 2222</a></p>
+              <a class="btn ghost small" href="https://maps.google.com" target="_blank" rel="noopener">View on map</a>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== FAQ + QUICK CONTACT ===== -->
+    <section id="contact" class="section contact" aria-labelledby="contact-title">
+      <div class="section-inner split">
+        <div class="contact-panel">
+          <h2 id="contact-title">Contact & FAQ</h2>
+          <p>Questions? Call us or drop a message. We respond quickly.</p>
+
+          <ul class="faq-list" role="list">
+            <li class="faq-item">
+              <button class="faq-q" aria-expanded="false">Do you deliver?</button>
+              <div class="faq-a" hidden>Yes — we deliver across Accra and neighbouring areas. Delivery fee calculated at checkout.</div>
+            </li>
+            <li class="faq-item">
+              <button class="faq-q" aria-expanded="false">Can I order for events?</button>
+              <div class="faq-a" hidden>Yes — our catering team handles events, birthday packs and corporate orders. See Catering.</div>
+            </li>
+            <li class="faq-item">
+              <button class="faq-q" aria-expanded="false">Are there vegetarian options?</button>
+              <div class="faq-a" hidden>We have vegetarian wraps, salad bowls and a veg pizza. Ask for no-meat variants when ordering.</div>
+            </li>
+          </ul>
+
+          <form class="contact-form" action="/contact" method="post" aria-label="Contact form">
+            <label class="visually-hidden" for="contact-name">Name</label>
+            <input id="contact-name" name="name" placeholder="Your name" required>
+
+            <label class="visually-hidden" for="contact-phone">Phone</label>
+            <input id="contact-phone" name="phone" placeholder="Phone or WhatsApp" required>
+
+            <label class="visually-hidden" for="contact-msg">Message</label>
+            <textarea id="contact-msg" name="message" rows="3" placeholder="How can we help?"></textarea>
+
+            <div class="form-actions">
+              <button class="btn primary" type="submit">Send Message</button>
+              <a class="btn ghost" href="mailto:hello@basilissa.com">Email Us</a>
+            </div>
+          </form>
+        </div>
+
+        <div class="contact-map" aria-hidden="true">
+          <!-- placeholder; replace with real Google Maps embed -->
+          <img src="images/map-placeholder.jpg" alt="Map of Basilissa locations" loading="lazy">
+          <p class="map-note">Tap a branch to open directions.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== NEWSLETTER / LOYALTY SIGNUP ===== -->
+    <section class="section newsletter" aria-labelledby="newsletter-title">
+      <div class="newsletter-inner">
+        <img src="images/newsletter-food.jpg" alt="Newsletter food" loading="lazy" class="newsletter-img">
+        <div class="newsletter-copy">
+          <h3 id="newsletter-title">Get tasty deals first</h3>
+          <p>Sign up for exclusive offers, early-bird promos and birthday freebies.</p>
+          <form class="newsletter-form" action="/subscribe" method="post" aria-label="Newsletter signup">
+            <input name="email" type="email" placeholder="you@example.com" required>
+            <button class="btn primary" type="submit"><i class="fa fa-envelope"></i> Subscribe</button>
+          </form>
+          <p class="small">By subscribing you agree to receive promotional messages. You can unsubscribe anytime.</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ===== FLOATING CART & WHATSAPP CTA ===== -->
+  <div class="floating-ctas" aria-hidden="false">
+    <a href="#cart" class="floating-btn cart-fab" aria-label="Open cart">
+      <i class="fa fa-shopping-bag"></i>
+      <span class="count">2</span>
+    </a>
+
+    <a href="https://wa.me/233240000000" class="floating-btn wa-fab" aria-label="Chat on WhatsApp">
+      <i class="fa fa-whatsapp"></i>
+      <span class="label">Order</span>
+    </a>
+  </div>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="site-footer" role="contentinfo" aria-label="Footer">
+    <div class="footer-inner">
+      <div class="footer-about">
+        <img src="images/logo-white.png" alt="Basilissa logo" loading="lazy" class="logo-footer">
+        <p>We make craveable food with love — drop by or order for delivery.</p>
+
+        <div class="socials">
+          <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+          <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+          <a href="#" aria-label="X / Twitter"><i class="fab fa-x-twitter"></i></a>
+        </div>
       </div>
 
-    </div>
-  </section>
+      <div class="footer-links">
+        <h4>Explore</h4>
+        <ul>
+          <li><a href="#menu">Menu</a></li>
+          <li><a href="#offers">Offers</a></li>
+          <li><a href="#locations">Locations</a></li>
+          <li><a href="#gallery">Gallery</a></li>
+        </ul>
+      </div>
 
-  <!-- FEATURES / OFFERS -->
-  <section class="section" aria-labelledby="offers">
-    <div class="container">
-      <h2 id="offers"><i class="fa fa-gift"></i> Today at Basilissa</h2>
-      <div class="cards" role="list">
-        <article class="card" role="listitem">
-          <i class="fa fa-truck"></i>
-          <div>
-            <div class="meta">Fast Delivery</div>
-            <div class="desc">Hot meals delivered in 30–45 mins.</div>
-          </div>
-        </article>
-
-        <article class="card" role="listitem">
-          <i class="fa fa-percent"></i>
-          <div>
-            <div class="meta">Weekly Deals</div>
-            <div class="desc">New limited offers every week.</div>
-          </div>
-        </article>
-
-        <article class="card" role="listitem">
-          <i class="fa fa-lemon"></i>
-          <div>
-            <div class="meta">Fresh Ingredients</div>
-            <div class="desc">Locally sourced produce & spices.</div>
-          </div>
-        </article>
-
-        <article class="card" role="listitem">
-          <i class="fa fa-user-friends"></i>
-          <div>
-            <div class="meta">Catering</div>
-            <div class="desc">Events, parties & bulk orders.</div>
-          </div>
-        </article>
+      <div class="footer-contact">
+        <h4>Contact</h4>
+        <p><i class="fa fa-phone"></i> <a href="tel:+233240000000">+233 24 000 0000</a></p>
+        <p><i class="fa fa-envelope"></i> <a href="mailto:hello@basilissa.com">hello@basilissa.com</a></p>
+        <p><i class="fa fa-map-marker-alt"></i> Accra, Ghana</p>
       </div>
     </div>
-  </section>
 
-  <script>
-    // Slideshow logic: uses dots/arrows; sets active classes; triggers animations via CSS (presence of .active)
-    (function(){
-      const slidesEl = document.getElementById('slides');
-      const slides = Array.from(slidesEl.querySelectorAll('.slide'));
-      const dotsEl = document.getElementById('dots');
-      const dots = Array.from(dotsEl.querySelectorAll('.dot'));
-      const prev = document.getElementById('prev');
-      const next = document.getElementById('next');
+    <div class="footer-legal">
+      <small>© <span id="year">2025</span> Basilissa. All rights reserved.</small>
+      <small><a href="/privacy.html">Privacy</a> · <a href="/terms.html">Terms</a></small>
+    </div>
+  </footer>
 
-      let current = 0;
-      let timer = null;
-      const interval = 5200;
-
-      function goTo(index, manual=false) {
-        index = (index + slides.length) % slides.length;
-        slides.forEach((s,i) => {
-          if(i===index) {
-            s.classList.add('active');
-            s.setAttribute('aria-hidden','false');
-          } else {
-            s.classList.remove('active');
-            s.setAttribute('aria-hidden','true');
-          }
-        });
-        dots.forEach((d,i) => {
-          d.classList.toggle('active', i===index);
-          d.setAttribute('aria-selected', i===index ? 'true' : 'false');
-        });
-        current = index;
-        if(manual) restartTimer();
-      }
-
-      function nextSlide() { goTo(current + 1, false); }
-      function prevSlide() { goTo(current - 1, false); }
-
-      // hook events
-      dots.forEach(d => d.addEventListener('click', (e)=> {
-        const idx = Number(e.currentTarget.dataset.dot);
-        goTo(idx, true);
-      }));
-      next.addEventListener('click', ()=> { goTo(current+1, true); });
-      prev.addEventListener('click', ()=> { goTo(current-1, true); });
-
-      // keyboard support
-      document.addEventListener('keydown', (e)=> {
-        if(e.key === 'ArrowRight') { goTo(current+1, true); }
-        if(e.key === 'ArrowLeft') { goTo(current-1, true); }
-      });
-
-      function startTimer() { timer = setInterval(()=> goTo(current+1, false), interval); }
-      function stopTimer() { if(timer) { clearInterval(timer); timer = null; } }
-      function restartTimer() { stopTimer(); startTimer(); }
-
-      // pause on hover
-      slidesEl.addEventListener('mouseenter', stopTimer);
-      slidesEl.addEventListener('mouseleave', startTimer);
-
-      // make slides accessible by assigning ids
-      slides.forEach((s,i)=> s.id = 'slide-' + i);
-
-      // initialize
-      goTo(0);
-      startTimer();
-
-    })();
-  </script>
+ 
 
 </body>
+  <script>
+/* Basilissa — Homepage Interaction Script
+   - Carousel autoplay (3s), looping
+   - Prev/Next, Dots, Keyboard support
+   - Pause on hover
+   - Parallax collage micro-animations
+   - Menu Add to cart + cart drawer (persisted in localStorage)
+   - Floating CTAs (open cart, WhatsApp)
+   - Gallery lightbox
+   - FAQ accordion
+   - Search toggle
+   - Contact/Newsletter fake submit with success UI
+   - Smooth scroll for anchors
+   - Accessible attributes updated (aria-selected, aria-hidden, aria-expanded)
+*/
+(function () {
+  'use strict';
+
+  /* -------------------------
+     Utility helpers
+  -------------------------*/
+  function qs(sel, root = document) { return root.querySelector(sel); }
+  function qsa(sel, root = document) { return Array.from((root || document).querySelectorAll(sel)); }
+  function on(el, ev, fn) { (el || document).addEventListener(ev, fn); }
+  function create(tag, attrs = {}, children = []) {
+    const el = document.createElement(tag);
+    Object.entries(attrs).forEach(([k, v]) => {
+      if (k === 'class') el.className = v;
+      else if (k === 'html') el.innerHTML = v;
+      else el.setAttribute(k, v);
+    });
+    children.forEach(ch => el.appendChild(ch));
+    return el;
+  }
+  function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+
+  /* -------------------------
+     Carousel / Hero Slideshow
+  -------------------------*/
+  const carousel = qs('#hero .carousel-inner');
+  if (carousel) {
+    const slides = qsa('.carousel-slide', carousel);
+    const prevBtn = qs('.carousel-controls .prev');
+    const nextBtn = qs('.carousel-controls .next');
+    const dots = qsa('.carousel-controls .dots .dot');
+    let currentIndex = slides.findIndex(s => s.classList.contains('is-active'));
+    if (currentIndex < 0) currentIndex = 0;
+
+    // ensure proper ids and aria
+    slides.forEach((s, i) => {
+      s.id = s.id || `slide-${i}`;
+      s.setAttribute('role', 'group');
+      s.setAttribute('aria-roledescription', 'slide');
+      s.setAttribute('aria-label', s.getAttribute('aria-label') || `Slide ${i+1}`);
+      s.setAttribute('aria-hidden', i === currentIndex ? 'false' : 'true');
+    });
+    dots.forEach((d, i) => {
+      d.setAttribute('data-dot', i);
+      d.setAttribute('role', 'tab');
+      d.setAttribute('aria-controls', slides[i].id);
+      d.setAttribute('aria-selected', i === currentIndex ? 'true' : 'false');
+      if (i === currentIndex) d.classList.add('active');
+    });
+
+    let carouselTimer = null;
+    const INTERVAL_MS = 3000;
+    function goToSlide(index, opts = {user: false}) {
+      index = ((index % slides.length) + slides.length) % slides.length;
+      slides.forEach((s, i) => {
+        const active = i === index;
+        s.classList.toggle('is-active', active);
+        s.setAttribute('aria-hidden', active ? 'false' : 'true');
+      });
+      dots.forEach((d, i) => {
+        const sel = i === index;
+        d.classList.toggle('active', sel);
+        d.setAttribute('aria-selected', sel ? 'true' : 'false');
+      });
+      currentIndex = index;
+      // Slight micro animation trigger for collage
+      const current = slides[currentIndex];
+      if (current) {
+        const collages = qsa('.image-collage', current);
+        collages.forEach(c => {
+          c.classList.remove('js-anim-pop');
+          void c.offsetWidth; // reflow
+          c.classList.add('js-anim-pop');
+          setTimeout(()=> c.classList.remove('js-anim-pop'), 800);
+        });
+      }
+      if (opts.user) restartTimer();
+    }
+    function nextSlide(user=false) { goToSlide(currentIndex + 1, {user}); }
+    function prevSlide(user=false) { goToSlide(currentIndex - 1, {user}); }
+
+    function startTimer() {
+      stopTimer();
+      carouselTimer = setInterval(()=> nextSlide(false), INTERVAL_MS);
+    }
+    function stopTimer() { if (carouselTimer) { clearInterval(carouselTimer); carouselTimer = null; } }
+    function restartTimer() { stopTimer(); startTimer(); }
+
+    // dot clicks
+    dots.forEach(d => on(d, 'click', e => {
+      const idx = Number(e.currentTarget.getAttribute('data-dot'));
+      goToSlide(idx, {user:true});
+    }));
+    if (nextBtn) on(nextBtn, 'click', ()=> nextSlide(true));
+    if (prevBtn) on(prevBtn, 'click', ()=> prevSlide(true));
+
+    // keyboard left / right
+    on(document, 'keydown', (e) => {
+      if (e.key === 'ArrowRight') nextSlide(true);
+      if (e.key === 'ArrowLeft') prevSlide(true);
+    });
+
+    // pause on hover (for entire #hero region)
+    const heroRegion = qs('#hero');
+    if (heroRegion) {
+      on(heroRegion, 'mouseenter', stopTimer);
+      on(heroRegion, 'mouseleave', startTimer);
+    }
+
+    // init
+    goToSlide(currentIndex);
+    startTimer();
+  }
+
+  /* -------------------------
+     Image Collage Parallax & micro-animations
+     - targets .image-collage within the hero
+  -------------------------*/
+  (function initParallax() {
+    const collages = qsa('.image-collage');
+    collages.forEach(collage => {
+      const layers = qsa('img.collage-layer, .collage-main, .collage-overlay, .collage-layer', collage);
+      let raf = null;
+      const strength = Number(collage.getAttribute('data-strength')) || 18;
+      function onMove(e) {
+        const rect = collage.getBoundingClientRect();
+        const cx = rect.left + rect.width/2;
+        const cy = rect.top + rect.height/2;
+        const clientX = (e.touches ? e.touches[0].clientX : e.clientX);
+        const clientY = (e.touches ? e.touches[0].clientY : e.clientY);
+        const dx = (clientX - cx) / rect.width;
+        const dy = (clientY - cy) / rect.height;
+        cancelAnimationFrame(raf);
+        raf = requestAnimationFrame(() => {
+          layers.forEach((layer, idx) => {
+            const depth = (idx + 1) / (layers.length + 1);
+            const tx = clamp(dx * strength * depth * -1, -strength, strength);
+            const ty = clamp(dy * strength * depth * -1, -strength, strength);
+            const rot = tx * 0.06 * depth;
+            layer.style.transform = `translate3d(${tx}px, ${ty}px, 0) rotate(${rot}deg) scale(${1 + depth*0.01})`;
+            layer.style.transition = 'transform 220ms linear';
+          });
+        });
+      }
+      function onLeave() {
+        cancelAnimationFrame(raf);
+        raf = requestAnimationFrame(() => {
+          layers.forEach(layer => layer.style.transform = '');
+        });
+      }
+      on(collage, 'mousemove', onMove);
+      on(collage, 'touchmove', onMove, {passive:true});
+      on(collage, 'mouseleave', onLeave);
+      on(collage, 'touchend', onLeave);
+    });
+  })();
+
+  /* -------------------------
+     Smooth scroll for anchor links (native-like)
+  -------------------------*/
+  (function smoothScrollInit() {
+    on(document, 'click', (e) => {
+      const a = e.target.closest && e.target.closest('a[href^="#"]');
+      if (!a) return;
+      const href = a.getAttribute('href');
+      if (!href || href === '#') return;
+      const target = document.querySelector(href);
+      if (!target) return;
+      e.preventDefault();
+      target.scrollIntoView({behavior:'smooth', block:'start'});
+    });
+  })();
+
+  /* -------------------------
+     FAQ Accordion
+  -------------------------*/
+  (function faqInit() {
+    qsa('.faq-q').forEach(btn => {
+      btn.setAttribute('aria-expanded', 'false');
+      on(btn, 'click', (e) => {
+        const q = e.currentTarget;
+        const parent = q.closest('.faq-item');
+        const a = parent && parent.querySelector('.faq-a');
+        const expanded = q.getAttribute('aria-expanded') === 'true';
+        if (expanded) {
+          q.setAttribute('aria-expanded', 'false');
+          if (a) { a.hidden = true; }
+        } else {
+          // close other siblings (optional)
+          qsa('.faq-q').forEach(other => {
+            if (other !== q) {
+              other.setAttribute('aria-expanded', 'false');
+              const ap = other.closest('.faq-item')?.querySelector('.faq-a');
+              if (ap) ap.hidden = true;
+            }
+          });
+          q.setAttribute('aria-expanded', 'true');
+          if (a) { a.hidden = false; }
+        }
+      });
+    });
+  })();
+
+  /* -------------------------
+     Search toggle (header)
+  -------------------------*/
+  (function searchToggleInit() {
+    const searchBtn = qs('.search-toggle');
+    if (!searchBtn) return;
+    let searchOverlay = null;
+    function createOverlay() {
+      searchOverlay = create('div', { class: 'bs-search-overlay', role: 'dialog', 'aria-modal': 'true' });
+      searchOverlay.innerHTML = `
+        <div class="bs-search-inner" role="document">
+          <button class="bs-search-close" aria-label="Close search">&times;</button>
+          <div class="bs-search-form">
+            <label class="visually-hidden" for="bs-search-input">Search menu</label>
+            <input id="bs-search-input" placeholder="Search meals, offers, branches..." autocomplete="off">
+            <button class="btn primary bs-search-go" aria-label="Search"><i class="fa fa-search"></i></button>
+          </div>
+          <div class="bs-search-sample">Try: "shawarma", "family pack", "fries"</div>
+        </div>
+      `;
+      Object.assign(searchOverlay.style, {
+        position: 'fixed', inset: '0', display:'flex', alignItems:'center', justifyContent:'center',
+        background:'rgba(0,0,0,0.6)', zIndex: 9999
+      });
+      // basic inner styles so it looks usable without CSS file
+      const inner = searchOverlay.querySelector('.bs-search-inner');
+      Object.assign(inner.style, { width:'min(920px,94%)', padding:'22px', background:'#fff', borderRadius:'12px' });
+      document.body.appendChild(searchOverlay);
+      on(searchOverlay.querySelector('.bs-search-close'), 'click', removeOverlay);
+      on(searchOverlay, 'click', (ev) => { if (ev.target === searchOverlay) removeOverlay(); });
+      on(document, 'keydown', (ev) => { if (ev.key === 'Escape') removeOverlay(); });
+      // simple search behavior
+      const input = searchOverlay.querySelector('#bs-search-input');
+      const go = searchOverlay.querySelector('.bs-search-go');
+      on(go, 'click', () => {
+        alert('Search is not hooked to backend in this demo. You searched: "' + input.value + '"');
+      });
+      input.focus();
+    }
+    function removeOverlay() {
+      if (searchOverlay) { searchOverlay.remove(); searchOverlay = null; }
+    }
+    on(searchBtn, 'click', (e) => {
+      e.preventDefault(); if (!searchOverlay) createOverlay();
+    });
+  })();
+
+  /* -------------------------
+     Gallery Lightbox
+  -------------------------*/
+  (function galleryLightbox() {
+    const items = qsa('a[data-lightbox]');
+    if (!items.length) return;
+    const gallery = items.map(a => ({ href: a.href, alt: a.querySelector('img')?.alt || '' }));
+    let idx = 0;
+    // create lightbox shell
+    const lb = create('div', { class: 'bs-lightbox', 'aria-hidden':'true' });
+    lb.innerHTML = `
+      <div class="bs-lb-inner" role="dialog" aria-modal="true">
+        <button class="bs-lb-close" aria-label="Close">&times;</button>
+        <button class="bs-lb-prev" aria-label="Previous"><i class="fa fa-chevron-left"></i></button>
+        <figure class="bs-lb-figure">
+          <img class="bs-lb-img" alt="">
+          <figcaption class="bs-lb-caption"></figcaption>
+        </figure>
+        <button class="bs-lb-next" aria-label="Next"><i class="fa fa-chevron-right"></i></button>
+      </div>
+    `;
+    Object.assign(lb.style, { position:'fixed', inset:0, zIndex: 9998, display:'none', alignItems:'center', justifyContent:'center', background:'rgba(0,0,0,0.86)' });
+    document.body.appendChild(lb);
+    const img = lb.querySelector('.bs-lb-img');
+    const caption = lb.querySelector('.bs-lb-caption');
+    function openLightbox(i) {
+      idx = i;
+      const g = gallery[idx];
+      lb.style.display = 'flex';
+      lb.setAttribute('aria-hidden', 'false');
+      img.src = g.href;
+      img.alt = g.alt;
+      caption.textContent = g.alt || '';
+    }
+    function closeLightbox() {
+      lb.style.display = 'none';
+      lb.setAttribute('aria-hidden', 'true');
+      img.src = '';
+    }
+    function next() { openLightbox((idx + 1) % gallery.length); }
+    function prev() { openLightbox((idx - 1 + gallery.length) % gallery.length); }
+
+    items.forEach((a, i) => on(a, 'click', (e) => { e.preventDefault(); openLightbox(i); }));
+    on(lb.querySelector('.bs-lb-close'), 'click', closeLightbox);
+    on(lb.querySelector('.bs-lb-next'), 'click', next);
+    on(lb.querySelector('.bs-lb-prev'), 'click', prev);
+    on(document, 'keydown', (e) => {
+      if (lb.style.display === 'flex') {
+        if (e.key === 'Escape') closeLightbox();
+        if (e.key === 'ArrowRight') next();
+        if (e.key === 'ArrowLeft') prev();
+      }
+    });
+    on(lb, 'click', (e) => { if (e.target === lb) closeLightbox(); });
+  })();
+
+  /* -------------------------
+     Cart: add items, drawer UI + persistence
+  -------------------------*/
+  const CART_KEY = 'basilissa_cart_v1';
+  const cart = {
+    items: JSON.parse(localStorage.getItem(CART_KEY) || '[]'),
+    save() { localStorage.setItem(CART_KEY, JSON.stringify(this.items)); updateCartUI(); },
+    add(item) {
+      // simple merge by id
+      const existing = this.items.find(it => it.id === item.id);
+      if (existing) existing.qty += item.qty;
+      else this.items.push(item);
+      this.save();
+    },
+    remove(itemId) {
+      this.items = this.items.filter(i => i.id !== itemId);
+      this.save();
+    },
+    clear() { this.items = []; this.save(); }
+  };
+
+  // create cart drawer element
+  const cartDrawer = create('aside', { id: 'bs-cart-drawer', class: 'bs-cart-drawer', 'aria-hidden': 'true' });
+  cartDrawer.innerHTML = `
+    <div class="bs-cart-inner" role="dialog" aria-modal="true" aria-label="Shopping cart">
+      <header class="bs-cart-head">
+        <h3>Your order</h3>
+        <button class="bs-cart-close" aria-label="Close cart">&times;</button>
+      </header>
+      <div class="bs-cart-body">
+        <ul class="bs-cart-list"></ul>
+        <div class="bs-cart-empty" style="display:none">Your cart is empty.</div>
+      </div>
+      <footer class="bs-cart-foot">
+        <div class="bs-cart-totals">Total: <strong class="bs-cart-total">GHC 0</strong></div>
+        <div class="bs-cart-actions">
+          <button class="btn ghost bs-cart-clear">Clear</button>
+          <button class="btn primary bs-cart-checkout">Checkout</button>
+        </div>
+      </footer>
+    </div>
+  `;
+  // minimal CSS injection so the drawer is visible / usable
+  const cartStyle = document.createElement('style');
+  cartStyle.innerHTML = `
+    .bs-cart-drawer{position:fixed;right:0;top:0;height:100%;width:360px;max-width:94vw;background:#fff;box-shadow:-18px 0 40px rgba(0,0,0,0.35);transform:translateX(110%);transition:transform 380ms ease;z-index:10001}
+    .bs-cart-drawer[aria-hidden="false"]{transform:translateX(0)}
+    .bs-cart-inner{display:flex;flex-direction:column;height:100%}
+    .bs-cart-head{display:flex;justify-content:space-between;align-items:center;padding:16px;border-bottom:1px solid #eee}
+    .bs-cart-body{flex:1;overflow:auto;padding:12px}
+    .bs-cart-list{list-style:none;margin:0;padding:0;display:block}
+    .bs-cart-list li{display:flex;gap:10px;padding:10px 6px;border-bottom:1px dashed #eee;align-items:center}
+    .bs-cart-foot{padding:12px;border-top:1px solid #eee}
+    .bs-cart-empty{padding:14px;color:#666;text-align:center}
+    .bs-cart-item-qty{min-width:28px;text-align:center}
+    .bs-cart-actions{display:flex;gap:8px;justify-content:flex-end}
+    .bs-cart-list img{width:64px;height:64px;object-fit:cover;border-radius:8px}
+  `;
+  document.head.appendChild(cartStyle);
+  document.body.appendChild(cartDrawer);
+
+  const cartListEl = qs('.bs-cart-list');
+  const cartEmptyEl = qs('.bs-cart-empty');
+  const cartTotalEl = qs('.bs-cart-total');
+
+  function formatCurrency(n) { return 'GHC ' + (Number(n) || 0).toFixed(2); }
+  function computeTotal() {
+    return cart.items.reduce((sum, it) => sum + (Number(it.price) || 0) * (it.qty || 1), 0);
+  }
+  function updateCartUI() {
+    // update count in floating cart
+    const count = cart.items.reduce((s, it) => s + (it.qty || 1), 0);
+    const countEl = qs('.cart-fab .count') || qs('.cart-fab .count') || qs('.floating-btn.cart-fab .count');
+    if (countEl) countEl.textContent = count;
+    // populate drawer list
+    cartListEl.innerHTML = '';
+    if (!cart.items.length) {
+      cartEmptyEl.style.display = '';
+    } else {
+      cartEmptyEl.style.display = 'none';
+      cart.items.forEach(it => {
+        const li = document.createElement('li');
+        li.innerHTML = `
+          <img src="${it.image || 'images/menu-placeholder.jpg'}" alt="${it.name}">
+          <div style="flex:1">
+            <div style="font-weight:800">${it.name}</div>
+            <div style="color:#666;font-size:13px">${it.desc || ''}</div>
+            <div style="margin-top:8px;display:flex;gap:8px;align-items:center">
+              <button class="btn small bs-dec" data-id="${it.id}">-</button>
+              <span class="bs-cart-item-qty">${it.qty}</span>
+              <button class="btn small bs-inc" data-id="${it.id}">+</button>
+            </div>
+          </div>
+          <div style="font-weight:900">${formatCurrency(it.price * it.qty)}</div>
+        `;
+        cartListEl.appendChild(li);
+      });
+    }
+    cartTotalEl.textContent = formatCurrency(computeTotal());
+  }
+
+  // wire up add-to-cart buttons (menu items)
+  on(document, 'click', (e) => {
+    const addBtn = e.target.closest && e.target.closest('.menu-item .item-actions .btn');
+    if (!addBtn) return;
+    // find the menu-item ancestor
+    const itemCard = addBtn.closest('.menu-item');
+    if (!itemCard) return;
+    // basic item data
+    const id = itemCard.getAttribute('data-item') || itemCard.dataset.item || ('item-' + Date.now());
+    const name = (itemCard.querySelector('h3') && itemCard.querySelector('h3').textContent.trim()) || 'Menu item';
+    const desc = (itemCard.querySelector('p') && itemCard.querySelector('p').textContent.trim()) || '';
+    // price extraction from .price-badge inside overlay (strip non-digit)
+    const priceBadge = itemCard.querySelector('.price-badge');
+    let price = 0;
+    if (priceBadge) {
+      const txt = priceBadge.textContent || '';
+      const num = txt.replace(/[^\d\.]/g,'');
+      price = parseFloat(num) || price;
+    }
+    // image
+    const img = itemCard.querySelector('.item-media img')?.src || '';
+    // add to cart
+    cart.add({ id, name, desc, price: price || 0, qty: 1, image: img });
+    // visual feedback
+    addBtn.classList.add('added');
+    setTimeout(()=> addBtn.classList.remove('added'), 700);
+    // optionally show drawer
+    openCartDrawer();
+  });
+
+  // cart drawer controls (close, inc/dec, clear, checkout)
+  on(document, 'click', (e) => {
+    const close = e.target.closest && e.target.closest('.bs-cart-close');
+    if (close) { closeCartDrawer(); return; }
+    const clear = e.target.closest && e.target.closest('.bs-cart-clear');
+    if (clear) { cart.clear(); return; }
+    const inc = e.target.closest && e.target.closest('.bs-inc');
+    if (inc) {
+      const id = inc.getAttribute('data-id');
+      const it = cart.items.find(i => i.id === id);
+      if (it) { it.qty = (it.qty || 1) + 1; cart.save(); }
+      return;
+    }
+    const dec = e.target.closest && e.target.closest('.bs-dec');
+    if (dec) {
+      const id = dec.getAttribute('data-id');
+      const it = cart.items.find(i => i.id === id);
+      if (it) { it.qty = Math.max(1, (it.qty || 1) - 1); cart.save(); }
+      return;
+    }
+    const checkout = e.target.closest && e.target.closest('.bs-cart-checkout');
+    if (checkout) {
+      // in real site, go to checkout flow; here we simulate
+      if (!cart.items.length) { alert('Your cart is empty'); return; }
+      alert('Proceeding to checkout — this demo simulates checkout. Total: ' + formatCurrency(computeTotal()));
+      cart.clear();
+      closeCartDrawer();
+    }
+  });
+
+  // floating cart open/close
+  function openCartDrawer() {
+    cartDrawer.setAttribute('aria-hidden', 'false');
+    cartDrawer.style.transform = 'translateX(0)';
+    updateCartUI();
+  }
+  function closeCartDrawer() {
+    cartDrawer.setAttribute('aria-hidden', 'true');
+    cartDrawer.style.transform = 'translateX(110%)';
+  }
+  // floating ctas (cart & wa)
+  on(document, 'click', (e) => {
+    const cartFab = e.target.closest && e.target.closest('.floating-btn.cart-fab, .cart-fab, .floating-btn.cart-fab *');
+    if (cartFab) { openCartDrawer(); e.preventDefault(); }
+    const wa = e.target.closest && e.target.closest('.wa-fab, .wa-fab *');
+    if (wa) {
+      // open whatsapp already handled by href; no-op here
+    }
+  });
+
+  // initialize cart UI
+  updateCartUI();
+
+  /* -------------------------
+     Floating micro-animations: badges & js-anim-pop trigger class
+     - We'll add a short lived class on badges when clicked
+  -------------------------*/
+  on(document, 'click', (e) => {
+    const badge = e.target.closest && e.target.closest('.badge, .ribbon, .label-pill');
+    if (!badge) return;
+    badge.classList.add('bs-pop');
+    setTimeout(()=> badge.classList.remove('bs-pop'), 650);
+  });
+
+  /* -------------------------
+     Newsletter & Contact form (simulated submit)
+  -------------------------*/
+  function simulateSubmit(form, opts = {}) {
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const initial = submitBtn && submitBtn.innerHTML;
+    if (submitBtn) { submitBtn.disabled = true; submitBtn.innerHTML = 'Sending...'; }
+    setTimeout(() => {
+      if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = initial; }
+      // show inline success
+      const success = create('div', { class: 'bs-inline-success', html: `<strong>Thanks!</strong> We've received your message.` });
+      success.style.cssText = 'padding:10px;background:#eaf8ed;border:1px solid #c7efd2;margin-top:10px;border-radius:8px';
+      form.appendChild(success);
+      setTimeout(()=> success.remove(), 4200);
+      // persist newsletter emails to localStorage for demo
+      if (opts.saveKey) {
+        const data = JSON.parse(localStorage.getItem(opts.saveKey) || '[]');
+        const payload = Object.fromEntries(new FormData(form));
+        data.push({ ts: Date.now(), payload });
+        localStorage.setItem(opts.saveKey, JSON.stringify(data));
+      }
+      // reset fields optionally
+      if (opts.reset) form.reset();
+    }, 900 + Math.random()*700);
+  }
+
+  qsa('.contact-form').forEach(form => {
+    on(form, 'submit', (e) => {
+      e.preventDefault();
+      simulateSubmit(form, { saveKey: 'basilissa_contact_demo', reset: true });
+    });
+  });
+  qsa('.newsletter-form').forEach(form => {
+    on(form, 'submit', (e) => {
+      e.preventDefault();
+      simulateSubmit(form, { saveKey: 'basilissa_newsletter_demo', reset: true });
+    });
+  });
+
+  /* -------------------------
+     Misc: close modals on ESC key
+  -------------------------*/
+  on(document, 'keydown', (e) => {
+    if (e.key === 'Escape') {
+      // close cart drawer if open
+      if (cartDrawer && cartDrawer.getAttribute('aria-hidden') === 'false') closeCartDrawer();
+      // close any search overlay if present
+      const so = qs('.bs-search-overlay'); if (so) so.remove();
+      // close lightbox if visible
+      const lb = qs('.bs-lightbox'); if (lb && lb.style.display === 'flex') lb.style.display = 'none';
+    }
+  });
+
+  /* -------------------------
+     Tiny accessibility enhancements: focus outlines for keyboard users
+  -------------------------*/
+  (function focusStyleToggle() {
+    function handleFirstTab(e) {
+      if (e.key === 'Tab') {
+        document.documentElement.classList.add('user-is-tabbing');
+        window.removeEventListener('keydown', handleFirstTab);
+      }
+    }
+    window.addEventListener('keydown', handleFirstTab);
+  })();
+
+  /* -------------------------
+     Finish: expose a small debug API on window for dev convenience
+  -------------------------*/
+  window._Basilissa = {
+    cart,
+    openCartDrawer,
+    closeCartDrawer,
+    goToSlide: function(idx){ const ev = new Event('click'); const dots = qsa('.carousel-controls .dots .dot'); if(dots[idx]) dots[idx].dispatchEvent(ev); }
+  };
+
+  // End of script
+})();
+</script>
 </html>
