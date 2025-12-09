@@ -1,0 +1,698 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Basilissa — Menu</title>
+  <meta name="description" content="Basilissa menu — pizzas, shawarma, chicken, burgers, combos, sides and beverages. Order online.">
+  <!-- Google font -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <!-- Font Awesome (icons) -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <style>
+    :root{
+      --bg: #071014;
+      --card: #0f1720;
+      --muted: #9aa8b3;
+      --primary: #0F6B3A;    /* basil green */
+      --accent: #F6C342;     /* warm yellow */
+      --cta: #c0302e;        /* prominent CTA (can change to red if desired) */
+      --white: #FFFFFF;
+      --glass: rgba(255,255,255,0.03);
+      --radius: 14px;
+      --shadow: 0 12px 40px rgba(2,6,12,0.6);
+      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg) 0%, #041214 100%);color:var(--white);-webkit-font-smoothing:antialiased}
+    a{color:inherit}
+    img{display:block;max-width:100%;height:auto}
+    .container{max-width:1200px;margin:0 auto;padding:28px}
+
+    /* header */
+    header{position:sticky;top:0;z-index:150;background:linear-gradient(180deg, rgba(7,18,20,0.95), rgba(7,18,20,0.85));border-bottom:1px solid rgba(255,255,255,0.03);backdrop-filter:blur(6px)}
+    .nav{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 28px}
+    .brand{display:flex;gap:12px;align-items:center}
+    .logo{width:60px;height:60px;border-radius:12px;background:linear-gradient(135deg,var(--primary),#0b9a5a);display:grid;place-items:center;font-weight:900;font-size:22px;box-shadow:0 8px 30px rgba(15,107,58,0.16)}
+    .brand .title{font-weight:900;letter-spacing:1px}
+    nav.primary ul{display:flex;gap:18px;list-style:none;margin:0;padding:0}
+    nav.primary a{padding:8px 10px;border-radius:8px;color:var(--muted);font-weight:700}
+    nav.primary a:hover, nav.primary a:focus{background:var(--glass);color:var(--white)}
+    .nav-actions{display:flex;align-items:center;gap:12px}
+
+    /* cart */
+    .cart-btn{position:relative;border-radius:10px;background:rgba(255,255,255,0.03);padding:10px;border:none;color:var(--white);cursor:pointer}
+    .cart-badge{position:absolute;top:-6px;right:-6px;min-width:20px;height:20px;padding:0 6px;border-radius:999px;background:#ff4b4b;color:white;font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center;border:2px solid rgba(0,0,0,0.25)}
+    .pill-order{background:var(--cta);color:#fff;padding:12px 26px;border-radius:999px;font-weight:900;border:none;cursor:pointer;box-shadow:0 12px 30px rgba(192,48,46,0.12)}
+
+    /* layout */
+    .page-grid{display:grid;grid-template-columns:260px 1fr;gap:20px;margin-top:18px}
+    /* left nav (category sticky) */
+    .left-nav{position:sticky;top:90px;align-self:start}
+    .categories{background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.01));padding:14px;border-radius:12px;box-shadow:var(--shadow)}
+    .categories h4{margin:0 0 10px}
+    .cat-list{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px}
+    .cat-list button{background:transparent;border:0;padding:10px;border-radius:10px;text-align:left;color:var(--muted);font-weight:700;cursor:pointer}
+    .cat-list button.active{background:var(--glass);color:var(--white)}
+
+    /* main content */
+    .menu-header{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px}
+    .search-box{display:flex;gap:8px;align-items:center;background:rgba(255,255,255,0.02);padding:8px;border-radius:10px}
+    .search-box input{background:transparent;border:0;color:var(--white);outline:none;padding:8px 6px;width:320px}
+    .menu-content{display:flex;flex-direction:column;gap:22px}
+
+    /* category section */
+    .section{background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.01));padding:18px;border-radius:12px;box-shadow:0 8px 30px rgba(2,6,12,0.4)}
+    .section-header{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px}
+    .grid-items{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+    .item{display:grid;grid-template-columns:120px 1fr 110px;gap:12px;align-items:center;padding:12px;border-radius:10px;background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent);transition:transform .18s ease, box-shadow .18s ease}
+    .item:hover{transform:translateY(-6px);box-shadow:0 18px 40px rgba(2,6,12,0.4)}
+    .item img{width:120px;height:88px;object-fit:cover;border-radius:8px}
+    .item .meta{display:flex;flex-direction:column;gap:6px}
+    .item .meta h5{margin:0;font-size:16px}
+    .item .meta p{margin:0;color:var(--muted);font-size:13px}
+    .price-block{text-align:right}
+    .price-block .price{font-weight:900;color:var(--accent);font-size:18px}
+    .price-block .small{color:var(--muted);font-size:13px}
+    .add-btn{margin-top:8px;border-radius:10px;padding:8px 10px;border:none;background:linear-gradient(90deg,var(--primary), #0b5a35);color:white;font-weight:800;cursor:pointer;display:inline-flex;gap:8px;align-items:center}
+    .add-btn .fa{transform:translateY(0);transition:transform .18s}
+    .add-btn:active .fa{transform:translateY(-2px)}
+
+    /* pizza special grid: prices for sizes */
+    .pizza-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .pizza-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px;border-radius:8px;background:rgba(255,255,255,0.01)}
+    .pizza-name{font-weight:800}
+    .pizza-prices{display:flex;gap:8px;align-items:center}
+    .pizza-prices .tier{background:rgba(255,255,255,0.03);padding:6px 10px;border-radius:6px;font-weight:800;color:var(--muted)}
+
+    /* side menu & beverage lists */
+    .list{display:grid;gap:8px}
+    .list .row{display:flex;justify-content:space-between;align-items:center;padding:8px;border-radius:8px;background:rgba(255,255,255,0.01)}
+
+    /* SMALL helper visuals */
+    .label{background:var(--accent);color:#071014;padding:6px 8px;border-radius:6px;font-weight:800;font-size:12px}
+
+    /* animations */
+    @keyframes fadeInUp {
+      from{opacity:0; transform:translateY(8px)}
+      to{opacity:1; transform:translateY(0)}
+    }
+    .animated{animation: fadeInUp .6s ease both}
+
+    /* cart panel */
+    #cartPanel{position:fixed;right:20px;bottom:20px;width:360px;background:linear-gradient(180deg,#071018,#071214);border-radius:12px;padding:14px;box-shadow:0 20px 60px rgba(0,0,0,0.6);z-index:300;display:none}
+    #cartPanel .line{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px dashed rgba(255,255,255,0.03)}
+    #cartItems{max-height:320px;overflow:auto;padding-right:6px}
+    .qty-btn{background:transparent;border:1px solid rgba(255,255,255,0.04);width:28px;height:28px;border-radius:6px;color:var(--muted);cursor:pointer}
+    .checkout{background:linear-gradient(90deg,var(--primary), #0b5a35);border:none;padding:10px;border-radius:8px;color:white;font-weight:900;cursor:pointer;width:100%}
+
+    /* responsive */
+    @media (max-width:1000px){
+      .page-grid{grid-template-columns:1fr; padding-bottom:100px}
+      .left-nav{order:2;position:static}
+      .cart-btn{padding:8px}
+      .grid-items{grid-template-columns:1fr}
+      .pizza-grid{grid-template-columns:1fr}
+      header .nav{padding:10px}
+    }
+
+    /* small helper */
+    .muted{color:var(--muted)}
+    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+  </style>
+</head>
+<body>
+  <a class="sr-only" href="#menu-main">Skip to content</a>
+
+  <header>
+    <div class="nav container" role="banner">
+      <div class="brand">
+        <div class="logo" aria-hidden="true">B</div>
+        <div>
+          <div class="title">BASILISSA</div>
+          <div class="muted" style="font-size:13px">Menu — Pizza • Shawarma • Chicken</div>
+        </div>
+      </div>
+
+      <nav class="primary" aria-label="Main navigation">
+        <ul>
+          <li><a href="#burgers">Burgers</a></li>
+          <li><a href="#chicken">Chicken</a></li>
+          <li><a href="#pizza">Pizza</a></li>
+          <li><a href="#beverages">Drinks</a></li>
+        </ul>
+      </nav>
+
+      <div class="nav-actions" role="toolbar" aria-label="Actions">
+        <button class="cart-btn" id="openCart" title="Open cart" aria-haspopup="dialog" aria-controls="cartPanel">
+          <i class="fa fa-shopping-cart" aria-hidden="true"></i>
+          <span class="cart-badge" id="cartCount" aria-live="polite" aria-atomic="true">0</span>
+        </button>
+        <button class="pill-order" onclick="location.href='#contact'"><i class="fa fa-phone"></i>&nbsp;Reserve</button>
+      </div>
+    </div>
+  </header>
+
+  <main id="menu-main" class="container">
+    <div class="page-grid">
+      <!-- LEFT: categories -->
+      <aside class="left-nav">
+        <div class="categories animated" style="animation-delay:.05s">
+          <h4>Categories</h4>
+          <ul class="cat-list" id="categoryList">
+            <li><button data-cat="all" class="active"><i class="fa fa-list"></i>&nbsp; All</button></li>
+            <li><button data-cat="burgers"><i class="fa fa-hamburger"></i>&nbsp; Burgers</button></li>
+            <li><button data-cat="shawarma"><i class="fa fa-bread-slice"></i>&nbsp; Shawarma</button></li>
+            <li><button data-cat="hotdog"><i class="fa fa-hotdog"></i>&nbsp; Hotdog</button></li>
+            <li><button data-cat="chicken"><i class="fa fa-drumstick-bite"></i>&nbsp; Chicken</button></li>
+            <li><button data-cat="combos"><i class="fa fa-box"></i>&nbsp; Combos</button></li>
+            <li><button data-cat="pizza"><i class="fa fa-pizza-slice"></i>&nbsp; Pizza</button></li>
+            <li><button data-cat="sides"><i class="fa fa-pepper-hot"></i>&nbsp; Side Menu</button></li>
+            <li><button data-cat="bev"><i class="fa fa-mug-hot"></i>&nbsp; Beverage & Snacks</button></li>
+          </ul>
+        </div>
+
+        <div class="categories animated" style="margin-top:14px;animation-delay:.08s">
+          <h4>Quick filters</h4>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <button onclick="filterByTag('vegetarian')" style="padding:10px;border-radius:10px;border:0;background:rgba(255,255,255,0.02);font-weight:700"><i class="fa fa-leaf"></i>&nbsp; Veg</button>
+            <button onclick="filterByTag('spicy')" style="padding:10px;border-radius:10px;border:0;background:rgba(255,255,255,0.02);font-weight:700"><i class="fa fa-fire"></i>&nbsp; Spicy</button>
+            <button onclick="filterByTag('popular')" style="padding:10px;border-radius:10px;border:0;background:rgba(255,255,255,0.02);font-weight:700"><i class="fa fa-star"></i>&nbsp; Popular</button>
+          </div>
+        </div>
+      </aside>
+
+      <!-- RIGHT: menu content -->
+      <section class="menu-content" id="menuContent">
+        <div class="menu-header animated" style="animation-delay:.04s">
+          <div>
+            <h2 style="margin:0">Full Menu</h2>
+            <div class="muted" style="margin-top:6px">Browse Basilissa’s full selection — tap “Add” to add items to your cart.</div>
+          </div>
+          <div class="search-box" role="search" aria-label="Search menu">
+            <i class="fa fa-search"></i>
+            <input id="searchInput" placeholder="Search dishes, ingredients or price (e.g. 'shawarma' or '75')" />
+            <button class="pill-order" onclick="clearSearch()">Clear</button>
+          </div>
+        </div>
+
+        <!-- BURGERS -->
+        <section id="burgers" class="section animated" data-cat="burgers" style="animation-delay:.06s">
+          <div class="section-header">
+            <h3>Burgers</h3>
+            <div class="label">Burgers & Sandwiches</div>
+          </div>
+          <div class="grid-items" role="list">
+            <article class="item" data-tags="popular" role="listitem">
+              <img src="/assets/menu/accra-crispy-chicken.jpg" alt="Accra Crispy Chicken Burger">
+              <div class="meta">
+                <h5>Accra Crispy Chicken</h5>
+                <p class="muted">Crunchy fried chicken, lettuce, special sauce</p>
+                <div class="muted" style="font-size:13px">Shop special</div>
+              </div>
+              <div class="price-block">
+                <div class="price">GHS 85</div>
+                <div><button class="add-btn" onclick="addToCart('Accra Crispy Chicken',85)"><i class="fa fa-cart-plus"></i> Add</button></div>
+              </div>
+            </article>
+
+            <article class="item" role="listitem">
+              <img src="/assets/menu/chicken-cheese.jpg" alt="Chicken Cheese Burger">
+              <div class="meta">
+                <h5>Chicken Cheese</h5>
+                <p class="muted">Melted cheese, chicken patty, pickles</p>
+              </div>
+              <div class="price-block">
+                <div class="price">GHS 90</div>
+                <div><button class="add-btn" onclick="addToCart('Chicken Cheese',90)"><i class="fa fa-cart-plus"></i> Add</button></div>
+              </div>
+            </article>
+
+            <article class="item" role="listitem">
+              <img src="/assets/menu/bbq-grilled-beef.jpg" alt="BBQ Grilled Single Beef">
+              <div class="meta">
+                <h5>BBQ Grilled Single Beef</h5>
+                <p class="muted">Smoky BBQ sauce & caramelized onion</p>
+              </div>
+              <div class="price-block">
+                <div class="price">GHS 80</div>
+                <div><button class="add-btn" onclick="addToCart('BBQ Grilled Single Beef',80)"><i class="fa fa-cart-plus"></i> Add</button></div>
+              </div>
+            </article>
+
+            <article class="item" role="listitem">
+              <img src="/assets/menu/double-beef-cheese.jpg" alt="Double Beef Cheese">
+              <div class="meta">
+                <h5>Double Beef Cheese</h5>
+                <p class="muted">Two patties, double cheese</p>
+              </div>
+              <div class="price-block">
+                <div class="price">GHS 110</div>
+                <div><button class="add-btn" onclick="addToCart('Double Beef Cheese',110)"><i class="fa fa-cart-plus"></i> Add</button></div>
+              </div>
+            </article>
+
+            <article class="item" role="listitem">
+              <img src="/assets/menu/bacon-beef.jpg" alt="Bacon and Beef Burger">
+              <div class="meta">
+                <h5>Bacon & Beef Burger</h5>
+                <p class="muted">Smoky bacon, beef patty, house sauce</p>
+              </div>
+              <div class="price-block">
+                <div class="price">GHS 115</div>
+                <div><button class="add-btn" onclick="addToCart('Bacon & Beef Burger',115)"><i class="fa fa-cart-plus"></i> Add</button></div>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <!-- SHAWARMA -->
+        <section id="shawarma" class="section animated" data-cat="shawarma" style="animation-delay:.08s">
+          <div class="section-header">
+            <h3>Shawarma</h3>
+            <div class="label">Popular wraps</div>
+          </div>
+
+          <div class="grid-items" role="list">
+            <article class="item" role="listitem">
+              <img src="/assets/menu/shawarma-chicken.jpg" alt="Chicken Shawarma">
+              <div class="meta">
+                <h5>Shawarma — Chicken</h5>
+                <p class="muted">Garlic sauce, fresh veg, warm wrap</p>
+              </div>
+              <div class="price-block">
+                <div class="price">GHS 75</div>
+                <div><button class="add-btn" onclick="addToCart('Chicken Shawarma',75)"><i class="fa fa-cart-plus"></i> Add</button></div>
+              </div>
+            </article>
+
+            <article class="item" role="listitem">
+              <img src="/assets/menu/shawarma-beef.jpg" alt="Beef Shawarma">
+              <div class="meta">
+                <h5>Shawarma — Beef</h5>
+                <p class="muted">Spiced beef, tahini, pickles</p>
+              </div>
+              <div class="price-block">
+                <div class="price">GHS 75</div>
+                <div><button class="add-btn" onclick="addToCart('Beef Shawarma',75)"><i class="fa fa-cart-plus"></i> Add</button></div>
+              </div>
+            </article>
+
+            <article class="item" role="listitem">
+              <img src="/assets/menu/shawarma-veg.jpg" alt="Vegetable Shawarma">
+              <div class="meta">
+                <h5>Shawarma — Vegetable</h5>
+                <p class="muted">Grilled veg, hummus, crisp lettuce</p>
+              </div>
+              <div class="price-block">
+                <div class="price">GHS 70</div>
+                <div><button class="add-btn" onclick="addToCart('Vegetable Shawarma',70)"><i class="fa fa-cart-plus"></i> Add</button></div>
+              </div>
+            </article>
+
+            <article class="item" data-tags="popular" role="listitem">
+              <img src="/assets/menu/shawarma-special.jpg" alt="Basilissa Special Shawarma">
+              <div class="meta">
+                <h5>Basilissa Special</h5>
+                <p class="muted">Signature spices, special sauce & herbs</p>
+              </div>
+              <div class="price-block">
+                <div class="price">GHS 80</div>
+                <div><button class="add-btn" onclick="addToCart('Basilissa Special Shawarma',80)"><i class="fa fa-cart-plus"></i> Add</button></div>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <!-- HOTDOG -->
+        <section id="hotdog" class="section animated" data-cat="hotdog" style="animation-delay:.10s">
+          <div class="section-header">
+            <h3>Hotdog</h3>
+            <div class="label">Street snacks</div>
+          </div>
+          <div class="grid-items">
+            <article class="item" role="listitem">
+              <img src="/assets/menu/korean-hotdog.jpg" alt="Korean Hotdog">
+              <div class="meta">
+                <h5>Korean Hotdog</h5>
+                <p class="muted">Crispy battered hotdog with sauce</p>
+              </div>
+              <div class="price-block">
+                <div class="price">GHS 45</div>
+                <div><button class="add-btn" onclick="addToCart('Korean Hotdog',45)"><i class="fa fa-cart-plus"></i> Add</button></div>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <!-- CHICKEN -->
+        <section id="chicken" class="section animated" data-cat="chicken" style="animation-delay:.12s">
+          <div class="section-header">
+            <h3>Chicken</h3>
+            <div class="label">Crispy • Spicy • Grilled</div>
+          </div>
+
+          <div class="grid-items">
+            <article class="item" role="listitem">
+              <img src="/assets/menu/crispy-chicken.jpg" alt="Crispy Chicken">
+              <div class="meta">
+                <h5>Crispy Chicken (Full / 1/2 / 1/4)</h5>
+                <p class="muted">Classic crisp fried chicken</p>
+              </div>
+              <div class="price-block">
+                <div class="price">GHS 190 / 120 / 75</div>
+                <div><button class="add-btn" onclick="openSizeModal('Crispy Chicken',{full:190,half:120,quarter:75})"><i class="fa fa-caret-down"></i> Sizes</button></div>
+              </div>
+            </article>
+
+            <article class="item" role="listitem">
+              <img src="/assets/menu/spicy-chicken.jpg" alt="Spicy Chicken">
+              <div class="meta">
+                <h5>Spicy Chicken (Full / 1/2 / 1/4)</h5>
+                <p class="muted">Hot & spicy seasoned chicken</p>
+              </div>
+              <div class="price-block">
+                <div class="price">GHS 190 / 120 / 75</div>
+                <div><button class="add-btn" onclick="openSizeModal('Spicy Chicken',{full:190,half:120,quarter:75})"><i class="fa fa-caret-down"></i> Sizes</button></div>
+              </div>
+            </article>
+
+            <article class="item" role="listitem">
+              <img src="/assets/menu/grilled-chicken.jpg" alt="Grilled Chicken">
+              <div class="meta">
+                <h5>Grilled Chicken (Full / 1/2 / 1/4)</h5>
+                <p class="muted">Tender grilled chicken with herbs</p>
+              </div>
+              <div class="price-block">
+                <div class="price">GHS 190 / 120 / 110</div>
+                <div><button class="add-btn" onclick="openSizeModal('Grilled Chicken',{full:190,half:120,quarter:110})"><i class="fa fa-caret-down"></i> Sizes</button></div>
+              </div>
+            </article>
+
+            <article class="item" role="listitem">
+              <img src="/assets/menu/spicy-wings.jpg" alt="Spicy Wings">
+              <div class="meta">
+                <h5>Spicy Wings</h5>
+                <p class="muted">8pcs • 16pcs • 24pcs</p>
+              </div>
+              <div class="price-block">
+                <div class="price">GHS 90 / 160 / 220</div>
+                <div><button class="add-btn" onclick="openSizeModal('Spicy Wings',{8:90,16:160,24:220})"><i class="fa fa-caret-down"></i> Choose</button></div>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <!-- COMBOS -->
+        <section id="combos" class="section animated" data-cat="combos" style="animation-delay:.14s">
+          <div class="section-header">
+            <h3>Combos</h3>
+            <div class="label">Chicken with chips or fried rice</div>
+          </div>
+
+          <div class="grid-items">
+            <article class="item" role="listitem">
+              <img src="/assets/menu/combo-crispy.jpg" alt="Crispy combo">
+              <div class="meta">
+                <h5>Crispy Combo (1/2 • 1/4)</h5>
+                <p class="muted">Served with chips or rice</p>
+              </div>
+              <div class="price-block">
+                <div class="price">GHS 150 / 100</div>
+                <div><button class="add-btn" onclick="openSizeModal('Crispy Combo',{half:150,quarter:100})"><i class="fa fa-cart-plus"></i> Add</button></div>
+              </div>
+            </article>
+
+            <article class="item" role="listitem">
+              <img src="/assets/menu/combo-spicy.jpg" alt="Spicy combo">
+              <div class="meta">
+                <h5>Spicy Combo (1/2 • 1/4)</h5>
+                <p class="muted">Served with chips or rice</p>
+              </div>
+              <div class="price-block">
+                <div class="price">GHS 150 / 100</div>
+                <div><button class="add-btn" onclick="openSizeModal('Spicy Combo',{half:150,quarter:100})"><i class="fa fa-cart-plus"></i> Add</button></div>
+              </div>
+            </article>
+
+            <article class="item" role="listitem">
+              <img src="/assets/menu/combo-grilled.jpg" alt="Grilled combo">
+              <div class="meta">
+                <h5>Grilled Combo</h5>
+                <p class="muted">Honey grilled option available</p>
+              </div>
+              <div class="price-block">
+                <div class="price">GHS 130</div>
+                <div><button class="add-btn" onclick="addToCart('Grilled Combo',130)"><i class="fa fa-cart-plus"></i> Add</button></div>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <!-- PIZZA -->
+        <section id="pizza" class="section animated" data-cat="pizza" style="animation-delay:.16s">
+          <div class="section-header">
+            <h3>Pizza</h3>
+            <div class="label">Small • Medium • Large</div>
+          </div>
+
+          <div class="pizza-grid">
+            <!-- Row format: name + price tiers small/med/large -->
+            <div class="pizza-row"><div class="pizza-name">Ham</div><div class="pizza-prices"><div class="tier">₵180</div><div class="tier">₵210</div><div class="tier">₵270</div><button class="add-btn" onclick="addPizzaToCart('Ham',180,210,270)">Add</button></div></div>
+
+            <div class="pizza-row"><div class="pizza-name">Pepperoni</div><div class="pizza-prices"><div class="tier">₵180</div><div class="tier">₵210</div><div class="tier">₵270</div><button class="add-btn" onclick="addPizzaToCart('Pepperoni',180,210,270)">Add</button></div></div>
+
+            <div class="pizza-row"><div class="pizza-name">BBQ Pineapple</div><div class="pizza-prices"><div class="tier">₵180</div><div class="tier">₵210</div><div class="tier">₵270</div><button class="add-btn" onclick="addPizzaToCart('BBQ Pineapple',180,210,270)">Add</button></div></div>
+
+            <div class="pizza-row"><div class="pizza-name">Ham & Mushroom</div><div class="pizza-prices"><div class="tier">₵180</div><div class="tier">₵210</div><div class="tier">₵270</div><button class="add-btn" onclick="addPizzaToCart('Ham & Mushroom',180,210,270)">Add</button></div></div>
+
+            <div class="pizza-row"><div class="pizza-name">Margherita</div><div class="pizza-prices"><div class="tier">₵160</div><div class="tier">₵190</div><div class="tier">₵250</div><button class="add-btn" onclick="addPizzaToCart('Margherita',160,190,250)">Add</button></div></div>
+
+            <div class="pizza-row"><div class="pizza-name">Chicken</div><div class="pizza-prices"><div class="tier">₵180</div><div class="tier">₵210</div><div class="tier">₵270</div><button class="add-btn" onclick="addPizzaToCart('Chicken',180,210,270)">Add</button></div></div>
+
+            <div class="pizza-row"><div class="pizza-name">Beef</div><div class="pizza-prices"><div class="tier">₵180</div><div class="tier">₵210</div><div class="tier">₵270</div><button class="add-btn" onclick="addPizzaToCart('Beef',180,210,270)">Add</button></div></div>
+
+            <div class="pizza-row"><div class="pizza-name">Vegetarian</div><div class="pizza-prices"><div class="tier">₵180</div><div class="tier">₵210</div><div class="tier">₵270</div><button class="add-btn" onclick="addPizzaToCart('Vegetarian',180,210,270)">Add</button></div></div>
+
+            <div class="pizza-row"><div class="pizza-name">Basilissa Special</div><div class="pizza-prices"><div class="tier">₵210</div><div class="tier">₵260</div><div class="tier">₵310</div><button class="add-btn" onclick="addPizzaToCart('Basilissa Special',210,260,310)">Add</button></div></div>
+
+            <div class="pizza-row"><div class="pizza-name">Spicy Ham & Garlic</div><div class="pizza-prices"><div class="tier">₵180</div><div class="tier">₵220</div><div class="tier">₵280</div><button class="add-btn" onclick="addPizzaToCart('Spicy Ham & Garlic',180,220,280)">Add</button></div></div>
+
+            <div class="pizza-row"><div class="pizza-name">Bacon & Beef</div><div class="pizza-prices"><div class="tier">₵210</div><div class="tier">₵250</div><div class="tier">₵300</div><button class="add-btn" onclick="addPizzaToCart('Bacon & Beef',210,250,300)">Add</button></div></div>
+
+            <div class="pizza-row"><div class="pizza-name">Basilissa Family (18”)</div><div class="pizza-prices"><div class="tier">₵360</div><button class="add-btn" onclick="addToCart('Basilissa Family Pizza',360)"><i class="fa fa-cart-plus"></i> Add</button></div></div>
+
+          </div>
+        </section>
+
+        <!-- SIDE MENU -->
+        <section id="sides" class="section animated" data-cat="sides" style="animation-delay:.18s">
+          <div class="section-header">
+            <h3>Side Menu</h3>
+            <div class="label">Sides • Chips • Kids</div>
+          </div>
+          <div class="list">
+            <div class="row"><div>Vege Fried Rice</div><div class="muted">GHS 85&nbsp;<button class="add-btn" onclick="addToCart('Vege Fried Rice',85)"><i class="fa fa-cart-plus"></i> Add</button></div></div>
+            <div class="row"><div>Beef Fried Rice</div><div class="muted">GHS 90&nbsp;<button class="add-btn" onclick="addToCart('Beef Fried Rice',90)"><i class="fa fa-cart-plus"></i> Add</button></div></div>
+            <div class="row"><div>Chips</div><div class="muted">GHS 70&nbsp;<button class="add-btn" onclick="addToCart('Chips',70)"><i class="fa fa-cart-plus"></i> Add</button></div></div>
+            <div class="row"><div>Chicken (single piece)</div><div class="muted">GHS 30&nbsp;<button class="add-btn" onclick="addToCart('Single Chicken',30)"><i class="fa fa-cart-plus"></i> Add</button></div></div>
+            <div class="row"><div>Kids Meal (2pc + rice/chips)</div><div class="muted">GHS 75&nbsp;<button class="add-btn" onclick="addToCart('Kids Meal',75)"><i class="fa fa-cart-plus"></i> Add</button></div></div>
+          </div>
+        </section>
+
+        <!-- BEVERAGE & SNACKS -->
+        <section id="beverages" class="section animated" data-cat="bev" style="animation-delay:.20s">
+          <div class="section-header">
+            <h3>Beverage & Snacks</h3>
+            <div class="label">Fresh juices • Smoothies • Coffee • Snacks</div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div class="list">
+              <div class="row"><div>Fresh Juice - Orange</div><div class="muted">GHS 45<button class="add-btn" style="margin-left:8px" onclick="addToCart('Fresh Juice - Orange',45)"><i class="fa fa-cart-plus"></i> Add</button></div></div>
+              <div class="row"><div>Mango Smoothie</div><div class="muted">GHS 50<button class="add-btn" style="margin-left:8px" onclick="addToCart('Mango Smoothie',50)"><i class="fa fa-cart-plus"></i> Add</button></div></div>
+              <div class="row"><div>Slushie - Pineapple</div><div class="muted">GHS 45<button class="add-btn" style="margin-left:8px" onclick="addToCart('Slushie - Pineapple',45)"><i class="fa fa-cart-plus"></i> Add</button></div></div>
+              <div class="row"><div>Gelato (any flavour)</div><div class="muted">GHS 45<button class="add-btn" style="margin-left:8px" onclick="addToCart('Gelato',45)"><i class="fa fa-cart-plus"></i> Add</button></div></div>
+            </div>
+
+            <div class="list">
+              <div class="row"><div>Coffee - Espresso</div><div class="muted">GHS 30<button class="add-btn" style="margin-left:8px" onclick="addToCart('Espresso',30)"><i class="fa fa-cart-plus"></i> Add</button></div></div>
+              <div class="row"><div>Pastries - Cup Cakes</div><div class="muted">GHS 25<button class="add-btn" style="margin-left:8px" onclick="addToCart('Cup Cakes',25)"><i class="fa fa-cart-plus"></i> Add</button></div></div>
+              <div class="row"><div>Chocolate Mousse</div><div class="muted">GHS 25<button class="add-btn" style="margin-left:8px" onclick="addToCart('Chocolate Mousse',25)"><i class="fa fa-cart-plus"></i> Add</button></div></div>
+              <div class="row"><div>Water / Soft Drink</div><div class="muted">GHS 10<button class="add-btn" style="margin-left:8px" onclick="addToCart('Drink',10)"><i class="fa fa-cart-plus"></i> Add</button></div></div>
+            </div>
+          </div>
+        </section>
+
+      </section>
+    </div>
+  </main>
+
+  <!-- CART PANEL -->
+  <div id="cartPanel" aria-hidden="true" role="dialog" aria-label="Cart" >
+    <div style="position:fixed;right:20px;bottom:20px;width:360px;background:linear-gradient(180deg,#071018,#071214);border-radius:12px;padding:14px;box-shadow:0 20px 60px rgba(0,0,0,0.6);z-index:300;display:none" id="cartBox">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <strong style="font-size:16px">Your Cart</strong>
+        <button onclick="closeCart()" style="background:transparent;border:0;color:var(--muted);font-weight:800;cursor:pointer"><i class="fa fa-times"></i></button>
+      </div>
+      <div id="cartItems" style="max-height:320px;overflow:auto;padding-right:6px"></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px">
+        <div class="muted">Subtotal</div>
+        <div id="cartTotal" style="font-weight:900">GHS 0</div>
+      </div>
+      <div style="margin-top:12px">
+        <button class="checkout" onclick="checkout()">Proceed to Checkout</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SIZE MODAL (simple) -->
+  <div id="sizeModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:400;align-items:center;justify-content:center">
+    <div style="width:100%;max-width:520px;background:linear-gradient(180deg,#071018,#071214);border-radius:12px;padding:16px;box-shadow:0 20px 60px rgba(0,0,0,0.6)">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <strong id="sizeTitle">Choose size</strong>
+        <button onclick="closeSizeModal()" style="background:transparent;border:0;color:var(--muted);font-weight:800;cursor:pointer"><i class="fa fa-times"></i></button>
+      </div>
+      <div id="sizeOptions" style="display:flex;gap:8px"></div>
+    </div>
+  </div>
+
+  <script>
+    // -- cart state --
+    const cart = { items: [] };
+    function updateBadge(){
+      const count = cart.items.reduce((s,i)=>s.qty+s,0);
+      const badge = document.getElementById('cartCount');
+      badge.textContent = count;
+      badge.style.display = count === 0 ? 'none' : 'flex';
+    }
+    function addToCart(name, price, qty = 1){
+      const existing = cart.items.find(i => i.name === name && (!i.size));
+      if(existing) existing.qty += qty;
+      else cart.items.push({ name, price, qty });
+      recalc();
+      flashAdd(name);
+    }
+    function addPizzaToCart(name, sPrice, mPrice, lPrice){
+      // open size modal if not provided (we pass three prices)
+      openSizeModal(name, { 'Small': sPrice, 'Medium': mPrice, 'Large': lPrice });
+    }
+
+    function openSizeModal(title, options){
+      document.getElementById('sizeTitle').textContent = title;
+      const container = document.getElementById('sizeOptions');
+      container.innerHTML = '';
+      for(const key in options){
+        const price = options[key];
+        const btn = document.createElement('button');
+        btn.className = 'add-btn';
+        btn.style.marginRight='8px';
+        btn.innerHTML = `<i class="fa fa-pizza-slice"></i> ${key} — GHS ${price}`;
+        btn.onclick = ()=>{ cart.items.push({ name: title + ' ('+key+')', price, qty:1, size:key }); recalc(); closeSizeModal(); flashAdd(title + ' ('+key+')'); };
+        container.appendChild(btn);
+      }
+      document.getElementById('sizeModal').style.display = 'flex';
+    }
+    function closeSizeModal(){ document.getElementById('sizeModal').style.display = 'none'; }
+
+    function recalc(){
+      const itemsEl = document.getElementById('cartItems');
+      itemsEl.innerHTML = '';
+      if(cart.items.length === 0){
+        itemsEl.innerHTML = '<div class="muted">Your cart is empty</div>';
+      } else {
+        cart.items.forEach((it, idx) => {
+          const row = document.createElement('div');
+          row.style.display='flex'; row.style.justifyContent='space-between'; row.style.alignItems='center'; row.style.padding='8px 0';
+          row.innerHTML = `<div style="flex:1"><div style="font-weight:800">${it.name}</div><div class="muted" style="font-size:13px">GHS ${it.price} × ${it.qty}</div></div>
+            <div style="display:flex;gap:6px;align-items:center">
+              <button class="qty-btn" onclick="changeQty(${idx}, -1)">−</button>
+              <div style="min-width:28px;text-align:center">${it.qty}</div>
+              <button class="qty-btn" onclick="changeQty(${idx}, 1)">+</button>
+            </div>`;
+          itemsEl.appendChild(row);
+        });
+      }
+      const total = cart.items.reduce((s,i)=>s + i.qty * i.price, 0);
+      document.getElementById('cartTotal').textContent = 'GHS ' + total;
+      updateBadge();
+    }
+    function changeQty(i, delta){
+      cart.items[i].qty += delta;
+      if(cart.items[i].qty <= 0) cart.items.splice(i,1);
+      recalc();
+    }
+    function openCart(){ document.getElementById('cartBox').style.display = 'block'; recalc(); }
+    function closeCart(){ document.getElementById('cartBox').style.display = 'none'; }
+    document.getElementById('openCart').addEventListener('click', ()=>{ openCart(); });
+
+    function checkout(){
+      if(cart.items.length === 0){ alert('Your cart is empty'); return; }
+      // Replace with real checkout integration
+      alert('Proceeding to checkout — replace with payment / order flow.');
+    }
+
+    function flashAdd(name){
+      // subtle confirmation + animation
+      const el = document.querySelector('.nav-actions');
+      const note = document.createElement('div');
+      note.textContent = `${name} added to cart`;
+      note.style.position='fixed';
+      note.style.right='22px';
+      note.style.bottom='110px';
+      note.style.background='linear-gradient(90deg,var(--primary),#0b9a5a)';
+      note.style.padding='10px 14px'; note.style.borderRadius='8px'; note.style.boxShadow='0 8px 30px rgba(0,0,0,0.4)';
+      document.body.appendChild(note);
+      note.animate([{transform:'translateY(10px)',opacity:0},{transform:'translateY(0)',opacity:1}],{duration:260});
+      setTimeout(()=>{ note.animate([{opacity:1},{opacity:0}],{duration:300}); setTimeout(()=>note.remove(),300); },1200);
+    }
+
+    // filter & search
+    const allSections = Array.from(document.querySelectorAll('.section'));
+    document.querySelectorAll('.cat-list button').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        document.querySelectorAll('.cat-list button').forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+        const cat = btn.dataset.cat;
+        filterCategory(cat);
+      });
+    });
+    function filterCategory(cat){
+      if(cat === 'all'){
+        allSections.forEach(s=>s.style.display='block');
+        return;
+      }
+      allSections.forEach(s=>{
+        if(s.dataset.cat === cat) s.style.display='block'; else s.style.display='none';
+      });
+      document.getElementById('searchInput').value = '';
+    }
+    function filterByTag(tag){
+      // show all then hide those without tag
+      allSections.forEach(s=>s.style.display = 'block');
+      document.querySelectorAll('[data-tags]').forEach(el=>{
+        const tags = el.dataset.tags || '';
+        el.style.display = tags.includes(tag) ? 'grid' : 'none';
+      });
+    }
+    function clearSearch(){ document.getElementById('searchInput').value=''; applySearch(); }
+    document.getElementById('searchInput').addEventListener('input', applySearch);
+    function applySearch(){
+      const q = document.getElementById('searchInput').value.trim().toLowerCase();
+      if(!q){ document.querySelectorAll('.item').forEach(i=>i.style.display='grid'); return; }
+      document.querySelectorAll('.item').forEach(i=>{
+        const name = i.querySelector('.meta h5').textContent.toLowerCase();
+        const txt = i.querySelector('.meta p') ? i.querySelector('.meta p').textContent.toLowerCase() : '';
+        const price = (i.querySelector('.price-block .price') || {}).textContent || '';
+        if(name.includes(q) || txt.includes(q) || price.includes(q)) i.style.display='grid'; else i.style.display='none';
+      });
+    }
+
+    // init
+    updateBadge(); recalc();
+
+    // keyboard close size modal / cart
+    document.addEventListener('keydown', (e)=>{ if(e.key==='Escape'){ closeSizeModal(); closeCart(); } });
+  </script>
+</body>
+</html>
