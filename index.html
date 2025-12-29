@@ -8714,584 +8714,416 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 });
 </script>
-  <!-- Promo-as-first-product: paste before </body> -->
-<!-- ========== Christmas Promo Product (paste before </body>) ========== -->
+
+  <!-- ======= Xmas Promo Product Cards (paste before </body>) ======= -->
 <style>
-  /* Christmas promo card styles */
-  .promo-christmas { border-radius:12px; padding:12px; display:flex; gap:12px; align-items:flex-start;
-    background: linear-gradient(180deg, rgba(255,250,240,0.02), rgba(255,245,235,0.01));
-    border:1px solid rgba(255,210,100,0.06);
-  }
-  .promo-christmas .pc-thumb { width:88px; height:64px; object-fit:cover; border-radius:10px; flex:0 0 88px; box-shadow: 0 8px 30px rgba(255,100,40,0.06);}
-  .promo-christmas .pc-meta { flex:1; min-width:0; }
-  .promo-christmas .pc-title { margin:0; font-weight:900; color:var(--accent-2); font-size:16px; }
-  .promo-christmas .pc-sub { color:rgba(255,255,255,0.85); font-size:13px; margin-top:6px; }
-  .pc-cta-row { display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
-  .pc-badge { display:inline-block; padding:6px 10px; border-radius:999px; font-weight:900; font-size:12px; background: linear-gradient(90deg,var(--accent-1),var(--accent-2)); color:#111; }
-  .pc-note { font-size:12px; color:rgba(255,255,255,0.7); margin-top:8px; }
-  .pc-count { font-weight:900; color:var(--accent-2); margin-left:6px; }
-  .pc-row { display:flex; gap:8px; align-items:center; margin-top:8px; flex-wrap:wrap; }
-  .pc-mini { font-size:12px; color:rgba(255,255,255,0.85); }
-  .pc-toggle { display:flex; gap:6px; align-items:center; }
-  .pc-tooltip { border-bottom:1px dotted rgba(255,255,255,0.18); cursor:help; }
-  /* modal */
-  .promo-modal { display:none; position:fixed; inset:0; z-index:10050; background:rgba(0,0,0,0.6); align-items:center; justify-content:center; padding:12px; }
-  .promo-modal[aria-hidden="false"]{ display:flex; }
-  .promo-modal .inner { width:100%; max-width:820px; border-radius:12px; background:linear-gradient(180deg,#0b0b0b,#050505); color:#fff; padding:14px; box-shadow: 0 30px 120px rgba(0,0,0,0.7); }
-  .promo-grid { display:grid; grid-template-columns:1fr 280px; gap:12px; }
-  .promo-summary { background:#0d0d0d; padding:10px; border-radius:10px; border:1px solid rgba(255,255,255,0.02); }
-  .promo-actions { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
-  .pc-toast { position:fixed; left:50%; transform:translateX(-50%); bottom:18px; z-index:10100; background: linear-gradient(90deg,var(--accent-1),var(--accent-2)); color:#111; padding:10px 14px; border-radius:999px; font-weight:900; display:none;}
-  .pc-toast.show{ display:block; animation: pc-toast-in 320ms cubic-bezier(.2,.9,.3,1); }
-  @keyframes pc-toast-in { from { transform:translate(-50%,10px); opacity:0 } to { transform:translate(-50%,0); opacity:1 } }
-  /* responsive */
-  @media (max-width:720px){ .promo-grid { grid-template-columns:1fr; } .pc-thumb { width:72px;height:56px } }
+/* Promo cards — visually match menu-item but with stickers & animation */
+.menu-item.promo-xmas {
+  display:flex; gap:12px; align-items:flex-start;
+  padding:12px; border-radius:12px;
+  background: linear-gradient(180deg, rgba(255,250,245,0.02), rgba(255,245,240,0.00));
+  border: 1px solid rgba(255,200,60,0.06);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.18);
+}
+.px-thumb { width:96px; height:72px; object-fit:cover; border-radius:10px; flex:0 0 96px; }
+.px-meta { flex:1; min-width:0; }
+.px-title { font-weight:900; color:var(--accent-2); margin:0 0 6px 0; }
+.px-sub { color:rgba(255,255,255,0.85); font-size:13px; margin:0; }
+.px-badge { display:inline-block; padding:6px 10px; border-radius:999px; font-weight:900; font-size:12px; background:linear-gradient(90deg,var(--accent-1),var(--accent-2)); color:#111; margin-left:8px; }
+.px-row { display:flex; gap:8px; align-items:center; margin-top:10px; flex-wrap:wrap; }
+.px-small { font-size:12px; color:rgba(255,255,255,0.78); }
+
+/* sticker & sparkle */
+.px-sticker { position:relative; display:inline-block; padding:6px 8px; border-radius:10px; font-weight:900; background:#fff; color:#111; transform: rotate(-8deg); box-shadow: 0 8px 30px rgba(255,120,0,0.08); }
+.px-sparkle { width:12px;height:12px;border-radius:50%; background: radial-gradient(circle,#fff,#ffd36b); box-shadow:0 6px 18px rgba(255,200,80,0.2); animation: sparkle 1100ms infinite alternate; display:inline-block; margin-left:6px; }
+@keyframes sparkle { from { transform:scale(.8) translateY(0);} to { transform:scale(1.15) translateY(-4px); } }
+
+/* add-btn custom look */
+.px-actions .btn { min-width:120px; font-weight:900; }
+
+/* Cart visual for promo lines (when your renderCart creates li.cart-line with data-item-id) */
+.cart-items li[data-item-id^="promo-shawarma"] .line-title,
+.cart-items li[data-item-id^="xmas-rice-bundle"] .line-title,
+.cart-items li[data-item-id^="promo-free-fries"] .line-title {
+  color: var(--accent-2);
+  font-weight:900;
+}
+.cart-items li[data-item-id^="promo-free-fries"] { background: linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border-left: 4px solid rgba(255,200,60,0.18); }
+
+/* confetti burst container */
+.px-confetti { position:fixed; left:50%; top:40%; transform:translate(-50%,-50%); pointer-events:none; z-index:9999; }
+.px-confetti .piece {
+  width:10px; height:16px; position:absolute; opacity:0; transform-origin:center; animation: confetti-fall 900ms forwards;
+  border-radius:2px;
+}
+@keyframes confetti-fall {
+  0% { opacity:1; transform: translateY(0) rotate(0) scale(1); }
+  100% { opacity:0; transform: translateY(420px) rotate(720deg) scale(.75); }
+}
+
+/* small pulse when freebies added */
+.px-pulse {
+  animation: px-pulse 740ms cubic-bezier(.2,.9,.3,1);
+}
+@keyframes px-pulse {
+  0% { transform: scale(1); box-shadow: 0 0 0 rgba(255,210,80,0.0); }
+  30% { transform: scale(1.03); box-shadow: 0 12px 40px rgba(255,130,30,0.12); }
+  100% { transform: scale(1); box-shadow: 0 0 0 rgba(255,210,80,0.0); }
+}
+
+/* responsive tweaks */
+@media (max-width:520px) {
+  .px-thumb { width:72px; height:56px; }
+  .px-actions .btn { min-width:100px; }
+}
 </style>
 
-<!-- Promo modal (details + controls) -->
-<div id="christmas-promo-modal" class="promo-modal" aria-hidden="true" role="dialog" aria-label="Christmas Promo details">
-  <div class="inner" role="document">
-    <div style="display:flex;justify-content:space-between;align-items:center;gap:12px">
-      <h3 style="margin:0;color:var(--accent-2);font-weight:900;"><i class="fa fa-gift"></i> Wrap District — Christmas Promo</h3>
-      <button id="pc-modal-close" class="icon-btn" aria-label="Close"><i class="fa fa-times"></i></button>
-    </div>
-
-    <div class="promo-grid" style="margin-top:12px;">
-      <div>
-        <div class="promo-summary">
-          <div style="font-weight:900">Rules — read carefully</div>
-          <ol style="margin:8px 0 0 18px; color: rgba(255,255,255,0.82); font-size:13px;">
-            <li><strong>Shawarma Promo:</strong> For every <em>2</em> Shawarmas where each shawarma's unit price is <strong>GHC 65 or more</strong>, you receive <strong>1 Mini Loaded Fries (FREE)</strong> automatically at checkout.</li>
-            <li><strong>Rice Bundle:</strong> If you add <em>Fried Rice</em> with unit price exactly <strong>GHC 100</strong> + <em>Shawarma</em> (unit price ≥ GHC 65) + a <em>Drink</em>, we will reduce that group's total to <strong>GHC 100</strong> per group. You must claim the Rice Bundle promo via the button or it will not apply automatically.</li>
-            <li><strong>Promo window:</strong> <em>Dec 20, 2025 — Jan 5, 2026</em>. Countdown shows how long is left.</li>
-          </ol>
-          <div class="pc-note" style="margin-top:8px;">Tip: If your menu uses a different Fried Rice price, use the "Add Promo Fried Rice (GHC 100)" helper in this modal to add a qualifying item.</div>
-        </div>
-
-        <div style="margin-top:12px;">
-          <div style="font-weight:900;margin-bottom:6px">Quick actions</div>
-          <div class="promo-actions">
-            <button id="pc-claim-shaw" class="btn primary"><i class="fa fa-tag"></i> Claim Shawarma Promo</button>
-            <button id="pc-claim-rice" class="btn primary"><i class="fa fa-tree"></i> Claim Rice Bundle</button>
-            <button id="pc-add-promo-rice" class="btn ghost"><i class="fa fa-plus-circle"></i> Add Promo Fried Rice (GHC 100)</button>
-            <button id="pc-add-missing-bundle" class="btn ghost"><i class="fa fa-magic"></i> Add Missing Bundle Items</button>
-          </div>
-        </div>
-      </div>
-
-      <div>
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <div style="font-weight:900">Status</div>
-          <div id="pc-countdown" style="font-weight:900;color:var(--accent-2)">—</div>
-        </div>
-
-        <div style="margin-top:10px;" id="pc-live-status" class="promo-summary">
-          <!-- live qualification details injected here -->
-          <div style="font-size:13px" id="pc-live-lines">Scanning cart...</div>
-          <div style="margin-top:8px;font-size:13px" id="pc-live-discount">Promo discount: <strong id="pc-live-discount-amt">GHC 0</strong></div>
-        </div>
-
-        <div style="margin-top:10px">
-          <label style="display:flex;align-items:center;gap:8px;" title="When on, the promo auto-applies when thresholds are met">
-            <input type="checkbox" id="pc-auto-apply" /> <span class="pc-mini"> Auto-apply promos when eligible</span>
-          </label>
-
-          <label style="display:flex;align-items:center;gap:8px;margin-top:8px" title="If ON, the rice bundle will add a single 'composite' line instead of 3 separate items">
-            <input type="checkbox" id="pc-bundle-composite" /> <span class="pc-mini"> Use composite bundle line (single product for Rice Bundle)</span>
-          </label>
-        </div>
-      </div>
-    </div>
-
-    <div style="margin-top:12px; display:flex; justify-content:flex-end; gap:8px;">
-      <button id="pc-modal-close-2" class="btn ghost">Close</button>
-    </div>
-  </div>
-</div>
-
-<!-- small toast -->
-<div id="pc-toast" class="pc-toast" role="status" aria-live="polite"></div>
-
+<!-- Inserted Xmas promo items -->
 <script>
-/* Christmas Promo Engine
-   - Insert promo card as first menu item
-   - Enforce: Shawarma unitPrice >= 65; Fried Rice unitPrice === 100
-   - Claim / auto-apply / add-missing / composite bundle modes
-   - Integrates with existing addToCart, renderCart, computeCartTotals, openCart when present
-*/
 (function(){
   document.addEventListener('DOMContentLoaded', () => {
-    const MENU_GRID_ID = 'menu-grid';
-    const menuGrid = document.getElementById(MENU_GRID_ID);
-    if (!menuGrid) {
-      console.warn('Promo: menu-grid not found. Aborting promo insertion.');
-      return;
-    }
+    const grid = document.getElementById('menu-grid');
+    if (!grid) { console.warn('XMAS promo: #menu-grid not found'); return; }
 
-    // Configuration (edit here if you prefer different dates or ids)
-    const CFG = {
-      promoName: 'Wrap District — Christmas Promo',
-      shawarmaId: 'shawarma',
-      friesMiniTitle: 'Mini Loaded Fries (Free)',
-      friesMiniId: 'promo-mini-fries',
-      friesMiniPrice: 0,
-      friedRiceId: 'fried-rice',
-      drinkId: 'drink',
-      promoRicePrice: 100, // must be exactly 100 to qualify (or use helper to add a promo-priced rice)
-      bundleTargetPrice: 100,
-      promoWindowStart: new Date('2025-12-20T00:00:00Z'), // Dec 20, 2025
-      promoWindowEnd:   new Date('2026-01-05T23:59:59Z'), // Jan 5, 2026
-      localStorageKeys: {
-        shawClaim: 'wrap_claimed_promo_XMAS-SHAW',
-        riceClaim: 'wrap_claimed_promo_XMAS-RICE100'
-      }
-    };
-
-    // Helper: create promo card and insert first
-    function buildPromoCard() {
-      const article = document.createElement('article');
-      article.className = 'menu-item promo-christmas';
-      article.dataset.itemId = 'promo-christmas-card';
-      article.innerHTML = `
-        <img class="pc-thumb" src="promo-christmas.jpg" alt="Christmas promo — Shawarma & Rice bundle">
-        <div class="pc-meta">
-          <div style="display:flex;align-items:center;gap:8px">
-            <h3 class="pc-title">Christmas Promo • Wrap District</h3>
-            <span class="pc-badge">Limited • Xmas</span>
-          </div>
-          <div class="pc-sub">
-            <strong>Shawarma rule:</strong> Only shawarmas priced <strong>GHC 65+</strong> qualify.<br>
-            <strong>Rice rule:</strong> Fried Rice must be <strong>GHC 100</strong> to join the bundle.
-          </div>
-
-          <div class="pc-row">
-            <div class="pc-cta-row">
-              <button class="btn primary" id="pc-open-modal"><i class="fa fa-gift"></i> See Xmas Promo</button>
-              <button class="btn ghost" id="pc-claim-shaw-card"><i class="fa fa-tag"></i> Claim Shawarma Promo</button>
-              <button class="btn ghost" id="pc-claim-rice-card"><i class="fa fa-tree"></i> Claim Rice Bundle</button>
-            </div>
-            <div style="margin-left:auto; text-align:right;">
-              <div class="pc-mini">Promo ends in</div>
-              <div class="pc-count" id="pc-card-countdown">—</div>
-            </div>
-          </div>
-
-          <div class="pc-row" style="margin-top:8px;">
-            <button class="btn small ghost" id="pc-add-2-shaw">Add 2 Shawarmas</button>
-            <button class="btn small ghost" id="pc-add-bundle-items">Add Rice+Shaw+Drink</button>
-            <button class="btn small ghost" id="pc-add-promo-rice">Add Promo Rice (GHC 100)</button>
-          </div>
-
-          <div class="pc-note">Everything auto-applies at checkout when you meet thresholds (if you toggle Auto-Apply in the modal).</div>
+    /* ---------- Build Promo Shawarma card (distinct from regular shawarma) ---------- */
+    const promoShaw = document.createElement('article');
+    promoShaw.className = 'menu-item promo-xmas';
+    promoShaw.dataset.itemId = 'promo-shawarma';
+    promoShaw.innerHTML = `
+      <img class="px-thumb" src="promo-shawarma.jpg" alt="Xmas Promo Shawarma — GHC 65">
+      <div class="px-meta">
+        <div style="display:flex;align-items:center;gap:8px">
+          <h3 class="px-title">XMAS Shawarma</h3>
+          <span class="px-badge">Special • GHC 65</span>
         </div>
-      `;
-      menuGrid.insertBefore(article, menuGrid.firstElementChild || null);
+        <p class="px-sub">This is the promo-only shawarma. Unit price is fixed to <strong>GHC 65</strong>. Add 2 to get a free Mini Loaded Fries instantly.</p>
 
-      // attach click handlers
-      article.querySelector('#pc-open-modal').addEventListener('click', openPromoModal);
-      article.querySelector('#pc-claim-shaw-card').addEventListener('click', () => claimPromo(CFG.localStorageKeys.shawClaim, 'Shawarma promo claimed.'));
-      article.querySelector('#pc-claim-rice-card').addEventListener('click', () => claimPromo(CFG.localStorageKeys.riceClaim, 'Rice bundle claimed.'));
-      article.querySelector('#pc-add-2-shaw').addEventListener('click', () => { addItemByBaseId(CFG.shawarmaId, 2); showToast('Added 2 Shawarmas.'); });
-      article.querySelector('#pc-add-bundle-items').addEventListener('click', addBundleItems);
-      article.querySelector('#pc-add-promo-rice').addEventListener('click', addPromoFriedRice);
-    }
+        <div class="px-row px-actions" aria-hidden="false">
+          <label class="px-sticker" title="Promo shawarma — 65cedis only">XMAS</label>
+          <span class="px-sparkle" aria-hidden="true"></span>
 
-    // Modal open/close and bindings
-    const modal = document.getElementById('christmas-promo-modal');
-    const modalCloseBtns = [document.getElementById('pc-modal-close'), document.getElementById('pc-modal-close-2')];
-    function openPromoModal() {
-      if (!modal) return;
-      modal.setAttribute('aria-hidden','false'); modal.style.display='flex'; document.body.style.overflow='hidden';
-      document.getElementById('pc-live-lines').innerText = 'Scanning cart...';
-      updateLiveStatus(); // immediate update
-      setTimeout(()=> document.getElementById('pc-claim-shaw').focus(), 120);
-    }
-    function closePromoModal() {
-      if (!modal) return;
-      modal.setAttribute('aria-hidden','true'); modal.style.display='none'; document.body.style.overflow='';
-    }
-    modalCloseBtns.forEach(b => b && b.addEventListener('click', closePromoModal));
+          <div style="margin-left:auto; display:flex; gap:8px; align-items:center;">
+            <button class="btn small add-btn" data-action="add" data-item-id="promo-shawarma" aria-label="Add Promo Shawarma">
+              <i class="fa fa-plus-circle"></i> Add
+            </button>
+            <button class="btn small remove-btn hidden" data-action="remove" data-item-id="promo-shawarma" aria-label="Remove Promo Shawarma">
+              <i class="fa fa-minus-circle"></i> Remove
+            </button>
+          </div>
+        </div>
 
-    // Claim promos
-    function claimPromo(key, toastMsg) {
-      try {
-        localStorage.setItem(key, JSON.stringify({ ts: Date.now() }));
-        showToast(toastMsg);
-        updateLiveStatus();
-      } catch(e) { console.warn('claimPromo error', e); }
-    }
+        <div class="px-row">
+          <div class="px-small">Promo: for each 2 × XMAS Shawarma (GHC 65) you get 1 <strong class="px-small">Mini Loaded Fries (Free)</strong> — appears in cart as a promo-free line.</div>
+        </div>
+      </div>
+    `;
+    // Insert as first card
+    grid.insertBefore(promoShaw, grid.firstElementChild || null);
 
-    // Add helper: add items by baseId using existing add button or fallback to addToCart
-    function addItemByBaseId(baseId, times=1) {
-      const menuEl = document.querySelector(`[data-item-id="${baseId}"]`);
-      if (menuEl) {
-        const addBtn = menuEl.querySelector('.add-btn');
-        if (addBtn) {
-          for (let i=0;i<times;i++) addBtn.click();
-          // ensure menu selections persist if necessary (your code does)
+    /* ---------- Build Xmas Rice Bundle card (Fried Rice + Shawarma + Drink = GHC 100) ---------- */
+    const riceBundle = document.createElement('article');
+    riceBundle.className = 'menu-item promo-xmas';
+    riceBundle.dataset.itemId = 'xmas-rice-bundle';
+    riceBundle.innerHTML = `
+      <img class="px-thumb" src="promo-rice-bundle.jpg" alt="Xmas Rice Bundle — GHC 100">
+      <div class="px-meta">
+        <div style="display:flex;align-items:center;gap:8px">
+          <h3 class="px-title">XMAS Rice Bundle</h3>
+          <span class="px-badge">Bundle • GHC 100</span>
+        </div>
+        <p class="px-sub">A bundle: <strong>Fried Rice + Shawarma + Drink</strong> — total fixed at <strong>GHC 100</strong>. This is a special bundle product, different from regular menu items.</p>
+
+        <div class="px-row px-actions" aria-hidden="false">
+          <label class="px-sticker" title="Bundle">BUNDLE</label>
+          <div style="margin-left:auto; display:flex; gap:8px; align-items:center;">
+            <button class="btn small add-btn" data-action="add" data-item-id="xmas-rice-bundle" aria-label="Add Xmas Rice Bundle">
+              <i class="fa fa-plus-circle"></i> Add Bundle
+            </button>
+            <button class="btn small remove-btn hidden" data-action="remove" data-item-id="xmas-rice-bundle" aria-label="Remove Xmas Rice Bundle">
+              <i class="fa fa-minus-circle"></i> Remove
+            </button>
+          </div>
+        </div>
+
+        <div class="px-row">
+          <div class="px-small">Adds a single special cart line that represents the three items together. You can add multiple bundles.</div>
+        </div>
+      </div>
+    `;
+    grid.insertBefore(riceBundle, promoShaw.nextSibling || null);
+
+    /* ---------- Confetti container ---------- */
+    const confettiRoot = document.createElement('div');
+    confettiRoot.className = 'px-confetti';
+    document.body.appendChild(confettiRoot);
+
+    /* ---------- Core behavior helpers ---------- */
+    function useAddToCart(key, item) {
+      // prefer existing addToCart
+      if (typeof window.addToCart === 'function') {
+        try {
+          addToCart(key, item);
+          if (typeof window.renderCart === 'function') window.renderCart();
           return true;
-        }
+        } catch(e){ console.warn('promo addToCart error', e); }
       }
-      if (typeof addToCart === 'function') {
-        const title = menuEl ? (menuEl.querySelector('.item-title')?.innerText || baseId) : baseId;
-        const unit = menuEl ? Number(menuEl.querySelector('.price-value')?.innerText || 0) : 0;
-        for (let i=0;i<times;i++) {
-          const key = `${baseId}::AUTO-${Date.now()}-${Math.floor(Math.random()*10000)}`;
-          addToCart(key, { baseId, title, unitPrice: unit || 0, qty:1, meta:{}, imageSrc: menuEl ? (menuEl.querySelector('img')?.src||'') : '' });
-        }
-        if (typeof renderCart === 'function') renderCart();
+      // fallback: try to click the regular item's add button if available
+      const menuEl = document.querySelector(`[data-item-id="${item.baseId}"]`);
+      if (menuEl) {
+        const btn = menuEl.querySelector('.add-btn');
+        if (btn) { btn.click(); return true; }
+      }
+      // last resort: inject into window.cart object so your render/persistence may pick it up
+      try {
+        window.cart = window.cart || {};
+        window.cart[key] = Object.assign({ id: key }, item);
+        if (typeof window.renderCart === 'function') window.renderCart();
         return true;
-      }
+      } catch(e){ console.warn('promo fallback add error', e); }
       return false;
     }
 
-    // Add promo-priced Fried Rice (GHC 100) as a special product (synthetic)
-    function addPromoFriedRice() {
-      // Try to find fried-rice menu item to clone config if available
-      const riceMenu = document.querySelector(`[data-item-id="${CFG.friedRiceId}"]`);
-      let title = 'Fried Rice (Promo GHC 100)';
-      let image = '';
-      if (riceMenu) { title = riceMenu.querySelector('.item-title')?.innerText || title; image = riceMenu.querySelector('img')?.src || ''; }
-      // Use addToCart when available to add unique promo rice (keeps it separate from menu rice)
-      if (typeof addToCart === 'function') {
-        const key = `promo-fried-rice::${Date.now()}`;
-        addToCart(key, { baseId: CFG.friedRiceId, title, unitPrice: CFG.promoRicePrice, qty:1, meta: { promoRice: true }, imageSrc:image });
-        if (typeof renderCart === 'function') renderCart();
-        showToast('Promo Fried Rice (GHC 100) added to cart.');
-        return;
+    function useRemoveFromCart(key) {
+      if (typeof window.removeItemFully === 'function') {
+        try { removeItemFully(key); if (typeof renderCart === 'function') renderCart(); return true; } catch(e) {}
       }
-      // fallback: attempt to click add on menu rice and then set its unit price (best-effort)
-      if (riceMenu) {
-        const addBtn = riceMenu.querySelector('.add-btn');
-        if (addBtn) {
-          addBtn.click();
-          // If you have a pricing UI, there's no safe generic way to change it here; inform user
-          showToast('Added Fried Rice. If not GHC 100, use the Promo Rice helper in the modal.');
-          return;
-        }
+      if (typeof window.changeItemQty === 'function') {
+        try { changeItemQty(key, 0); if (typeof renderCart === 'function') renderCart(); return true; } catch(e) {}
       }
-      showToast('Could not auto-add promo fried rice. Please add manually.');
+      // fallback: delete from window.cart
+      try {
+        if (window.cart && window.cart[key]) { delete window.cart[key]; if (typeof renderCart === 'function') renderCart(); return true; }
+      } catch(e){}
+      return false;
     }
 
-    // Add full bundle items: 1 rice (promo or menu), 1 shawarma, 1 drink
-    function addBundleItems() {
-      // Prefer to add promo rice so it meets the exact 100 cedis requirement
-      addPromoFriedRice();
-      const addedShaw = addItemByBaseId(CFG.shawarmaId, 1);
-      const addedDrink = addItemByBaseId(CFG.drinkId, 1);
-      showToast('Added Rice + Shawarma + Drink (where available).');
+    // find promo-shawarma lines in cart and sum qty
+    function totalPromoShawarmaQty() {
+      const c = window.cart || {};
+      return Object.values(c).reduce((s,l) => s + ((l.baseId === 'promo-shawarma') ? (Number(l.qty)||0) : 0), 0);
     }
 
-    // Add missing bundle/shaw items to reach thresholds
-    function addMissingForShawarmaPromo() {
-      // count shawarmas that qualify
-      const lines = Object.values(window.cart || {});
-      const shawUnits = [];
-      lines.forEach(l => {
-        if ((l.baseId || '').toLowerCase() === CFG.shawarmaId) {
-          for (let i=0;i<(l.qty||0); i++) shawUnits.push(Number(l.unitPrice)||0);
-        }
-      });
-      const qualifying = shawUnits.filter(p => p >= 65);
-      const missing = (2 - (qualifying.length % 2)) % 2;
-      if (missing === 0) { showToast('You already qualify for Shawarma promo.'); return; }
-      const ok = addItemByBaseId(CFG.shawarmaId, missing);
-      if (ok) showToast(`Added ${missing} shawarma(s) to qualify.`);
-      else showToast('Could not auto-add shawarmas. Please add them manually.');
-    }
+    // ensure promo-free-fries count equals floor(promoShawQty / 2)
+    function syncFreeFries() {
+      try {
+        const c = window.cart || {};
+        const freeKeyPrefix = 'promo-free-fries';
+        const freeEntries = Object.keys(c).filter(k => typeof k === 'string' && k.indexOf(freeKeyPrefix) === 0);
+        const desired = Math.floor(totalPromoShawarmaQty() / 2);
+        const existingQty = freeEntries.reduce((s,k) => s + (Number(c[k].qty)||0), 0);
 
-    // Promo engine: scan cart and compute freebies/discounts
-    // behaviour: either wrap existing computeCartTotals (if present) or update cart DOM fallback
-    function promoEngineComputeAndApply() {
-      const now = new Date();
-      const inWindow = (now >= CFG.promoWindowStart && now <= CFG.promoWindowEnd);
-      // read claim flags
-      const shawClaim = !!localStorage.getItem(CFG.localStorageKeys.shawClaim);
-      const riceClaim = !!localStorage.getItem(CFG.localStorageKeys.riceClaim);
-
-      // gather cart
-      const cartObj = window.cart || {};
-      const lines = Object.values(cartObj);
-      let subtotal = 0;
-      // collect shawarma unit prices per unit
-      const shawUnits = [];
-      // collect rice units exactly equal to promoRicePrice
-      const riceUnits = [];
-      // collect drink units
-      const drinkUnits = [];
-
-      lines.forEach(l => {
-        const unit = Number(l.unitPrice) || 0;
-        const qty = Number(l.qty) || 0;
-        subtotal += unit * qty;
-        const id = String(l.baseId || l.id || '').toLowerCase();
-
-        for (let i=0;i<qty;i++) {
-          if (id === CFG.shawarmaId) shawUnits.push(unit);
-          if (id === CFG.friedRiceId && Math.round(unit) === CFG.promoRicePrice) riceUnits.push(unit);
-          if (id === CFG.drinkId) drinkUnits.push(unit);
-        }
-      });
-
-      // Promo A: For every 2 qualifying shawarmas (unit >=65) => 1 free mini fries
-      let shawFreeCount = 0;
-      const qualifyingShaw = shawUnits.filter(p => p >= 65);
-      shawFreeCount = Math.floor(qualifyingShaw.length / 2);
-
-      // Promo B: Rice bundle: groups = min(riceUnits.length, number of shawUnits >=65, drinkUnits.length)
-      const bundleGroupsPossible = Math.min(riceUnits.length, shawUnits.filter(p=>p>=65).length, drinkUnits.length);
-
-      // If composite bundle mode enabled (from modal toggle), we will create a single composite line later
-      const autoApply = !!(document.getElementById('pc-auto-apply')?.checked);
-      const compositeMode = !!(document.getElementById('pc-bundle-composite')?.checked);
-
-      // Compute discounts for bundle groups only if claimed
-      let bundleDiscount = 0;
-      if (riceClaim && bundleGroupsPossible > 0 && inWindow) {
-        // For each group, compute current sum and if > bundle target, discount difference
-        // We'll pair cheapest eligible elements to be fair
-        const shawSorted = shawUnits.filter(p=>p>=65).slice().sort((a,b)=>a-b);
-        const riceSorted = riceUnits.slice().sort((a,b)=>a-b);
-        const drinkSorted = drinkUnits.slice().sort((a,b)=>a-b);
-        for (let i=0;i<bundleGroupsPossible;i++) {
-          const rP = riceSorted[i] || CFG.promoRicePrice;
-          const sP = shawSorted[i] || 0;
-          const dP = drinkSorted[i] || 0;
-          const groupSum = rP + sP + dP;
-          if (groupSum > CFG.bundleTargetPrice) bundleDiscount += (groupSum - CFG.bundleTargetPrice);
-        }
-      }
-
-      // Now apply freebies & discounts in the UI safely:
-      //  - If computeCartTotals exists, prefer to wrap it and inject our freeItems/promoDiscount
-      if (typeof window.computeCartTotals === 'function') {
-        // Wrap once: replace computeCartTotals with wrapped version that preserves previous logic
-        if (!window.__promo_wrapped_computeCartTotals) {
-          const orig = window.computeCartTotals;
-          window.computeCartTotals = function() {
-            const t = orig.apply(this, arguments) || {};
-            // ensure numbers
-            t.subtotal = Number(t.subtotal || t.subTotal || 0);
-            t.delivery = Number(t.delivery || 0);
-            t.promoDiscount = Number(t.promoDiscount || t.promo || 0);
-
-            // Add shawarma freebies to freeItems array
-            t.freeItems = t.freeItems || [];
-            if (shawFreeCount > 0) {
-              // remove any existing promo mini fries we previously injected to avoid duplicates (we detect by id)
-              const existingIndex = t.freeItems.findIndex(fi => fi.id === CFG.friesMiniId);
-              if (existingIndex >= 0) t.freeItems.splice(existingIndex, 1);
-              t.freeItems.push({ id: CFG.friesMiniId, title: CFG.friesMiniTitle, qty: shawFreeCount, unitPrice: 0, meta:{promo:'XMAS-SHAW'} });
-            }
-            // Bundle discount
-            t.promoDiscount = Number(t.promoDiscount || 0) + Math.round(bundleDiscount || 0);
-
-            // If composite mode requested for rice bundle and conditions met, we add a synthetic freeItems entry with negative price? Better: we will add a "promo bundle" freeItems with unitPrice 0 and rely on promoDiscount to reflect money removed.
-            if (compositeMode && bundleDiscount > 0) {
-              // indicate composite bundle applied (UI will show promoDiscount)
-              // no further action required here
-            }
-
-            return t;
-          };
-          window.__promo_wrapped_computeCartTotals = true;
-          console.info('Promo: computeCartTotals wrapped to apply Xmas rules.');
-        }
-      } else {
-        // Fallback: push free 'cart lines' using addToCart (synthetic free items) and update DOM totals elements directly
-        // Remove prior promo-free lines we added (guarded by promo id)
-        try {
-          // remove any existing synthetic promo-free lines from cart object
-          if (window.cart) {
-            Object.keys(window.cart).forEach(k => {
-              if (k && String(k).indexOf('promo-free-') === 0) delete window.cart[k];
-            });
+        if (desired > existingQty) {
+          // add missing freebies
+          const missing = desired - existingQty;
+          for (let i=0;i<missing;i++) {
+            const key = `${freeKeyPrefix}::${Date.now()}-${Math.floor(Math.random()*9999)}`;
+            const item = { baseId: 'promo-free-fries', title: 'Mini Loaded Fries (Free — Xmas)', unitPrice: 0, qty: 1, meta: { promo: 'XMAS-SHAW' }, imageSrc: 'thumb-fries.jpg' };
+            useAddToCart(key, item);
           }
-          // add free mini fries if any
-          if (shawFreeCount > 0 && typeof addToCart === 'function') {
-            const key = `promo-free-${CFG.friesMiniId}-${Date.now()}`;
-            addToCart(key, { baseId: CFG.friesMiniId, title: CFG.friesMiniTitle, unitPrice: 0, qty: shawFreeCount, meta:{promo:'XMAS-SHAW'}, imageSrc:'' });
-          }
-          // adjust visible totals in DOM: if cart-total element exists, subtract bundleDiscount
-          if (bundleDiscount > 0) {
-            const cartTotalEl = document.getElementById('cart-total');
-            const cartSubtotalEl = document.getElementById('cart-subtotal');
-            if (cartSubtotalEl) {
-              const baseSub = Number(String(cartSubtotalEl.innerText || '').replace(/[^\d.]/g,'')) || 0;
-              cartSubtotalEl.innerText = `GHC ${Math.round(Math.max(0, baseSub - bundleDiscount))}`;
-            }
-            if (cartTotalEl) {
-              const baseTotal = Number(String(cartTotalEl.innerText || '').replace(/[^\d.]/g,'')) || 0;
-              cartTotalEl.innerText = `GHC ${Math.round(Math.max(0, baseTotal - bundleDiscount))}`;
-            }
-            // show cart promo block if present
-            const cartPromo = document.getElementById('cart-promo');
-            if (cartPromo) {
-              cartPromo.classList.remove('hidden');
-              const promoDisc = document.getElementById('promo-discount');
-              if (promoDisc) promoDisc.innerText = `-GHC ${Math.round(bundleDiscount)}`;
-              const help = document.getElementById('promo-help-text');
-              if (help) help.innerText = `Rice bundle discount applied: -GHC ${Math.round(bundleDiscount)}`;
+          // animation & highlight
+          playConfetti();
+          highlightCartPromo();
+        } else if (desired < existingQty) {
+          // remove extra freebies until match desired
+          let toRemove = existingQty - desired;
+          for (let k of freeEntries) {
+            if (toRemove <= 0) break;
+            const qty = Number((window.cart[k] && window.cart[k].qty) || 0);
+            if (qty <= toRemove) {
+              useRemoveFromCart(k);
+              toRemove -= qty;
+            } else {
+              // reduce qty
+              if (typeof changeItemQty === 'function') changeItemQty(k, qty - toRemove);
+              else { window.cart[k].qty = qty - toRemove; if (typeof renderCart === 'function') renderCart(); }
+              toRemove = 0;
             }
           }
-        } catch(e){ console.warn('Promo fallback apply error', e); }
-      }
-
-      // Update modal live status
-      const liveLines = [];
-      liveLines.push(`${qualifyingShaw.length} qualifying shawarma unit(s) (GHC ≥ 65).`);
-      liveLines.push(`${shawFreeCount} free Mini Loaded Fries will be added for you (per 2 shawarmas).`);
-      liveLines.push(`${riceUnits.length} promo-priced Fried Rice (GHC ${CFG.promoRicePrice}) in cart.`);
-      liveLines.push(`${bundleGroupsPossible} complete Rice+Shaw+Drink group(s) eligible.`);
-      document.getElementById('pc-live-lines').innerHTML = liveLines.map(l=>`• ${l}`).join('<br>');
-      document.getElementById('pc-live-discount-amt').innerText = `GHC ${Math.round(bundleDiscount || 0)}`;
-
-      // If auto-apply toggled & conditions met => show toast
-      if (autoApply && shawFreeCount > 0 && inWindow) {
-        // ensure we only auto-add freebies when not already added (if addToCart available we'll add a synthetic free line if needed)
-        // try to add freebies via computeCartTotals wrapper logic (it will show free items)
-        if (typeof renderCart === 'function') renderCart();
-      }
+        }
+      } catch(e){ console.warn('syncFreeFries error', e); }
     }
 
-    // Wrap renderCart to call promo engine after render (so cart UI is kept in sync)
-    function wrapRenderCart() {
-      if (typeof window.renderCart === 'function' && !window.__promo_wrapped_renderCart) {
+    // Whenever cart changes, re-evaluate freebies — we wrap renderCart if possible
+    function wrapRenderCartForPromo() {
+      if (typeof window.renderCart === 'function' && !window.__promo_wrapped_renderCart_v2) {
         const orig = window.renderCart;
         window.renderCart = function() {
           const r = orig.apply(this, arguments);
-          try { promoEngineComputeAndApply(); } catch(e){ console.warn('promoEngineComputeAndApply failed', e); }
+          try { syncFreeFries(); stylePromoLinesInCart(); } catch(e){ console.warn('post-render promo sync failed', e); }
           return r;
         };
-        window.__promo_wrapped_renderCart = true;
+        window.__promo_wrapped_renderCart_v2 = true;
+      } else if (!window.renderCart) {
+        // poll fallback if renderCart isn't defined yet
+        setInterval(() => { try { syncFreeFries(); stylePromoLinesInCart(); } catch(e){} }, 1200);
+      } else {
+        // if already wrapped previously, still call once
+        syncFreeFries(); stylePromoLinesInCart();
       }
     }
 
-    // If renderCart not present, poll
-    function ensurePromoUpdater() {
-      wrapRenderCart();
-      // run once and periodically to keep UI fresh
-      promoEngineComputeAndApply();
-      setInterval(promoEngineComputeAndApply, 1200);
+    // Highlight / pulse the cart to draw attention when freebies added
+    function highlightCartPromo() {
+      const cartDrawer = document.getElementById('cart-drawer') || document.querySelector('.cart-items');
+      if (!cartDrawer) return;
+      cartDrawer.classList.add('px-pulse');
+      setTimeout(()=> cartDrawer.classList.remove('px-pulse'), 800);
     }
 
-    // Countdown helper (updates card and modal)
-    function startCountdownUI() {
-      const elCard = document.getElementById('pc-card-countdown');
-      const elModal = document.getElementById('pc-countdown');
-      function update() {
-        const now = new Date();
-        const diff = CFG.promoWindowEnd - now;
-        function fmt(ms) {
-          if (ms <= 0) return '00:00:00';
-          const s = Math.floor(ms/1000);
-          const d = Math.floor(s/86400);
-          const h = Math.floor((s%86400)/3600);
-          const m = Math.floor((s%3600)/60);
-          const sec = s % 60;
-          return (d>0?d+'d ':'') + String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0') + ':' + String(sec).padStart(2,'0');
+    // Confetti routine (simple DOM pieces with random colors/angles)
+    function playConfetti() {
+      const colors = ['#FFCE4B','#FF6A00','#FFD166','#ACFF9C','#7EE8FA'];
+      const root = confettiRoot;
+      const pieces = 20;
+      for (let i=0;i<pieces;i++) {
+        const p = document.createElement('div');
+        p.className = 'piece';
+        p.style.left = (Math.random()*160 - 80) + 'px';
+        p.style.background = colors[Math.floor(Math.random()*colors.length)];
+        p.style.transform = `translateY(0) rotate(${Math.random()*360}deg)`;
+        p.style.top = (Math.random()*40 - 20) + 'px';
+        p.style.opacity = '1';
+        p.style.left = (50 + (Math.random()*30 - 15)) + '%';
+        p.style.animationDelay = (Math.random()*120) + 'ms';
+        root.appendChild(p);
+        // remove after animation
+        setTimeout(()=> { try { root.removeChild(p); } catch(e){} }, 1300);
+      }
+    }
+
+    // Style promo lines inside cart after render (adds badges or small text)
+    function stylePromoLinesInCart() {
+      try {
+        const cartItems = document.querySelectorAll('#cart-items li.cart-line');
+        cartItems.forEach(li => {
+          const dataId = li.getAttribute('data-item-id') || '';
+          // Normalize: some cart renderers set dataset.itemId to unique key containing baseId
+          if (/promo-shawarma/.test(dataId) || (li.querySelector('.line-title')?.innerText || '').toLowerCase().includes('xmas shawarma')) {
+            li.classList.add('promo-shawarma-line');
+            // add small label if not present
+            if (!li.querySelector('.lbl-promo')) {
+              const lbl = document.createElement('div'); lbl.className='lbl-promo'; lbl.style.fontSize='12px'; lbl.style.color='rgba(255,210,80,0.95)'; lbl.style.fontWeight='900'; lbl.innerText='PROMO ITEM';
+              li.querySelector('.line-title')?.insertAdjacentElement('afterend', lbl);
+            }
+          }
+          if (/xmas-rice-bundle/.test(dataId) || (li.querySelector('.line-title')?.innerText || '').toLowerCase().includes('rice bundle')) {
+            li.classList.add('xmas-bundle-line');
+            if (!li.querySelector('.lbl-bundle')) {
+              const lbl = document.createElement('div'); lbl.className='lbl-bundle'; lbl.style.fontSize='12px'; lbl.style.color='rgba(100,220,170,0.95)'; lbl.style.fontWeight='900'; lbl.innerText='BUNDLE';
+              li.querySelector('.line-title')?.insertAdjacentElement('afterend', lbl);
+            }
+          }
+          if (/promo-free-fries/.test(dataId) || (li.querySelector('.line-title')?.innerText || '').toLowerCase().includes('mini loaded fries (free)')) {
+            li.classList.add('promo-free-line');
+            if (!li.querySelector('.lbl-free')) {
+              const lbl = document.createElement('div'); lbl.className='lbl-free'; lbl.style.fontSize='12px'; lbl.style.color='rgba(255,120,60,0.95)'; lbl.style.fontWeight='900'; lbl.innerText='FREE';
+              li.querySelector('.line-title')?.insertAdjacentElement('afterend', lbl);
+            }
+          }
+        });
+      } catch(e){ console.warn('stylePromoLinesInCart error', e); }
+    }
+
+    /* ---------- Wire Add buttons for the two promo cards ---------- */
+    function wirePromoAdders() {
+      // Promo Shawarma add
+      const addBtn = promoShaw.querySelector('.add-btn');
+      addBtn && addBtn.addEventListener('click', (ev) => {
+        ev.preventDefault();
+        // build unique config key (no selects, price fixed)
+        const key = `promo-shawarma::${Date.now()}-${Math.floor(Math.random()*9999)}`;
+        const item = {
+          baseId: 'promo-shawarma',
+          title: 'XMAS Shawarma (Promo)',
+          unitPrice: 65,
+          qty: 1,
+          meta: { promo: 'XMAS-SHAW', note: 'Promo-only shawarma (GHC 65)' },
+          imageSrc: promoShaw.querySelector('.px-thumb')?.src || ''
+        };
+        const ok = useAddToCart(key, item);
+        if (ok) {
+          showInlinePulse(promoShaw);
+          if (typeof window.renderCart === 'function') window.renderCart();
+          syncFreeFries();
+        } else {
+          showToast('Could not add promo shawarma — please add manually.');
         }
-        const val = fmt(diff);
-        if (elCard) elCard.innerText = val;
-        if (elModal) elModal.innerText = val;
-      }
-      update();
-      setInterval(update, 1000);
-    }
-
-    // Toast
-    const toastEl = document.getElementById('pc-toast');
-    function showToast(msg, ms=2400) {
-      if (!toastEl) return;
-      toastEl.innerText = msg;
-      toastEl.classList.add('show');
-      setTimeout(()=> toastEl.classList.remove('show'), ms);
-    }
-
-    // Utility: addBundleItems wrapper (tries to add real items then show cart)
-    function addBundleItems() {
-      addPromoFriedRice();
-      addItemByBaseId(CFG.shawarmaId, 1);
-      addItemByBaseId(CFG.drinkId, 1);
-      if (typeof openCart === 'function') openCart(); else document.getElementById('cart-toggle')?.click();
-      showToast('Added bundle items (promo rice + shawarma + drink) where available.');
-    }
-
-    // Expose addPromoFriedRice here (used above)
-    function addPromoFriedRice() {
-      // re-use earlier helper
-      const riceMenu = document.querySelector(`[data-item-id="${CFG.friedRiceId}"]`);
-      let title = 'Fried Rice (Promo GHC 100)';
-      let image = '';
-      if (riceMenu) { title = riceMenu.querySelector('.item-title')?.innerText || title; image = riceMenu.querySelector('img')?.src || ''; }
-      if (typeof addToCart === 'function') {
-        const key = `promo-fried-rice::${Date.now()}`;
-        addToCart(key, { baseId: CFG.friedRiceId, title, unitPrice: CFG.promoRicePrice, qty:1, meta: { promoRice: true }, imageSrc:image });
-        if (typeof renderCart === 'function') renderCart();
-        showToast('Promo Fried Rice (GHC 100) added to cart.');
-        return true;
-      } else if (riceMenu) {
-        const addBtn = riceMenu.querySelector('.add-btn');
-        if (addBtn) { addBtn.click(); showToast('Added Fried Rice (menu). If not GHC 100, use Promo Rice helper.'); return true; }
-      }
-      showToast('Could not add promo fried rice automatically.');
-      return false;
-    }
-
-    // Live status updater for modal (also used on open)
-    function updateLiveStatus() {
-      try { promoEngineComputeAndApply(); } catch(e){ console.warn('updateLiveStatus error', e); }
-    }
-
-    // Wire modal buttons
-    function wireModalButtons() {
-      document.getElementById('pc-claim-shaw')?.addEventListener('click', () => { claimPromo(CFG.localStorageKeys.shawClaim, 'Shawarma promo claimed.'); updateLiveStatus(); });
-      document.getElementById('pc-claim-rice')?.addEventListener('click', () => { claimPromo(CFG.localStorageKeys.riceClaim, 'Rice bundle claimed.'); updateLiveStatus(); });
-      document.getElementById('pc-add-promo-rice')?.addEventListener('click', () => addPromoFriedRice());
-      document.getElementById('pc-add-missing-bundle')?.addEventListener('click', () => {
-        // find counts and add missing
-        const cartLines = Object.values(window.cart || {});
-        const riceQty = cartLines.filter(l=> l.baseId===CFG.friedRiceId && Math.round(l.unitPrice)===CFG.promoRicePrice).reduce((s,l)=>s+(l.qty||0),0);
-        const shawQty = cartLines.filter(l=> l.baseId===CFG.shawarmaId && (l.unitPrice||0)>=65).reduce((s,l)=>s+(l.qty||0),0);
-        const drinkQty = cartLines.filter(l=> l.baseId===CFG.drinkId).reduce((s,l)=>s+(l.qty||0),0);
-        // to make 1 group, add missing for the min counts
-        const needRice = riceQty < 1;
-        const needShaw = shawQty < 1;
-        const needDrink = drinkQty < 1;
-        if (needRice) addPromoFriedRice();
-        if (needShaw) addItemByBaseId(CFG.shawarmaId, 1);
-        if (needDrink) addItemByBaseId(CFG.drinkId, 1);
-        showToast('Added missing items for one bundle group where available.');
       });
 
-      // auto-apply / composite toggles already present in modal; no special wiring needed (their state read on compute)
+      // Promo Shawarma remove (attempts to remove last promo-shawarma)
+      const remBtn = promoShaw.querySelector('.remove-btn');
+      remBtn && remBtn.addEventListener('click', (ev) => {
+        ev.preventDefault();
+        // remove one promo-shawarma instance (find a key with baseId promo-shawarma)
+        const keys = Object.keys(window.cart || {}).filter(k => (window.cart[k].baseId === 'promo-shawarma'));
+        if (keys.length) {
+          const key = keys[keys.length-1]; // remove last
+          useRemoveFromCart(key);
+          if (typeof window.renderCart === 'function') window.renderCart();
+          syncFreeFries();
+        } else showToast('No promo shawarma in cart to remove.');
+      });
+
+      // Rice bundle add
+      const addBundle = riceBundle.querySelector('.add-btn');
+      addBundle && addBundle.addEventListener('click', (ev) => {
+        ev.preventDefault();
+        const key = `xmas-rice-bundle::${Date.now()}-${Math.floor(Math.random()*9999)}`;
+        const item = {
+          baseId: 'xmas-rice-bundle',
+          title: 'XMAS Rice Bundle (Rice+Shawarma+Drink)',
+          unitPrice: 100,
+          qty: 1,
+          meta: { promo: 'XMAS-RICEBUNDLE', components: ['fried-rice', 'shawarma', 'drink'] },
+          imageSrc: riceBundle.querySelector('.px-thumb')?.src || ''
+        };
+        const ok = useAddToCart(key, item);
+        if (ok) {
+          showInlinePulse(riceBundle);
+          if (typeof window.renderCart === 'function') window.renderCart();
+        } else showToast('Could not add bundle — try adding components individually.');
+      });
+
+      // Rice bundle remove
+      const remBundle = riceBundle.querySelector('.remove-btn');
+      remBundle && remBundle.addEventListener('click', (ev) => {
+        ev.preventDefault();
+        const keys = Object.keys(window.cart || {}).filter(k => (window.cart[k].baseId === 'xmas-rice-bundle'));
+        if (keys.length) {
+          const key = keys[keys.length-1];
+          useRemoveFromCart(key);
+          if (typeof window.renderCart === 'function') window.renderCart();
+        } else showToast('No bundle in cart to remove.');
+      });
     }
 
-    // Initial boot
-    buildPromoCard();
-    wireModalButtons();
-    ensurePromoUpdater();
-    startCountdownUI();
+    function showInlinePulse(el) {
+      el.classList.add('px-pulse');
+      setTimeout(()=> el.classList.remove('px-pulse'), 700);
+    }
 
-    // Accessibility: close modal on ESC
-    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { if (modal && modal.getAttribute('aria-hidden') === 'false') closePromoModal(); } });
+    function showToast(msg, ms=2200) {
+      const t = document.getElementById('pc-toast') || (function(){
+        const el = document.createElement('div'); el.id='pc-toast'; el.className='pc-toast'; document.body.appendChild(el); return el;
+      })();
+      t.innerText = msg; t.classList.add('show');
+      setTimeout(()=> t.classList.remove('show'), ms);
+    }
 
-    // when cart changes (persisted by your app), re-run promo engine
-    // watch storage events (other tabs) and cart object changes (poll fallback)
-    window.addEventListener('storage', (e) => {
-      if (e.key && e.key.startsWith('wrap_claimed_promo')) updateLiveStatus();
-    });
+    /* ---------- Boot wiring: wrap renderCart and start promo sync ---------- */
+    wrapRenderCartForPromo();
+    wirePromoAdders();
+    // initial sync (in case there are promo items already)
+    setTimeout(()=> { try { syncFreeFries(); stylePromoLinesInCart(); } catch(e){} }, 400);
 
-    // small polling in case cart is mutated by code not emitting events
-    setInterval(()=> {
-      try { promoEngineComputeAndApply(); } catch(e) {}
-    }, 1200);
+    // Keep sync if cart object changes (poll fallback)
+    setInterval(()=> { try { syncFreeFries(); stylePromoLinesInCart(); } catch(e){} }, 1500);
 
-    // finished boot
-    console.info('Christmas Promo loaded — rules: Shawarma >= GHC 65, Fried Rice == GHC 100. Promo window: Dec 20, 2025 → Jan 5, 2026.');
+    // Expose a few helpers for debugging in console
+    window.__promoXmas = { syncFreeFries, playConfetti, highlightCartPromo };
   });
 })();
 </script>
-<!-- ========== end Christmas Promo product ========== -->
+<!-- ======= End Xmas Promo Product Cards ======= -->
 </html>
   
