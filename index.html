@@ -9255,83 +9255,107 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   function wirePromoCards() {
-    const cards = injectPromoCards();
-    if (!cards) return;
-    const { promoShaw, riceCard } = cards;
+ // Ensure promo cards exist (inject if not)
+  const cards = injectPromoCards() || {};
+  // Try to query existing elements in case inject didn't return nodes
+  const promoShaw = cards.promoShaw || document.querySelector('[data-item-id="promo-shawarma"]');
+  const riceCard = cards.riceCard || document.querySelector('[data-item-id="xmas-rice-bundle"]');
+  if (!promoShaw || !riceCard) {
+   // If we couldn't locate both cards, try reinjecting once more and then continue
+    injectPromoCards();
+ }
 
-    // add handlers that prefer the native site behavior when possible
-    function onAddShaw(e) {
-      e && e.preventDefault();
-      // prefer clicking native shawarma Add
-      const usedNative = tryNativeAdd(IDS.native_shawarma_sku);
-      if (usedNative) {
-        setTimeout(()=> { syncFreeFries(); renderPromoLines(); safePlatformRender(); }, 160);
-        showToast('Added Shawarma (native)');
-        return;
-      }
-      // fallback: deterministic promo add
-      addOrIncrementPromo(IDS.shawarmaBase, { title: 'XMAS Shawarma', unitPrice: 65, meta: { promo: 'XMAS-SHAW' }});
-      syncFreeFries(); renderPromoLines(); showToast('Added XMAS Shawarma');
-    }
-    function onRemoveShaw(e) {
-      e && e.preventDefault();
-      const usedNative = tryNativeRemove(IDS.native_shawarma_sku);
-      if (usedNative) {
-        setTimeout(()=> { syncFreeFries(); renderPromoLines(); safePlatformRender(); }, 160);
-        showToast('Removed Shawarma (native)');
-        return;
-      }
-      const ok = decrementOrRemovePromo(IDS.shawarmaBase);
-      if (ok) { syncFreeFries(); renderPromoLines(); showToast('Removed XMAS Shawarma'); } else showToast('Nothing to remove');
-    }
-
-    function onAddRiceBundle(e) {
-      e && e.preventDefault();
-      // prefer to add native fried rice product first (platform will handle render/totals)
-      const usedNative = tryNativeAdd(IDS.native_friedrice_sku);
-      if (usedNative) {
-        // after native add, try to ensure shawarma+drink present (native add may not auto-add them)
-        setTimeout(()=> {
-          tryNativeAdd(IDS.native_shawarma_sku);
-          tryNativeAdd(IDS.native_drink_sku);
-          // fallback sync
-          syncFreeFries(); renderPromoLines(); safePlatformRender();
-          // applyBundle logic: if platform didn't add the rest, we'll run bundle apply to ensure discount
-          applyBundleIfNeeded();
-        }, 200);
-        showToast('Added Fried Rice (native)');
-        return;
-      }
-      // fallback: deterministic promo rice bundle line
-      addOrIncrementPromo(IDS.riceBundleBase, { title: 'XMAS Rice Bundle (Rice+Shawarma+Drink)', unitPrice: 100, meta: { promo: 'XMAS-RICE' }});
-      // then apply bundle computation (adds shaw/drink promo lines if required + discount)
-      applyBundleIfNeeded();
-      renderPromoLines(); showToast('Added XMAS Rice Bundle');
-    }
-
-    function onRemoveRiceBundle(e) {
-      e && e.preventDefault();
-      // try native remove first
-      const usedNative = tryNativeRemove(IDS.native_friedrice_sku);
-      if (usedNative) {
-        setTimeout(()=> { renderPromoLines(); syncFreeFries(); safePlatformRender(); }, 140);
-        showToast('Removed Fried Rice (native)');
-        return;
-      }
-      const ok = decrementOrRemovePromo(IDS.riceBundleBase);
-      if (ok) {
-        applyBundleIfNeeded(); // recompute discount
-        renderPromoLines(); showToast('Removed XMAS Rice Bundle'); 
-      } else showToast('Nothing to remove');
-    }
-
-    // wire DOM buttons
-    promoShaw.querySelector('.add-btn')?.addEventListener('click', onAddShaw);
-    promoShaw.querySelector('.remove-btn')?.addEventListener('click', onRemoveShaw);
-    riceCard.querySelector('.add-btn')?.addEventListener('click', onAddRiceBundle);
-    riceCard.querySelector('.remove-btn')?.addEventListener('click', onRemoveRiceBundle);
+  // internal handlers (same logic as before)
+  function onAddShaw(e) {
+   e && e.preventDefault();
+   console.debug('promo:onAddShaw fired', e && e.target);
+    const usedNative = tryNativeAdd(IDS.native_shawarma_sku);
+    if (usedNative) {
+    setTimeout(()=> { syncFreeFries(); renderPromoLines(); safePlatformRender(); }, 160);
+      showToast('Added Shawarma (native)');
+      return;
+   }
+    addOrIncrementPromo(IDS.shawarmaBase, { title: 'XMAS Shawarma', unitPrice: 65, meta: { promo: 'XMAS-SHAW' }});
+    syncFreeFries(); renderPromoLines(); showToast('Added XMAS Shawarma');
   }
 
+ function onRemoveShaw(e) {
+    e && e.preventDefault();
+    console.debug('promo:onRemoveShaw fired', e && e.target);
+    const usedNative = tryNativeRemove(IDS.native_shawarma_sku);
+    if (usedNative) {
+      setTimeout(()=> { syncFreeFries(); renderPromoLines(); safePlatformRender(); }, 160);
+      showToast('Removed Shawarma (native)');
+      return;
+   }
+    const ok = decrementOrRemovePromo(IDS.shawarmaBase);
+    if (ok) { syncFreeFries(); renderPromoLines(); showToast('Removed XMAS Shawarma'); } else showToast('Nothing to remove');
+  }
+
+ function onAddRiceBundle(e) {
+  e && e.preventDefault();
+    console.debug('promo:onAddRiceBundle fired', e && e.target);
+   const usedNative = tryNativeAdd(IDS.native_friedrice_sku);
+   if (usedNative) {
+     setTimeout(()=> {
+       tryNativeAdd(IDS.native_shawarma_sku);
+       tryNativeAdd(IDS.native_drink_sku);
+     syncFreeFries(); renderPromoLines(); safePlatformRender();
+       applyBundleIfNeeded();
+    }, 200);
+     showToast('Added Fried Rice (native)');
+      return;
+    }
+   addOrIncrementPromo(IDS.riceBundleBase, { title: 'XMAS Rice Bundle (Rice+Shawarma+Drink)', unitPrice: 100, meta: { promo: 'XMAS-RICE' }});
+   applyBundleIfNeeded();
+   renderPromoLines(); showToast('Added XMAS Rice Bundle');
+ }
+
+  function onRemoveRiceBundle(e) {
+   e && e.preventDefault();
+   console.debug('promo:onRemoveRiceBundle fired', e && e.target);
+   const usedNative = tryNativeRemove(IDS.native_friedrice_sku);
+   if (usedNative) {
+     setTimeout(()=> { renderPromoLines(); syncFreeFries(); safePlatformRender(); }, 140);
+      showToast('Removed Fried Rice (native)');
+     return;
+  }
+   const ok = decrementOrRemovePromo(IDS.riceBundleBase);
+    if (ok) { applyBundleIfNeeded(); renderPromoLines(); showToast('Removed XMAS Rice Bundle'); } else showToast('Nothing to remove');
+ }
+
+  // Attach direct handlers if elements exist
+  try { promoShaw?.querySelector('.add-btn')?.addEventListener('click', onAddShaw); } catch(e){ console.warn('attach direct add-shaw failed', e); }
+  try { promoShaw?.querySelector('.remove-btn')?.addEventListener('click', onRemoveShaw); } catch(e){ console.warn('attach direct remove-shaw failed', e); }
+ try { riceCard?.querySelector('.add-btn')?.addEventListener('click', onAddRiceBundle); } catch(e){ console.warn('attach direct add-rice failed', e); }
+  try { riceCard?.querySelector('.remove-btn')?.addEventListener('click', onRemoveRiceBundle); } catch(e){ console.warn('attach direct remove-rice failed', e); }
+
+ // Delegated fallback: ensure any click on promo Add/Remove will be handled even if direct handlers aren't attached
+  document.addEventListener('click', function(ev){
+   try {
+    const btn = ev.target.closest && ev.target.closest('.promo-xmas .add-btn, .promo-xmas .remove-btn');
+     if (!btn) return;
+    // determine which card
+     const card = btn.closest && btn.closest('.menu-item');
+      const id = card && card.getAttribute && card.getAttribute('data-item-id');
+     if (!id) return;
+      // prevent duplicate handling if direct handlers already ran (we can't detect that reliably), but this is safe
+     ev.preventDefault();
+     if (id === 'promo-shawarma') {
+        if (btn.classList.contains('add-btn')) onAddShaw(ev);
+        else onRemoveShaw(ev);
+     } else if (id === 'xmas-rice-bundle') {
+      if (btn.classList.contains('add-btn')) onAddRiceBundle(ev);
+       else onRemoveRiceBundle(ev);
+      } else {
+       // any other promo-xmas card: no-op
+     }
+   } catch(e) {
+     console.error('promo delegated click error', e);
+   }
+  }, true);
+}
+  
   /* ---------- apply bundle if needed (exposed wrapper) ---------- */
   function applyBundleIfNeeded() {
     try {
