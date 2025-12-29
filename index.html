@@ -8714,143 +8714,157 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 });
 </script>
-
-  <!-- BEGIN: Christmas Promo Product Card (drop this before </body>) -->
+<!-- BEGIN: Christmas Bundle Products (paste before </body>) -->
 <style>
-/* Christmas promo card styles & animations */
-.christmas-promo-card {
-  display: grid;
-  grid-template-columns: 100px 1fr auto;
-  gap: 12px;
-  align-items: center;
-  padding: 12px;
-  border-radius: 12px;
-  background: linear-gradient(180deg, rgba(255,246,235,0.06), rgba(255,240,230,0.02));
-  border: 1px solid rgba(255,200,120,0.06);
-  box-shadow: 0 12px 36px rgba(0,0,0,0.35);
+/* Radiant Xmas bundle cards + micro-animations */
+.bundle-promo {
+  display:grid;
+  grid-template-columns: 96px 1fr auto;
+  gap:12px;
+  align-items:center;
+  padding:12px;
+  border-radius:12px;
+  background: linear-gradient(180deg, rgba(255,250,240,0.04), rgba(255,240,230,0.02));
+  border: 1px solid rgba(255,160,80,0.06);
+  box-shadow: 0 18px 60px rgba(8,6,6,0.45);
   position: relative;
   overflow: visible;
+  transform-origin: center;
+  transition: transform .28s cubic-bezier(.2,.9,.3,1), box-shadow .28s;
 }
-.christmas-promo-card .thumb {
-  width:100px; height:86px; border-radius:10px; object-fit:cover;
-  background: linear-gradient(90deg,#ffefc6,#ffd7a3);
-  display:flex; align-items:center; justify-content:center; font-weight:900; color:#7a3000;
-  border:1px solid rgba(255,255,255,0.03);
+.bundle-promo:hover { transform: translateY(-6px) scale(1.01); box-shadow: 0 32px 120px rgba(8,6,6,0.55); }
+
+/* thumbnail */
+.bundle-thumb { width:96px; height:76px; border-radius:10px; object-fit:cover; border:1px solid rgba(255,255,255,0.04); background: linear-gradient(90deg,#fff4e6,#fff0e0); display:flex; align-items:center; justify-content:center; font-weight:900; color:#9b2b0e; font-size:13px; }
+
+/* ribbons / stickers */
+.ribbon {
+  position:absolute; left:12px; top:-10px; background: linear-gradient(90deg,#ff3b30,#ffb86b);
+  color:#111; font-weight:900; padding:6px 10px; border-radius:999px; font-size:12px; box-shadow: 0 10px 34px rgba(255,80,60,0.12);
 }
-.christmas-ribbon {
-  position:absolute; left:12px; top:-8px; background:linear-gradient(90deg,#ff4d4d,#ffb86b);
-  color:#fff; font-weight:900; padding:6px 10px; border-radius:999px; font-size:12px; box-shadow:0 8px 26px rgba(255,80,60,0.12);
-}
-.christmas-sticker {
-  position:absolute; right:12px; top:-10px; background:#fff; color:#b10e0e; font-weight:900; padding:6px 8px; border-radius:10px;
-  transform: rotate(8deg); box-shadow:0 8px 26px rgba(0,0,0,0.12);
-  display:flex; gap:6px; align-items:center; font-size:13px;
-}
-/* badge */
-.promo-badge {
-  font-size:12px; padding:6px 8px; border-radius:999px; background:linear-gradient(90deg,#ffd166,#ff6a00); color:#111; font-weight:900;
-  display:inline-flex; gap:8px; align-items:center;
-  box-shadow: 0 8px 30px rgba(255,106,0,0.08);
+.sticker {
+  position:absolute; right:12px; top:-14px; background:#fff; color:#b10e0e; font-weight:900; padding:6px 8px; border-radius:10px; transform:rotate(6deg); box-shadow:0 10px 26px rgba(0,0,0,0.12);
 }
 
-/* title/desc */
-.promo-title { font-weight:900; margin:0 0 4px 0; color:#fff; text-shadow:0 6px 20px rgba(0,0,0,0.45); }
-.promo-desc { margin:0; color: rgba(255,255,255,0.86); font-size:13px; }
+/* titles & desc */
+.bundle-title { margin:0; font-weight:900; color:#fff; text-shadow: 0 8px 22px rgba(0,0,0,0.55); font-size:16px; }
+.bundle-desc { margin:4px 0 0 0; font-size:13px; color: rgba(255,255,255,0.9); }
 
-/* CTA */
-.promo-ctas { display:flex; gap:8px; margin-top:10px; align-items:center; }
-.btn-promo {
-  padding:8px 12px; border-radius:10px; font-weight:900; min-width:120px; cursor:pointer; border:0;
-  background: linear-gradient(90deg,#ff6a00,#ffd166); color:#111;
-  box-shadow: 0 10px 30px rgba(255,106,0,0.10); transition: transform .18s ease, box-shadow .18s ease;
+/* price / CTA */
+.bundle-actions { display:flex; flex-direction:column; gap:8px; align-items:flex-end; }
+.bundle-price { font-weight:900; color:var(--accent-2); font-size:16px; text-align:right; }
+.bundle-cta { display:flex; gap:8px; }
+.btn-bundle {
+  padding:8px 12px; border-radius:10px; font-weight:900; cursor:pointer; border:0;
+  background: linear-gradient(90deg,#ff6a00,#ffd166); color:#111; min-width:120px;
+  box-shadow: 0 12px 36px rgba(255,106,0,0.10); transition: transform .12s;
 }
-.btn-promo.ghost { background: transparent; color:#fff; border:1px solid rgba(255,255,255,0.06); box-shadow:none; }
-.btn-promo:active { transform: translateY(1px) scale(.995); }
+.btn-bundle.ghost { background:transparent; color:#fff; border:1px solid rgba(255,255,255,0.06); box-shadow:none; }
+.btn-bundle:active { transform: translateY(1px) scale(.995); }
 
-/* small helper line */
-.promo-helper { margin-top:6px; color: rgba(255,255,255,0.75); font-size:13px; }
+/* confetti / snowfall indicator */
+.xmas-snow { position:absolute; inset:0; pointer-events:none; background-image: radial-gradient(circle at 10% 10%, rgba(255,255,255,0.08) 0 1px, transparent 2px),
+              radial-gradient(circle at 70% 20%, rgba(255,255,255,0.06) 0 1px, transparent 2px);
+  opacity:0; transform:translateY(-6px); transition: opacity .4s, transform .4s; }
+.bundle-promo.animate .xmas-snow { opacity:1; transform:translateY(0); }
 
-/* animation: confetti pop */
-.promo-confetti {
-  pointer-events:none;
-  position: absolute;
-  left: 50%;
-  top: 40%;
-  transform: translate(-50%,-40%);
-  width: 200px;
-  height: 140px;
-  display: none;
+/* tiny sparkle animation on Add */
+.sparkle {
+  position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); pointer-events:none; width:180px; height:130px; display:none;
 }
-.promo-confetti .piece {
-  width:10px; height:6px; border-radius:2px; position:absolute; opacity:0; animation:pop 800ms forwards;
-}
-@keyframes pop {
-  0% { transform: translateY(0) rotate(0) scale(0.2); opacity:1; }
-  60% { opacity:1; }
-  100% { transform: translateY(-180px) rotate(360deg) scale(1); opacity:0; }
-}
+.sparkle .dot { width:8px; height:8px; border-radius:50%; position:absolute; opacity:0; transform:translateY(0); animation:pop .85s cubic-bezier(.2,.9,.3,1) forwards; }
+@keyframes pop { 0% { opacity:1; transform: translateY(0) scale(.2); } 60% { opacity:1; } 100% { opacity:0; transform: translateY(-120px) scale(1.1); } }
 
-/* small "free item" pill for cart & card */
-.free-pill { display:inline-block; padding:6px 10px; border-radius:999px; background: rgba(255,255,255,0.06); color:#fff; font-weight:900; font-size:12px; }
+/* free-pill (shown inside card to tell user what's included) */
+.free-pill { display:inline-block; padding:6px 10px; border-radius:999px; background: rgba(255,255,255,0.06); color:#fff; font-weight:900; font-size:12px; margin-left:6px; }
 
 /* small responsive */
-@media (max-width:480px){
-  .christmas-promo-card { grid-template-columns: 88px 1fr; gap:10px; padding:10px; }
-  .christmas-sticker { right:8px; top:-8px; font-size:12px; }
+@media (max-width:480px) {
+  .bundle-promo { grid-template-columns: 84px 1fr; gap:10px; padding:10px; }
+  .bundle-actions { align-items:flex-start; }
 }
 </style>
 
 <script>
-/* Christmas Promo Product card insertion + behaviour
-   - Inserts first into #menu-grid
-   - Promo shawarma fixed price GHC 65 (baseId 'promo-shawarma')
-   - For every 2 promo-shawarmas added, a free mini fries line is created (baseId 'promo-free-mini-fries', unitPrice 0)
-   - Bundle item 'rice-bundle' priced GHC 100 (distinct from regular fried rice)
-   - Immediate cart update via localStorage 'wrap_cart_v2' & tries to call renderCart() if available
-   - Add <-> Remove toggle, Remove actually removes lines; cart shows instantly
+/* Inject two bundle product cards into #menu-grid and wire add/remove behavior.
+   - Bundle 1: bundle-shawarma-2 (GHC 130) — shows included Free Mini Loaded Fries
+   - Bundle 2: bundle-rice-100 (GHC 100) — shows what is included
+   - Adds to localStorage wrap_cart_v2 and calls renderCart() if available
+   - Add button toggles to Remove (removes entire line)
+   - No modals. Immediate cart update.
 */
 (function(){
   document.addEventListener('DOMContentLoaded', () => {
-    const menuGrid = document.getElementById('menu-grid');
-    if (!menuGrid) {
-      console.warn('Menu grid #menu-grid not found — promo card cannot be inserted.');
+    const grid = document.getElementById('menu-grid');
+    if (!grid) {
+      console.warn('menu-grid not found. Paste this block after your menu markup or ensure #menu-grid exists.');
       return;
     }
 
-    // Build promo card element
-    const card = document.createElement('article');
-    card.className = 'menu-item christmas-promo-card';
-    card.setAttribute('data-item-id','promo-christmas');
-    card.setAttribute('tabindex','0');
-    card.innerHTML = `
-      <div class="christmas-ribbon">🎄 CHRISTMAS PROMO</div>
-      <div class="christmas-sticker"><span>LIMITED</span> <span style="background:#ffecec;padding:6px 8px;border-radius:8px;color:#b10e0e;font-weight:900;margin-left:6px">HOT</span></div>
+    /* HTML for both cards */
+    const bundleHtml = `
+      <!-- Bundle A: 2× Shawarma (65 each) + Mini Loaded Fries (free) — GHC 130 -->
+      <article class="menu-item bundle-promo" data-item-id="bundle-shawarma-2" data-category="wraps" tabindex="0">
+        <div class="ribbon">🎁 Christmas Bundle</div>
+        <div class="sticker">Limited</div>
+        <div class="bundle-thumb" aria-hidden="true"><img src="promo-shawarma.jpg" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:10px;" /></div>
 
-      <div class="thumb" aria-hidden="true">XMAS<br>DEAL</div>
-
-      <div style="min-width:0;">
-        <h3 class="promo-title">Christmas Special • Two options</h3>
-        <p class="promo-desc">1) <strong>Promo Shawarma</strong> — GHC <span style="font-weight:900">65</span> (fixed). Buy 2 → get 1 <em>Mini Loaded Fries</em> FREE. (Free mini fries added automatically at checkout.)<br>
-        2) <strong>Fried Rice Bundle</strong> — GHC <span style="font-weight:900">100</span> for Rice + Shawarma + Drink (ready-made bundle).</p>
-
-        <div class="promo-ctas" style="margin-top:8px;">
-          <button class="btn-promo" id="promo-add-shaw">Add Promo Shawarma — GHC 65</button>
-          <button class="btn-promo ghost" id="promo-add-bundle">Add Rice Bundle — GHC 100</button>
+        <div style="min-width:0">
+          <h3 class="bundle-title">2× Shawarma (65 each) + Mini Loaded Fries</h3>
+          <p class="bundle-desc">Two promotional shawarmas (each GHC 65) bundled for GHC <strong>130</strong>. Includes a **Mini Loaded Fries** for free. This is a special Christmas bundle — regular shawarmas do not qualify.</p>
+          <div style="margin-top:8px">
+            <span class="free-pill">Includes: Mini Loaded Fries (FREE)</span>
+            <span style="margin-left:8px" class="free-pill">Quantity: 2 Shawarmas</span>
+          </div>
         </div>
 
-        <div class="promo-helper small-muted" style="margin-top:8px;">
-          <span class="promo-badge">Christmas • Auto-applies</span>
-          <span style="margin-left:10px">Only promo-shawarma items priced <strong>GHC 65</strong> qualify. Regular shawarmas do NOT count.</span>
+        <div class="bundle-actions" aria-hidden="false">
+          <div class="bundle-price">GHC <span class="price-value">130</span></div>
+          <div class="bundle-cta">
+            <button class="btn-bundle" data-action="add-bundle" data-bundle-id="bundle-shawarma-2">Add</button>
+            <button class="btn-bundle ghost remove-hidden" data-action="remove-bundle" data-bundle-id="bundle-shawarma-2" style="display:none">Remove</button>
+          </div>
         </div>
-      </div>
 
-      <div style="display:none;" class="promo-confetti" id="promo-confetti"></div>
+        <div class="xmas-snow" aria-hidden="true"></div>
+        <div class="sparkle" aria-hidden="true"></div>
+      </article>
+
+      <!-- Bundle B: Fried Rice + Shawarma + Drink — GHC 100 -->
+      <article class="menu-item bundle-promo" data-item-id="bundle-rice-100" data-category="rice" tabindex="0">
+        <div class="ribbon">🎄 Festive Deal</div>
+        <div class="sticker">Hot</div>
+        <div class="bundle-thumb" aria-hidden="true"><img src="promo-rice-bundle.jpg" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:10px;" /></div>
+
+        <div style="min-width:0">
+          <h3 class="bundle-title">Fried Rice + Shawarma + Drink (Bundle)</h3>
+          <p class="bundle-desc">Hearty Fried Rice paired with a shawarma and a soft drink — all for **GHC 100**. Perfect single-meal Christmas treat.</p>
+          <div style="margin-top:8px">
+            <span class="free-pill">Includes: Fried Rice • Shawarma • Drink</span>
+          </div>
+        </div>
+
+        <div class="bundle-actions" aria-hidden="false">
+          <div class="bundle-price">GHC <span class="price-value">100</span></div>
+          <div class="bundle-cta">
+            <button class="btn-bundle" data-action="add-bundle" data-bundle-id="bundle-rice-100">Add</button>
+            <button class="btn-bundle ghost remove-hidden" data-action="remove-bundle" data-bundle-id="bundle-rice-100" style="display:none">Remove</button>
+          </div>
+        </div>
+
+        <div class="xmas-snow" aria-hidden="true"></div>
+        <div class="sparkle" aria-hidden="true"></div>
+      </article>
     `;
 
-    // insert as first product
-    menuGrid.insertBefore(card, menuGrid.firstChild);
+    // Insert both as first children
+    const wrapper = document.createElement('div');
+    wrapper.innerHTML = bundleHtml;
+    // insert each new node so ordering is preserved
+    const nodes = Array.from(wrapper.children);
+    nodes.reverse().forEach(n => grid.insertBefore(n, grid.firstChild));
 
-    /* ---------- helpers: cart storage format & utilities ---------- */
+    /* ------- CART helpers (safe, localStorage based, compatible with wrap_cart_v2) ------- */
     const CART_KEY = 'wrap_cart_v2';
     function readCart() {
       try {
@@ -8858,249 +8872,176 @@ document.addEventListener('DOMContentLoaded', function () {
       } catch(e){ return {}; }
     }
     function writeCart(obj) {
-      try { localStorage.setItem(CART_KEY, JSON.stringify(obj)); } catch(e) { console.warn('Could not save cart', e); }
+      try { localStorage.setItem(CART_KEY, JSON.stringify(obj)); } catch(e) { console.warn('Could not write cart', e); }
     }
-
     function callRenderCart() {
-      try {
-        if (typeof renderCart === 'function') {
-          renderCart();
-          return true;
-        }
-        // also try to call window.renderCart
-        if (typeof window.renderCart === 'function') {
-          window.renderCart();
-          return true;
-        }
-      } catch(e){ console.warn('renderCart called failed', e); }
-      // fallback: trigger a custom event other parts might listen to
-      window.dispatchEvent(new Event('wrap_cart_updated'));
-      // also update small DOM badges if present
+      try { if (typeof renderCart === 'function') { renderCart(); return true; } } catch(e){}
+      // fallback: update badges/totals and dispatch an event
       updateCartBadgesAndTotals();
+      window.dispatchEvent(new Event('wrap_cart_updated'));
       return false;
     }
-
-    function updateCartBadgesAndTotals() {
+    function updateCartBadgesAndTotals(){
       const cart = readCart();
-      let count = 0; let subtotal = 0;
-      Object.values(cart).forEach(l => { count += Number(l.qty||0); subtotal += (Number(l.unitPrice)||0) * (Number(l.qty)||0); });
-      // update cart badges if present
+      let count = 0, subtotal = 0;
+      Object.values(cart).forEach(it => { count += Number(it.qty||0); subtotal += (Number(it.unitPrice||0) * Number(it.qty||0)); });
       const cntEl = document.getElementById('cart-count');
-      const miniCnt = document.getElementById('cart-mini-count');
-      const subtotalEl = document.getElementById('cart-subtotal');
+      const mini = document.getElementById('cart-mini-count');
+      const subEl = document.getElementById('cart-subtotal');
       const totalEl = document.getElementById('cart-total');
       if (cntEl) cntEl.innerText = String(count);
-      if (miniCnt) miniCnt.innerText = String(count);
-      if (subtotalEl) subtotalEl.innerText = `GHC ${Math.round(subtotal)}`;
+      if (mini) mini.innerText = String(count);
+      if (subEl) subEl.innerText = `GHC ${Math.round(subtotal)}`;
       if (totalEl) totalEl.innerText = `GHC ${Math.round(subtotal)}`;
-      // If cart drawer present but renderCart missing, ensure promo line shows
-      try {
-        if (typeof renderCart !== 'function') {
-          const ul = document.getElementById('cart-items');
-          if (ul) {
-            // remove any existing promo li
-            Array.from(ul.querySelectorAll('.cart-line.promo-line')).forEach(n => n.remove());
-            // re-insert lines for promo items
-            Object.keys(cart).forEach(k => {
-              const it = cart[k];
-              if (!it || !it.baseId) return;
-              if (it.baseId.startsWith('promo-') || it.baseId === 'rice-bundle') {
-                const li = document.createElement('li');
-                li.className = 'cart-line promo-line';
-                const price = it.unitPrice ? `GHC ${Number(it.unitPrice||0).toFixed(0)}` : 'FREE';
-                li.innerHTML = `<div style="display:flex;gap:12px;align-items:center">
-                  <div style="flex:1;min-width:0"><strong>${escapeHtml(it.title)}</strong><div style="font-size:12px;color:#ccc">${it.meta && it.meta.promo ? '['+escapeHtml(it.meta.promo)+']':''}</div></div>
-                  <div style="text-align:right"><div style="font-weight:900">${escapeHtml(price)}</div><div style="font-size:13px;color:#ccc">x${it.qty}</div></div>
-                </div>`;
-                ul.appendChild(li);
-              }
-            });
+      // also try to show promo lines inside #cart-items if renderCart unavailable
+      const ul = document.getElementById('cart-items');
+      if (ul && typeof renderCart !== 'function') {
+        // remove previous promo lines
+        Array.from(ul.querySelectorAll('.cart-line.promo-line')).forEach(n => n.remove());
+        // append promo items present
+        Object.keys(cart).forEach(k => {
+          const it = cart[k];
+          if (!it) return;
+          if (it.baseId && (it.baseId.startsWith('bundle-') || it.meta?.promo)) {
+            const li = document.createElement('li');
+            li.className = 'cart-line promo-line';
+            const priceText = it.unitPrice ? `GHC ${Number(it.unitPrice).toFixed(0)}` : 'FREE';
+            li.innerHTML = `<div style="display:flex;gap:12px;align-items:center;min-width:0">
+              <div style="flex:1;min-width:0"><strong>${escapeHtml(it.title)}</strong><div style="font-size:12px;color:#ccc">${it.meta?.promo?escapeHtml(it.meta.promo):''}</div></div>
+              <div style="text-align:right"><div style="font-weight:900">${escapeHtml(priceText)}</div><div style="font-size:13px;color:#ccc">x${it.qty}</div></div>
+            </div>`;
+            ul.appendChild(li);
           }
-        }
-      } catch(e){}
+        });
+      }
     }
-
     function escapeHtml(s){ return String(s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/'/g,"&#39;").replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
-    /* ---------- promo-specific helpers ---------- */
-    function ensurePromoFreeFries(cartObj) {
-      // count promo-shawarma qty
-      const shaw = Object.values(cartObj).find(l => l.baseId === 'promo-shawarma');
-      const qty = shaw ? Number(shaw.qty || 0) : 0;
-      const freeCount = Math.floor(qty / 2);
-      // remove existing free line if present then re-add when needed
-      Object.keys(cartObj).forEach(k => {
-        if (cartObj[k] && cartObj[k].baseId === 'promo-free-mini-fries') delete cartObj[k];
-      });
-      if (freeCount > 0) {
-        cartObj['promo-free-mini-fries'] = {
-          id: 'promo-free-mini-fries',
-          baseId: 'promo-free-mini-fries',
-          title: 'Mini Loaded Fries (Free - Xmas Promo)',
-          unitPrice: 0,
-          qty: freeCount,
-          meta: { promo: 'CHRISTMAS-BUY2-FREE-MINI' },
-          imageSrc: ''
-        };
-      }
-    }
-
-    /* ---------- add / remove logic (instant) ---------- */
-    function addPromoShawarmaOnce() {
+    /* ------- Add / Remove functions for both bundles ------- */
+    function addBundleToCart(key, data) {
       const cart = readCart();
-      // use single stable key ('promo-shawarma') to collect qty
-      if (!cart['promo-shawarma']) {
-        cart['promo-shawarma'] = {
-          id: 'promo-shawarma',
-          baseId: 'promo-shawarma',
-          title: 'Promo Shawarma — Christmas (GHC 65)',
-          unitPrice: 65,
+      if (!cart[key]) {
+        cart[key] = {
+          id: key,
+          baseId: data.baseId,
+          title: data.title,
+          unitPrice: Number(data.unitPrice || 0),
           qty: 1,
-          meta: { promo: 'CHRISTMAS-SHAWARMA' },
-          imageSrc: ''
+          meta: data.meta || {},
+          imageSrc: data.imageSrc || ''
         };
       } else {
-        // increase qty by 1
-        cart['promo-shawarma'].qty = Number(cart['promo-shawarma'].qty||0) + 1;
+        // increment quantity by 1 if Add clicked while it's already present in other places;
+        // but because user requested Add toggles to Remove, we usually add only once here.
+        cart[key].qty = Number(cart[key].qty || 0) + 1;
       }
-      // ensure freebies
-      ensurePromoFreeFries(cart);
+
       writeCart(cart);
-      // try to refresh UI (renderCart)
+      // try to show "Mini Loaded Fries (free)" inside the bundle meta if it's the shawarma bundle
       callRenderCart();
-      // visual feedback
-      showConfetti();
-      updatePromoCardButtons();
-    }
-
-    function removePromoShawarmaEntire() {
-      const cart = readCart();
-      if (cart['promo-shawarma']) delete cart['promo-shawarma'];
-      // remove free fries too
-      Object.keys(cart).forEach(k => { if (cart[k] && cart[k].baseId === 'promo-free-mini-fries') delete cart[k]; });
-      writeCart(cart);
-      callRenderCart();
-      updatePromoCardButtons();
-    }
-
-    function addRiceBundleOnce() {
-      const cart = readCart();
-      // create or increment 'rice-bundle' key
-      if (!cart['rice-bundle']) {
-        cart['rice-bundle'] = {
-          id: 'rice-bundle',
-          baseId: 'rice-bundle',
-          title: 'Fried Rice + Shawarma + Drink (Bundle) — Xmas',
-          unitPrice: 100,
-          qty: 1,
-          meta: { promo: 'CHRISTMAS-RICE-BUNDLE' },
-          imageSrc: ''
-        };
-      } else {
-        cart['rice-bundle'].qty = Number(cart['rice-bundle'].qty||0) + 1;
-      }
-      // bundles do not affect freebies
-      writeCart(cart);
-      callRenderCart();
-      animateButtonPulse(document.getElementById('promo-add-bundle'));
-      updatePromoCardButtons();
-    }
-
-    function removeRiceBundleEntire() {
-      const cart = readCart();
-      if (cart['rice-bundle']) delete cart['rice-bundle'];
-      writeCart(cart);
-      callRenderCart();
-      updatePromoCardButtons();
-    }
-
-    /* ---------- UI glue: Add/Remove toggle + animation ---------- */
-    const addShawBtn = document.getElementById('promo-add-shaw');
-    const addBundleBtn = document.getElementById('promo-add-bundle');
-
-    function updatePromoCardButtons() {
-      const cart = readCart();
-      const shaw = cart['promo-shawarma'];
-      if (shaw && Number(shaw.qty||0) > 0) {
-        addShawBtn.innerText = 'Remove Promo Shawarma';
-        addShawBtn.classList.add('is-added');
-      } else {
-        addShawBtn.innerText = 'Add Promo Shawarma — GHC 65';
-        addShawBtn.classList.remove('is-added');
-      }
-      const bundle = cart['rice-bundle'];
-      if (bundle && Number(bundle.qty||0) > 0) {
-        addBundleBtn.innerText = 'Remove Rice Bundle';
-        addBundleBtn.classList.add('is-added');
-      } else {
-        addBundleBtn.innerText = 'Add Rice Bundle — GHC 100';
-        addBundleBtn.classList.remove('is-added');
-      }
       updateCartBadgesAndTotals();
     }
 
-    // when Add is clicked: if not present -> add 1; if present -> remove entirely
-    addShawBtn.addEventListener('click', (e) => {
-      e.preventDefault();
+    function removeBundleFromCart(key) {
       const cart = readCart();
-      if (!cart['promo-shawarma']) {
-        addPromoShawarmaOnce();
-      } else {
-        // remove entirely
-        removePromoShawarmaEntire();
-      }
-    });
-
-    addBundleBtn.addEventListener('click', (e) => {
-      e.preventDefault();
-      const cart = readCart();
-      if (!cart['rice-bundle']) {
-        addRiceBundleOnce();
-      } else {
-        removeRiceBundleEntire();
-      }
-    });
-
-    /* ---------- confetti / visual feedback ---------- */
-    const confettiWrap = document.getElementById('promo-confetti');
-    function showConfetti() {
-      if (!confettiWrap) return;
-      // create pieces
-      confettiWrap.innerHTML = '';
-      const colors = ['#ff3b30','#ff9500','#ffd60a','#34c759','#0a84ff','#af52de'];
-      for (let i=0;i<18;i++){
-        const p = document.createElement('div');
-        p.className = 'piece';
-        p.style.left = (20 + Math.random()*160)+'px';
-        p.style.top = (40 + Math.random()*40)+'px';
-        p.style.background = colors[i % colors.length];
-        p.style.transform = `rotate(${Math.random()*360}deg)`;
-        p.style.animationDelay = (Math.random()*120)+'ms';
-        confettiWrap.appendChild(p);
-      }
-      confettiWrap.style.display = 'block';
-      // hide after animation
-      setTimeout(()=> confettiWrap.style.display = 'none', 900);
+      if (cart[key]) delete cart[key];
+      writeCart(cart);
+      callRenderCart();
+      updateCartBadgesAndTotals();
     }
 
-    function animateButtonPulse(btn){
-      if (!btn) return;
-      btn.style.transform = 'scale(0.98)';
-      setTimeout(()=> btn.style.transform = '', 260);
+    /* ------- Wire the card buttons (toggle Add <-> Remove) ------- */
+    function attachCardHandlers() {
+      // query both nodes
+      const cards = grid.querySelectorAll('.menu-item.bundle-promo');
+      cards.forEach(card => {
+        const addBtn = card.querySelector('[data-action="add-bundle"]');
+        const removeBtn = card.querySelector('[data-action="remove-bundle"]');
+        const bundleId = addBtn && addBtn.dataset.bundleId;
+        if (!bundleId) return;
+
+        // determine data for each bundle id
+        const data = (bundleId === 'bundle-shawarma-2') ? {
+          baseId: 'bundle-shawarma-2',
+          title: '2× Shawarma (65 each) + Mini Loaded Fries (XMAS)',
+          unitPrice: 130,
+          meta: { promo: 'CHRISTMAS_BUNDLE_TWO_SHW' },
+          imageSrc: card.querySelector('img')?.src || ''
+        } : {
+          baseId: 'bundle-rice-100',
+          title: 'Fried Rice + Shawarma + Drink (Bundle)',
+          unitPrice: 100,
+          meta: { promo: 'CHRISTMAS_RICE_BUNDLE' },
+          imageSrc: card.querySelector('img')?.src || ''
+        };
+
+        function syncButtons() {
+          const cart = readCart();
+          if (cart[bundleId] && Number(cart[bundleId].qty||0) > 0) {
+            addBtn.style.display = 'none';
+            removeBtn.style.display = '';
+          } else {
+            addBtn.style.display = '';
+            removeBtn.style.display = 'none';
+          }
+        }
+
+        // initial sync
+        syncButtons();
+
+        // add handler
+        addBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          addBundleToCart(bundleId, data);
+
+          // visual flourish: animate card & sparkles
+          card.classList.add('animate');
+          const snow = card.querySelector('.xmas-snow');
+          if (snow) snow.style.opacity = '1';
+          const sparkle = card.querySelector('.sparkle');
+          if (sparkle) {
+            sparkle.innerHTML = '';
+            const colors = ['#ff3b30','#ff9500','#ffd60a','#34c759','#0a84ff','#af52de'];
+            for (let i=0;i<10;i++){
+              const d = document.createElement('div');
+              d.className = 'dot';
+              d.style.left = (10 + Math.random()*160)+'px';
+              d.style.top = (20 + Math.random()*60)+'px';
+              d.style.background = colors[i % colors.length];
+              d.style.animationDelay = (Math.random()*180)+'ms';
+              sparkle.appendChild(d);
+            }
+            sparkle.style.display = 'block';
+            setTimeout(()=> { sparkle.style.display = 'none'; sparkle.innerHTML = ''; }, 900);
+          }
+          // small timeout to toggle UI
+          setTimeout(()=> { card.classList.remove('animate'); syncButtons(); }, 420);
+
+        });
+
+        // remove handler (removes entire product from cart)
+        removeBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          removeBundleFromCart(bundleId);
+          syncButtons();
+        });
+
+        // Also keep sync if cart changes elsewhere (storage events)
+        window.addEventListener('storage', (ev) => {
+          if (ev.key === CART_KEY) syncButtons();
+        });
+        // periodic safety sync
+        setInterval(syncButtons, 1200);
+      });
     }
 
-    // Try to keep promo card in sync if other scripts change cart (poll + storage event)
-    window.addEventListener('storage', (e) => {
-      if (e.key === CART_KEY) updatePromoCardButtons();
-    });
-    // periodic sync in case other code writes without storage event
-    setInterval(updatePromoCardButtons, 1200);
-
-    // initial sync at load
-    updatePromoCardButtons();
+    // initial attach
+    attachCardHandlers();
+    // ensure buttons re-attached if dynamic reflows happen later
+    setTimeout(attachCardHandlers, 600);
   });
 })();
 </script>
-<!-- END: Christmas Promo Product Card -->
+<!-- END: Christmas Bundle Products -->
 </html>
   
