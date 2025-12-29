@@ -8825,7 +8825,7 @@ document.addEventListener('DOMContentLoaded', function () {
     riceBundle.className = 'menu-item promo-xmas';
     riceBundle.dataset.itemId = 'xmas-rice-bundle';
     riceBundle.innerHTML = `
-      <img class="px-thumb" src="promo-rice-bundle.jpg" alt="Xmas Rice Bundle — GHC 100">
+      <img class="px-thumb" src="hero-friedrice-large.jpg" alt="Xmas Rice Bundle — GHC 100">
       <div class="px-meta">
         <div style="display:flex;align-items:center;gap:8px">
           <h3 class="px-title">XMAS Rice Bundle</h3>
@@ -9323,6 +9323,254 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Expose a safe API for debugging
     window.__promoXmasControls = { addPromoLine, removeOnePromoLine, updatePromoCardButtons };
+
+  }); // DOMContentLoaded
+})();
+</script>
+  <script>
+(function(){
+  document.addEventListener('DOMContentLoaded', () => {
+    const CART_KEY = 'wrap_cart_v2'; // update if your persistent-cart uses a different key
+
+    // Robust read/write cart that prefers window.cart and falls back to localStorage
+    function readCart() {
+      try {
+        if (window.cart && typeof window.cart === 'object') return window.cart;
+        const raw = localStorage.getItem(CART_KEY);
+        return raw ? JSON.parse(raw) : {};
+      } catch (e) { console.warn('readCart error', e); return {}; }
+    }
+    function writeCart(cart) {
+      try {
+        window.cart = cart;
+        localStorage.setItem(CART_KEY, JSON.stringify(cart));
+      } catch (e) { console.warn('writeCart error', e); window.cart = cart; }
+      // Prefer site render hook if present
+      try { if (typeof window.renderCart === 'function') window.renderCart(); } catch(e){ console.warn('renderCart error', e); }
+      // small custom event so other scripts can react
+      try { window.dispatchEvent(new CustomEvent('wrap:cart:updated', { detail: { timestamp: Date.now() } })); } catch(e){}
+    }
+
+    // Find a cart key by baseId (first match)
+    function findKeyForBase(baseId) {
+      const cart = readCart();
+      return Object.keys(cart).find(k => String(cart[k].baseId) === String(baseId));
+    }
+
+    // Add or increment a deterministic promo item (one cart line per baseId)
+    function addOrIncrementPromo(baseId, payload) {
+      // payload: { title, unitPrice, meta, imageSrc }
+      try {
+        const cart = readCart();
+        // pick a deterministic key name for promo items so we don't create duplicates
+        const key = `promo-${baseId}`;
+        if (cart[key]) {
+          // increment via site API if available
+          if (typeof window.changeItemQty === 'function') {
+            try {
+              const newQty = (Number(cart[key].qty) || 0) + 1;
+              window.changeItemQty(key, newQty);
+              // ensure render
+              if (typeof window.renderCart === 'function') window.renderCart();
+              return key;
+            } catch(e){ /* fallback */ }
+          }
+          cart[key].qty = (Number(cart[key].qty) || 0) + 1;
+          writeCart(cart);
+          return key;
+        } else {
+          // create line using site addToCart if it exists (many apps prefer unique keys, but we'll also ensure deterministic key)
+          if (typeof window.addToCart === 'function') {
+            // addToCart might insist on generating a key; we still write deterministic afterwards if needed
+            try {
+              window.addToCart(key, {
+                baseId: baseId,
+                title: payload.title,
+                unitPrice: Number(payload.unitPrice) || 0,
+                qty: 1,
+                meta: payload.meta || {},
+                imageSrc: payload.imageSrc || ''
+              });
+              if (typeof window.renderCart === 'function') window.renderCart();
+              // ensure we have a deterministic shape in storage
+              const newCart = readCart();
+              if (!newCart[key]) {
+                // try to find any newly created key with same baseId and normalize it to deterministic key
+                const alt = Object.keys(newCart).find(k => newCart[k].baseId === baseId && k !== key);
+                if (alt) {
+                  newCart[key] = Object.assign({}, newCart[alt]);
+                  newCart[key].baseId = baseId;
+                  // remove alt
+                  delete newCart[alt];
+                  writeCart(newCart);
+                }
+              }
+              return key;
+            } catch(e){ console.warn('addToCart wrapper failed', e); }
+          }
+          // fallback: direct write
+          cart[key] = {
+            id: key,
+            baseId: baseId,
+            title: payload.title,
+            unitPrice: Number(payload.unitPrice) || 0,
+            qty: 1,
+            meta: payload.meta || {},
+            imageSrc: payload.imageSrc || ''
+          };
+          writeCart(cart);
+          return key;
+        }
+      } catch (err) {
+        console.error('addOrIncrementPromo error', err);
+      }
+    }
+
+    // Remove one unit of promo (decrement or remove line). Returns true if removed/modified
+    function removeOnePromo(baseId) {
+      try {
+        const cart = readCart();
+        const key = findKeyForBase(baseId) || `promo-${baseId}`;
+        if (!cart[key]) return false;
+
+        const currentQty = Number(cart[key].qty) || 0;
+        if (currentQty > 1) {
+          // prefer site API
+          if (typeof window.changeItemQty === 'function') {
+            try { window.changeItemQty(key, currentQty - 1); if (typeof window.renderCart === 'function') window.renderCart(); return true; } catch(e){}
+          }
+          cart[key].qty = currentQty - 1;
+          writeCart(cart);
+          return true;
+        } else {
+          // qty == 1 -> remove
+          if (typeof window.removeItemFully === 'function') {
+            try { window.removeItemFully(key); if (typeof window.renderCart === 'function') window.renderCart(); return true; } catch(e){}
+          }
+          delete cart[key];
+          writeCart(cart);
+          return true;
+        }
+      } catch (err) {
+        console.error('removeOnePromo error', err);
+        return false;
+      }
+    }
+
+    // Get total qty for a baseId
+    function qtyForBase(baseId) {
+      try {
+        const cart = readCart();
+        return Object.values(cart).reduce((s, l) => s + ((String(l.baseId) === String(baseId)) ? (Number(l.qty) || 0) : 0), 0);
+      } catch(e){ return 0; }
+    }
+
+    // UI helpers: toggling Add/Remove immediately
+    function updatePromoCardButtons() {
+      const shawCard = document.querySelector('[data-item-id="promo-shawarma"]');
+      if (shawCard) {
+        const has = qtyForBase('promo-shawarma') > 0;
+        toggleBtns(shawCard, has);
+      }
+      const riceCard = document.querySelector('[data-item-id="xmas-rice-bundle"]');
+      if (riceCard) {
+        const has = qtyForBase('xmas-rice-bundle') > 0;
+        toggleBtns(riceCard, has);
+      }
+    }
+    function toggleBtns(cardEl, stateHasItem) {
+      try {
+        const add = cardEl.querySelector('.add-btn');
+        const rem = cardEl.querySelector('.remove-btn');
+        if (stateHasItem) { if (add) add.classList.add('hidden'); if (rem) rem.classList.remove('hidden'); }
+        else { if (add) add.classList.remove('hidden'); if (rem) rem.classList.add('hidden'); }
+      } catch(e){}
+    }
+
+    // Quick visual pulse
+    function pulse(el) { if (!el) return; el.classList.add('px-pulse'); setTimeout(()=> el.classList.remove('px-pulse'), 700); }
+    function toast(msg) {
+      let el = document.getElementById('promo-snack');
+      if (!el) { el = document.createElement('div'); el.id='promo-snack'; el.style.cssText='position:fixed;left:50%;transform:translateX(-50%);bottom:18px;padding:10px 14px;border-radius:999px;background:rgba(0,0,0,0.85);color:#fff;font-weight:800;z-index:5000;'; document.body.appendChild(el); }
+      el.innerText = msg; el.style.opacity = '1';
+      setTimeout(()=> { try { el.style.opacity = '0'; } catch(e){} }, 2200);
+    }
+
+    // Wire promo card buttons (idempotent)
+    function wirePromoControls() {
+      const shawCard = document.querySelector('[data-item-id="promo-shawarma"]');
+      if (shawCard && !shawCard.__wired) {
+        const add = shawCard.querySelector('.add-btn');
+        const rem = shawCard.querySelector('.remove-btn');
+        add && add.addEventListener('click', (e) => {
+          e.preventDefault();
+          addOrIncrementPromo('promo-shawarma', { title: 'XMAS Shawarma (Promo)', unitPrice: 65, meta: { promo: 'XMAS-SHAW' }, imageSrc: shawCard.querySelector('.px-thumb')?.src || '' });
+          // Immediate UI update + render
+          try { if (typeof window.renderCart === 'function') window.renderCart(); } catch(e){}
+          updatePromoCardButtons();
+          // sync freebies (if available)
+          try { if (typeof window.syncFreeFries === 'function') window.syncFreeFries(); } catch(e){}
+          pulse(shawCard); toast('Added XMAS Shawarma');
+        });
+        rem && rem.addEventListener('click', (e) => {
+          e.preventDefault();
+          const ok = removeOnePromo('promo-shawarma');
+          if (ok) {
+            try { if (typeof window.renderCart === 'function') window.renderCart(); } catch(e){}
+            updatePromoCardButtons();
+            try { if (typeof window.syncFreeFries === 'function') window.syncFreeFries(); } catch(e){}
+            pulse(shawCard); toast('Removed one XMAS Shawarma');
+          } else toast('No XMAS Shawarma in cart');
+        });
+        shawCard.__wired = true;
+      }
+
+      const riceCard = document.querySelector('[data-item-id="xmas-rice-bundle"]');
+      if (riceCard && !riceCard.__wired) {
+        const add = riceCard.querySelector('.add-btn');
+        const rem = riceCard.querySelector('.remove-btn');
+        add && add.addEventListener('click', (e) => {
+          e.preventDefault();
+          addOrIncrementPromo('xmas-rice-bundle', { title: 'XMAS Rice Bundle', unitPrice: 100, meta: { promo: 'XMAS-RICE' }, imageSrc: riceCard.querySelector('.px-thumb')?.src || '' });
+          // Immediate update
+          try { if (typeof window.renderCart === 'function') window.renderCart(); } catch(e){}
+          updatePromoCardButtons();
+          pulse(riceCard); toast('Added Xmas Rice Bundle');
+        });
+        rem && rem.addEventListener('click', (e) => {
+          e.preventDefault();
+          const ok = removeOnePromo('xmas-rice-bundle');
+          if (ok) {
+            try { if (typeof window.renderCart === 'function') window.renderCart(); } catch(e){}
+            updatePromoCardButtons();
+            pulse(riceCard); toast('Removed one bundle');
+          } else toast('No bundle in cart');
+        });
+        riceCard.__wired = true;
+      }
+    }
+
+    // Observe cart DOM and storage so button state stays in sync
+    function observeCartAndSyncUI() {
+      const cartEl = document.getElementById('cart-items');
+      if (cartEl) {
+        const mo = new MutationObserver(() => {
+          try { updatePromoCardButtons(); if (typeof window.stylePromoLinesInCart === 'function') window.stylePromoLinesInCart(); } catch(e){}
+        });
+        mo.observe(cartEl, { childList: true, subtree: true, characterData: true });
+      }
+      window.addEventListener('storage', (ev) => { if (ev.key === CART_KEY) updatePromoCardButtons(); });
+      // fallback poll
+      setInterval(updatePromoCardButtons, 800);
+    }
+
+    // Boot
+    wirePromoControls();
+    updatePromoCardButtons();
+    observeCartAndSyncUI();
+
+    // Export for debugging
+    window.__promoFixes = { addOrIncrementPromo, removeOnePromo, qtyForBase, updatePromoCardButtons };
 
   }); // DOMContentLoaded
 })();
