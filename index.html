@@ -8714,5 +8714,137 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 });
 </script>
+  <!-- Promo-as-first-product: paste before </body> -->
+<style>
+  /* small promo-card styles */
+  .menu-item.promo-item {
+    border: 2px solid rgba(255,214,92,0.08);
+    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+    padding: 10px;
+    border-radius: 12px;
+    display:flex;
+    gap:12px;
+    align-items:flex-start;
+  }
+  .promo-item .promo-thumb { width:84px; height:64px; object-fit:cover; border-radius:10px; flex:0 0 84px; }
+  .promo-item .promo-meta { flex:1; min-width:0; }
+  .promo-item .promo-title { font-weight:900; margin:0 0 6px 0; color:var(--accent-2); }
+  .promo-ctas { display:flex; gap:8px; margin-top:8px; flex-wrap:wrap; }
+  .promo-badge { display:inline-block; padding:4px 8px; border-radius:999px; font-weight:900; font-size:12px; background: linear-gradient(90deg, var(--accent-1), var(--accent-2)); color:#111;}
+</style>
+
+<script>
+(function(){
+  document.addEventListener('DOMContentLoaded', () => {
+    const menuGrid = document.getElementById('menu-grid');
+    if (!menuGrid) return;
+
+    // Create promo card element
+    const promo = document.createElement('article');
+    promo.className = 'menu-item promo-item';
+    promo.dataset.itemId = 'promo-first';
+    promo.setAttribute('tabindex','0');
+    promo.innerHTML = `
+      <div style="display:flex;gap:12px;align-items:flex-start;width:100%">
+        <img class="promo-thumb" src="promo-shawarma.jpg" alt="Promo: Buy 2 Shawarmas get mini fries">
+        <div class="promo-meta">
+          <div style="display:flex;gap:8px;align-items:center;">
+            <h3 class="promo-title">Friday Madness • Promo</h3>
+            <span class="promo-badge">Save</span>
+          </div>
+          <div style="font-size:13px;color:rgba(255,255,255,0.88);margin-top:6px;">
+            <strong>Buy 2 Shawarmas (≥ GHC 65)</strong> → Get a <em>Mini Loaded Fries</em> free.<br>
+            <strong>Fried Rice bundle:</strong> Fried Rice + Shawarma + Drink = <strong>GHC 100</strong> (claim to apply).
+          </div>
+
+          <div class="promo-ctas" style="margin-top:10px;">
+            <button class="btn primary" id="promo-claim-shaw" aria-label="Claim shawarma promo"><i class="fa fa-tag"></i> Claim Shawarma Promo</button>
+            <button class="btn ghost" id="promo-add-shaw" aria-label="Add 2 qualifying shawarmas">Add 2 Shawarmas</button>
+            <button class="btn primary" id="promo-claim-rice" aria-label="Claim rice bundle"><i class="fa fa-tag"></i> Claim Rice Bundle (GHC 100)</button>
+            <button class="btn ghost" id="promo-fill-rice" aria-label="Add rice bundle items">Add Bundle Items</button>
+          </div>
+        </div>
+      </div>
+    `;
+
+    // insert as first child so it's the first product
+    menuGrid.insertBefore(promo, menuGrid.firstElementChild);
+
+    // small toast helper
+    function showToast(msg, ms=2200) {
+      let el = document.querySelector('.wrap-toast');
+      if (!el) { el = document.createElement('div'); el.className = 'toast wrap-toast'; document.body.appendChild(el); }
+      el.textContent = msg;
+      el.classList.add('show');
+      setTimeout(()=> el.classList.remove('show'), ms);
+    }
+
+    // helper to simulate clicking an item's add button n times (falls back to addToCart if present)
+    function addItemByBaseId(baseId, times = 1) {
+      const menuEl = document.querySelector(`[data-item-id="${baseId}"]`);
+      if (menuEl) {
+        const addBtn = menuEl.querySelector('.add-btn');
+        if (addBtn) {
+          for (let i=0;i<times;i++) addBtn.click();
+          return true;
+        }
+      }
+      // fallback: if global addToCart exists, try using it (make a best-effort entry)
+      if (typeof addToCart === 'function') {
+        const title = menuEl ? (menuEl.querySelector('.item-title')?.innerText || baseId) : baseId;
+        const unit = menuEl ? Number(menuEl.querySelector('.price-value')?.innerText || 0) : 0;
+        for (let i=0;i<times;i++) {
+          const key = `${baseId}::AUTO-${Date.now()}-${Math.floor(Math.random()*10000)}`;
+          addToCart(key, { baseId, title, unitPrice: unit || 0, qty: 1, meta: {}, imageSrc: menuEl ? (menuEl.querySelector('img')?.src || '') : '' });
+        }
+        if (typeof renderCart === 'function') renderCart();
+        return true;
+      }
+      return false;
+    }
+
+    // Claim shawarma promo
+    document.getElementById('promo-claim-shaw').addEventListener('click', (e) => {
+      try {
+        localStorage.setItem('wrap_claimed_promo_FRIDAY-B2G1', JSON.stringify({ ts: Date.now() }));
+        showToast('Shawarma promo claimed. Add 2 qualifying shawarmas to see free fries in cart.');
+      } catch (err) { console.warn(err); }
+    });
+
+    // Add 2 shawarmas button: helps users reach threshold easily
+    document.getElementById('promo-add-shaw').addEventListener('click', (e) => {
+      const ok = addItemByBaseId('shawarma', 2);
+      if (ok) showToast('Added 2 shawarmas to cart.');
+      else showToast('Could not add shawarmas automatically — please add them from the menu.');
+      // open cart to show result (if you have openCart)
+      try { if (typeof openCart === 'function') openCart(); else document.getElementById('cart-toggle')?.click(); } catch(e){}
+    });
+
+    // Claim rice bundle promo
+    document.getElementById('promo-claim-rice').addEventListener('click', (e) => {
+      try {
+        localStorage.setItem('wrap_claimed_promo_RICE100', JSON.stringify({ ts: Date.now() }));
+        showToast('Rice bundle claimed. Add Rice+Shawarma+Drink — discount applied at checkout.');
+      } catch (err) { console.warn(err); }
+    });
+
+    // Add bundle items: adds one fried-rice, one shawarma, one drink
+    document.getElementById('promo-fill-rice').addEventListener('click', (e) => {
+      let added = false;
+      added = addItemByBaseId('fried-rice', 1) || added;
+      added = addItemByBaseId('shawarma', 1) || added;
+      // try drink; if you don't have a drink please add one to the menu with data-item-id="drink"
+      added = addItemByBaseId('drink', 1) || added;
+      if (added) {
+        showToast('Added bundle items to cart. Claim the promo if you haven\'t already.');
+        try { if (typeof openCart === 'function') openCart(); else document.getElementById('cart-toggle')?.click(); } catch(e){}
+      } else {
+        showToast('Could not auto-add bundle items — please add them manually from the menu.');
+      }
+    });
+
+  });
+})();
+</script>
 </html>
   
