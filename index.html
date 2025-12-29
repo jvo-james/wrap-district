@@ -7374,65 +7374,126 @@ body.cart-open::before {
        - preview price updates when selects or addons change
        - when Add clicked, collect selects + addons into meta, compute price, create unique cart key, add to cart
     */
+
     function initMenuInteractions(){
-      const menuItems = qa('.menu-item');
-      menuItems.forEach(item => {
-        updateItemPriceDisplay(item);
-        item.addEventListener('change', () => updateItemPriceDisplay(item));
+  // selector expanded so promo cards / alternate markup are included
+  const menuItems = qa('.menu-item, [data-item-id], [data-product-id], .promo-item');
 
-        const addBtn = q('.add-btn', item);
-        const removeBtn = q('.remove-btn', item);
+  menuItems.forEach(item => {
+    // Ensure we operate on the real element that holds controls. Some promo cards may be the add button container;
+    // find the true "root" menu element (closest with a stable identifier).
+    const root = item.closest('.menu-item') || item;
 
-        addBtn?.addEventListener('click', () => {
-          const baseId = item.dataset.itemId || 'item';
-          // collect selected options
-          const meta = {};
-          qa('select', item).forEach(sel => {
-            const key = sel.name || sel.dataset.item || sel.className || ('opt_'+Math.random().toString(36).slice(2,6));
-            meta[key] = {
-              value: sel.value,
-              text: sel.options[sel.selectedIndex]?.text || ''
-            };
-          });
-          // collect addons (labels)
-          const addons = [];
-          qa('input.addon-checkbox', item).forEach(cb => {
-            if (cb.checked) {
-              const ownerLabel = cb.closest('.addon');
-              const labelText = ownerLabel?.querySelector('span')?.innerText || ownerLabel?.innerText || '';
-              addons.push({ key: cb.dataset.addonKey || '', label: labelText, value: Number(cb.value) || 0 });
-            }
-          });
-          if (addons.length) meta.addons = addons;
+    // update visual price initially and on change
+    updateItemPriceDisplay(root);
+    root.addEventListener('change', () => updateItemPriceDisplay(root));
 
-          const price = calculateItemPrice(item);
-          const titleBase = q('.item-title', item)?.innerText?.trim() || baseId;
-          const imageSrc = q('.item-thumb', item)?.src || '';
+    const addBtn = q('.add-btn', root) || q('[data-action="add"]', root);
+    const removeBtn = q('.remove-btn', root);
 
-          // create a stable unique key per configuration
-          const configId = encodeURIComponent(JSON.stringify({ baseId, meta }));
-          const lineKey = `${baseId}::${configId}`;
-
-          addToCart(lineKey, { baseId, title: titleBase, unitPrice: price, qty: 1, meta, imageSrc });
-
-          // toggle buttons: show remove if any baseId in cart
-          addBtn.classList.add('hidden');
-          removeBtn.classList.remove('hidden');
-
-          // save menu selections too (makes UI persistent)
-          saveMenuSelections();
-        });
-
-        removeBtn?.addEventListener('click', () => {
-          const baseId = item.dataset.itemId;
-          const foundKey = Object.keys(cart).find(k => cart[k].baseId === baseId);
-          if (foundKey) removeItemFully(foundKey);
-          const addBtn = q('.add-btn', item), removeBtn2 = q('.remove-btn', item);
-          addBtn?.classList.remove('hidden'); removeBtn2?.classList.add('hidden');
-          saveMenuSelections();
-        });
-      });
+    // Guard to prevent double-adds on same menu item within short window
+    function isRecentlyAdded(el) {
+      try {
+        const last = Number(el.dataset._lastAddedAt || 0);
+        return (Date.now() - last) < 600; // 600ms guard
+      } catch(e){ return false; }
     }
+    function markAddedNow(el) {
+      try { el.dataset._lastAddedAt = String(Date.now()); setTimeout(()=> { try { delete el.dataset._lastAddedAt; } catch(e){} }, 700); } catch(e){}
+    }
+
+    addBtn?.addEventListener('click', () => {
+      try {
+        // defensive: if another handler already added this item very recently, ignore this invocation
+        if (isRecentlyAdded(root)) return;
+        markAddedNow(root);
+
+        const baseId = root.dataset.itemId || root.dataset.productId || root.id || 'item';
+
+        // collect selected options into meta
+        const meta = {};
+        qa('select', root).forEach(sel => {
+          const key = sel.name || sel.dataset.item || sel.className || ('opt_'+Math.random().toString(36).slice(2,6));
+          meta[key] = { value: sel.value, text: sel.options[sel.selectedIndex]?.text || '' };
+        });
+
+        // addons (checkboxes)
+        const addons = [];
+        qa('input.addon-checkbox', root).forEach(cb => {
+          if (cb.checked) {
+            const ownerLabel = cb.closest('.addon');
+            const labelText = ownerLabel?.querySelector('span')?.innerText || ownerLabel?.innerText || '';
+            addons.push({ key: cb.dataset.addonKey || cb.value || '', label: labelText.trim(), value: Number(cb.value) || 0 });
+          }
+        });
+        if (addons.length) meta.addons = addons;
+
+        // get price consistent with calculateItemPrice()
+        const price = calculateItemPrice(root);
+
+        const titleBase = q('.item-title', root)?.innerText?.trim() || (root.dataset.title || baseId);
+        const imageSrc = q('.item-thumb', root)?.src || root.dataset.thumb || '';
+
+        // stable config id (ensures products with different options are distinct lines)
+        const configId = encodeURIComponent(JSON.stringify({ baseId, meta }));
+        const lineKey = `${baseId}::${configId}`;
+
+        // Use existing addToCart if available in this scope (this function exists in your persistent-cart script).
+        // If it is not available for some reason, we fallback to updating window.cart + localStorage manually.
+        if (typeof addToCart === 'function') {
+          addToCart(lineKey, { baseId, title: titleBase, unitPrice: price, qty: 1, meta, imageSrc });
+        } else {
+          // fallback: mutate global window.cart and persist (keeps compatibility)
+          try {
+            window.cart = window.cart || {};
+            if (!window.cart[lineKey]) {
+              window.cart[lineKey] = {
+                id: lineKey,
+                baseId,
+                title: titleBase,
+                unitPrice: Number(price) || 0,
+                qty: 0,
+                meta: meta || {},
+                imageSrc: imageSrc || ''
+              };
+            }
+            window.cart[lineKey].qty = (Number(window.cart[lineKey].qty) || 0) + 1;
+            // persist same key used elsewhere (wrap_cart_v2)
+            try { localStorage.setItem('wrap_cart_v2', JSON.stringify(window.cart)); } catch(e){}
+            // attempt to call a render function if present
+            try { if (typeof renderCart === 'function') renderCart(); } catch(e){}
+          } catch (err) { console.error('fallback addToCart failed', err); }
+        }
+
+        // toggle buttons state to match other items
+        if (addBtn) addBtn.classList.add('hidden');
+        if (removeBtn) removeBtn.classList.remove('hidden');
+
+        // save menu selections too so UI persists
+        try { saveMenuSelections && saveMenuSelections(); } catch(e){}
+      } catch (err) {
+        console.error('initMenuInteractions addBtn error', err);
+      }
+    });
+
+    removeBtn?.addEventListener('click', () => {
+      try {
+        const baseId = root.dataset.itemId || root.dataset.productId || root.id;
+        const foundKey = Object.keys(window.cart || {}).find(k => (window.cart[k]?.baseId || '').toString() === baseId);
+        if (foundKey) {
+          // Use removeItemFully if available
+          if (typeof removeItemFully === 'function') removeItemFully(foundKey);
+          else {
+            try { delete window.cart[foundKey]; localStorage.setItem('wrap_cart_v2', JSON.stringify(window.cart)); if (typeof renderCart === 'function') renderCart(); } catch(e){}
+          }
+        }
+        const addBtn = q('.add-btn', root), removeBtn2 = q('.remove-btn', root);
+        addBtn?.classList.remove('hidden'); removeBtn2?.classList.add('hidden');
+        saveMenuSelections && saveMenuSelections();
+      } catch(e){ console.error('removeBtn handler error', e); }
+    });
+  });
+}
 
     function updateItemPriceDisplay(item){
       try {
