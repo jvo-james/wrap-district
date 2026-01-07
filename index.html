@@ -7032,9 +7032,9 @@ try { localStorage.setItem('wrap_user_name', name); localStorage.setItem('wrap_u
               <div class="promo-card">
                 <div class="promo-left"><i class="fa fa-fire pc-ico" aria-hidden="true"></i></div>
                 <div class="promo-right">
-                   <div class="promo-eyebrow">Limited • Friday</div>
+                   <div class="promo-eyebrow">Limited • Wednesday–Friday</div>
                   <h3 class="promo-title">Buy 2 Shawarmas — Get 1 Free</h3>
-                  <div class="promo-desc">Add 2 qualifying shawarmas at checkout on Tuesdays and the third becomes free automatically. Applies per 3 items.</div>
+                  <div class="promo-desc">Add 2 qualifying shawarmas at checkout Wednesday–Friday and the third becomes free automatically. Applies per 3 items.</div>
                   <div class="promo-cta-row">
                      <button class="btn primary" data-action="apply-promo" data-promo-code="FRIDAY-B2G1" aria-label="Claim Shawarma promo"><i class="fa fa-tag"></i> Claim Promo</button>
                     <button class="btn ghost" data-action="promo-details" data-target="shawarma" aria-expanded="false"><i class="fa fa-info-circle"></i> Details</button>
@@ -7153,7 +7153,7 @@ try { localStorage.setItem('wrap_user_name', name); localStorage.setItem('wrap_u
     // Details toggles: show more copy in #promo-more-content
     const detailsMap = {
       'shawarma': `<strong>Shawarma Promo (Buy 2 Get 1 Free)</strong><br>
-                   Promo works per 3 Shawarmas. On Fridays, the cheapest of each group of 3 will be discounted to free automatically at checkout. Add 2 qualifying shawarmas to your cart during Friday Madness and the third will appear as a free line.`,
+                   Promo works per 3 Shawarmas. Wednesday–Friday, the cheapest of each group of 3 will be discounted to free automatically at checkout. Add 2 qualifying shawarmas to your cart during Friday Madness and the third will appear as a free line.`,
       'fries': `<strong>Loaded Fries (Free Coke)</strong><br>
                 Buy a qualifying Loaded Fries during promo hours and we will add a free Coke to your cart. If not auto-added, use the "Add missing items" helper inside the cart.`
     };
@@ -7534,10 +7534,10 @@ body.cart-open::before {
     entryCloseBtn?.addEventListener('click', () => { entryPromoModal.classList.add('hidden'); });
     claimPromoEntryBtn?.addEventListener('click', () => {
       if (!promo.isActive()) {
-        alert('The Tuesday promo applies only on Fridays. You will be able to claim it when it is Tuesday in your local time.');
+        alert('The promo applies only Wednesday–Friday. You will be able to claim it when it is Wednesday–Friday in your local time.');
         return;
       }
-      alert('Promo is active — add qualifying items to see discounts at checkout (Fridays).');
+      alert('Promo is active — add qualifying items to see discounts at checkout (Wednesday–Friday).');
     });
     dontShowAgainCheckbox?.addEventListener('change', (e) => {
       if (e.target.checked) { localStorage.setItem('wrap_hide_entry_promo','1'); } else { localStorage.removeItem('wrap_hide_entry_promo'); }
@@ -7950,7 +7950,7 @@ body.cart-open::before {
       const shawQty = Object.values(cart).filter(l => l.baseId === 'shawarma').reduce((s,l) => s + (l.qty||0), 0);
       const missing = (3 - (shawQty % 3)) % 3;
       if (missing === 0) { alert('You already qualify for the Buy 2 Get 1 promo for shawarma.'); return; }
-      if (!promo.isActive()) { alert('Tuesday promo is only available on Tuesdays in your local time.'); return; }
+      if (!promo.isActive()) { alert('Promo is only available Wednesday–Friday in your local time.'); return; }
 
       const menuEl = q('[data-item-id="shawarma"]');
       if (!menuEl) { alert('Shawarma item not found in menu.'); return; }
