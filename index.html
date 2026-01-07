@@ -3581,8 +3581,8 @@ a:focus, button:focus { outline: 3px solid rgba(255,204,51,0.10); outline-offset
           <div class="slide-overlay slide-promo">
             <div class="slide-content">
               <p class="eyebrow"><i class="fa fa-clock"></i> Limited Time</p>
-<h2 class="slide-title">Friday Madness — Buy 2 Shawarmas, Get 1 Free</h2>
-              <p class="slide-sub">Loaded Fries come with a free Coke during Friday promo hours.</p>
+<h2 class="slide-title">Midweek Madness (Wed–Fri) — Buy 2 Shawarmas, Get 1 Free</h2>
+              <p class="slide-sub">Loaded Fries come with a free Coke during promo hours.</p>
 
            <!-- inside your Slide 3 slide-content where promo-cta-row exists -->
 <div class="promo-cta-row">
@@ -3602,7 +3602,7 @@ a:focus, button:focus { outline: 3px solid rgba(255,204,51,0.10); outline-offset
 
               <div class="promo-urgency">
                 <span class="promo-countdown" id="promo-countdown" aria-live="polite">Promo ends in: <strong id="promo-timer">—</strong></span>
-               <small class="promo-note">Next promo: Fridays • Add 2 Shawarmas to auto-apply.</small>
+               <small class="promo-note">Next promo: Wed–Fri • Add 2 Shawarmas to auto-apply.</small>
               </div>
             </div>
           </div>
@@ -3902,7 +3902,7 @@ a:focus, button:focus { outline: 3px solid rgba(255,204,51,0.10); outline-offset
       <div class="container-small">
         <h2 id="promo-heading" class="section-title"><i class="fa fa-gift"></i> Promo</h2>
         <div id="promo-details" class="promo-copy">
-<p><strong>Buy 2 Shawarmas, Get 1 Free (Fridays)</strong> — Promo applies automatically at checkout. Add two qualifying shawarmas and the third will be discounted to free during the Friday Madness window.</p>
+<p><strong>Buy 2 Shawarmas, Get 1 Free (Wed–Fri)</strong> — Promo applies automatically at checkout. Add two qualifying shawarmas and the third will be discounted to free during the Friday Madness window.</p>
           <p><strong>Loaded Fries</strong> — Get a free Coke when purchasing during promo hours. Free item will appear in cart once qualifying product is added.</p>
          <!-- somewhere inside #promo-details (promo-copy) -->
 <div style="margin-top:10px;">
@@ -3982,8 +3982,8 @@ a:focus, button:focus { outline: 3px solid rgba(255,204,51,0.10); outline-offset
       <div class="modal-inner">
         <button id="entry-close" class="icon-btn modal-close" aria-label="Close promo"><i class="fa fa-times"></i></button>
         <div class="modal-body">
-         <h3><i class="fa fa-gift"></i> Friday Madness</h3>
-        <p class="lead">Buy 2 Shawarmas, get one free. Valid Fridays. Tap to claim now.</p>
+         <h3><i class="fa fa-gift"></i> Midweek Madness (Wed–Fri)</h3>
+        <p class="lead">Buy 2 Shawarmas, get one free. Valid Wednesday through Friday. Tap to claim now.</p>
         <div class="modal-actions">
           <button class="btn primary" id="claim-promo-entry" data-promo="FRIDAY-B2G1"><i class="fa fa-tag"></i> Claim Promo</button>
             <label class="dont-show">
@@ -4065,7 +4065,7 @@ a:focus, button:focus { outline: 3px solid rgba(255,204,51,0.10); outline-offset
     <button class="icon-btn modal-close" id="preorder-close" aria-label="Close"><i class="fa fa-times"></i></button>
     <div class="modal-body">
       <h3><i class="fa fa-calendar-plus"></i> Preorder for next Promo</h3>
-      <p class="lead">We will reserve your current cart items for the next Tuesday promo window.</p>
+      <p class="lead">We will reserve your current cart items for the next promo window.</p>
 
       <form id="preorder-form">
         <label class="label">Name</label>
@@ -6086,13 +6086,13 @@ const PAYSTACK_PUBLIC_KEY = 'pk_live_ad7d0e0b164d83ec61bf2bf4fdb2af366c41c0ed';
        }
      });
 
-     // Promo rules: Buy 2 Get 1 free applies only on Tuesdays (or when user explicitly claimed the promo)
-    const todayIsFriday = (new Date()).getDay() === 5; // Sunday=0, Friday=5
-    const promoClaimed = !!localStorage.getItem('wrap_claimed_promo_FRIDAY-B2G1');
-      let promoDiscount = 0;
+      const promoDays = [3,4,5]; // Wed, Thu, Fri
+    const todayIsPromoDay = promoDays.includes((new Date()).getDay());
+   const promoClaimed = !!localStorage.getItem('wrap_claimed_promo_FRIDAY-B2G1');
+          let promoDiscount = 0;
      const freeItems = [];
 
-     if ((todayIsFriday || promoClaimed) && shawarmaUnitPrices.length >= 3) {
+     if ((todayIsPromoDay || promoClaimed) && shawarmaUnitPrices.length >= 3) {
        // Number of free items is floor(total_shawarmas / 3)
         const freeCount = Math.floor(shawarmaUnitPrices.length / 3);
        // discount the cheapest items (common retail pattern)
@@ -6485,7 +6485,7 @@ try { localStorage.setItem('wrap_user_name', name); localStorage.setItem('wrap_u
       try {
         if (itemElement && itemElement.dataset.itemId === 'jollof') {
           const fridayPrice = Number(itemElement.dataset.fridayPrice || 75);
-          const todayIsFriday = (new Date()).getDay() === 5;
+          const todayIsPromoDay = [3,4,5].includes((new Date()).getDay());
           total = todayIsFriday ? fridayPrice : Number(itemElement.querySelector('.price-value')?.innerText || 85);
         }
       } catch(e){}
@@ -7207,13 +7207,13 @@ body.cart-open::before {
     window.cart = cart;
 
   const promo = {
-     // Friday Madness: active on Fridays (day 5).
-      activeDays: [5],
-      isActive() {
-        const now = new Date();
-        return this.activeDays.includes(now.getDay());
-      }
-    };
+     // Promo window: active Wednesday → Friday (days 3,4,5).
+     activeDays: [3,4,5], // Wed, Thu, Fri
+     isActive() {
+       const now = new Date();
+       return this.activeDays.includes(now.getDay());
+     }
+   };
 
     // slideshow state
     let slideIndex = 0, slideTimer = null, slideAutoDelay = 5000;
@@ -7445,13 +7445,13 @@ body.cart-open::before {
         if (item.dataset.itemId === 'jollof') {
           const fridayPrice = Number(item.dataset.fridayPrice || 75);
           const normalPrice = Number(item.querySelector('.price-value')?.innerText || 85);
-         const isFriday = (new Date()).getDay() === 5;
+         const isPromoDay = [3,4,5].includes((new Date()).getDay());
          const normalEl = item.querySelector('.normal-price');
           const fridayEl = item.querySelector('.friday-price');
-          if (normalEl) normalEl.classList.toggle('hidden', isFriday);
-          if (fridayEl) fridayEl.classList.toggle('hidden', !isFriday);
+           if (normalEl) normalEl.classList.toggle('hidden', isPromoDay);
+        if (fridayEl) fridayEl.classList.toggle('hidden', !isPromoDay);
           // ensure the visible .price-value matches the shown price (above we already set it via calculateItemPrice)
-          if (displayEl) displayEl.innerText = isFriday ? String(fridayPrice) : String(normalPrice);
+          if (displayEl) displayEl.innerText = isPromoDay ? String(fridayPrice) : String(normalPrice);
         }
       } catch(e){}
        const priceWrap = q('.item-price', item);
