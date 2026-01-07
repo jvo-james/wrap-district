@@ -8619,57 +8619,72 @@ body.cart-open::before {
 (function(){
   document.addEventListener('DOMContentLoaded', function(){
     try {
-      const isTuesday = (new Date()).getDay() === 5; // Sunday=0, Monday=1, Tuesday=2
+      // getDay() mapping: Sunday=0, Monday=1, Tuesday=2, Wednesday=3, Thursday=4, Friday=5, Saturday=6
+      const PROMO_DAYS = [3,4,5]; // Wed, Thu, Fri
+      const isPromoDay = PROMO_DAYS.includes((new Date()).getDay());
 
-      // promo-only selectors (safe to hide/show)
+      // NOTE: we intentionally DO NOT include the badge selectors here so label badges remain visible.
       const promoSelectors = [
-        '.promo-badge',
-        '.promo-badge-small',
-        '.promo-cta-row',
-        '.slide-promo',
-        '.promo-countdown',
+        '.promo-cta-row',        // CTA buttons inside promo card/slide
+        '.slide-promo',         // the large promo slide visual
+        '.promo-countdown',     // countdown text
         '.promo-countdown-chip',
-        '#entry-promo',
+        '#entry-promo',         // entry modal
         '#promo-details .promo-cta-row'
       ];
 
-      // Hide/show explicit promo elements
+      // Hide/show explicit promo elements (but NOT the small badge labels)
       document.querySelectorAll(promoSelectors.join(',')).forEach(el => {
-        if (!isTuesday) {
-          el.dataset._promoHiddenByDay = '1';
-          el.style.display = 'none';
-          try { el.setAttribute('aria-hidden', 'true'); } catch(e){}
-        } else {
-          if (el.dataset._promoHiddenByDay) {
-            el.style.display = '';
-            delete el.dataset._promoHiddenByDay;
+        try {
+          if (!isPromoDay) {
+            // hide non-essential promo UI off-window
+            el.dataset._promoHiddenByDay = '1';
+            el.style.display = 'none';
+            el.setAttribute && el.setAttribute('aria-hidden', 'true');
+          } else {
+            if (el.dataset._promoHiddenByDay) {
+              el.style.display = '';
+              delete el.dataset._promoHiddenByDay;
+            }
+            el.setAttribute && el.setAttribute('aria-hidden', 'false');
           }
-          try { el.setAttribute('aria-hidden', 'false'); } catch(e){}
-        }
+        } catch(e){}
       });
 
-      // If you must hide elements marked [data-promo], be careful:
-      // skip any element that is inside a menu/catalog/product container so real menu items aren't hidden.
+      // Handle [data-promo] elements (defensively). Don't hide items that look like menu/product parts
       const menuContainerSelectors = '.menu, .catalog, .menu-list, .product-list, .menu-item, .catalog-item, .product-card';
-
-      if (!isTuesday) {
-        document.querySelectorAll('[data-promo]').forEach(el => {
-          // skip if this element is inside something that looks like a menu/product
+      document.querySelectorAll('[data-promo]').forEach(el => {
+        try {
+          // skip if inside menu/product container or if element itself is a small badge label
           if (el.closest(menuContainerSelectors)) return;
-          el.dataset._promoHiddenByDay = '1';
-          el.style.display = 'none';
-          try { el.setAttribute('aria-hidden', 'true'); } catch(e){}
-        });
-      } else {
-        // restore [data-promo] elements that we hid previously
-        document.querySelectorAll('[data-promo]').forEach(el => {
-          if (el.dataset._promoHiddenByDay) {
-            el.style.display = '';
-            delete el.dataset._promoHiddenByDay;
+          if (el.classList && (el.classList.contains('promo-badge') || el.classList.contains('promo-badge-small') || el.classList.contains('badge'))) return;
+
+          if (!isPromoDay) {
+            el.dataset._promoHiddenByDay = '1';
+            el.style.display = 'none';
+            el.setAttribute && el.setAttribute('aria-hidden', 'true');
+          } else {
+            if (el.dataset._promoHiddenByDay) {
+              el.style.display = '';
+              delete el.dataset._promoHiddenByDay;
+            }
+            el.setAttribute && el.setAttribute('aria-hidden', 'false');
           }
-          try { el.setAttribute('aria-hidden', 'false'); } catch(e){}
-        });
-      }
+        } catch(e){}
+      });
+
+      // Final defensive step: make sure small badge elements are visible (in case other scripts hid them)
+      Array.from(document.querySelectorAll('.promo-badge, .promo-badge-small, .badge')).forEach(b => {
+        try {
+          // only force-visible if not intentionally hidden by other logic
+          if (b.dataset._promoHiddenByDay) return;
+          if (b.style && b.style.display === 'none') b.style.display = '';
+          if (getComputedStyle(b).display === 'none') {
+            b.style.display = 'inline-block';
+            b.style.visibility = 'visible';
+          }
+        } catch(e){}
+      });
 
     } catch (err) {
       console.warn('Promo show/hide script failed', err);
