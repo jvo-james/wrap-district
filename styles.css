@@ -817,8 +817,9 @@ main {
 
 .drawer__panel--cart {
   width: min(100%, 520px);
+  display: flex;
+  flex-direction: column;
 }
-
 .modal__panel {
   width: min(100%, 760px);
   height: min(100%, 100svh);
@@ -2019,4 +2020,29 @@ main {
   .nav-drawer__panel {
     width: min(100%, 86vw);
   }
+}
+.cart-drawer {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 120px);
+  gap: 18px;
+}
+
+.cart-drawer__items {
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.cart-drawer__summary {
+  position: sticky;
+  bottom: 0;
+  z-index: 5;
+  padding: 16px;
+  border-radius: 22px;
+  background: rgba(14, 14, 17, 0.96);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 -10px 24px rgba(0, 0, 0, 0.18);
 }
