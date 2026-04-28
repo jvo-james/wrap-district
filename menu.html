@@ -1,1843 +1,1033 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Basilissa — Menu (Foody)</title>
-<meta name="description" content="Basilissa menu — pizzas, shawarma, chicken, burgers, combos, sides and beverages. Beautiful animated menu with cart & customizers." />
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
-<!-- Font Awesome for icons -->
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="" crossorigin="anonymous"/>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
- <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet"/>
-<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
-  <link rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
-  <script src='https://kit.fontawesome.com/a076d05399.js' crossorigin='anonymous'></script>
-  <style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#000000" />
+  <meta
+    name="description"
+    content="Wrap District, a premium mobile-first food ordering experience for shawarma, loaded fries, rice, angwamo, jollof, and noodles in Tema Community 25."
+  />
+  <title>Wrap District | Order Fresh, Fast, and Premium</title>
 
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Bebas+Neue&display=swap"
+    rel="stylesheet"
+  />
 
-/* ---------- Theme tokens ---------- */
-:root{
-  --bg-900: #071014;        /* deep background */
-  --bg-800: #0b1216;
-  --card: #0f1618;
-  --muted: #9fb0b6;
-  --text: #fffdfa;
-  --accent-red: #d7262f;
-  --accent-red-2: #ff4d4d;
-  --accent-gold: #ffd166;
-  --green: #0b9a5a;
-  --glass: rgba(255,255,255,0.03);
-  --glass-2: rgba(255,255,255,0.02);
-  --shadow-lg: 0 30px 80px rgba(2,6,12,0.7);
-  --shadow-md: 0 12px 40px rgba(0,0,0,0.5);
-  --radius-lg: 14px;
-  --radius-md: 10px;
-  --ease: cubic-bezier(.16,.84,.24,1);
-  --max-w: 1240px;
-  --ui-z: 9999;
-}
+  <!-- Font Awesome -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    referrerpolicy="no-referrer"
+  />
 
-/* ---------- Reset & base ---------- */
-*{box-sizing:border-box}
-html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg-900) 0%, #041214 100%);color:var(--text);font-family:Inter, "Montserrat", system-ui, -apple-system, "Segoe UI", Roboto, Arial;-webkit-font-smoothing:antialiased}
-a{color:inherit;text-decoration:none}
-img{display:block;max-width:100%;height:auto}
-.container{max-width:var(--max-w);margin:0 auto;padding:20px}
-
-/* Visual helpers */
-.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
-.muted{color:var(--muted)}
-.small{font-size:13px}
-
-/* Focus ring for keyboard users */
-.user-is-tabbing :focus{outline:3px solid rgba(255,200,140,0.16);outline-offset:3px;border-radius:8px}
-
-/* ---------- Header ---------- */
-.site-header{
-  position:sticky;top:0;z-index:1200;
-  background:linear-gradient(180deg, rgba(7,12,14,0.94), rgba(7,12,14,0.82));
-  border-bottom:1px solid rgba(255,255,255,0.03);
-  backdrop-filter: blur(8px);
-}
-.header-inner{display:flex;align-items:center;gap:18px;height:76px;max-width:var(--max-w);margin:0 auto;padding:0 20px}
-.brand{display:flex;gap:14px;align-items:center}
-.logo-wrap img,#logo-img{height:54px;width:auto;border-radius:10px;box-shadow:0 8px 28px rgba(0,0,0,0.6)}
-.brand-title{font-weight:900;letter-spacing:1px;font-size:18px;color:var(--accent-red)}
-.brand-sub{font-size:12px;color:var(--muted);font-weight:700}
-
-/* nav */
-.main-nav{display:flex;gap:12px;margin-left:6px;align-items:center}
-.main-nav a{display:inline-flex;gap:8px;align-items:center;padding:8px 10px;border-radius:10px;color:var(--muted);font-weight:800;font-size:13px;transition:all .18s var(--ease)}
-.main-nav a:hover{background:rgba(255,255,255,0.02);color:var(--text);transform:translateY(-2px)}
-
-/* header CTAs */
-.header-ctas{margin-left:auto;display:flex;gap:10px;align-items:center}
-.btn{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:999px;border:0;cursor:pointer;font-weight:900}
-.btn.small{padding:6px 10px;border-radius:8px}
-.btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--text)}
-.btn.primary{background:linear-gradient(90deg,var(--accent-red),var(--accent-red-2));color:#fff;box-shadow:0 14px 40px rgba(215,40,40,0.12);transform:translateZ(0)}
-.icon{display:inline-flex;align-items:center;justify-content:center}
-.circle{width:46px;height:46px;border-radius:12px;background:var(--glass);display:grid;place-items:center;color:var(--text);border:1px solid rgba(255,255,255,0.03)}
-.cart-count{background:linear-gradient(90deg,#ff6b6b,#ff3b3b);min-width:28px;height:28px;padding:0 8px;border-radius:999px;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:13px;margin-left:6px;box-shadow:0 10px 30px rgba(255,60,60,0.12)}
-
-/* ---------- HERO / Carousel ---------- */
-.hero{margin-top:18px;display:grid;grid-template-columns:1fr 360px;gap:24px;align-items:start;padding:10px 0}
-.hero-left{position:relative;border-radius:18px;overflow:visible;box-shadow:var(--shadow-lg);background:linear-gradient(180deg, rgba(0,0,0,0.28), rgba(255,255,255,0.02));padding:14px}
-.slides{position:relative;min-height:420px;overflow:visible}
-.slide{position:absolute;inset:0;display:flex;gap:24px;align-items:center;padding:18px;border-radius:14px;opacity:0;transform:translateY(12px) scale(.99);pointer-events:none;transition:all .52s var(--ease)}
-.slide.is-active{opacity:1;transform:none;pointer-events:auto;z-index:5}
-.slide-copy{width:55%;padding:14px}
-.badge-pill{display:inline-flex;gap:10px;align-items:center;padding:8px 12px;border-radius:999px;background:linear-gradient(90deg,var(--accent-gold), #ffb703);color:#2b1f00;font-weight:900;box-shadow:0 12px 30px rgba(255,180,60,0.08)}
-.slide-copy h2{font-size:34px;margin:12px 0 8px;line-height:1;letter-spacing:-0.6px;color:var(--text);text-transform:capitalize}
-.lead{color:rgba(255,255,255,0.88);font-weight:600;margin:0 0 12px}
-.cta-row{display:flex;gap:12px;margin-top:12px}
-.cta-row .btn{font-size:14px;padding:10px 14px}
-.quick-icons{display:flex;gap:10px;list-style:none;margin-top:14px;padding:0}
-.quick-icons li{display:flex;gap:8px;align-items:center;font-weight:800;color:var(--muted);background:rgba(255,255,255,0.02);padding:8px 10px;border-radius:999px}
-
-/* Slide media: layered images for appetite */
-.slide-media{width:45%;position:relative;display:flex;align-items:center;justify-content:center}
-.media-main{width:92%;border-radius:12px;box-shadow:var(--shadow-md);transform-origin:center;transition:transform .8s var(--ease),filter .6s var(--ease)}
-.media-layer{position:absolute;right:6%;top:8%;width:36%;transform-origin:center;border-radius:12px;filter:drop-shadow(0 30px 60px rgba(0,0,0,0.45));transition:transform .9s var(--ease)}
-.media-overlay{position:absolute;left:6%;top:6%;width:60%;opacity:.95;pointer-events:none}
-.media-badges{position:absolute;left:12px;bottom:12px;display:flex;flex-direction:column;gap:8px;z-index:20}
-.pill{display:inline-flex;gap:8px;align-items:center;padding:8px 10px;border-radius:10px;background:rgba(0,0,0,0.6);color:#fff;font-weight:900}
-
-/* micro animations */
-@keyframes floaty {0%{transform:translateY(0)}50%{transform:translateY(-8px)}100%{transform:translateY(0)}}
-@keyframes popin {0%{transform:scale(.92);opacity:0}70%{transform:scale(1.06);opacity:1}100%{transform:scale(1)}}
-.js-pop{animation:popin .72s var(--ease) both}
-.layer-fries{animation:floaty 6s ease-in-out infinite}
-
-/* carousel controls */
-.carousel-controls{position:absolute;left:50%;transform:translateX(-50%);bottom:-36px;display:flex;gap:12px;align-items:center;z-index:60}
-.arrow{width:46px;height:46px;border-radius:999px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.03);display:inline-flex;align-items:center;justify-content:center;color:var(--text);cursor:pointer;box-shadow:0 12px 30px rgba(0,0,0,0.4)}
-.dot{width:12px;height:12px;border-radius:999px;background:rgba(255,255,255,0.08);box-shadow:0 6px 18px rgba(0,0,0,0.24)}
-.dot.active{width:18px;height:18px;background:linear-gradient(90deg,var(--accent-gold),var(--accent-red-2));box-shadow:0 12px 30px rgba(214,40,40,0.12)}
-
-/* hero-right */
-.hero-right{display:flex;flex-direction:column;gap:14px}
-.quick-card{background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);padding:12px;border-radius:12px;box-shadow:var(--shadow-md)}
-.quick-grid{display:grid;grid-template-columns:1fr;gap:10px}
-.quick-grid li{display:flex;gap:10px;align-items:center}
-.quick-grid img{width:72px;height:56px;object-fit:cover;border-radius:10px}
-
-/* offers */
-.offers-strip{margin-top:6px}
-.offer-tiles{display:flex;flex-direction:column;gap:10px}
-.offer-tile{display:flex;gap:12px;align-items:center;padding:10px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent);box-shadow:0 12px 36px rgba(0,0,0,0.45)}
-.offer-tile img{width:78px;height:78px;object-fit:cover;border-radius:10px}
-.offer-tile .info{display:flex;flex-direction:column}
-
-/* ---------- Sidebar ---------- */
-.sidebar{position:sticky;top:98px;align-self:start;background:rgba(0,0,0,0.02);padding:14px;border-radius:12px;border:1px solid rgba(255,255,255,0.02);box-shadow:0 12px 30px rgba(0,0,0,0.5)}
-.sidebar h4{margin:0 0 12px 0;font-size:16px}
-.cat-list{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px}
-.cat-btn{display:flex;gap:8px;align-items:center;border:0;background:transparent;padding:10px;border-radius:10px;color:var(--muted);font-weight:800;cursor:pointer;text-align:left}
-.cat-btn img{width:20px;height:20px;opacity:0.9}
-.cat-btn.active{background:linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));color:var(--text);transform:translateX(4px);box-shadow:0 10px 30px rgba(0,0,0,0.45)}
-.search-box{display:flex;gap:8px;margin-top:12px}
-.search-box input{flex:1;padding:10px;border-radius:10px;background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--text)}
-.filters{margin-top:14px}
-.filters h5{margin:12px 0 8px 0;font-size:13px}
-.filter{display:flex;align-items:center;gap:8px;color:var(--muted);font-weight:800;padding:6px 8px;border-radius:8px}
-
-/* ---------- Menu sections & cards ---------- */
-.menu-sections{display:flex;flex-direction:column;gap:18px}
-.menu-section{padding:16px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent);box-shadow:0 12px 36px rgba(0,0,0,0.42);animation:fadeInUp .6s var(--ease) both}
-.section-head{display:flex;flex-direction:column;gap:6px}
-.section-head h2{margin:0;font-size:20px}
-.section-sub{margin:0;color:var(--muted);font-weight:700}
-
-/* grid */
-.cards-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
-.food-card{display:grid;grid-template-columns:140px 1fr 150px;gap:12px;align-items:center;padding:12px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent);transition:transform .22s var(--ease), box-shadow .22s var(--ease);cursor:pointer;position:relative;overflow:visible}
-.food-card:hover{transform:translateY(-8px);box-shadow:0 28px 80px rgba(0,0,0,0.6)}
-.food-media{position:relative;display:flex;align-items:center;justify-content:center}
-.food-photo{width:140px;height:100px;object-fit:cover;border-radius:10px;box-shadow:0 12px 34px rgba(0,0,0,0.48);transition:transform .6s var(--ease)}
-.food-card:hover .food-photo{transform:scale(1.06)}
-.food-badges{position:absolute;left:8px;top:8px;display:flex;flex-direction:column;gap:8px}
-.badge{display:inline-flex;align-items:center;gap:8px;padding:6px 8px;border-radius:8px;font-weight:900;background:rgba(0,0,0,0.6);color:#fff}
-.badge.best{background:linear-gradient(90deg,#ffd166,#ffb703);color:#2b1f00}
-.badge.hot{background:linear-gradient(90deg,#ff6b4a,#ff3b2f)}
-.badge.new{background:linear-gradient(90deg,#ffdede,#ffbcbc);color:#2b1f1f}
-
-/* body */
-.food-body{display:flex;flex-direction:column;gap:8px}
-.food-title{margin:0;font-size:16px;font-weight:900}
-.food-desc{margin:0;color:var(--muted);font-size:13px}
-.meta-row{display:flex;justify-content:space-between;align-items:center;gap:8px}
-.meta-left{display:flex;gap:8px;align-items:center}
-.rating{display:inline-flex;gap:6px;align-items:center;color:var(--accent-gold);font-weight:900}
-.calorie{font-weight:700;color:var(--muted);font-size:13px}
-.price-area{text-align:right}
-.price{font-weight:900;color:var(--accent-gold);font-size:18px}
-.actions{display:flex;gap:8px;justify-content:flex-end;align-items:center}
-.btn-add{background:linear-gradient(90deg,var(--green), #0f9a5a);border:0;color:#fff;padding:8px 12px;border-radius:10px;font-weight:900;cursor:pointer;box-shadow:0 12px 30px rgba(15,155,90,0.12)}
-.btn-options{background:transparent;border:1px solid rgba(255,255,255,0.04);padding:8px 10px;border-radius:10px;color:var(--muted);cursor:pointer}
-
-/* pizza grid */
-.pizza-grid{display:grid;grid-template-columns:1fr;gap:12px}
-.pizza-card{display:flex;gap:12px;align-items:center;padding:12px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent)}
-.pizza-media img{width:160px;height:120px;object-fit:cover;border-radius:12px}
-.pizza-actions{display:flex;gap:10px}
-
-/* sides */
-.sides-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
-.side-card{display:flex;gap:12px;align-items:center;padding:10px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent)}
-.side-card img{width:120px;height:88px;object-fit:cover;border-radius:10px}
-
-/* ---------- Gallery (masonry) ---------- */
-.gallery-section{padding:22px 0}
-.masonry{column-count:3;column-gap:14px}
-.masonry-item{break-inside:avoid;margin-bottom:14px;border-radius:12px;overflow:hidden}
-.masonry-item img{width:100%;height:auto;display:block;border-radius:12px;transition:transform .5s var(--ease)}
-.masonry-item:hover img{transform:scale(1.04)}
-
-/* ---------- Testimonials ---------- */
-.testimonials{display:flex;gap:12px;margin-top:10px}
-.testimonial{flex:1;background:linear-gradient(180deg,#0f1718,#0b1112);padding:12px;border-radius:12px;box-shadow:var(--shadow-md);display:flex;gap:12px;align-items:flex-start}
-.testimonial img{width:56px;height:56px;border-radius:999px;object-fit:cover}
-.testimonial p{margin:6px 0;font-weight:700}
-.testimonial cite{color:var(--muted);font-size:13px}
-
-/* ---------- FAQ / Contact ---------- */
-.faq-grid{display:grid;grid-template-columns:1fr 420px;gap:18px}
-.faq-panel details{background:linear-gradient(180deg,#071014,#071214);padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,0.02);margin-bottom:8px}
-.contact-card{display:flex;gap:10px;align-items:center;background:linear-gradient(180deg,#071014,#071216);padding:10px;border-radius:10px}
-
-/* ---------- Floating CTAs ---------- */
-.floating-ctas{position:fixed;right:18px;bottom:18px;display:flex;flex-direction:column;gap:12px;z-index:12000}
-.fab{width:56px;height:56px;border-radius:999px;display:inline-flex;align-items:center;justify-content:center;color:#fff;background:linear-gradient(90deg,var(--accent-red),var(--accent-red-2));box-shadow:0 18px 60px rgba(215,40,40,0.12);border:0;cursor:pointer}
-.fab.wa-fab{background:linear-gradient(90deg,#25D366,#1ebea5)}
-.fab .count{position:absolute;right:-6px;top:-6px;background:rgba(255,255,255,0.12);padding:4px 8px;border-radius:999px;font-weight:900}
-
-/* ---------- Cart Drawer ---------- */
-.cart-drawer{position:fixed;right:0;top:0;height:100%;width:420px;max-width:96vw;background:linear-gradient(180deg,#071016,#08121a);box-shadow:-28px 0 80px rgba(0,0,0,0.85);transform:translateX(110%);transition:transform .38s var(--ease);z-index:11999;border-left:1px solid rgba(255,255,255,0.03);display:flex;flex-direction:column}
-.cart-drawer[aria-hidden="false"]{transform:translateX(0)}
-.drawer-head{display:flex;justify-content:space-between;align-items:center;padding:18px;border-bottom:1px solid rgba(255,255,255,0.02)}
-.drawer-body{padding:12px;overflow:auto;flex:1}
-.drawer-foot{padding:12px;border-top:1px solid rgba(255,255,255,0.02)}
-.drawer-body .empty-cart{color:var(--muted);font-weight:700}
-
-/* ---------- Product Modal ---------- */
-.modal-backdrop{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:linear-gradient(180deg, rgba(0,0,0,0.64), rgba(0,0,0,0.75));z-index:12001;padding:20px}
-.modal-backdrop[aria-hidden="false"]{display:flex}
-.modal-panel{width:100%;max-width:1100px;border-radius:14px;background:linear-gradient(180deg,#071416,#0b1a1e);padding:18px;box-shadow:0 40px 120px rgba(0,0,0,0.8);display:flex;flex-direction:column;gap:12px}
-.modal-head{display:flex;justify-content:space-between;align-items:center}
-.modal-grid{display:grid;grid-template-columns:420px 1fr;gap:14px}
-.modal-media{background:linear-gradient(180deg,#071416,#08161a);padding:12px;border-radius:12px;display:flex;flex-direction:column;gap:12px;align-items:center}
-.modal-carousel{width:100%;display:flex;flex-direction:column;gap:8px;align-items:center}
-.modal-img.main{width:100%;height:320px;object-fit:cover;border-radius:12px;box-shadow:0 30px 80px rgba(0,0,0,0.7)}
-.modal-thumbs{display:flex;gap:8px;overflow:auto;width:100%}
-.modal-thumbs img.thumb{width:78px;height:58px;object-fit:cover;border-radius:8px;border:2px solid transparent;cursor:pointer;transition:transform .18s,var(--ease)}
-.modal-thumbs img.thumb:hover{transform:translateY(-4px);border-color:rgba(255,255,255,0.06)}
-
-/* modal body */
-.modal-body{display:flex;flex-direction:column;gap:12px;padding:6px}
-.modal-meta{display:flex;align-items:center;justify-content:space-between;gap:12px}
-.modal-price{font-size:22px;font-weight:900;color:var(--accent-gold)}
-.modal-rating{color:var(--muted);font-weight:800}
-.modal-section{background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);padding:10px;border-radius:10px}
-.options-row{display:flex;gap:8px;flex-wrap:wrap}
-.variant{padding:8px 12px;border-radius:10px;background:rgba(255,255,255,0.02);color:var(--muted);border:1px solid rgba(255,255,255,0.02);cursor:pointer;font-weight:800}
-.variant.active{background:linear-gradient(90deg,var(--green),#0f9a5a);color:#fff;border-color:transparent;box-shadow:0 12px 36px rgba(15,155,90,0.12)}
-.options-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
-.nutrition-row{display:flex;gap:12px;align-items:center}
-.allergens span{display:inline-flex;gap:6px;align-items:center;padding:6px;border-radius:8px;background:rgba(255,255,255,0.02);margin-right:6px}
-.pairings{display:flex;gap:8px;flex-wrap:wrap}
-.pair{display:inline-flex;gap:8px;align-items:center;padding:8px;border-radius:8px;background:rgba(255,255,255,0.02);cursor:pointer}
-.qty-controls{display:inline-flex;align-items:center;gap:6px}
-.qty-controls input{width:56px;text-align:center;background:transparent;border:1px solid rgba(255,255,255,0.04);padding:6px;border-radius:8px;color:var(--text)}
-.modal-actions{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:12px}
-.add-row{display:flex;gap:8px;align-items:center}
-
-/* modal reviews */
-.review-list{display:flex;flex-direction:column;gap:8px}
-.review{background:linear-gradient(180deg,#071316,#071516);padding:8px;border-radius:8px}
-
-/* Modal close button */
-.modal-close{background:transparent;border:0;color:var(--muted);font-weight:900;cursor:pointer}
-
-/* ---------- Toast ---------- */
-.bs-toast{position:fixed;right:22px;bottom:90px;background:linear-gradient(90deg,var(--green),#0f6b3a);color:#fff;padding:10px 14px;border-radius:10px;box-shadow:0 12px 40px rgba(0,0,0,0.5);z-index:13000}
-
-/* ---------- Footer ---------- */
-.site-footer{padding:24px 20px;margin-top:28px;background:linear-gradient(180deg,#0b0b0b,#0a0a0a);border-top:1px solid rgba(255,255,255,0.02)}
-.footer-grid{display:grid;grid-template-columns:1fr 280px 220px;gap:18px;align-items:start}
-.logo-footer{height:48px}
-.footer-gallery img{width:64px;height:64px;object-fit:cover;border-radius:8px;margin:6px}
-
-/* ---------- Small utilities & animations ---------- */
-@keyframes fadeInUp {from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
-/* subtle shimmer for CTAs */
-.shimmer{background:linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.06) 40%, rgba(255,255,255,0.02));background-size:200% 100%;animation:shimmer 2.6s linear infinite}
-@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
-
-/* small hover micro-animations for images and badges */
-.food-photo:hover{filter:brightness(1.06) contrast(1.06)}
-.pill:hover, .badge:hover{transform:translateY(-4px) scale(1.02);transition:transform .28s var(--ease)}
-
-/* ---------- Responsive ---------- */
-@media (max-width:1100px){
-  .hero{grid-template-columns:1fr;align-items:stretch}
-  .modal-grid{grid-template-columns:1fr}
-  .masonry{column-count:2}
-  .footer-grid{grid-template-columns:1fr 1fr}
-  .cards-grid{grid-template-columns:repeat(2,1fr)}
-}
-@media (max-width:760px){
-  .header-inner{height:auto;padding:10px}
-  .main-nav{display:none}
-  .hero-left{padding:12px}
-  .slide-copy h2{font-size:26px}
-  .slide-media{display:none}
-  .cards-grid{grid-template-columns:1fr}
-  .masonry{column-count:1}
-  .sidebar{position:static;top:auto}
-  .modal-panel{padding:12px}
-  .modal-img.main{height:220px}
-  .modal-grid{grid-template-columns:1fr}
-  .cart-drawer{width:100vw}
-}
-
-/* Preserve crispness for icons */
-.fa, .fas, i {font-weight:900;}
-
-/* End of stylesheet */
-</style>
-
+  <!-- Styles -->
+  <link rel="stylesheet" href="styles.css" />
 </head>
-<body class="menu-page theme-red" id="page-body">
-  <a class="sr-only" href="#menu-main">Skip to content</a>
+<body>
+  <a class="skip-link" href="#main-content">Skip to main content</a>
 
-  <!-- ====== HEADER (compact, image-ready) ====== -->
-  <header class="site-header" role="banner" aria-label="Basilissa header">
-    <div class="header-inner container">
-      <div class="brand" aria-hidden="false">
-        <picture class="logo-wrap">
-          <source srcset="images/logo@2x.png 2x, images/logo.png 1x" />
-          <img src="images/logo.png" alt="Basilissa logo" id="logo-img">
-        </picture>
-
-        <div class="brand-text">
-          <h1 class="brand-title">BASILISSA</h1>
-          <p class="brand-sub">Fresh • Fast • Flavorful</p>
-        </div>
+  <!-- Entry Promo Modal -->
+  <div class="modal" id="entryPromoModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="entryPromoTitle">
+    <div class="modal__backdrop" data-close-modal="entryPromoModal"></div>
+    <div class="modal__panel modal__panel--promo">
+      <button class="modal__close" type="button" aria-label="Close promo" data-close-modal="entryPromoModal">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+      <div class="promo-intro">
+        <p class="eyebrow">This week only</p>
+        <h2 id="entryPromoTitle">Big promo days at Wrap District</h2>
+        <p class="promo-intro__text">
+          From Tuesday, 28 April 2026 to Friday, 1 May 2026, enjoy our featured deals while they last.
+        </p>
       </div>
 
-      <nav class="main-nav" aria-label="Main Navigation">
-        <a href="#menu-main"><i class="fa fa-utensils"></i><span>Menu</span></a>
-        <a href="#offers"><i class="fa fa-tags"></i><span>Offers</span></a>
-        <a href="#gallery"><i class="fa fa-images"></i><span>Gallery</span></a>
-        <a href="#locations"><i class="fa fa-map-marker-alt"></i><span>Locations</span></a>
+      <div class="promo-intro__grid">
+        <article class="promo-intro__feature">
+          <span class="promo-tag">Shawarma Deal</span>
+          <h3>Buy 2 Shawarmas, Get 1 Free</h3>
+          <p>Add any two qualifying shawarmas and the third one is discounted to free automatically.</p>
+        </article>
+
+        <article class="promo-intro__feature">
+          <span class="promo-tag">Loaded Fries Deal</span>
+          <h3>Buy Loaded Fries, Get a Free Coke</h3>
+          <p>Place a loaded fries order during promo hours and the free Coke appears in your cart.</p>
+        </article>
+      </div>
+
+      <div class="promo-intro__actions">
+        <label class="promo-check">
+          <input type="checkbox" id="dontShowPromoAgain" />
+          <span>Do not show this again on this device</span>
+        </label>
+        <button class="btn btn--primary" type="button" data-close-modal="entryPromoModal">
+          <i class="fa-solid fa-bolt"></i>
+          Start Ordering
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile Menu Overlay -->
+  <div class="mobile-nav" id="mobileNav" aria-hidden="true">
+    <div class="mobile-nav__backdrop" data-close-mobile-nav></div>
+    <aside class="mobile-nav__panel" aria-label="Mobile navigation">
+      <div class="mobile-nav__header">
+        <div class="brand brand--mobile">
+          <span class="brand__mark">WRAP</span>
+          <span class="brand__name">District</span>
+        </div>
+        <button class="icon-btn" type="button" aria-label="Close menu" data-close-mobile-nav>
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <nav class="mobile-nav__links">
+        <a href="#hero" data-close-mobile-nav>Home</a>
+        <a href="#menu" data-close-mobile-nav>Menu</a>
+        <a href="#promos" data-close-mobile-nav>Promotions</a>
+        <a href="#checkout" data-close-mobile-nav>Checkout</a>
+        <a href="#contact" data-close-mobile-nav>Contact</a>
       </nav>
 
-      <div class="header-ctas">
-        <button class="btn ghost" id="searchToggle" aria-label="Search menu"><i class="fa fa-search"></i></button>
-        <button class="btn" id="downloadPDF" aria-label="Download Menu"><i class="fa fa-file-pdf"></i></button>
-        <a class="btn primary order-now" href="#cart" aria-label="Order now"><i class="fa fa-motorcycle"></i> Order</a>
-        <button class="icon circle cart-btn" id="cartBtn" aria-label="Open cart">
-          <i class="fa fa-shopping-bag"></i>
-          <span class="cart-count" id="globalCartCount" aria-live="polite">0</span>
+      <div class="mobile-nav__actions">
+        <button class="btn btn--ghost" type="button" data-open-history>
+          <i class="fa-regular fa-rectangle-list"></i>
+          Purchase History
+        </button>
+        <button class="btn btn--primary" type="button" data-open-cart>
+          <i class="fa-solid fa-bag-shopping"></i>
+          Open Cart
+        </button>
+      </div>
+
+      <div class="mobile-nav__footer">
+        <p>Pickup at Devtraco, Tema Community 25</p>
+        <p>Delivery available. Fees shown at checkout.</p>
+      </div>
+    </aside>
+  </div>
+
+  <!-- Header -->
+  <header class="site-header" id="siteHeader">
+    <div class="promo-strip">
+      <span><i class="fa-solid fa-fire"></i> Promo week runs from 28 April 2026 to 1 May 2026</span>
+      <span><i class="fa-solid fa-circle-check"></i> Pickup available at Devtraco</span>
+      <span><i class="fa-solid fa-truck-fast"></i> Delivery fee estimated after checkout</span>
+    </div>
+
+    <div class="header-bar">
+      <button class="icon-btn icon-btn--menu" type="button" aria-label="Open menu" data-open-mobile-nav>
+        <i class="fa-solid fa-bars"></i>
+      </button>
+
+      <a class="brand" href="#hero" aria-label="Wrap District home">
+        <span class="brand__mark">WRAP</span>
+        <span class="brand__name">District</span>
+      </a>
+
+      <nav class="site-nav" aria-label="Primary">
+        <a href="#hero">Home</a>
+        <a href="#menu">Menu</a>
+        <a href="#promos">Promotions</a>
+        <a href="#contact">Contact</a>
+      </nav>
+
+      <div class="header-tools">
+        <button class="tool-btn" type="button" data-open-history>
+          <i class="fa-regular fa-clock"></i>
+          <span>History</span>
+        </button>
+
+        <button class="tool-btn tool-btn--cart" type="button" data-open-cart aria-label="Open cart">
+          <i class="fa-solid fa-bag-shopping"></i>
+          <span>Cart</span>
+          <span class="cart-badge" id="cartBadge">0</span>
         </button>
       </div>
     </div>
   </header>
 
-  <!-- ====== TOP PROMO / HERO (image-heavy animated slideshow placeholders) ====== -->
-  <section id="hero" class="hero container" aria-label="Featured promotions">
-    <div class="hero-left" role="region" aria-label="Promotional carousel" data-animate="carousel">
-      <!-- Slide set: each slide visually distinct — JS will rotate these -->
-      <div class="slides" aria-live="polite">
-        <article class="slide slide-1 is-active" data-slide="0" aria-roledescription="slide" aria-label="Shawarma special">
-          <div class="slide-copy">
-            <span class="badge-pill"><i class="fa fa-fire"></i> Limited</span>
-            <h2>Shito Wings Meal — Smoky & Hot</h2>
-            <p class="lead">3 pcs wings + choice of jollof or fries. Add our signature shito for GHS 5. Perfectly charred, intensely smoky.</p>
-            <div class="cta-row">
-              <button class="btn primary" data-action="order" data-item="Shito Wings Meal">Order Now</button>
-              <button class="btn ghost" data-action="customize" data-item="Shito Wings Meal">Customize</button>
+  <main id="main-content">
+    <!-- Hero -->
+    <section class="hero" id="hero" aria-label="Featured promotions">
+      <div class="hero__slider" id="heroSlider">
+        <article class="hero-slide hero-slide--active" data-slide="0" style="background-image: url('https://images.unsplash.com/photo-1604908176997-125f25cc500f?auto=format&fit=crop&w=1600&q=80');">
+          <div class="hero-slide__overlay"></div>
+          <div class="hero-slide__content">
+            <span class="hero-kicker">Promo of the week</span>
+            <h1>Buy 2 Shawarmas, Get 1 Free</h1>
+            <p>
+              Choose your size, choose your protein, and enjoy the best shawarma deal in town.
+              Freshly packed, beautifully wrapped, and ready to go.
+            </p>
+
+            <div class="hero-slide__meta">
+              <span><i class="fa-solid fa-location-dot"></i> Tema Community 25</span>
+              <span><i class="fa-solid fa-clock"></i> Tue 28 Apr to Fri 1 May, 2026</span>
             </div>
 
-            <ul class="quick-icons">
-              <li><i class="fa fa-leaf"></i> Fresh herbs</li>
-              <li><i class="fa fa-bolt"></i> Ready in 12m</li>
-              <li><i class="fa fa-users"></i> Great for sharing</li>
-            </ul>
-          </div>
-
-          <div class="slide-media" aria-hidden="true">
-            <!-- layered images for appetite effect -->
-            <img src="images/hero/shawarma-main.jpg" alt="Shito wings plated" class="media-main" data-animate="pop">
-            <img src="images/hero/shawarma-fries.png" alt="Fries" class="media-layer layer-fries" data-animate="float">
-            <img src="images/hero/steam.png" alt="" class="media-overlay steam" aria-hidden="true">
-            <div class="media-badges">
-              <span class="pill best"><i class="fa fa-award"></i> Best Seller</span>
-              <span class="pill hot"><i class="fa fa-fire"></i> Hot</span>
+            <div class="hero-slide__actions">
+              <button class="btn btn--primary" type="button" data-scroll-to-menu="shawarma">
+                <i class="fa-solid fa-utensils"></i>
+                Order Shawarma
+              </button>
+              <button class="btn btn--ghost" type="button" data-open-product="shawarma">
+                View Details
+              </button>
             </div>
           </div>
         </article>
 
-        <article class="slide slide-2" data-slide="1" aria-roledescription="slide" aria-label="Family bucket">
-          <div class="slide-copy">
-            <span class="badge-pill gold"><i class="fa fa-users"></i> Family</span>
-            <h2>Family Feast — Share & Save</h2>
-            <p class="lead">Big buckets for 4 — wings, shawarma slices, rice & sides. Bring everyone together.</p>
-            <div class="cta-row">
-              <button class="btn primary" data-action="order" data-item="Family Feast">Order Family Pack</button>
-              <button class="btn ghost" data-action="view" data-item="Family Feast">View Details</button>
+        <article class="hero-slide" data-slide="1" style="background-image: url('https://images.unsplash.com/photo-1631515243349-e0cb75fb8d3a?auto=format&fit=crop&w=1600&q=80');">
+          <div class="hero-slide__overlay"></div>
+          <div class="hero-slide__content">
+            <span class="hero-kicker">Sweet bonus</span>
+            <h2>Loaded Fries, Free Coke</h2>
+            <p>
+              Crunchy, creamy, loaded and satisfying. Order any loaded fries during promo hours and your free Coke joins the cart automatically.
+            </p>
+
+            <div class="hero-slide__meta">
+              <span><i class="fa-solid fa-gift"></i> Free Coke included</span>
+              <span><i class="fa-solid fa-bowl-food"></i> Perfect for sharing</span>
             </div>
 
-            <div class="feature-photos">
-              <img src="images/hero/feast-1.jpg" alt="Feast image 1">
-              <img src="images/hero/feast-2.jpg" alt="Feast image 2">
-              <img src="images/hero/feast-3.jpg" alt="Feast image 3">
+            <div class="hero-slide__actions">
+              <button class="btn btn--primary" type="button" data-scroll-to-menu="loaded-fries">
+                <i class="fa-solid fa-cart-plus"></i>
+                Order Loaded Fries
+              </button>
+              <button class="btn btn--ghost" type="button" data-open-product="loaded-fries">
+                View Details
+              </button>
             </div>
-          </div>
-
-          <div class="slide-media">
-            <img src="images/hero/family-bucket.jpg" alt="Family bucket" class="media-main" data-animate="pop">
-            <svg class="sauce-splash" viewBox="0 0 120 60" aria-hidden="true"><path d="M10 40 Q40 5 110 30" stroke="rgba(255,120,60,0.9)" stroke-width="6" fill="none" stroke-linecap="round"/></svg>
           </div>
         </article>
 
-        <article class="slide slide-3" data-slide="2" aria-roledescription="slide" aria-label="Burgers special">
-          <div class="slide-copy">
-            <span class="badge-pill new"><i class="fa fa-star"></i> New</span>
-            <h2>Stacked Burgers — Melted & Juicy</h2>
-            <p class="lead">Double patties, melty cheese & proprietary house sauce. Built for big appetites.</p>
-            <div class="cta-row">
-              <button class="btn primary" data-action="order" data-item="Stacked Burger">Try Now</button>
-              <button class="btn ghost" data-action="customize" data-item="Stacked Burger">Customize</button>
+        <article class="hero-slide" data-slide="2" style="background-image: url('https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1600&q=80');">
+          <div class="hero-slide__overlay"></div>
+          <div class="hero-slide__content">
+            <span class="hero-kicker">More to love</span>
+            <h2>Enjoy Discounts on Our Other Foods</h2>
+            <p>
+              Fried rice, loaded angwamo, loaded jollof, and noodles are all waiting with premium portions and rich flavors.
+            </p>
+
+            <div class="hero-slide__meta">
+              <span><i class="fa-solid fa-star"></i> Premium menu</span>
+              <span><i class="fa-solid fa-motorcycle"></i> Delivery available</span>
             </div>
 
-            <div class="mini-gallery">
-              <img src="images/hero/burger-side1.jpg" alt="burger closeup">
-              <img src="images/hero/burger-side2.jpg" alt="cheese pull">
+            <div class="hero-slide__actions">
+              <button class="btn btn--primary" type="button" data-scroll-to-menu="all">
+                <i class="fa-solid fa-list"></i>
+                Explore Menu
+              </button>
+              <button class="btn btn--ghost" type="button" data-open-product="featured">
+                View Best Sellers
+              </button>
             </div>
           </div>
+        </article>
 
-          <div class="slide-media">
-            <img src="images/hero/burger-main.jpg" alt="Stacked burger" class="media-main" data-animate="pop">
-            <div class="media-ornament"><i class="fa fa-heart"></i> Crowd Favorite</div>
+        <div class="hero-slider__controls">
+          <button type="button" class="hero-control" data-hero-prev aria-label="Previous slide">
+            <i class="fa-solid fa-chevron-left"></i>
+          </button>
+          <button type="button" class="hero-control" data-hero-next aria-label="Next slide">
+            <i class="fa-solid fa-chevron-right"></i>
+          </button>
+        </div>
+
+        <div class="hero-slider__dots" aria-label="Slider navigation">
+          <button class="hero-dot hero-dot--active" type="button" data-go-slide="0" aria-label="Go to slide 1"></button>
+          <button class="hero-dot" type="button" data-go-slide="1" aria-label="Go to slide 2"></button>
+          <button class="hero-dot" type="button" data-go-slide="2" aria-label="Go to slide 3"></button>
+        </div>
+      </div>
+
+      <div class="hero__quickline" aria-label="Quick info">
+        <div class="quickline-item">
+          <i class="fa-solid fa-mobile-screen-button"></i>
+          <div>
+            <strong>Mobile first</strong>
+            <span>Easy ordering on any phone</span>
+          </div>
+        </div>
+        <div class="quickline-item">
+          <i class="fa-solid fa-sack-dollar"></i>
+          <div>
+            <strong>Clear prices</strong>
+            <span>Simple tiers and add-ons</span>
+          </div>
+        </div>
+        <div class="quickline-item">
+          <i class="fa-solid fa-shield-heart"></i>
+          <div>
+            <strong>Trusted checkout</strong>
+            <span>Paystack MoMo or card</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Promotions and service strip -->
+    <section class="promo-band" id="promos" aria-label="Promotions">
+      <div class="promo-band__item">
+        <span class="promo-band__label">Shawarma promo</span>
+        <strong>Buy 2, get 1 free</strong>
+        <p>Applies automatically in your cart.</p>
+      </div>
+      <div class="promo-band__item">
+        <span class="promo-band__label">Loaded fries promo</span>
+        <strong>Free Coke included</strong>
+        <p>Appears automatically during promo hours.</p>
+      </div>
+      <div class="promo-band__item">
+        <span class="promo-band__label">Pickup and delivery</span>
+        <strong>Devtraco pickup available</strong>
+        <p>Delivery fee is confirmed after checkout.</p>
+      </div>
+    </section>
+
+    <!-- Menu -->
+    <section class="menu-area" id="menu" aria-label="Menu">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">Menu Studio</p>
+          <h2>Build your order with premium choices</h2>
+        </div>
+
+        <div class="menu-tools">
+          <div class="menu-search">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="search" id="menuSearch" placeholder="Search shawarma, fries, rice, jollof, noodles" />
+          </div>
+          <button class="btn btn--ghost" type="button" data-open-history>
+            <i class="fa-regular fa-folder-open"></i>
+            Purchase History
+          </button>
+        </div>
+      </div>
+
+      <div class="menu-rail" role="tablist" aria-label="Menu categories">
+        <button class="menu-pill menu-pill--active" type="button" data-filter-category="all">All Foods</button>
+        <button class="menu-pill" type="button" data-filter-category="shawarma">Shawarma</button>
+        <button class="menu-pill" type="button" data-filter-category="loaded-fries">Loaded Fries</button>
+        <button class="menu-pill" type="button" data-filter-category="rice">Rice</button>
+        <button class="menu-pill" type="button" data-filter-category="angwamo">Angwamo</button>
+        <button class="menu-pill" type="button" data-filter-category="specials">Specials</button>
+      </div>
+
+      <div class="menu-runway" id="menuRunway">
+        <!-- Shawarma -->
+        <article class="menu-feature menu-feature--large" data-category="shawarma" data-product-id="shawarma">
+          <div class="menu-feature__topline">
+            <span class="menu-badge">Buy 2 → 1 Free</span>
+            <span class="menu-label">Signature</span>
+          </div>
+
+          <div class="menu-feature__body">
+            <div class="menu-feature__copy">
+              <h3>Shawarma</h3>
+              <p>Choose size, then protein. Rich sauces and extra cheese available.</p>
+              <ul class="menu-notes">
+                <li>Lite: GHC 45</li>
+                <li>Classic: GHC 55</li>
+                <li>District Max: GHC 70</li>
+              </ul>
+              <div class="menu-actions">
+                <button class="btn btn--primary" type="button" data-open-product="shawarma">
+                  <i class="fa-solid fa-pen-to-square"></i>
+                  Customize Shawarma
+                </button>
+                <button class="btn btn--ghost" type="button" data-add-simple="shawarma">
+                  Add Quick Order
+                </button>
+              </div>
+            </div>
+
+            <div class="menu-feature__visual" style="background-image: url('https://images.unsplash.com/photo-1606756790138-261d2b21cd75?auto=format&fit=crop&w=1200&q=80');">
+              <div class="menu-feature__floating">
+                <span>Promo applies automatically</span>
+                <strong>Third shawarma becomes free</strong>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <!-- Loaded Fries -->
+        <article class="menu-feature" data-category="loaded-fries" data-product-id="loaded-fries">
+          <div class="menu-feature__topline">
+            <span class="menu-badge">Free Coke</span>
+            <span class="menu-label">Crunchy</span>
+          </div>
+
+          <div class="menu-feature__body">
+            <div class="menu-feature__copy">
+              <h3>Loaded Fries</h3>
+              <p>Choose portion and add toppings for a heavy, satisfying bite.</p>
+              <ul class="menu-notes">
+                <li>Regular: GHC 65</li>
+                <li>Medium: GHC 75</li>
+                <li>Large: GHC 85</li>
+              </ul>
+              <div class="menu-actions">
+                <button class="btn btn--primary" type="button" data-open-product="loaded-fries">
+                  <i class="fa-solid fa-pen-to-square"></i>
+                  Customize Fries
+                </button>
+                <button class="btn btn--ghost" type="button" data-add-simple="loaded-fries">
+                  Add Quick Order
+                </button>
+              </div>
+            </div>
+
+            <div class="menu-feature__visual" style="background-image: url('https://images.unsplash.com/photo-1573080496219-bb080dd4f877?auto=format&fit=crop&w=1200&q=80');">
+              <div class="menu-feature__floating">
+                <span>Promo included automatically</span>
+                <strong>Free Coke appears in cart</strong>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <!-- Fried Rice -->
+        <article class="menu-feature" data-category="rice" data-product-id="fried-rice">
+          <div class="menu-feature__topline">
+            <span class="menu-badge">Rice</span>
+            <span class="menu-label">Classic</span>
+          </div>
+
+          <div class="menu-feature__body">
+            <div class="menu-feature__copy">
+              <h3>Fried Rice</h3>
+              <p>Classic spiced fried rice with your choice of protein.</p>
+              <ul class="menu-notes">
+                <li>Chicken: GHC 60</li>
+                <li>Beef: GHC 60</li>
+                <li>Gizzard: GHC 60</li>
+              </ul>
+              <div class="menu-actions">
+                <button class="btn btn--primary" type="button" data-open-product="fried-rice">
+                  <i class="fa-solid fa-plate-wheat"></i>
+                  Choose Protein
+                </button>
+                <button class="btn btn--ghost" type="button" data-add-simple="fried-rice">
+                  Add to Cart
+                </button>
+              </div>
+            </div>
+
+            <div class="menu-feature__visual" style="background-image: url('https://images.unsplash.com/photo-1512058564366-18510be2db19?auto=format&fit=crop&w=1200&q=80');">
+              <div class="menu-feature__floating">
+                <span>Balanced and filling</span>
+                <strong>Freshly prepared to order</strong>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <!-- Loaded Angwamo -->
+        <article class="menu-feature" data-category="angwamo" data-product-id="loaded-angwamo">
+          <div class="menu-feature__topline">
+            <span class="menu-badge">New price</span>
+            <span class="menu-label">Angwamo</span>
+          </div>
+
+          <div class="menu-feature__body">
+            <div class="menu-feature__copy">
+              <h3>Loaded Angwamo</h3>
+              <p>Tiered portions with bold protein options and premium value.</p>
+              <ul class="menu-notes">
+                <li>Basic: <span class="price-old">GHC 65</span> <strong>GHC 60</strong></li>
+                <li>Classic: <span class="price-old">GHC 75</span> <strong>GHC 70</strong></li>
+                <li>Max, 5 proteins: <span class="price-old">GHC 85</span> <strong>GHC 80</strong></li>
+              </ul>
+              <div class="menu-actions">
+                <button class="btn btn--primary" type="button" data-open-product="loaded-angwamo">
+                  <i class="fa-solid fa-pen-to-square"></i>
+                  Pick a Tier
+                </button>
+                <button class="btn btn--ghost" type="button" data-add-simple="loaded-angwamo">
+                  Add to Cart
+                </button>
+              </div>
+            </div>
+
+            <div class="menu-feature__visual" style="background-image: url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1200&q=80');">
+              <div class="menu-feature__floating">
+                <span>Upgraded value</span>
+                <strong>Bold portions, better price</strong>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <!-- Loaded Jollof -->
+        <article class="menu-feature menu-feature--small" data-category="rice specials" data-product-id="loaded-jollof">
+          <div class="menu-feature__topline">
+            <span class="menu-badge">New</span>
+            <span class="menu-label">Rice</span>
+          </div>
+          <div class="menu-feature__body">
+            <div class="menu-feature__copy">
+              <h3>Loaded Jollof</h3>
+              <p>Hearty Jungle Jumbo Fully Loaded Jollof rice with protein and extras.</p>
+              <div class="price-line">
+                <strong>GHC 85</strong>
+              </div>
+              <div class="menu-actions">
+                <button class="btn btn--primary" type="button" data-open-product="loaded-jollof">
+                  <i class="fa-solid fa-circle-plus"></i>
+                  Order Loaded Jollof
+                </button>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <!-- Noodles -->
+        <article class="menu-feature menu-feature--small" data-category="specials" data-product-id="noodles">
+          <div class="menu-feature__topline">
+            <span class="menu-badge">Popular</span>
+            <span class="menu-label">Quick pick</span>
+          </div>
+          <div class="menu-feature__body">
+            <div class="menu-feature__copy">
+              <h3>Noodles</h3>
+              <p>Assorted proteins available, made for a fast and satisfying meal.</p>
+              <div class="price-line">
+                <strong>GHC 50</strong>
+              </div>
+              <div class="menu-actions">
+                <button class="btn btn--primary" type="button" data-open-product="noodles">
+                  <i class="fa-solid fa-circle-plus"></i>
+                  Order Noodles
+                </button>
+              </div>
+            </div>
           </div>
         </article>
       </div>
+    </section>
 
-      <!-- dots & arrows (JS-controlled) -->
-      <div class="carousel-controls" aria-hidden="false">
-        <button class="arrow prev" aria-label="Previous slide"><i class="fa fa-chevron-left"></i></button>
-        <div class="dots" role="tablist" aria-label="Slide navigation">
-          <button class="dot active" data-dot="0" role="tab" aria-selected="true" aria-controls="slide-0"></button>
-          <button class="dot" data-dot="1" role="tab" aria-selected="false" aria-controls="slide-1"></button>
-          <button class="dot" data-dot="2" role="tab" aria-selected="false" aria-controls="slide-2"></button>
-        </div>
-        <button class="arrow next" aria-label="Next slide"><i class="fa fa-chevron-right"></i></button>
+    <!-- Highlights -->
+    <section class="highlights" aria-label="Why order from Wrap District">
+      <div class="highlight-panel">
+        <i class="fa-solid fa-bag-shopping"></i>
+        <h3>Fast ordering flow</h3>
+        <p>Add to cart, edit quantity, and checkout in a few taps.</p>
       </div>
-    </div>
+      <div class="highlight-panel">
+        <i class="fa-solid fa-receipt"></i>
+        <h3>Clear order details</h3>
+        <p>See your subtotal, delivery, promo discount, and total before paying.</p>
+      </div>
+      <div class="highlight-panel">
+        <i class="fa-solid fa-lock"></i>
+        <h3>Reliable payments</h3>
+        <p>Paystack mobile money and card checkout for a smooth experience.</p>
+      </div>
+    </section>
 
-    <!-- hero-right: quick links, app badges, featured micro-cards (all image heavy) -->
-    <aside class="hero-right" aria-label="Quick actions & featured items">
-      <div class="quick-card" data-animate="float">
-        <h4>Quick Picks</h4>
-        <ul class="quick-grid">
-          <li>
-            <img src="images/picks/shawarma-thumb.jpg" alt="Shawarma">
-            <div class="meta"><strong>Special Shawarma</strong><span>GHS 75</span></div>
-          </li>
-          <li>
-            <img src="images/picks/burger-thumb.jpg" alt="Burger">
-            <div class="meta"><strong>Double Burger</strong><span>GHS 110</span></div>
-          </li>
-          <li>
-            <img src="images/picks/fries-thumb.jpg" alt="Fries">
-            <div class="meta"><strong>Loaded Fries</strong><span>GHS 38</span></div>
-          </li>
-        </ul>
-
-        <div class="app-links">
-          <img src="images/app/appstore.png" alt="App Store">
-          <img src="images/app/playstore.png" alt="Play Store">
-        </div>
+    <!-- Checkout section teaser -->
+    <section class="checkout-teaser" id="checkout" aria-label="Checkout preview">
+      <div class="checkout-teaser__copy">
+        <p class="eyebrow">Checkout</p>
+        <h2>Simple details. Smooth payment. Premium finish.</h2>
+        <p>
+          Checkout price does not include delivery fees. Delivery is estimated after checkout, and the final fee is communicated based on the address.
+        </p>
       </div>
 
-      <div class="offers-strip" aria-live="polite">
-        <h5>Hot Offers</h5>
-        <div class="offer-tiles">
-          <article class="offer-tile">
-            <img src="images/offers/offer-bucket.jpg" alt="Bucket offer">
-            <div class="info"><strong>Festive Bucket</strong><span>GHS 180</span></div>
-            <button class="btn small" data-action="add" data-item="Festive Bucket" data-price="180"><i class="fa fa-cart-plus"></i> Add</button>
-          </article>
-          <article class="offer-tile">
-            <img src="images/offers/offer-fries.jpg" alt="Fries offer">
-            <div class="info"><strong>Cheesy Fries</strong><span>GHS 38</span></div>
-            <button class="btn small" data-action="add" data-item="Loaded Fries" data-price="38"><i class="fa fa-cart-plus"></i> Add</button>
-          </article>
+      <div class="checkout-teaser__facts">
+        <div>
+          <span>Name</span>
+          <strong>Customer details</strong>
+        </div>
+        <div>
+          <span>Payment</span>
+          <strong>Paystack MoMo or card</strong>
+        </div>
+        <div>
+          <span>Order type</span>
+          <strong>Delivery or pickup</strong>
         </div>
       </div>
-    </aside>
-  </section>
 
-  <!-- ====== MENU: categories + items (image-heavy, organized) ====== -->
-  <main id="menu-main" class="container" role="main" aria-label="All menu items">
-    <section class="menu-wrap" aria-label="Full menu">
-      <!-- left: category nav + search -->
-      <aside class="sidebar" role="navigation" aria-label="Menu categories">
-        <h4>Browse by category</h4>
-        <ul class="cat-list" id="catList" role="list">
-          <!-- Each category shows a thumbnail image on hover (CSS) -->
-          <li role="listitem"><button class="cat-btn active" data-cat="all"><i class="fa fa-th-large"></i> All</button></li>
-          <li role="listitem"><button class="cat-btn" data-cat="burgers"><img src="images/icons/burger.png" alt=""> Burgers</button></li>
-          <li role="listitem"><button class="cat-btn" data-cat="shawarma"><img src="images/icons/shawarma.png" alt=""> Shawarma</button></li>
-          <li role="listitem"><button class="cat-btn" data-cat="chicken"><img src="images/icons/chicken.png" alt=""> Chicken</button></li>
-          <li role="listitem"><button class="cat-btn" data-cat="pizza"><img src="images/icons/pizza.png" alt=""> Pizza</button></li>
-          <li role="listitem"><button class="cat-btn" data-cat="sides"><img src="images/icons/fries.png" alt=""> Sides</button></li>
-          <li role="listitem"><button class="cat-btn" data-cat="bev"><img src="images/icons/drink.png" alt=""> Drinks</button></li>
-          <li role="listitem"><button class="cat-btn" data-cat="combos"><img src="images/icons/combo.png" alt=""> Combos</button></li>
-        </ul>
+      <button class="btn btn--primary checkout-teaser__btn" type="button" data-open-checkout>
+        <i class="fa-solid fa-lock"></i>
+        Continue to Checkout
+      </button>
+    </section>
 
-        <div class="search-box" role="search" aria-label="Search menu">
-          <label for="menuSearch" class="sr-only">Search menu</label>
-          <input id="menuSearch" type="search" placeholder="Search (e.g. shawarma, burger)" />
-          <button class="btn ghost" id="clearSearch" aria-label="Clear search"><i class="fa fa-times"></i></button>
+    <!-- Contact -->
+    <section class="contact-section" id="contact" aria-label="Contact and business information">
+      <div class="contact-section__copy">
+        <p class="eyebrow">Contact</p>
+        <h2>Visit Wrap District or order from your phone</h2>
+        <p>Fresh food, friendly service, and a location that is easy to find.</p>
+      </div>
+
+      <div class="contact-strip">
+        <a href="tel:0552509241" class="contact-chip">
+          <i class="fa-solid fa-phone"></i>
+          <span>0552509241</span>
+        </a>
+        <a href="https://wa.me/233571118856" target="_blank" rel="noopener" class="contact-chip">
+          <i class="fa-brands fa-whatsapp"></i>
+          <span>WhatsApp</span>
+        </a>
+        <a href="mailto:kennethkamkam22@gmail.com" class="contact-chip">
+          <i class="fa-solid fa-envelope"></i>
+          <span>kennethkamkam22@gmail.com</span>
+        </a>
+        <span class="contact-chip contact-chip--static">
+          <i class="fa-brands fa-snapchat"></i>
+          <span>@kenneth_idk</span>
+        </span>
+      </div>
+
+      <div class="business-card">
+        <div class="business-card__item">
+          <span>Location</span>
+          <strong>Tema Community 25, Devtraco</strong>
         </div>
-
-        <div class="filters" aria-hidden="false">
-          <h5>Filters</h5>
-          <label class="filter"><input type="checkbox" name="veg" /> <i class="fa fa-leaf"></i> Vegetarian</label>
-          <label class="filter"><input type="checkbox" name="spicy" /> <i class="fa fa-pepper-hot"></i> Spicy</label>
-          <label class="filter"><input type="checkbox" name="popular" /> <i class="fa fa-star"></i> Popular</label>
+        <div class="business-card__item">
+          <span>Pickup</span>
+          <strong>Available at Devtraco</strong>
         </div>
-
-        <div class="promo-tiles" aria-hidden="true">
-          <img src="images/sidebar/promo-1.jpg" alt="promo 1">
-          <img src="images/sidebar/promo-2.jpg" alt="promo 2">
+        <div class="business-card__item">
+          <span>Hours</span>
+          <strong>Mon to Fri: 5pm | Sat to Sun: 9am</strong>
         </div>
-      </aside>
-
-      <!-- right: menu sections -->
-      <div class="menu-sections" id="menuSections" aria-live="polite">
-        <!-- SECTION: Burgers -->
-        <section class="menu-section" data-cat="burgers" id="burgers">
-          <header class="section-head">
-            <h2>Burgers</h2>
-            <p class="section-sub">Flame-grilled patties, house sauces & signature buns</p>
-          </header>
-
-          <div class="cards-grid" role="list">
-            <!-- Food card (image-heavy) — each has rich data- attributes for modal -->
-            <article class="food-card" role="listitem"
-                     data-name="Accra Crispy Chicken"
-                     data-price="85"
-                     data-cat="burgers"
-                     data-images="images/menu/accra-crispy-chicken-1.jpg|images/menu/accra-crispy-chicken-2.jpg|images/menu/accra-crispy-chicken-3.jpg"
-                     data-options='{"sizes":{"Regular":85,"Large":110},"extras":["Extra cheese","Bacon","Double patty"],"cal":650,"allergens":["gluten","dairy"]}'
-                     aria-label="Accra Crispy Chicken — GHS 85">
-              <div class="food-media">
-                <img src="images/menu/accra-crispy-chicken-1.jpg" alt="Accra Crispy Chicken" class="food-photo">
-                <div class="food-badges">
-                  <span class="badge spicy" title="Spicy"><i class="fa fa-pepper-hot"></i></span>
-                  <span class="badge chef" title="Chef pick"><i class="fa fa-award"></i></span>
-                </div>
-              </div>
-
-              <div class="food-body">
-                <h3 class="food-title">Accra Crispy Chicken</h3>
-                <p class="food-desc">Crunchy fried chicken, house aioli, pickles & lettuce tucked in a toasted brioche.</p>
-
-                <div class="meta-row">
-                  <div class="meta-left">
-                    <span class="rating"><i class="fa fa-star"></i> 4.8</span>
-                    <span class="calorie"><i class="fa fa-fire"></i> 650 kcal</span>
-                  </div>
-                  <div class="meta-right">
-                    <div class="price">GHS <strong>85</strong></div>
-                    <div class="actions">
-                      <button class="btn ghost" data-action="view" data-modal-target="productModal" aria-haspopup="dialog">View</button>
-                      <button class="btn primary" data-action="add" data-item="Accra Crispy Chicken" data-price="85">Add</button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </article>
-
-            <article class="food-card"
-                     data-name="Double Beef Cheese"
-                     data-price="110"
-                     data-cat="burgers"
-                     data-images="images/menu/double-beef-cheese-1.jpg|images/menu/double-beef-cheese-2.jpg"
-                     data-options='{"sizes":{"Single":75,"Double":110},"extras":["Extra cheese","Onion rings"],"cal":920}'
-                     aria-label="Double Beef Cheese — GHS 110">
-              <div class="food-media">
-                <img src="images/menu/double-beef-cheese-1.jpg" alt="Double Beef Cheese" class="food-photo">
-                <div class="food-badges"><span class="badge best"><i class="fa fa-thumbs-up"></i></span></div>
-              </div>
-
-              <div class="food-body">
-                <h3 class="food-title">Double Beef Cheese</h3>
-                <p class="food-desc">Two flame-grilled patties, melted cheddar & smoky house sauce.</p>
-                <div class="meta-row">
-                  <div class="meta-left"><span class="rating"><i class="fa fa-star"></i> 4.9</span></div>
-                  <div class="meta-right">
-                    <div class="price">GHS <strong>110</strong></div>
-                    <div class="actions">
-                      <button class="btn ghost" data-action="view" data-modal-target="productModal">View</button>
-                      <button class="btn primary" data-action="add" data-item="Double Beef Cheese" data-price="110">Add</button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </article>
-
-            <!-- more burger cards (copy pattern) -->
-            <article class="food-card"
-                     data-name="Bacon & Beef Burger"
-                     data-price="115"
-                     data-cat="burgers"
-                     data-images="images/menu/bacon-beef-1.jpg|images/menu/bacon-beef-2.jpg"
-                     data-options='{"extras":["Extra bacon","Egg"],"cal":870}'
-                     aria-label="Bacon & Beef Burger — GHS 115">
-              <div class="food-media">
-                <img src="images/menu/bacon-beef-1.jpg" alt="Bacon & Beef Burger" class="food-photo">
-                <div class="food-badges"><span class="badge new"><i class="fa fa-star"></i></span></div>
-              </div>
-
-              <div class="food-body">
-                <h3 class="food-title">Bacon & Beef Burger</h3>
-                <p class="food-desc">Smoky bacon, beef patty & caramelised onions.</p>
-                <div class="meta-row">
-                  <div class="meta-left"></div>
-                  <div class="meta-right">
-                    <div class="price">GHS <strong>115</strong></div>
-                    <div class="actions">
-                      <button class="btn ghost" data-action="view" data-modal-target="productModal">View</button>
-                      <button class="btn primary" data-action="add" data-item="Bacon & Beef Burger" data-price="115">Add</button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </article>
-          </div> <!-- cards-grid -->
-        </section> <!-- Burgers -->
-
-        <!-- SECTION: Shawarma -->
-        <section class="menu-section" data-cat="shawarma" id="shawarma">
-          <header class="section-head">
-            <h2>Shawarma</h2>
-            <p class="section-sub">Hand-wrapped, thin-sliced meat & house sauces</p>
-          </header>
-
-          <div class="cards-grid">
-            <!-- Chicken Shawarma -->
-            <article class="food-card"
-                     data-name="Chicken Shawarma"
-                     data-price="75"
-                     data-cat="shawarma"
-                     data-images="images/menu/shawarma-chicken-1.jpg|images/menu/shawarma-chicken-2.jpg"
-                     data-options='{"extras":["Extra sauce","No garlic"],"cal":520}'
-                     aria-label="Chicken Shawarma — GHS 75">
-              <div class="food-media">
-                <img src="images/menu/shawarma-chicken-1.jpg" alt="Chicken Shawarma" class="food-photo">
-                <div class="food-badges"><span class="badge popular"><i class="fa fa-heart"></i></span></div>
-              </div>
-              <div class="food-body">
-                <h3 class="food-title">Chicken Shawarma</h3>
-                <p class="food-desc">Garlic sauce, fresh veg & warm flatbread.</p>
-                <div class="meta-row">
-                  <div class="meta-left"><span class="rating"><i class="fa fa-star"></i> 4.7</span></div>
-                  <div class="meta-right">
-                    <div class="price">GHS <strong>75</strong></div>
-                    <div class="actions">
-                      <button class="btn ghost" data-action="view" data-modal-target="productModal">View</button>
-                      <button class="btn primary" data-action="add" data-item="Chicken Shawarma" data-price="75">Add</button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </article>
-
-            <!-- Beef Shawarma -->
-            <article class="food-card"
-                     data-name="Beef Shawarma"
-                     data-price="75"
-                     data-cat="shawarma"
-                     data-images="images/menu/shawarma-beef-1.jpg|images/menu/shawarma-beef-2.jpg"
-                     data-options='{"extras":["Tahini","Spicy sauce"],"cal":560}'
-                     aria-label="Beef Shawarma — GHS 75">
-              <div class="food-media"><img src="images/menu/shawarma-beef-1.jpg" alt="Beef Shawarma" class="food-photo"></div>
-              <div class="food-body">
-                <h3 class="food-title">Beef Shawarma</h3>
-                <p class="food-desc">Spiced beef, tahini, pickles & fresh wrap.</p>
-                <div class="meta-row">
-                  <div class="meta-left"></div>
-                  <div class="meta-right">
-                    <div class="price">GHS <strong>75</strong></div>
-                    <div class="actions">
-                      <button class="btn ghost" data-action="view" data-modal-target="productModal">View</button>
-                      <button class="btn primary" data-action="add" data-item="Beef Shawarma" data-price="75">Add</button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </article>
-
-            <!-- Basilissa Special Shawarma -->
-            <article class="food-card"
-                     data-name="Basilissa Special Shawarma"
-                     data-price="80"
-                     data-cat="shawarma"
-                     data-images="images/menu/shawarma-special-1.jpg|images/menu/shawarma-special-2.jpg|images/menu/shawarma-special-3.jpg"
-                     data-options='{"extras":["Shito"],"cal":600}'
-                     aria-label="Basilissa Special Shawarma — GHS 80">
-              <div class="food-media"><img src="images/menu/shawarma-special-1.jpg" alt="Special Shawarma" class="food-photo"></div>
-              <div class="food-body">
-                <h3 class="food-title">Basilissa Special</h3>
-                <p class="food-desc">Signature spice blend, special sauce & toasted wrap.</p>
-                <div class="meta-row">
-                  <div class="meta-left"><span class="badge chef"><i class="fa fa-award"></i></span></div>
-                  <div class="meta-right">
-                    <div class="price">GHS <strong>80</strong></div>
-                    <div class="actions">
-                      <button class="btn ghost" data-action="view" data-modal-target="productModal">View</button>
-                      <button class="btn primary" data-action="add" data-item="Basilissa Special Shawarma" data-price="80">Add</button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </article>
-          </div>
-        </section> <!-- Shawarma -->
-
-        <!-- SECTION: Chicken -->
-        <section class="menu-section" data-cat="chicken" id="chicken">
-          <header class="section-head">
-            <h2>Chicken</h2>
-            <p class="section-sub">Crispy, grilled & saucy — choose your size</p>
-          </header>
-
-          <div class="cards-grid">
-            <article class="food-card"
-                     data-name="Crispy Chicken (Full)"
-                     data-price="190"
-                     data-cat="chicken"
-                     data-images="images/menu/crispy-full-1.jpg|images/menu/crispy-full-2.jpg"
-                     data-options='{"sizes":{"Full":190,"Half":120,"Quarter":75},"cal":1200}'
-                     aria-label="Crispy Chicken — multiple sizes">
-              <div class="food-media"><img src="images/menu/crispy-full-1.jpg" alt="Crispy Chicken" class="food-photo"></div>
-              <div class="food-body">
-                <h3 class="food-title">Crispy Chicken</h3>
-                <p class="food-desc">Classic fried chicken with our secret buttermilk batter.</p>
-                <div class="meta-row">
-                  <div class="meta-left"></div>
-                  <div class="meta-right">
-                    <div class="price">GHS <strong>190</strong> / 120 / 75</div>
-                    <div class="actions">
-                      <button class="btn ghost" data-action="sizes" data-item="Crispy Chicken" data-sizes='{"Full":190,"1/2":120,"1/4":75}'>Sizes</button>
-                      <button class="btn primary" data-action="add" data-item="Crispy Chicken (Full)" data-price="190">Add</button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </article>
-
-            <!-- Spicy Wings -->
-            <article class="food-card"
-                     data-name="Spicy Wings"
-                     data-price="90"
-                     data-cat="chicken"
-                     data-images="images/menu/spicy-wings-1.jpg|images/menu/spicy-wings-2.jpg"
-                     data-options='{"tiers":{"8":90,"16":160,"24":220},"cal":820}'
-                     aria-label="Spicy Wings">
-              <div class="food-media"><img src="images/menu/spicy-wings-1.jpg" alt="Spicy Wings" class="food-photo"></div>
-              <div class="food-body">
-                <h3 class="food-title">Spicy Wings</h3>
-                <p class="food-desc">8 / 16 / 24 pieces — tossed in our signature spicy glaze.</p>
-                <div class="meta-row">
-                  <div class="meta-left"></div>
-                  <div class="meta-right">
-                    <div class="price">GHS <strong>90</strong> / 160 / 220</div>
-                    <div class="actions">
-                      <button class="btn ghost" data-action="sizes" data-item="Spicy Wings" data-sizes='{"8":90,"16":160,"24":220}'>Choose</button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </article>
-          </div>
-        </section> <!-- Chicken -->
-
-        <!-- SECTION: Pizza (grid with large imagery for each row) -->
-        <section class="menu-section" data-cat="pizza" id="pizza">
-          <header class="section-head">
-            <h2>Pizza</h2>
-            <p class="section-sub">Stone-baked, bubbling cheese & signature toppings</p>
-          </header>
-
-          <div class="pizza-grid">
-            <article class="pizza-card" data-name="Basilissa Special Pizza" data-cat="pizza"
-                     data-images="images/menu/pizza-special-1.jpg|images/menu/pizza-special-2.jpg"
-                     data-options='{"sizes":{"Small":210,"Medium":260,"Large":310},"toppings":["Extra cheese","Pepperoni","Mushrooms"]}'>
-              <div class="pizza-media"><img src="images/menu/pizza-special-1.jpg" alt="Basilissa Special Pizza"></div>
-              <div class="pizza-body">
-                <h3>Basilissa Special</h3>
-                <p class="food-desc">Roasted peppers, pepperoni, fresh basil & bubbling mozzarella.</p>
-                <div class="pizza-actions">
-                  <button class="btn ghost" data-action="view" data-modal-target="productModal">Preview</button>
-                  <button class="btn primary" data-action="customize" data-item="Basilissa Special Pizza">Customize</button>
-                </div>
-              </div>
-            </article>
-
-            <!-- smaller pizza rows -->
-            <article class="pizza-card" data-name="Pepperoni" data-cat="pizza" data-images="images/menu/pizza-pepperoni.jpg" data-options='{"sizes":{"Small":180,"Medium":210,"Large":270}}'>
-              <div class="pizza-media"><img src="images/menu/pizza-pepperoni.jpg" alt="Pepperoni"></div>
-              <div class="pizza-body">
-                <h3>Pepperoni</h3>
-                <div class="pizza-actions">
-                  <button class="btn ghost" data-action="view">Preview</button>
-                  <button class="btn primary" data-action="customize" data-item="Pepperoni Pizza">Customize</button>
-                </div>
-              </div>
-            </article>
-          </div>
-        </section> <!-- Pizza -->
-
-        <!-- SECTION: Sides -->
-        <section class="menu-section" data-cat="sides" id="sides">
-          <header class="section-head">
-            <h2>Sides</h2>
-            <p class="section-sub">Shareable sides & add-ons</p>
-          </header>
-
-          <div class="sides-grid">
-            <article class="side-card" data-name="Loaded Fries" data-price="38" data-images="images/menu/loaded-fries-1.jpg">
-              <img src="images/menu/loaded-fries-1.jpg" alt="Loaded Fries">
-              <div class="side-body">
-                <h4>Loaded Fries</h4>
-                <p class="muted">Cheesy, peppered & herbed — perfect with burgers.</p>
-                <div class="actions"><button class="btn primary" data-action="add" data-item="Loaded Fries" data-price="38">Add</button></div>
-              </div>
-            </article>
-
-            <article class="side-card" data-name="Chips" data-price="25" data-images="images/menu/chips.jpg">
-              <img src="images/menu/chips.jpg" alt="Chips">
-              <div class="side-body">
-                <h4>Chips</h4>
-                <p class="muted">Crispy salted chips.</p>
-                <div class="actions"><button class="btn primary" data-action="add" data-item="Chips" data-price="25">Add</button></div>
-              </div>
-            </article>
-          </div>
-        </section> <!-- Sides -->
-
-        <!-- SECTION: Beverages -->
-        <section class="menu-section" data-cat="bev" id="beverages">
-          <header class="section-head">
-            <h2>Beverages & Desserts</h2>
-            <p class="section-sub">Juices, smoothies, coffee & sweet treats</p>
-          </header>
-
-          <div class="cards-grid">
-            <article class="food-card"
-                     data-name="Mango & Basil Smoothie"
-                     data-price="50"
-                     data-cat="bev"
-                     data-images="images/menu/smoothie-mango-1.jpg|images/menu/smoothie-mango-2.jpg"
-                     data-options='{"cal":320}' aria-label="Mango Smoothie — GHS 50">
-              <div class="food-media"><img src="images/menu/smoothie-mango-1.jpg" alt="Mango Smoothie" class="food-photo"></div>
-              <div class="food-body">
-                <h3 class="food-title">Mango & Basil Smoothie</h3>
-                <p class="food-desc">Fresh mangoes, basil & yogurt for a bright finish.</p>
-                <div class="meta-row">
-                  <div class="meta-left"></div>
-                  <div class="meta-right">
-                    <div class="price">GHS <strong>50</strong></div>
-                    <div class="actions">
-                      <button class="btn ghost" data-action="view" data-modal-target="productModal">View</button>
-                      <button class="btn primary" data-action="add" data-item="Mango Smoothie" data-price="50">Add</button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </article>
-
-            <article class="food-card"
-                     data-name="Gelato Scoop"
-                     data-price="45"
-                     data-cat="bev"
-                     data-images="images/menu/gelato-1.jpg|images/menu/gelato-2.jpg"
-                     data-options='{"flavours":["Vanilla","Chocolate","Mango"],"cal":180}'>
-              <div class="food-media"><img src="images/menu/gelato-1.jpg" alt="Gelato" class="food-photo"></div>
-              <div class="food-body">
-                <h3 class="food-title">Gelato (any flavour)</h3>
-                <p class="food-desc">Creamy scoops of gelato made in-house.</p>
-                <div class="meta-row">
-                  <div class="meta-left"></div>
-                  <div class="meta-right">
-                    <div class="price">GHS <strong>45</strong></div>
-                    <div class="actions">
-                      <button class="btn ghost" data-action="view">View</button>
-                      <button class="btn primary" data-action="add" data-item="Gelato" data-price="45">Add</button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </article>
-          </div>
-        </section> <!-- Beverages -->
-      </div> <!-- menu-sections -->
+        <div class="business-card__item">
+          <span>Delivery</span>
+          <strong>Available, fees at checkout</strong>
+        </div>
+      </div>
     </section>
   </main>
 
-  <!-- ====== GALLERY: lots of images (masonry placeholders) ====== -->
-  <section id="gallery" class="container gallery-section" aria-label="Food gallery">
-    <h2>Mouthwatering Moments</h2>
-    <div class="masonry">
-      <figure class="masonry-item"><img src="images/gallery/1.jpg" alt="Wings closeup"></figure>
-      <figure class="masonry-item"><img src="images/gallery/2.jpg" alt="Shawarma wrap"></figure>
-      <figure class="masonry-item"><img src="images/gallery/3.jpg" alt="Loaded fries"></figure>
-      <figure class="masonry-item"><img src="images/gallery/4.jpg" alt="Pizza pull"></figure>
-      <figure class="masonry-item"><img src="images/gallery/5.jpg" alt="Family dining"></figure>
-      <figure class="masonry-item"><img src="images/gallery/6.jpg" alt="Desserts"></figure>
-    </div>
-  </section>
+  <!-- Cart Drawer -->
+  <aside class="cart-drawer" id="cartDrawer" aria-hidden="true" aria-label="Shopping cart">
+    <div class="cart-drawer__backdrop" data-close-cart></div>
+    <section class="cart-drawer__panel">
+      <header class="cart-drawer__header">
+        <div>
+          <p class="eyebrow">Your cart</p>
+          <h2>Cart summary</h2>
+        </div>
+        <button class="icon-btn" type="button" aria-label="Close cart" data-close-cart>
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </header>
 
-  <!-- ====== TESTIMONIALS / TRUST ====== -->
-  <section id="social-proof" class="container testimonials" aria-label="Customer testimonials">
-    <h2>Why people love Basilissa</h2>
-    <div class="testimonials">
-      <blockquote class="testimonial"><img src="images/customers/1.jpg" alt="Customer"><p>"Fast delivery and the shawarma tastes home-made!"</p><cite>— Ama S.</cite></blockquote>
-      <blockquote class="testimonial"><img src="images/customers/2.jpg" alt="Customer"><p>"The family bucket is perfect for parties. Great value."</p><cite>— Daniel K.</cite></blockquote>
-      <blockquote class="testimonial"><img src="images/customers/3.jpg" alt="Customer"><p>"Consistent quality and amazing flavors every time."</p><cite>— Sarah N.</cite></blockquote>
-    </div>
-  </section>
+      <div class="cart-drawer__body">
+        <div class="cart-empty" id="cartEmptyState">
+          <i class="fa-solid fa-bag-shopping"></i>
+          <h3>Your cart is empty</h3>
+          <p>Add shawarma, loaded fries, rice, angwamo, jollof, or noodles to begin.</p>
+        </div>
 
-  <!-- ====== FAQ / Contact quick ====== -->
-  <section id="faq-contact" class="container faq-section" aria-label="FAQ and contact">
-    <div class="faq-grid">
-      <div class="faq-panel">
-        <h3>Frequently Asked</h3>
-        <details open><summary>Do you deliver?</summary><p>Yes — we deliver across Accra and surrounding areas. Delivery fees apply.</p></details>
-        <details><summary>Event & catering?</summary><p>Yes — book our catering team for events. Contact sales@basilissa.com.</p></details>
-        <details><summary>Allergens & dietary</summary><p>We label common allergens in each product — check the product modal for details.</p></details>
+        <div class="cart-items" id="cartItems" aria-live="polite"></div>
       </div>
 
-      <div class="contact-panel">
-        <h3>Quick Contact</h3>
-        <div class="contact-cards">
-          <div class="contact-card">
-            <img src="images/contact/store.jpg" alt="Store">
-            <div><strong>Accra Mall</strong><p class="muted">Open daily 9:00 – 23:00</p></div>
+      <footer class="cart-drawer__footer">
+        <div class="cart-summary">
+          <div>
+            <span>Subtotal</span>
+            <strong id="cartSubtotal">GHC 0.00</strong>
           </div>
-          <div class="contact-card">
-            <img src="images/contact/catering.jpg" alt="Catering">
-            <div><strong>Catering</strong><p class="muted">events@basilissa.com</p></div>
+          <div>
+            <span>Delivery</span>
+            <strong id="cartDelivery">GHC 0.00</strong>
+          </div>
+          <div class="cart-summary__discount">
+            <span>Promo discount</span>
+            <strong id="cartDiscount">- GHC 0.00</strong>
+          </div>
+          <div class="cart-summary__total">
+            <span>Total</span>
+            <strong id="cartTotal">GHC 0.00</strong>
           </div>
         </div>
 
-        <form class="contact-mini" action="#" aria-label="Contact form">
-          <label class="sr-only" for="quickName">Name</label>
-          <input id="quickName" name="name" placeholder="Your name" />
-          <label class="sr-only" for="quickPhone">Phone</label>
-          <input id="quickPhone" name="phone" placeholder="Phone or WhatsApp" />
-          <button class="btn primary" type="submit">Send</button>
+        <div class="cart-actions">
+          <button class="btn btn--ghost" type="button" id="promoHelperBtn">
+            <i class="fa-solid fa-wand-magic-sparkles"></i>
+            Promo Helper
+          </button>
+          <button class="btn btn--ghost" type="button" id="clearCartBtn">
+            <i class="fa-solid fa-trash"></i>
+            Clear Cart
+          </button>
+        </div>
+
+        <button class="btn btn--primary cart-drawer__checkout" type="button" data-open-checkout>
+          <i class="fa-solid fa-lock"></i>
+          Checkout
+        </button>
+      </footer>
+    </section>
+  </aside>
+
+  <!-- Product Modal -->
+  <div class="modal" id="productModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="productModalTitle">
+    <div class="modal__backdrop" data-close-modal="productModal"></div>
+    <div class="modal__panel modal__panel--product">
+      <button class="modal__close" type="button" aria-label="Close product modal" data-close-modal="productModal">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <div class="product-modal__hero" id="productModalHero"></div>
+
+      <div class="product-modal__content">
+        <div class="product-modal__header">
+          <span class="product-modal__badge" id="productModalBadge">Featured</span>
+          <h2 id="productModalTitle">Product title</h2>
+          <p id="productModalDescription">Product description goes here.</p>
+        </div>
+
+        <form id="productOptionsForm" class="product-options-form">
+          <div class="option-group" id="productOptionGroups"></div>
+
+          <div class="option-group">
+            <h3>Quantity</h3>
+            <div class="stepper">
+              <button type="button" class="stepper__btn" data-stepper-minus aria-label="Decrease quantity">
+                <i class="fa-solid fa-minus"></i>
+              </button>
+              <input type="number" id="productQuantity" min="1" value="1" aria-label="Quantity" />
+              <button type="button" class="stepper__btn" data-stepper-plus aria-label="Increase quantity">
+                <i class="fa-solid fa-plus"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="product-modal__pricebar">
+            <div>
+              <span>Estimated total</span>
+              <strong id="productModalPrice">GHC 0.00</strong>
+            </div>
+            <button class="btn btn--primary" type="submit">
+              <i class="fa-solid fa-cart-plus"></i>
+              Add to Cart
+            </button>
+          </div>
         </form>
       </div>
     </div>
-  </section>
-
-  <!-- ====== FLOATING CTAS: cart + whatsapp + order ====== -->
-  <div class="floating-ctas" aria-hidden="false">
-    <button class="fab cart-fab" id="floatingCart" aria-label="Open cart"><i class="fa fa-shopping-bag"></i><span class="count" id="fabCount">0</span></button>
-    <a class="fab wa-fab" href="https://wa.me/233240000000" aria-label="Order on WhatsApp" target="_blank" rel="noopener"><i class="fa fa-whatsapp"></i></a>
-    <button class="fab quick-order" aria-label="Quick order" data-action="quick-order"><i class="fa fa-bolt"></i></button>
   </div>
 
-  <!-- ====== CART DRAWER (skeleton) ====== -->
-  <aside id="cartDrawer" class="cart-drawer" aria-hidden="true" role="dialog" aria-label="Shopping cart">
-    <header class="drawer-head">
-      <h3>Your Order</h3>
-      <button class="close-drawer" aria-label="Close cart"><i class="fa fa-times"></i></button>
-    </header>
-    <div class="drawer-body" id="drawerItems" tabindex="0" aria-live="polite">
-      <!-- JS will populate items -->
-      <div class="empty-cart">Your cart is empty — add something tasty!</div>
-    </div>
-    <footer class="drawer-foot">
-      <div class="totals"><span>Subtotal</span><strong id="drawerSubtotal">GHS 0</strong></div>
-      <div class="drawer-actions">
-        <button class="btn ghost" data-action="save">Save for later</button>
-        <button class="btn primary" data-action="checkout">Checkout</button>
-      </div>
-    </footer>
-  </aside>
+  <!-- Preorder Modal -->
+  <div class="modal" id="preorderModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="preorderTitle">
+    <div class="modal__backdrop" data-close-modal="preorderModal"></div>
+    <div class="modal__panel modal__panel--form">
+      <button class="modal__close" type="button" aria-label="Close preorder modal" data-close-modal="preorderModal">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
 
-  <!-- ====== PRODUCT / ITEM MODAL (single reusable modal) ======
-       - Will be populated by JS when user clicks "View" or "Customize".
-       - Contains: image carousel, price + size selectors, toppings toggles, nutrition panel,
-         allergen icons, reviews preview, recommended pairings, quantity, add-to-cart
-  -->
-  <div id="productModal" class="modal-backdrop" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="productModalTitle">
-    <div class="modal-panel" role="document">
-      <header class="modal-head">
-        <h2 id="productModalTitle">Item name</h2>
-        <button class="modal-close" aria-label="Close modal"><i class="fa fa-times"></i></button>
+      <div class="modal__heading">
+        <p class="eyebrow">Preorder</p>
+        <h2 id="preorderTitle">Plan your meal ahead</h2>
+        <p>Choose a date and time, then let us prepare your order at the right moment.</p>
+      </div>
+
+      <form id="preorderForm" class="stack-form">
+        <label>
+          <span>Name</span>
+          <input type="text" name="preorderName" placeholder="Your name" />
+        </label>
+        <label>
+          <span>Phone</span>
+          <input type="tel" name="preorderPhone" placeholder="Your phone number" />
+        </label>
+        <label>
+          <span>Preferred date</span>
+          <input type="date" name="preorderDate" />
+        </label>
+        <label>
+          <span>Preferred time</span>
+          <input type="time" name="preorderTime" />
+        </label>
+        <label>
+          <span>Notes</span>
+          <textarea name="preorderNotes" rows="4" placeholder="Add instructions here"></textarea>
+        </label>
+
+        <div class="stack-form__actions">
+          <button class="btn btn--ghost" type="button" data-close-modal="preorderModal">Cancel</button>
+          <button class="btn btn--primary" type="submit">
+            <i class="fa-solid fa-calendar-check"></i>
+            Save Preorder
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Checkout Modal -->
+  <div class="modal" id="checkoutModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="checkoutModalTitle">
+    <div class="modal__backdrop" data-close-modal="checkoutModal"></div>
+    <div class="modal__panel modal__panel--form modal__panel--checkout">
+      <button class="modal__close" type="button" aria-label="Close checkout modal" data-close-modal="checkoutModal">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <div class="modal__heading">
+        <p class="eyebrow">Checkout</p>
+        <h2 id="checkoutModalTitle">Complete your order</h2>
+        <p>
+          Checkout price does not include delivery fees. Delivery is estimated after checkout, and the delivery fee is communicated based on the address.
+        </p>
+      </div>
+
+      <form id="checkoutForm" class="checkout-form">
+        <div class="checkout-form__grid">
+          <label>
+            <span>Name</span>
+            <input type="text" name="name" id="customerName" placeholder="Your full name" required />
+          </label>
+
+          <label>
+            <span>Phone</span>
+            <input type="tel" name="phone" id="customerPhone" placeholder="Your phone number" required />
+          </label>
+
+          <label>
+            <span>Email</span>
+            <input type="email" name="email" id="customerEmail" placeholder="Your email address" required />
+          </label>
+
+          <label>
+            <span>Order type</span>
+            <select name="orderType" id="orderType" required>
+              <option value="delivery">Delivery</option>
+              <option value="pickup">Pickup</option>
+            </select>
+          </label>
+
+          <label class="checkout-form__full">
+            <span>Address</span>
+            <input type="text" name="address" id="customerAddress" placeholder="Delivery address or pickup note" />
+          </label>
+
+          <label>
+            <span>Preferred date</span>
+            <input type="date" name="preferredDate" id="preferredDate" />
+          </label>
+
+          <label>
+            <span>Preferred time</span>
+            <input type="time" name="preferredTime" id="preferredTime" />
+          </label>
+
+          <label class="checkout-form__full">
+            <span>Notes</span>
+            <textarea name="notes" id="orderNotes" rows="4" placeholder="Add any instructions"></textarea>
+          </label>
+        </div>
+
+        <div class="payment-box">
+          <h3>Payment method</h3>
+
+          <label class="payment-option">
+            <input type="radio" name="paymentMethod" value="paystack" checked />
+            <span>
+              <strong>Paystack mobile money or card</strong>
+              <small>Secure payment through Paystack inline checkout</small>
+            </span>
+          </label>
+
+          <label class="payment-option payment-option--disabled">
+            <input type="radio" name="paymentMethod" value="cod" disabled />
+            <span>
+              <strong>Cash on delivery</strong>
+              <small>Disabled in the markup</small>
+            </span>
+          </label>
+        </div>
+
+        <div class="checkout-summary">
+          <div>
+            <span>Subtotal</span>
+            <strong id="checkoutSubtotal">GHC 0.00</strong>
+          </div>
+          <div>
+            <span>Delivery</span>
+            <strong id="checkoutDelivery">GHC 0.00</strong>
+          </div>
+          <div>
+            <span>Promo discount</span>
+            <strong id="checkoutDiscount">- GHC 0.00</strong>
+          </div>
+          <div class="checkout-summary__total">
+            <span>Total</span>
+            <strong id="checkoutTotal">GHC 0.00</strong>
+          </div>
+        </div>
+
+        <div class="checkout-form__actions">
+          <button class="btn btn--ghost" type="button" data-close-modal="checkoutModal">Back to cart</button>
+          <button class="btn btn--primary" type="submit">
+            <i class="fa-solid fa-credit-card"></i>
+            Pay with Paystack
+          </button>
+        </div>
+      </form>
+
+      <p class="checkout-note">
+        Paystack inline checkout is enabled in the page scripts. Processing fees are handled using the configured Paystack and MTN withdrawal percentage logic.
+      </p>
+    </div>
+  </div>
+
+  <!-- Purchase History Modal -->
+  <div class="modal" id="historyModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="historyModalTitle">
+    <div class="modal__backdrop" data-close-modal="historyModal"></div>
+    <div class="modal__panel modal__panel--form modal__panel--history">
+      <button class="modal__close" type="button" aria-label="Close history modal" data-close-modal="historyModal">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <div class="modal__heading">
+        <p class="eyebrow">Purchase history</p>
+        <h2 id="historyModalTitle">Find previous orders</h2>
+        <p>Search by reference, name, or phone. All data is saved locally in the browser.</p>
+      </div>
+
+      <div class="history-tools">
+        <label class="history-search">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input type="search" id="historySearch" placeholder="Search reference, name, or phone" />
+        </label>
+
+        <div class="history-actions">
+          <button class="btn btn--ghost" type="button" id="historyOpenBtn">
+            <i class="fa-regular fa-folder-open"></i>
+            Open
+          </button>
+          <button class="btn btn--ghost" type="button" id="historyDownloadBtn">
+            <i class="fa-solid fa-download"></i>
+            Download
+          </button>
+          <button class="btn btn--ghost" type="button" id="historyPrintBtn">
+            <i class="fa-solid fa-print"></i>
+            Print
+          </button>
+          <button class="btn btn--ghost" type="button" id="historyRefreshBtn">
+            <i class="fa-solid fa-rotate"></i>
+            Refresh
+          </button>
+          <button class="btn btn--danger" type="button" id="historyClearBtn">
+            <i class="fa-solid fa-trash-can"></i>
+            Clear all
+          </button>
+        </div>
+      </div>
+
+      <div class="history-list" id="historyList" aria-live="polite"></div>
+    </div>
+  </div>
+
+  <!-- Order Confirmed Modal -->
+  <div class="modal" id="orderConfirmedModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="orderConfirmedTitle">
+    <div class="modal__backdrop" data-close-modal="orderConfirmedModal"></div>
+    <div class="modal__panel modal__panel--form modal__panel--success">
+      <button class="modal__close" type="button" aria-label="Close confirmation modal" data-close-modal="orderConfirmedModal">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <div class="success-head">
+        <i class="fa-solid fa-circle-check"></i>
+        <p class="eyebrow">Order confirmed</p>
+        <h2 id="orderConfirmedTitle">Your order is on the way</h2>
+        <p>Keep your reference details. You can save, print, or download the invoice.</p>
+      </div>
+
+      <div class="success-details" id="orderConfirmedDetails"></div>
+
+      <div class="success-actions">
+        <button class="btn btn--ghost" type="button" id="saveInvoicePdfBtn">
+          <i class="fa-solid fa-file-pdf"></i>
+          Save as PDF
+        </button>
+        <button class="btn btn--primary" type="button" data-close-modal="orderConfirmedModal">
+          Okay
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Printable Invoice Template -->
+  <template id="invoiceTemplate">
+    <article class="invoice">
+      <header class="invoice__header">
+        <div>
+          <h1>WRAP District</h1>
+          <p>Tema Community 25, Devtraco</p>
+        </div>
+        <div class="invoice__meta">
+          <p><strong>Reference:</strong> <span data-invoice-reference></span></p>
+          <p><strong>Timestamp:</strong> <span data-invoice-timestamp></span></p>
+        </div>
       </header>
 
-      <div class="modal-grid">
-        <!-- Image carousel (many images) -->
-        <div class="modal-media">
-          <div class="modal-carousel" data-animate="modal-carousel">
-            <img src="images/product-placeholder.jpg" alt="" class="modal-img main" id="modalMainImg">
-            <div class="modal-thumbs">
-              <img src="images/product-placeholder-thumb.jpg" alt="" class="thumb" data-src="">
-              <!-- JS will fill thumbnails -->
-            </div>
-          </div>
-        </div>
+      <section class="invoice__customer">
+        <h2>Customer details</h2>
+        <p><strong>Name:</strong> <span data-invoice-name></span></p>
+        <p><strong>Phone:</strong> <span data-invoice-phone></span></p>
+        <p><strong>Email:</strong> <span data-invoice-email></span></p>
+        <p><strong>Order type:</strong> <span data-invoice-order-type></span></p>
+        <p><strong>Address:</strong> <span data-invoice-address></span></p>
+        <p><strong>Notes:</strong> <span data-invoice-notes></span></p>
+      </section>
 
-        <!-- Right: details, customizers & actions -->
-        <div class="modal-body" id="modalDetails">
-          <div class="modal-meta">
-            <div class="modal-price" id="modalPrice">GHS 0</div>
-            <div class="modal-rating"><i class="fa fa-star"></i> <span id="modalRating">4.8</span> • <span id="modalReviewCount">124 reviews</span></div>
-          </div>
+      <section class="invoice__items">
+        <h2>Items</h2>
+        <div data-invoice-items></div>
+      </section>
 
-          <p class="modal-desc" id="modalDesc">Full description goes here — ingredients, story, chef note.</p>
+      <section class="invoice__totals">
+        <p><strong>Subtotal:</strong> <span data-invoice-subtotal></span></p>
+        <p><strong>Delivery:</strong> <span data-invoice-delivery></span></p>
+        <p><strong>Promo discount:</strong> <span data-invoice-discount></span></p>
+        <p><strong>Total:</strong> <span data-invoice-total></span></p>
+      </section>
+    </article>
+  </template>
 
-          <!-- size / price selector -->
-          <div class="modal-section">
-            <h4>Size & Price</h4>
-            <div class="options-row" id="modalSizes" role="radiogroup" aria-label="Size options">
-              <!-- JS will render radio buttons for sizes -->
-            </div>
-          </div>
-
-          <!-- toppings / extras -->
-          <div class="modal-section">
-            <h4>Toppings & Extras</h4>
-            <div class="options-grid" id="modalToppings">
-              <!-- JS will render toggles (each shows small image & price) -->
-            </div>
-          </div>
-
-          <!-- nutrition & allergens -->
-          <div class="modal-section nutrition">
-            <h4>Nutrition & Allergens</h4>
-            <div class="nutrition-row">
-              <div class="nut"><strong id="modalCals">520</strong> kcal</div>
-              <div class="allergens" id="modalAllergens">
-                <span title="Contains gluten"><i class="fa fa-bread-slice"></i></span>
-                <span title="Contains dairy"><i class="fa fa-cheese"></i></span>
-              </div>
-            </div>
-          </div>
-
-          <!-- recommended pairings -->
-          <div class="modal-section">
-            <h4>Recommended Pairings</h4>
-            <div class="pairings">
-              <button class="pair" data-item="Loaded Fries" data-price="38"><img src="images/pairings/fries-thumb.jpg" alt=""> Fries <small>GHS 38</small></button>
-              <button class="pair" data-item="Mango Smoothie" data-price="50"><img src="images/pairings/smoothie-thumb.jpg" alt=""> Smoothie <small>GHS 50</small></button>
-            </div>
-          </div>
-
-          <!-- quantity + add -->
-          <div class="modal-actions">
-            <div class="qty">
-              <label for="modalQty" class="sr-only">Quantity</label>
-              <div class="qty-controls">
-                <button class="btn ghost" data-action="dec">−</button>
-                <input id="modalQty" type="number" min="1" value="1" />
-                <button class="btn ghost" data-action="inc">+</button>
-              </div>
-            </div>
-
-            <div class="add-row">
-              <button class="btn ghost" data-action="save-wishlist"><i class="fa fa-heart"></i> Save</button>
-              <button class="btn primary" id="modalAddToCart"><i class="fa fa-cart-plus"></i> Add to cart</button>
-            </div>
-          </div>
-
-          <!-- reviews snapshot -->
-          <div class="modal-section reviews">
-            <h4>Customer Reviews</h4>
-            <div class="review-list">
-              <div class="review"><strong>Ama</strong><span class="muted">• 5.0</span><p>Fantastic flavor — my favorite.</p></div>
-              <div class="review"><strong>Daniel</strong><span class="muted">• 4.8</span><p>Family loved it. Great portions.</p></div>
-              <a href="#reviews" class="muted small">See all reviews</a>
-            </div>
-          </div>
-        </div>
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="site-footer__brand">
+      <div class="brand">
+        <span class="brand__mark">WRAP</span>
+        <span class="brand__name">District</span>
       </div>
-    </div>
-  </div>
-
-  <!-- ====== FOOTER (image + trust) ====== -->
-  <footer class="site-footer container" role="contentinfo" aria-label="Footer">
-    <div class="footer-grid">
-      <div class="footer-about">
-        <img src="images/logo-white.png" alt="Basilissa" class="logo-footer">
-        <p>We craft craveable food using fresh ingredients and passionate chefs.</p>
-        <div class="trust-logos">
-          <img src="images/trust/visa.svg" alt="Visa">
-          <img src="images/trust/mastercard.svg" alt="Mastercard">
-          <img src="images/trust/gereporter.svg" alt="Local award">
-        </div>
-      </div>
-
-      <div class="footer-gallery">
-        <h4>Instagram</h4>
-        <div class="insta-grid">
-          <img src="images/insta/1.jpg" alt="">
-          <img src="images/insta/2.jpg" alt="">
-          <img src="images/insta/3.jpg" alt="">
-          <img src="images/insta/4.jpg" alt="">
-        </div>
-      </div>
-
-      <div class="footer-contact">
-        <h4>Contact</h4>
-        <p><i class="fa fa-phone"></i> +233 24 000 0000</p>
-        <p><i class="fa fa-map-marker-alt"></i> Accra Mall, Accra</p>
-        <a class="btn ghost" href="#menu-main">Order Online</a>
-      </div>
+      <p>Fresh wraps, bold flavors, and fast ordering for every craving.</p>
     </div>
 
-    <div class="footer-legal">
-      <small>© <span id="year">2025</span> Basilissa — All rights reserved.</small>
-      <div class="footer-links"><a href="/privacy">Privacy</a> · <a href="/terms">Terms</a></div>
+    <div class="site-footer__links">
+      <a href="#hero">Home</a>
+      <a href="#menu">Menu</a>
+      <a href="#contact">Contact</a>
+      <button type="button" data-open-history>Purchase History</button>
     </div>
+
+    <p class="site-footer__note">
+      Built for mobile-first ordering with local storage, promo logic, checkout, and invoice flow.
+    </p>
   </footer>
 
-
+  <!-- Scripts -->
+  <script src="script.js" defer></script>
 </body>
-  <script>
-
-
-(function () {
-  'use strict';
-
-  /* -----------------------
-     Utility helpers
-  ----------------------- */
-  const $ = (sel, root = document) => root.querySelector(sel);
-  const $$ = (sel, root = document) => Array.from((root || document).querySelectorAll(sel));
-  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
-  function safeJSONParse(str, fallback = null) {
-    try { return JSON.parse(str); } catch (e) { return fallback; }
-  }
-  function elData(el, key) {
-    if (!el) return null;
-    // prefer getAttribute to preserve original JSON formatting
-    return el.getAttribute('data-' + key);
-  }
-
-  /* -----------------------
-     Toast helper
-  ----------------------- */
-  function toast(msg, opts = {}) {
-    const t = document.createElement('div');
-    t.className = 'bs-toast';
-    t.textContent = msg;
-    Object.assign(t.style, {
-      position: 'fixed', right: '22px', bottom: (opts.bottom || 90) + 'px',
-      background: 'linear-gradient(90deg,#0b9a5a,#0f6b3a)', color: '#fff',
-      padding: '10px 14px', borderRadius: '10px', boxShadow: '0 12px 40px rgba(0,0,0,0.4)',
-      zIndex: 99999, fontWeight: 800
-    });
-    document.body.appendChild(t);
-    t.animate([{opacity:0, transform:'translateY(6px)'},{opacity:1, transform:'translateY(0)'}], {duration:220});
-    setTimeout(()=> {
-      t.animate([{opacity:1},{opacity:0, transform:'translateY(6px)'}], {duration:220});
-      setTimeout(()=> t.remove(), 220);
-    }, opts.duration || 1600);
-  }
-
-  /* -----------------------
-     CART (persistent)
-  ----------------------- */
-  const CART_KEY = 'basilissa_menu_cart_v1';
-  let CART = { items: [] };
-  function loadCart() {
-    try {
-      const raw = localStorage.getItem(CART_KEY);
-      CART = raw ? JSON.parse(raw) : { items: [] };
-    } catch (e) {
-      CART = { items: [] };
-    }
-  }
-  function saveCart() {
-    try { localStorage.setItem(CART_KEY, JSON.stringify(CART)); } catch (e) {}
-    renderCartUI();
-  }
-  function cartTotalCount() {
-    return CART.items.reduce((s, it) => s + (it.qty || 1), 0);
-  }
-  function cartTotalPrice() {
-    return CART.items.reduce((s, it) => s + (Number(it.price)||0) * (it.qty||1), 0);
-  }
-  function addItemToCart(item) {
-    // item: { id?, name, price, qty, opts }
-    const key = item.id || (item.name + '|' + JSON.stringify(item.opts || {}));
-    let found = CART.items.find(i => i._key === key);
-    if (found) { found.qty = (found.qty || 1) + (item.qty || 1); }
-    else {
-      CART.items.push(Object.assign({}, item, {_key: key, qty: item.qty || 1}));
-    }
-    saveCart();
-    // UI
-    toast(`${item.name} added to cart`);
-  }
-  function changeCartQty(index, delta) {
-    if (!CART.items[index]) return;
-    CART.items[index].qty = (CART.items[index].qty || 1) + delta;
-    if (CART.items[index].qty <= 0) CART.items.splice(index, 1);
-    saveCart();
-  }
-  function removeCartItem(index) {
-    CART.items.splice(index, 1);
-    saveCart();
-  }
-  function clearCart() { CART.items = []; saveCart(); }
-
-  /* Cart UI elements */
-  const globalCountEl = document.getElementById('globalCartCount');
-  const fabCountEl = document.getElementById('fabCount');
-  const cartBtn = document.getElementById('cartBtn');
-  const cartDrawer = document.getElementById('cartDrawer');
-  const drawerItems = document.getElementById('drawerItems');
-  const drawerSubtotal = document.getElementById('drawerSubtotal');
-  const floatingCart = document.getElementById('floatingCart');
-
-  function renderCartUI() {
-    // counts
-    const count = cartTotalCount();
-    if (globalCountEl) { globalCountEl.textContent = count; globalCountEl.style.display = count ? 'inline-flex' : 'none'; }
-    if (fabCountEl) { fabCountEl.textContent = count; fabCountEl.style.display = count ? 'inline-flex' : 'none'; }
-
-    // drawer
-    if (!drawerItems) return;
-    drawerItems.innerHTML = '';
-    if (!CART.items.length) {
-      const empty = document.createElement('div');
-      empty.className = 'empty-cart';
-      empty.textContent = 'Your cart is empty — add something tasty!';
-      drawerItems.appendChild(empty);
-      drawerSubtotal.textContent = 'GHS 0';
-      return;
-    }
-    CART.items.forEach((it, idx) => {
-      const row = document.createElement('div');
-      row.className = 'cart-row';
-      row.style.display = 'flex';
-      row.style.gap = '12px';
-      row.style.alignItems = 'center';
-      row.style.marginBottom = '12px';
-      row.innerHTML = `
-        <img src="${it.image || 'images/menu/placeholder-mini.jpg'}" alt="${it.name}" style="width:64px;height:52px;object-fit:cover;border-radius:8px">
-        <div style="flex:1">
-          <div style="font-weight:800">${it.name}</div>
-          <div style="color:#bfc7cb;font-size:13px">${Object.entries(it.opts||{}).filter(([k,v])=>v).map(([k,v])=> k + (v===true?'':': '+v)).join(' • ')}</div>
-        </div>
-        <div style="text-align:right">
-          <div style="font-weight:900">GHS ${(Number(it.price||0) * (it.qty||1)).toFixed(2)}</div>
-          <div style="display:flex;gap:8px;align-items:center;justify-content:flex-end;margin-top:8px">
-            <button class="btn ghost cart-dec" data-idx="${idx}">−</button>
-            <div style="min-width:26px;text-align:center">${it.qty}</div>
-            <button class="btn ghost cart-inc" data-idx="${idx}">+</button>
-          </div>
-        </div>
-      `;
-      drawerItems.appendChild(row);
-    });
-    drawerSubtotal.textContent = 'GHS ' + cartTotalPrice().toFixed(2);
-
-    // wire inc/dec
-    $$('.cart-inc', drawerItems).forEach(b => b.onclick = () => { changeCartQty(Number(b.dataset.idx), 1); });
-    $$('.cart-dec', drawerItems).forEach(b => b.onclick = () => { changeCartQty(Number(b.dataset.idx), -1); });
-  }
-
-  /* Drawer open / close */
-  function openDrawer() {
-    if (!cartDrawer) return;
-    cartDrawer.setAttribute('aria-hidden', 'false');
-    cartDrawer.style.transform = 'translateX(0)';
-    cartDrawer.style.display = 'block';
-  }
-  function closeDrawer() {
-    if (!cartDrawer) return;
-    cartDrawer.setAttribute('aria-hidden', 'true');
-    cartDrawer.style.transform = 'translateX(110%)';
-    // hide after animation (safe)
-    setTimeout(()=> { cartDrawer.style.display = 'none'; }, 380);
-  }
-
-  /* Init cart */
-  try { loadCart(); } catch (e) { CART = { items: [] }; }
-  renderCartUI();
-
-  // wire drawer openers
-  if (cartBtn) cartBtn.addEventListener('click', (e) => { e.preventDefault(); openDrawer(); });
-  if (floatingCart) floatingCart.addEventListener('click', (e) => { e.preventDefault(); openDrawer(); });
-  // close drawer via close button
-  const closeDrawerBtn = cartDrawer && cartDrawer.querySelector('.close-drawer');
-  if (closeDrawerBtn) closeDrawerBtn.addEventListener('click', closeDrawer);
-
-  /* -----------------------
-     Hero carousel (3s autoplay)
-  ----------------------- */
-  (function heroCarousel() {
-    const slides = $$('.slide', document.querySelector('#hero') || document);
-    const dots = $$('.dot', document.querySelector('#hero') || document);
-    const prev = $('.prev', document.querySelector('#hero')) || null;
-    const next = $('.next', document.querySelector('#hero')) || null;
-    if (!slides.length) return;
-    let current = slides.findIndex(s => s.classList.contains('is-active'));
-    if (current < 0) current = 0;
-    let timer = null;
-    const INTERVAL = 3000;
-
-    function goTo(i, manual = false) {
-      i = (i + slides.length) % slides.length;
-      slides.forEach((s, idx) => {
-        const active = idx === i;
-        s.classList.toggle('is-active', active);
-        s.setAttribute('aria-hidden', active ? 'false' : 'true');
-      });
-      dots.forEach((d, idx) => {
-        d.classList.toggle('active', idx === i);
-        d.setAttribute('aria-selected', idx === i ? 'true' : 'false');
-      });
-      current = i;
-      if (manual) restart();
-      // micro-animations: pop image layers
-      const media = slides[i].querySelectorAll('[data-animate="pop"], .media-main, .media-layer');
-      media.forEach(m => {
-        m.classList.remove('js-pop');
-        void m.offsetWidth;
-        m.classList.add('js-pop');
-        setTimeout(()=> m.classList.remove('js-pop'), 700);
-      });
-    }
-    function nextSlide() { goTo(current + 1); }
-    function prevSlide() { goTo(current - 1); }
-    function start() { stop(); timer = setInterval(nextSlide, INTERVAL); }
-    function stop() { if (timer) { clearInterval(timer); timer = null; } }
-    function restart() { stop(); start(); }
-
-    // wire dots
-    dots.forEach(d => d.addEventListener('click', () => goTo(Number(d.dataset.dot), true)));
-    if (next) next.addEventListener('click', () => goTo(current + 1, true));
-    if (prev) prev.addEventListener('click', () => goTo(current - 1, true));
-    // keyboard
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'ArrowRight') goTo(current + 1, true);
-      if (e.key === 'ArrowLeft') goTo(current - 1, true);
-    });
-    // pause on hover
-    const heroEl = document.getElementById('hero');
-    if (heroEl) {
-      heroEl.addEventListener('mouseenter', stop);
-      heroEl.addEventListener('mouseleave', start);
-    }
-    goTo(current);
-    start();
-  })();
-
-  /* -----------------------
-     Menu categories & search
-  ----------------------- */
-  (function categoriesSearch() {
-    const catBtns = $$('.cat-btn');
-    const sections = $$('.menu-section');
-    const searchInput = $('#menuSearch');
-    const clearSearch = $('#clearSearch');
-
-    function showCategory(cat) {
-      sections.forEach(sec => {
-        if (cat === 'all' || sec.dataset.cat === cat) sec.style.display = '';
-        else sec.style.display = 'none';
-      });
-      // scroll to top of menu
-      const menuMain = document.getElementById('menu-main');
-      if (menuMain) window.scrollTo({ top: menuMain.offsetTop - 84, behavior: 'smooth' });
-    }
-
-    catBtns.forEach(btn => btn.addEventListener('click', (e) => {
-      catBtns.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      const cat = btn.dataset.cat || btn.getAttribute('data-cat') || 'all';
-      showCategory(cat);
-    }));
-
-    if (searchInput) {
-      searchInput.addEventListener('input', (e) => {
-        const q = (e.target.value || '').trim().toLowerCase();
-        // reveal all sections to allow searching across them
-        sections.forEach(sec => sec.style.display = '');
-        $$('.food-card').forEach(card => {
-          const name = (card.dataset.name || '').toLowerCase();
-          const desc = (card.querySelector('.food-desc')?.textContent || '').toLowerCase();
-          const cat = (card.dataset.cat || '').toLowerCase();
-          card.style.display = (!q || name.includes(q) || desc.includes(q) || cat.includes(q)) ? '' : 'none';
-        });
-      });
-    }
-    if (clearSearch) clearSearch.addEventListener('click', () => {
-      if (searchInput) searchInput.value = '';
-      $$('.food-card').forEach(c => c.style.display = '');
-    });
-  })();
-
-  /* -----------------------
-     Product modal (populate & behaviors)
-  ----------------------- */
-  const productModal = document.getElementById('productModal');
-  const modalPanel = productModal && productModal.querySelector('.modal-panel');
-  const modalTitle = productModal && productModal.querySelector('#productModalTitle');
-  const modalMainImg = productModal && productModal.querySelector('#modalMainImg');
-  const modalPriceEl = productModal && productModal.querySelector('#modalPrice');
-  const modalDescEl = productModal && productModal.querySelector('#modalDesc');
-  const modalSizesEl = productModal && productModal.querySelector('#modalSizes');
-  const modalToppingsEl = productModal && productModal.querySelector('#modalToppings');
-  const modalCalsEl = productModal && productModal.querySelector('#modalCals');
-  const modalAllergensEl = productModal && productModal.querySelector('#modalAllergens');
-  const modalQtyInput = productModal && productModal.querySelector('#modalQty');
-  const modalAddBtn = productModal && productModal.querySelector('#modalAddToCart');
-  const modalCloseBtn = productModal && productModal.querySelector('.modal-close');
-
-  let modalState = { images: [], sizes: null, toppings: [], chosen: {}, basePrice: 0, name: '', id: null, image: null };
-
-  function showProductModal() {
-    if (!productModal) return;
-    productModal.style.display = 'flex';
-    productModal.setAttribute('aria-hidden', 'false');
-    document.body.style.overflow = 'hidden';
-  }
-  function hideProductModal() {
-    if (!productModal) return;
-    productModal.style.display = 'none';
-    productModal.setAttribute('aria-hidden', 'true');
-    document.body.style.overflow = '';
-    // clear thumbnail container etc.
-    if (modalSizesEl) modalSizesEl.innerHTML = '';
-    if (modalToppingsEl) modalToppingsEl.innerHTML = '';
-  }
-
-  function populateModalFromCard(cardEl) {
-    if (!cardEl) return;
-    modalState = { images: [], sizes: null, toppings: [], chosen: {}, basePrice: 0, name: '', id: null, image: null };
-
-    const name = cardEl.dataset.name || cardEl.getAttribute('data-name') || cardEl.querySelector('.food-title')?.textContent || 'Item';
-    const priceStr = cardEl.dataset.price || cardEl.getAttribute('data-price') || (cardEl.querySelector('.price strong')?.textContent) || '0';
-    const basePrice = Number(priceStr) || 0;
-    const imagesRaw = cardEl.getAttribute('data-images') || cardEl.dataset.images || '';
-    const optRaw = cardEl.getAttribute('data-options') || cardEl.dataset.options || null;
-    const imagePrimary = cardEl.querySelector('.food-photo')?.src || '';
-
-    modalState.name = name;
-    modalState.basePrice = basePrice;
-    modalState.id = (cardEl.dataset.id) || name;
-    modalState.image = imagePrimary;
-
-    // images (pipe-delimited)
-    modalState.images = imagesRaw ? imagesRaw.split('|').map(s => s.trim()).filter(Boolean) : (imagePrimary ? [imagePrimary] : []);
-    if (!modalState.images.length && imagePrimary) modalState.images = [imagePrimary];
-
-    // options (JSON)
-    const options = safeJSONParse(optRaw, {});
-    // options may include sizes, toppings, extras, tiers etc.
-    if (options && typeof options === 'object') {
-      // sizes or tiers
-      modalState.sizes = options.sizes || options.tiers || null;
-      // extras or toppings
-      modalState.toppings = options.toppings || options.extras || [];
-      // calories / allergens
-      modalState.cal = options.cal || options.calories || null;
-      modalState.allergens = options.allergens || null;
-    }
-
-    // fill UI
-    if (modalTitle) modalTitle.textContent = modalState.name;
-    if (modalMainImg) modalMainImg.src = modalState.images[0] || '';
-    if (modalPriceEl) modalPriceEl.textContent = 'GHS ' + (modalState.basePrice || basePrice).toFixed(2);
-    if (modalDescEl) modalDescEl.textContent = cardEl.querySelector('.food-desc')?.textContent || '';
-
-    // sizes: render radio-like buttons
-    if (modalSizesEl) {
-      modalSizesEl.innerHTML = '';
-      if (modalState.sizes && typeof modalState.sizes === 'object') {
-        Object.entries(modalState.sizes).forEach(([sizeName, sizePrice]) => {
-          const btn = document.createElement('button');
-          btn.className = 'modal-size variant';
-          btn.type = 'button';
-          btn.textContent = `${sizeName} — GHS ${sizePrice}`;
-          btn.dataset.size = sizeName;
-          btn.dataset.price = sizePrice;
-          btn.addEventListener('click', () => {
-            // toggle exclusive
-            modalSizesEl.querySelectorAll('.variant').forEach(v => v.classList.remove('active'));
-            btn.classList.add('active');
-            modalState.chosen.size = sizeName;
-            modalState.basePrice = Number(sizePrice);
-            updateModalPrice();
-          });
-          modalSizesEl.appendChild(btn);
-        });
-      } else {
-        // no size options - show base price selected
-        const span = document.createElement('div');
-        span.className = 'muted';
-        span.textContent = 'Standard size — price shown';
-        modalSizesEl.appendChild(span);
-      }
-    }
-
-    // toppings/extras: toggles
-    if (modalToppingsEl) {
-      modalToppingsEl.innerHTML = '';
-      if (Array.isArray(modalState.toppings) && modalState.toppings.length) {
-        modalState.toppings.forEach(t => {
-          const b = document.createElement('button');
-          b.type = 'button';
-          b.className = 'modal-topping variant';
-          b.textContent = t;
-          b.dataset.topping = t;
-          b.addEventListener('click', () => {
-            modalState.chosen[t] = !modalState.chosen[t];
-            b.classList.toggle('active', !!modalState.chosen[t]);
-            updateModalPrice();
-          });
-          modalToppingsEl.appendChild(b);
-        });
-      } else {
-        modalToppingsEl.innerHTML = '<div class="muted">No extras available</div>';
-      }
-    }
-
-    // nutrition/allergens
-    if (modalCalsEl) modalCalsEl.textContent = modalState.cal || (cardEl.dataset.cal || '');
-    if (modalAllergensEl) {
-      modalAllergensEl.innerHTML = '';
-      if (modalState.allergens && Array.isArray(modalState.allergens)) {
-        modalState.allergens.forEach(a => {
-          const span = document.createElement('span');
-          span.title = a;
-          // small mapping for icons
-          const icon = a.includes('gluten') ? 'fa-bread-slice' : a.includes('dairy') ? 'fa-cheese' : 'fa-exclamation-triangle';
-          span.innerHTML = `<i class="fa ${icon}"></i>`;
-          modalAllergensEl.appendChild(span);
-        });
-      } else {
-        modalAllergensEl.innerHTML = '<span class="muted">—</span>';
-      }
-    }
-
-    if (modalQtyInput) modalQtyInput.value = 1;
-
-    // thumbnails: add click handlers to change main image
-    const thumbsContainer = productModal.querySelector('.modal-thumbs');
-    if (thumbsContainer) {
-      thumbsContainer.innerHTML = '';
-      modalState.images.forEach((src, idx) => {
-        const t = document.createElement('img');
-        t.src = src;
-        t.className = 'thumb';
-        t.alt = modalState.name + ' photo ' + (idx+1);
-        t.style.cursor = 'pointer';
-        t.addEventListener('click', () => {
-          if (modalMainImg) modalMainImg.src = src;
-        });
-        thumbsContainer.appendChild(t);
-      });
-    }
-
-    // set price display
-    updateModalPrice();
-
-    // show modal
-    showProductModal();
-  }
-
-  function updateModalPrice() {
-    if (!modalPriceEl) return;
-    let base = Number(modalState.basePrice || 0);
-    // toppings count => add GHS 6 each (example)
-    const toppingsCount = Object.keys(modalState.chosen || {}).filter(k => modalState.chosen[k] && k !== 'size').length;
-    const total = base + (toppingsCount * 6);
-    modalPriceEl.textContent = 'GHS ' + total.toFixed(2);
-  }
-
-  // handle Add to cart from modal
-  if (modalAddBtn) {
-    modalAddBtn.addEventListener('click', () => {
-      const qty = Number(modalQtyInput?.value) || 1;
-      // compute price again
-      let base = Number(modalState.basePrice || 0);
-      const toppingsCount = Object.keys(modalState.chosen || {}).filter(k => modalState.chosen[k] && k !== 'size').length;
-      const price = base + toppingsCount * 6;
-      const item = {
-        id: modalState.id || modalState.name,
-        name: modalState.name,
-        price: Number(price),
-        qty,
-        opts: Object.assign({}, modalState.chosen),
-        image: modalState.images[0] || modalState.image || ''
-      };
-      addItemToCart(item);
-      // visual: fly image to cart
-      if (modalMainImg) animateFlyToCart(modalMainImg);
-      hideProductModal();
-      openDrawer();
-    });
-  }
-  if (modalCloseBtn) modalCloseBtn.addEventListener('click', hideProductModal);
-  // close modal when clicking backdrop
-  if (productModal) productModal.addEventListener('click', (e) => {
-    if (e.target === productModal) hideProductModal();
-  });
-
-  /* -----------------------
-     Click delegation for menu actions (add/view/customize/etc.)
-  ----------------------- */
-  document.addEventListener('click', (e) => {
-    const btn = e.target.closest('[data-action]');
-    if (!btn) return;
-    const action = btn.dataset.action;
-    // handle add (from card or offer tile)
-    if (action === 'add') {
-      e.preventDefault();
-      const itemName = btn.dataset.item || btn.getAttribute('data-item') || btn.closest('.food-card')?.dataset.name;
-      const price = Number(btn.dataset.price || btn.getAttribute('data-price') || btn.closest('.food-card')?.dataset.price || 0);
-      const image = btn.closest('.food-card')?.querySelector('.food-photo')?.src || btn.closest('.offer-tile')?.querySelector('img')?.src || '';
-      if (!itemName) return;
-      addItemToCart({ id: itemName, name: itemName, price, qty: 1, opts: {}, image });
-      // animate fly
-      const imgEl = btn.closest('.food-card')?.querySelector('.food-photo') || btn.closest('.offer-tile')?.querySelector('img');
-      if (imgEl) animateFlyToCart(imgEl);
-      return;
-    }
-
-    if (action === 'view') {
-      e.preventDefault();
-      // find nearest food-card
-      const card = btn.closest('.food-card') || btn.closest('.pizza-card') || btn.closest('.offer-tile');
-      if (!card) return;
-      populateModalFromCard(card);
-      return;
-    }
-
-    if (action === 'customize' || action === 'sizes') {
-      e.preventDefault();
-      const card = btn.closest('.food-card') || btn.closest('.pizza-card') || btn.closest('.promo-slide');
-      if (!card) return;
-      populateModalFromCard(card);
-      return;
-    }
-
-    if (action === 'view' && btn.dataset.modalTarget) {
-      // future: open different modal
-    }
-
-    if (action === 'order') {
-      e.preventDefault();
-      // scroll to section or open modal based on dataset-item
-      const target = btn.dataset.item;
-      // if dataset-item and it's in menu, open modal else add to cart
-      const card = $(`[data-name="${target}"]`);
-      if (card) { populateModalFromCard(card); }
-      else if (target) { addItemToCart({ id: target, name: target, price: Number(btn.dataset.price||0), qty:1 }); }
-      return;
-    }
-
-    if (action === 'pair') {
-      e.preventDefault();
-      const name = btn.dataset.item;
-      const price = Number(btn.dataset.price||0);
-      if (name) { addItemToCart({ id:name, name, price, qty:1 }); }
-      return;
-    }
-  });
-
-  /* -----------------------
-     Add "click card" to open modal when clicking anywhere on the food-card
-  ----------------------- */
-  $$('.food-card').forEach(card => {
-    card.addEventListener('click', (e) => {
-      // ignore clicks on buttons/links inside card
-      if (e.target.closest('button, a')) return;
-      populateModalFromCard(card);
-    });
-  });
-
-  /* -----------------------
-     Fly-to-cart animation
-  ----------------------- */
-  function animateFlyToCart(imgEl) {
-    if (!imgEl) return;
-    try {
-      const rect = imgEl.getBoundingClientRect();
-      const clone = imgEl.cloneNode(true);
-      clone.style.position = 'fixed';
-      clone.style.left = rect.left + 'px';
-      clone.style.top = rect.top + 'px';
-      clone.style.width = rect.width + 'px';
-      clone.style.height = rect.height + 'px';
-      clone.style.transition = 'transform 700ms cubic-bezier(.2,.8,.2,1), opacity 700ms';
-      clone.style.zIndex = 99999;
-      clone.style.borderRadius = getComputedStyle(imgEl).borderRadius;
-      document.body.appendChild(clone);
-      // target position (cart button)
-      const targetBtn = cartBtn || document.querySelector('.cart-btn') || document.getElementById('cartButton') || document.getElementById('floatingCart');
-      const targetRect = targetBtn ? targetBtn.getBoundingClientRect() : { left: window.innerWidth - 72, top: 24, width: 40, height: 40 };
-      const dx = targetRect.left + targetRect.width/2 - (rect.left + rect.width/2);
-      const dy = targetRect.top + targetRect.height/2 - (rect.top + rect.height/2);
-      requestAnimationFrame(() => {
-        clone.style.transform = `translate(${dx}px, ${dy}px) scale(0.2) rotate(10deg)`;
-        clone.style.opacity = '0.2';
-      });
-      setTimeout(()=> clone.remove(), 780);
-    } catch (e) {
-      // silent
-    }
-  }
-
-  /* -----------------------
-     Pairings inside modal (delegation)
-  ----------------------- */
-  document.addEventListener('click', (e) => {
-    const pair = e.target.closest('.pair');
-    if (!pair) return;
-    e.preventDefault();
-    const name = pair.dataset.item;
-    const price = Number(pair.dataset.price || 0);
-    if (name) {
-      addItemToCart({ id: name, name, price, qty: 1 });
-      toast(`${name} added`);
-      // optionally animate using thumb inside pair
-      const img = pair.querySelector('img');
-      if (img) animateFlyToCart(img);
-    }
-  });
-
-  /* -----------------------
-     Floating CTAs: quick order
-  ----------------------- */
-  document.addEventListener('click', (e) => {
-    const quick = e.target.closest('[data-action="quick-order"], .quick-order');
-    if (!quick) return;
-    e.preventDefault();
-    // choose top recommended item (first in menu)
-    const firstCard = document.querySelector('.food-card[data-name]');
-    if (firstCard) {
-      const name = firstCard.dataset.name;
-      const price = Number(firstCard.dataset.price || 0);
-      addItemToCart({ id: name, name, price, qty: 1, image: firstCard.querySelector('.food-photo')?.src });
-      toast(`Quick order: ${name}`);
-      animateFlyToCart(firstCard.querySelector('.food-photo'));
-      openDrawer();
-    }
-  });
-
-  /* -----------------------
-     Contact mini form (simulate)
-  ----------------------- */
-  document.querySelectorAll('.contact-mini').forEach(form => {
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const name = form.querySelector('input[name="name"], #quickName')?.value || 'Guest';
-      const phone = form.querySelector('input[name="phone"], #quickPhone')?.value || '';
-      toast('Thanks ' + name + '! We will contact you shortly.');
-      form.reset();
-    });
-  });
-
-  /* -----------------------
-     Keyboard: ESC closes modal & drawer
-  ----------------------- */
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-      hideProductModal();
-      closeDrawer();
-    }
-  });
-
-  /* -----------------------
-     Simulated Download menu (PDF) — safe fallback
-  ----------------------- */
-  const downloadBtn = document.getElementById('downloadPDF');
-  if (downloadBtn) {
-    downloadBtn.addEventListener('click', (e) => {
-      e.preventDefault();
-      toast('Download is not enabled in demo. Export feature can be added.');
-    });
-  }
-
-  /* -----------------------
-     Clicks on section "offer-tiles" add to cart
-  ----------------------- */
-  $$('.offer-tile').forEach(tile => {
-    const add = tile.querySelector('[data-action="add"]');
-    if (add) {
-      add.addEventListener('click', (e) => {
-        e.preventDefault();
-        const name = add.dataset.item || tile.querySelector('.info strong')?.textContent;
-        const price = Number(add.dataset.price || 0);
-        const img = tile.querySelector('img')?.src;
-        addItemToCart({ id: name, name, price, qty:1, image: img });
-        animateFlyToCart(tile.querySelector('img'));
-      });
-    }
-  });
-
-  /* -----------------------
-     Safety: guard against missing UI elements
-  ----------------------- */
-  try {
-    // initial UI state
-    renderCartUI();
-    // hide modal initially
-    if (productModal) { productModal.style.display = 'none'; productModal.setAttribute('aria-hidden', 'true'); }
-    // hide drawer initially
-    if (cartDrawer) { cartDrawer.style.display = 'none'; cartDrawer.setAttribute('aria-hidden', 'true'); cartDrawer.style.transform = 'translateX(110%)'; }
-  } catch (e) {
-    // swallow to avoid uncaught exceptions interfering with page
-    console.error('Init error (non-fatal):', e);
-  }
-
-  /* -----------------------
-     Extra accessibility improvements
-  ----------------------- */
-  (function focusRing() {
-    function handleFirstTab(e) {
-      if (e.key === 'Tab') {
-        document.documentElement.classList.add('user-is-tabbing');
-        window.removeEventListener('keydown', handleFirstTab);
-      }
-    }
-    window.addEventListener('keydown', handleFirstTab);
-  })();
-
-  // expose small debug API
-  window.BasilissaMenu = {
-    addItemToCart,
-    CART,
-    clearCart,
-    openDrawer,
-    closeDrawer,
-    populateModalFromCard
-  };
-
-})(); 
-</script>
-
 </html>
