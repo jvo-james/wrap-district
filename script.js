@@ -57,12 +57,10 @@
     }
   };
 
-  const money = (value) =>
-    new Intl.NumberFormat("en-GH", {
-      style: "currency",
-      currency: "GHS",
-      minimumFractionDigits: 2
-    }).format(Number(value) || 0);
+  const money = (value) => {
+    const num = Number(value) || 0;
+    return `GHS ${num.toFixed(2)}`;
+  };
 
   const uid = (prefix = "WD") => {
     const tail = Math.random().toString(36).slice(2, 6).toUpperCase();
@@ -94,6 +92,11 @@
       .replaceAll('"', "&quot;")
       .replaceAll("'", "&#39;");
 
+  const safeText = (value) =>
+    String(value ?? "")
+      .replace(/\s+/g, " ")
+      .trim();
+
   const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
 
   const isPromoActive = () => {
@@ -121,6 +124,8 @@
     checkoutDelivery: $("#checkoutDelivery"),
     checkoutDiscount: $("#checkoutDiscount"),
     checkoutTotal: $("#checkoutTotal"),
+    checkoutItemsList: $("#checkoutItemsList"),
+    checkoutItemsCount: $("#checkoutItemsCount"),
     orderType: $("#orderType"),
     productDrawerImg: $("#productDrawerImg"),
     productDrawerBadge: $("#productDrawerBadge"),
@@ -358,9 +363,14 @@
   }
 
   function closeAllOverlays() {
-    [els.navDrawer, els.cartDrawer, els.productDrawer, els.checkoutModal, els.historyModal, els.confirmedModal].forEach(
-      (panel) => togglePanel(panel, false)
-    );
+    [
+      els.navDrawer,
+      els.cartDrawer,
+      els.productDrawer,
+      els.checkoutModal,
+      els.historyModal,
+      els.confirmedModal
+    ].forEach((panel) => togglePanel(panel, false));
     maybeUnlockBody();
   }
 
@@ -412,6 +422,7 @@
     state.currentSelections = getDefaultSelections(product);
 
     populateProductDrawer(product);
+    renderProductDrawerPrice();
     togglePanel(els.productDrawer, true);
     setBodyLocked(true);
   }
@@ -425,10 +436,10 @@
     const focusable = $(
       [
         'button:not([disabled])',
-        '[href]',
-        'input:not([disabled])',
-        'select:not([disabled])',
-        'textarea:not([disabled])',
+        "[href]",
+        "input:not([disabled])",
+        "select:not([disabled])",
+        "textarea:not([disabled])",
         '[tabindex]:not([tabindex="-1"])'
       ].join(", "),
       root
@@ -481,7 +492,16 @@
       slide.classList.toggle("hero__slide--active", i === state.activeHeroIndex)
     );
 
-    els.heroDots.forEach((dot, i) => dot.classList.toggle("hero-dot--active", i === state.activeHeroIndex));
+    els.heroDots.forEach((dot, i) =>
+      dot.classList.toggle("hero-dot--active", i === state.activeHeroIndex)
+    );
+  }
+
+  function stopHeroAutoplay() {
+    if (state.heroTimer) {
+      clearInterval(state.heroTimer);
+      state.heroTimer = null;
+    }
   }
 
   function startHeroAutoplay() {
@@ -492,13 +512,6 @@
       const next = (state.activeHeroIndex + 1) % els.heroSlides.length;
       renderHero(next);
     }, 6500);
-  }
-
-  function stopHeroAutoplay() {
-    if (state.heroTimer) {
-      clearInterval(state.heroTimer);
-      state.heroTimer = null;
-    }
   }
 
   function matchesFilter(itemEl, filter) {
@@ -530,74 +543,74 @@
 
     els.productDrawerImg.src = product.image;
     els.productDrawerImg.alt = product.title;
-    els.productDrawerBadge.textContent = product.badge;
-    els.productDrawerCategory.textContent = product.categoryLabel;
-    els.productDrawerTitle.textContent = product.title;
-    els.productDrawerDescription.textContent = product.description;
+    if (els.productDrawerBadge) els.productDrawerBadge.textContent = product.badge;
+    if (els.productDrawerCategory) els.productDrawerCategory.textContent = product.categoryLabel;
+    if (els.productDrawerTitle) els.productDrawerTitle.textContent = product.title;
+    if (els.productDrawerDescription) els.productDrawerDescription.textContent = product.description;
 
-    els.productDrawerHighlights.innerHTML = product.highlights
-      .map(
-        (text) => `
-          <span class="product-chip">
+    if (els.productDrawerHighlights) {
+      els.productDrawerHighlights.innerHTML = product.highlights
+        .map(
+          (text) => `
+            <span class="product-chip">
+              <i class="fa-solid fa-circle-check"></i>
+              ${esc(text)}
+            </span>
+          `
+        )
+        .join("");
+    }
+
+    if (els.productDrawerOptions) {
+      els.productDrawerOptions.innerHTML = product.optionGroups.length
+        ? product.optionGroups
+            .map(
+              (group) => `
+                <fieldset class="option-group" data-group="${esc(group.key)}">
+                  <legend>${esc(group.label)}</legend>
+                  <div class="option-group__list">
+                    ${group.options
+                      .map((option) => {
+                        const checked =
+                          group.type === "radio"
+                            ? (state.currentSelections[group.key] ?? null) === option.value
+                            : (state.currentSelections[group.key] || []).includes(option.value);
+
+                        const inputType = group.type === "checkbox" ? "checkbox" : "radio";
+                        const name = group.type === "checkbox" ? `${group.key}[]` : group.key;
+                        const priceMarkup =
+                          typeof option.oldPrice === "number"
+                            ? `<span class="option-price"><del>${money(option.oldPrice)}</del> <strong>${money(option.price)}</strong></span>`
+                            : `<span class="option-price"><strong>${option.price === 0 ? "Free" : `+ ${money(option.price)}`}</strong></span>`;
+
+                        return `
+                          <label class="option-pill">
+                            <input
+                              type="${inputType}"
+                              name="${esc(name)}"
+                              value="${esc(option.value)}"
+                              ${checked ? "checked" : ""}
+                            />
+                            <span class="option-pill__text">
+                              <span>${esc(option.label)}</span>
+                              ${priceMarkup}
+                            </span>
+                          </label>
+                        `;
+                      })
+                      .join("")}
+                  </div>
+                </fieldset>
+              `
+            )
+            .join("")
+        : `
+          <div class="drawer-note">
             <i class="fa-solid fa-circle-check"></i>
-            ${esc(text)}
-          </span>
-        `
-      )
-      .join("");
-
-    els.productDrawerOptions.innerHTML = product.optionGroups.length
-      ? product.optionGroups
-          .map(
-            (group) => `
-              <fieldset class="option-group" data-group="${esc(group.key)}">
-                <legend>${esc(group.label)}</legend>
-                <div class="option-group__list">
-                  ${group.options
-                    .map((option) => {
-                      const checked =
-                        group.type === "radio"
-                          ? (state.currentSelections[group.key] ?? null) === option.value
-                          : (state.currentSelections[group.key] || []).includes(option.value);
-
-                      const inputType = group.type === "checkbox" ? "checkbox" : "radio";
-                      const name = group.type === "checkbox" ? `${group.key}[]` : group.key;
-                      const priceMarkup =
-                        typeof option.oldPrice === "number"
-                          ? `<span class="option-price"><del>${money(option.oldPrice)}</del> <strong>${money(
-                              option.price
-                            )}</strong></span>`
-                          : `<span class="option-price"><strong>${option.price === 0 ? "Free" : `+ ${money(
-                              option.price
-                            )}`}</strong></span>`;
-
-                      return `
-                        <label class="option-pill">
-                          <input
-                            type="${inputType}"
-                            name="${esc(name)}"
-                            value="${esc(option.value)}"
-                            ${checked ? "checked" : ""}
-                          />
-                          <span class="option-pill__text">
-                            <span>${esc(option.label)}</span>
-                            ${priceMarkup}
-                          </span>
-                        </label>
-                      `;
-                    })
-                    .join("")}
-                </div>
-              </fieldset>
-            `
-          )
-          .join("")
-      : `
-        <div class="drawer-note">
-          <i class="fa-solid fa-circle-check"></i>
-          This one is ready to add straight to the cart.
-        </div>
-      `;
+            This one is ready to add straight to the cart.
+          </div>
+        `;
+    }
   }
 
   function readProductSelections(product) {
@@ -727,11 +740,14 @@
 
     const resolvedSelections = selections || getDefaultSelections(product);
     const lineKey = makeLineKey(productId, resolvedSelections);
-    const unitPrice = computeUnitPrice(productId, resolvedSelections);
     const existing = state.cart.find((item) => item.lineKey === lineKey && !item.isPromo);
+    const unitPrice = computeUnitPrice(productId, resolvedSelections);
 
     if (existing) {
       existing.qty += quantity;
+      existing.unitPrice = unitPrice;
+      existing.note = getSelectionLabel(productId, resolvedSelections);
+      existing.selections = normalizeSelections(resolvedSelections);
     } else {
       state.cart.push({
         id: uid("ITEM"),
@@ -794,9 +810,7 @@
     for (const item of baseLines) {
       if (item.productId === "shawarma") {
         for (let i = 0; i < item.qty; i += 1) {
-          shawarmaUnits.push({
-            price: Number(item.unitPrice) || 0
-          });
+          shawarmaUnits.push({ price: Number(item.unitPrice) || 0 });
         }
       }
 
@@ -837,9 +851,15 @@
   function getResolvedCart() {
     const base = state.cart.filter((item) => !item.isPromo);
     const promoState = computeDiscountAndPromos(base);
+    const lines = [...base, ...promoState.promoItems];
+    const subtotal = computeSubtotal(lines);
+    const total = Math.max(0, subtotal - promoState.discount);
+
     return {
-      lines: [...base, ...promoState.promoItems],
-      discount: promoState.discount
+      lines,
+      discount: promoState.discount,
+      subtotal,
+      total
     };
   }
 
@@ -896,12 +916,57 @@
     return node;
   }
 
-  function renderCart() {
-    const { lines, discount } = getResolvedCart();
-    const subtotal = computeSubtotal(lines);
-    const total = Math.max(0, subtotal - discount);
+  function renderCheckoutItems(lines = []) {
+    if (!els.checkoutItemsList || !els.checkoutItemsCount) return;
 
-    if (!els.cartItems) return { subtotal, discount, total, lines };
+    const visibleLines = lines.filter((item) => !item.isPromo);
+    const totalItems = visibleLines.reduce((sum, item) => sum + item.qty, 0);
+
+    els.checkoutItemsCount.textContent = totalItems === 1 ? "1 item" : `${totalItems} items`;
+    els.checkoutItemsList.innerHTML = "";
+
+    if (!lines.length) {
+      els.checkoutItemsList.innerHTML = `
+        <div class="checkout-item-empty">Your cart is empty.</div>
+      `;
+      return;
+    }
+
+    lines.forEach((item) => {
+      const row = document.createElement("div");
+      row.className = "checkout-item";
+
+      const selectionsText = item.note
+        ? item.note
+        : item.selections && Object.keys(item.selections).length
+          ? Object.entries(item.selections)
+              .map(([key, value]) => {
+                const pretty = Array.isArray(value) ? value.join(", ") : value;
+                return `${capitalize(key)}: ${pretty}`;
+              })
+              .join(" • ")
+          : item.categoryLabel || "";
+
+      row.innerHTML = `
+        <img class="checkout-item__thumb" src="${esc(item.image)}" alt="${esc(item.name)}" />
+        <div class="checkout-item__info">
+          <h4>${esc(item.name)}</h4>
+          <p>${esc(selectionsText)}</p>
+          <span>${esc(item.qty)} × ${item.unitPrice === 0 ? "Free" : money(item.unitPrice)}</span>
+        </div>
+        <strong class="checkout-item__price">
+          ${item.unitPrice === 0 ? "Free" : money(item.unitPrice * item.qty)}
+        </strong>
+      `;
+      els.checkoutItemsList.appendChild(row);
+    });
+  }
+
+  function renderCart() {
+    const cartState = getResolvedCart();
+    const { lines, discount, subtotal } = cartState;
+
+    if (!els.cartItems) return cartState;
 
     els.cartItems.innerHTML = "";
 
@@ -912,18 +977,19 @@
     }
 
     const count = lines.reduce((sum, item) => sum + item.qty, 0);
-
     if (els.cartBadge) els.cartBadge.textContent = String(count);
     if (els.cartSubtotal) els.cartSubtotal.textContent = money(subtotal);
     if (els.cartDiscount) els.cartDiscount.textContent = money(discount);
-    if (els.cartTotal) els.cartTotal.textContent = money(total);
+    if (els.cartTotal) els.cartTotal.textContent = money(cartState.total);
 
     if (els.checkoutSubtotal) els.checkoutSubtotal.textContent = money(subtotal);
     if (els.checkoutDiscount) els.checkoutDiscount.textContent = money(discount);
-    if (els.checkoutTotal) els.checkoutTotal.textContent = money(total);
+    if (els.checkoutTotal) els.checkoutTotal.textContent = money(cartState.total);
     if (els.checkoutDelivery) els.checkoutDelivery.textContent = "Calculated after checkout";
 
-    return { subtotal, discount, total, lines };
+    renderCheckoutItems(lines);
+
+    return cartState;
   }
 
   function renderProductDrawerPrice() {
@@ -940,9 +1006,7 @@
 
     if (els.addProductToCartBtn) {
       els.addProductToCartBtn.dataset.price = String(total);
-      const priceText = total > 0 ? `Add to cart • ${money(total)}` : "Add to cart";
-      els.addProductToCartBtn.lastChild && (els.addProductToCartBtn.childNodes[els.addProductToCartBtn.childNodes.length - 1].textContent = "");
-      els.addProductToCartBtn.textContent = priceText;
+      els.addProductToCartBtn.textContent = total > 0 ? `Add to cart • ${money(total)}` : "Add to cart";
     }
   }
 
@@ -1006,14 +1070,28 @@
 
   function createOrderItemsMarkup(order) {
     return (order.items || [])
-      .map(
-        (item) => `
+      .map((item) => {
+        const detailParts = [];
+        if (item.note) detailParts.push(item.note);
+        if (item.selections && Object.keys(item.selections).length) {
+          detailParts.push(
+            Object.entries(item.selections)
+              .map(([key, value]) => {
+                const pretty = Array.isArray(value) ? value.join(", ") : value;
+                return `${capitalize(key)}: ${pretty}`;
+              })
+              .join(" • ")
+          );
+        }
+        const detailText = detailParts.filter(Boolean).join(" • ");
+
+        return `
           <div class="success-item">
-            <span>${esc(item.qty)} x ${esc(item.name)}${item.note ? ` <small>(${esc(item.note)})</small>` : ""}</span>
+            <span>${esc(item.qty)} x ${esc(item.name)}${detailText ? ` <small>(${esc(detailText)})</small>` : ""}</span>
             <strong>${item.unitPrice === 0 ? "Free" : esc(money(item.unitPrice * item.qty))}</strong>
           </div>
-        `
-      )
+        `;
+      })
       .join("");
   }
 
@@ -1066,150 +1144,216 @@
         ...item,
         total: item.unitPrice * item.qty
       })),
-      subtotal: cartState.subtotal ?? computeSubtotal(cartState.lines),
+      subtotal: cartState.subtotal,
       discount: cartState.discount,
-      total: Math.max(0, (cartState.subtotal ?? computeSubtotal(cartState.lines)) - cartState.discount)
+      total: cartState.total
     };
   }
 
-  function createInvoiceHTML(order) {
-    const rows = (order.items || [])
-      .map(
-        (item) => `
-          <tr>
-            <td>${esc(item.qty)} x ${esc(item.name)}${item.note ? ` <small>(${esc(item.note)})</small>` : ""}</td>
-            <td>${item.unitPrice === 0 ? "Free" : esc(money(item.unitPrice * item.qty))}</td>
-          </tr>
-        `
-      )
-      .join("");
+  function createInvoicePdf(order) {
+    const JsPDF = window.jspdf?.jsPDF;
+    if (!JsPDF || typeof window.jspdf?.jsPDF !== "function") return null;
 
-    return `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <title>Invoice ${esc(order.reference)}</title>
-        <style>
-          body {
-            font-family: Inter, Arial, sans-serif;
-            margin: 0;
-            padding: 24px;
-            color: #111;
-            background: #fff;
-          }
-          .invoice {
-            max-width: 860px;
-            margin: 0 auto;
-            border: 1px solid #ddd;
-            border-radius: 20px;
-            padding: 24px;
-          }
-          .head {
-            display: flex;
-            justify-content: space-between;
-            gap: 16px;
-            flex-wrap: wrap;
-            margin-bottom: 24px;
-          }
-          h1, h2, p {
-            margin: 0 0 8px;
-          }
-          table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 18px;
-          }
-          td, th {
-            padding: 12px 10px;
-            border-bottom: 1px solid #e9e9e9;
-            text-align: left;
-            vertical-align: top;
-          }
-          .totals {
-            margin-top: 18px;
-            display: grid;
-            gap: 8px;
-            justify-content: end;
-          }
-          .totals div {
-            display: flex;
-            gap: 24px;
-            justify-content: space-between;
-            min-width: 260px;
-          }
-          .muted {
-            color: #666;
-          }
-        </style>
-      </head>
-      <body>
-        <div class="invoice">
-          <div class="head">
-            <div>
-              <h1>WRAP District</h1>
-              <p class="muted">Tema Community 25, Devtraco</p>
-            </div>
-            <div>
-              <p><strong>Reference:</strong> ${esc(order.reference)}</p>
-              <p><strong>Timestamp:</strong> ${esc(formatDateTime(order.timestamp))}</p>
-            </div>
-          </div>
+    const doc = new JsPDF({
+      orientation: "p",
+      unit: "mm",
+      format: "a4"
+    });
 
-          <h2>Customer details</h2>
-          <p><strong>Name:</strong> ${esc(order.name)}</p>
-          <p><strong>Phone:</strong> ${esc(order.phone)}</p>
-          <p><strong>Email:</strong> ${esc(order.email)}</p>
-          <p><strong>Order type:</strong> ${esc(capitalize(order.orderType))}</p>
-          <p><strong>Address:</strong> ${esc(order.address)}</p>
-          <p><strong>Notes:</strong> ${esc(order.notes || "None")}</p>
+    if (typeof doc.autoTable !== "function") {
+      return null;
+    }
 
-          <h2 style="margin-top:24px;">Items</h2>
-          <table>
-            <thead>
-              <tr>
-                <th>Item</th>
-                <th>Total</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${rows}
-            </tbody>
-          </table>
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const margin = 14;
+    const contentWidth = pageWidth - margin * 2;
+    const dark = [17, 17, 17];
+    const soft = [245, 245, 245];
+    const accent = [255, 179, 71];
+    const muted = [96, 96, 96];
 
-          <div class="totals">
-            <div><span>Subtotal</span><strong>${esc(money(order.subtotal))}</strong></div>
-            <div><span>Promo discount</span><strong>${esc(money(order.discount))}</strong></div>
-            <div><span>Total</span><strong>${esc(money(order.total))}</strong></div>
-          </div>
-        </div>
-      </body>
-      </html>
-    `;
+    let y = 14;
+
+    doc.setFillColor(...dark);
+    doc.roundedRect(margin, y, contentWidth, 28, 5, 5, "F");
+    doc.setTextColor(255, 255, 255);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(18);
+    doc.text("WRAP District", margin + 8, y + 11);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(9);
+    doc.text("Tema Community 25, Devtraco", margin + 8, y + 18);
+
+    doc.setFillColor(...accent);
+    doc.roundedRect(pageWidth - margin - 48, y + 8, 40, 10, 2, 2, "F");
+    doc.setTextColor(17, 17, 17);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(9);
+    doc.text("RECEIPT", pageWidth - margin - 28, y + 14, { align: "center" });
+
+    y += 36;
+
+    doc.setFillColor(...soft);
+    doc.roundedRect(margin, y, contentWidth, 20, 4, 4, "F");
+    doc.setTextColor(...dark);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(14);
+    doc.text("Order Receipt", margin + 8, y + 8);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(9);
+    doc.setTextColor(...muted);
+    doc.text(`Reference: ${safeText(order.reference)}`, margin + 8, y + 15);
+    doc.text(`Timestamp: ${formatDateTime(order.timestamp)}`, pageWidth - margin - 8, y + 15, {
+      align: "right"
+    });
+
+    y += 28;
+
+    const ensureSpace = (needed) => {
+      if (y + needed > pageHeight - 18) {
+        doc.addPage();
+        y = 16;
+      }
+    };
+
+    const writeLabelValue = (label, value) => {
+      ensureSpace(9);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(10);
+      doc.setTextColor(72, 72, 72);
+      doc.text(label, margin, y);
+
+      doc.setFont("helvetica", "normal");
+      doc.setTextColor(22, 22, 22);
+      const lines = doc.splitTextToSize(safeText(value || "None"), contentWidth - 48);
+      doc.text(lines, margin + 42, y);
+      y += Math.max(6, lines.length * 5.5);
+    };
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(12);
+    doc.setTextColor(...dark);
+    doc.text("Customer details", margin, y);
+    y += 6;
+
+    writeLabelValue("Name:", order.name);
+    writeLabelValue("Phone:", order.phone);
+    writeLabelValue("Email:", order.email);
+    writeLabelValue("Order type:", capitalize(order.orderType));
+    writeLabelValue("Address:", order.address);
+    writeLabelValue("Preferred date:", order.preferredDate);
+    writeLabelValue("Preferred time:", order.preferredTime);
+    writeLabelValue("Notes:", order.notes || "None");
+
+    y += 4;
+    ensureSpace(30);
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(12);
+    doc.setTextColor(...dark);
+    doc.text("Items purchased", margin, y);
+    y += 4;
+
+    const rows = (order.items || []).map((item) => {
+      const selectionText =
+        item.note ||
+        (item.selections && Object.keys(item.selections).length
+          ? Object.entries(item.selections)
+              .map(([key, value]) => {
+                const pretty = Array.isArray(value) ? value.join(", ") : value;
+                return `${capitalize(key)}: ${pretty}`;
+              })
+              .join(" • ")
+          : "");
+
+      return [
+        safeText(item.name),
+        safeText(selectionText || item.categoryLabel || "None"),
+        String(item.qty),
+        item.unitPrice === 0 ? "Free" : money(item.unitPrice),
+        item.unitPrice === 0 ? "Free" : money(item.unitPrice * item.qty)
+      ];
+    });
+
+    doc.autoTable({
+      startY: y,
+      head: [["Item", "Details", "Qty", "Unit price", "Line total"]],
+      body: rows.length ? rows : [["No items", "-", "-", "-", "-"]],
+      theme: "grid",
+      margin: { left: margin, right: margin },
+      styles: {
+        font: "helvetica",
+        fontSize: 9,
+        cellPadding: 3,
+        textColor: [25, 25, 25],
+        lineColor: [225, 225, 225],
+        lineWidth: 0.2
+      },
+      headStyles: {
+        fillColor: dark,
+        textColor: 255,
+        fontStyle: "bold"
+      },
+      alternateRowStyles: {
+        fillColor: [250, 250, 250]
+      },
+      columnStyles: {
+        2: { halign: "center" },
+        3: { halign: "right" },
+        4: { halign: "right" }
+      }
+    });
+
+    y = doc.lastAutoTable.finalY + 10;
+
+    ensureSpace(40);
+    doc.setFillColor(...soft);
+    doc.roundedRect(margin, y, contentWidth, 34, 4, 4, "F");
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(10);
+    doc.setTextColor(...muted);
+    doc.text("Subtotal", margin + 8, y + 10);
+    doc.text("Delivery", margin + 8, y + 17);
+    doc.text("Promo discount", margin + 8, y + 24);
+    doc.text("Total", margin + 8, y + 31);
+
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(...dark);
+    doc.text(money(order.subtotal), margin + contentWidth - 8, y + 10, { align: "right" });
+    doc.text("Calculated after checkout", margin + contentWidth - 8, y + 17, { align: "right" });
+    doc.text(money(order.discount), margin + contentWidth - 8, y + 24, { align: "right" });
+    doc.setFont("helvetica", "bold");
+    doc.text(money(order.total), margin + contentWidth - 8, y + 31, { align: "right" });
+
+    doc.setFont("helvetica", "italic");
+    doc.setFontSize(9);
+    doc.setTextColor(...muted);
+    doc.text(
+      "Thank you for ordering from WRAP District.",
+      pageWidth / 2,
+      pageHeight - 12,
+      { align: "center" }
+    );
+
+    return doc;
   }
 
   function saveInvoicePdf(order) {
-    const html = createInvoiceHTML(order);
-    const win = window.open("", "_blank", "noopener,noreferrer");
+    try {
+      const doc = createInvoicePdf(order);
 
-    if (!win) {
-      showToast("Allow pop-ups to save or print the invoice.");
-      return;
-    }
-
-    win.document.open();
-    win.document.write(html);
-    win.document.close();
-
-    window.setTimeout(() => {
-      try {
-        win.focus();
-        win.print();
-      } catch {
-        showToast("Invoice preview opened.");
+      if (!doc) {
+        showToast("PDF could not be generated. Make sure jsPDF and AutoTable are loaded.");
+        return;
       }
-    }, 600);
+
+      doc.save(`WRAP-District-${safeText(order.reference)}.pdf`);
+    } catch (error) {
+      console.error("PDF generation failed:", error);
+      showToast("PDF could not be generated.");
+    }
   }
 
   function syncCheckoutFields() {
@@ -1279,6 +1423,7 @@
     }
 
     renderCart();
+    renderCheckoutItems(cartState.lines);
     syncCheckoutFields();
     openModal(els.checkoutModal);
   }
@@ -1286,6 +1431,71 @@
   function openProductFromButton(btn) {
     const id = btn?.dataset?.openProduct;
     if (id && catalog[id]) openProductDrawer(id);
+  }
+
+  function buildPaystackMetadata(customer, cartState, paymentRef) {
+    const itemsText = cartState.lines
+      .map((item) => {
+        const parts = [];
+        if (item.note) parts.push(item.note);
+        if (item.isPromo) parts.push("Promo item");
+        if (item.selections && Object.keys(item.selections).length) {
+          const selectionText = Object.entries(item.selections)
+            .map(([key, value]) => {
+              const pretty = Array.isArray(value) ? value.join(", ") : value;
+              return `${capitalize(key)}: ${pretty}`;
+            })
+            .join(" • ");
+          if (selectionText) parts.push(selectionText);
+        }
+
+        return `${item.qty} x ${safeText(item.name)}${parts.length ? ` — ${parts.join(" | ")}` : ""}`;
+      })
+      .join(" || ");
+
+    const itemsJson = cartState.lines.map((item) => ({
+      productId: item.productId,
+      name: item.name,
+      categoryLabel: item.categoryLabel,
+      qty: item.qty,
+      unitPrice: item.unitPrice,
+      lineTotal: item.unitPrice * item.qty,
+      note: item.note || "",
+      selections: item.selections || {},
+      isPromo: !!item.isPromo
+    }));
+
+    return {
+      customer_name: customer.name,
+      customer_phone: customer.phone,
+      customer_email: customer.email,
+      order_type: customer.orderType,
+      address: customer.address,
+      preferred_date: customer.preferredDate,
+      preferred_time: customer.preferredTime,
+      notes: customer.notes || "",
+      cart_reference: paymentRef,
+      subtotal: cartState.subtotal,
+      discount: cartState.discount,
+      total: cartState.total,
+      items_json: JSON.stringify(itemsJson),
+      items_text: itemsText,
+      custom_fields: [
+        { display_name: "Order Reference", variable_name: "order_reference", value: paymentRef },
+        { display_name: "Name", variable_name: "name", value: customer.name },
+        { display_name: "Email", variable_name: "email", value: customer.email },
+        { display_name: "Phone", variable_name: "phone", value: customer.phone },
+        { display_name: "Order Type", variable_name: "order_type", value: capitalize(customer.orderType) },
+        { display_name: "Address", variable_name: "address", value: customer.address },
+        { display_name: "Preferred Date", variable_name: "preferred_date", value: customer.preferredDate },
+        { display_name: "Preferred Time", variable_name: "preferred_time", value: customer.preferredTime },
+        { display_name: "Notes", variable_name: "notes", value: customer.notes || "None" },
+        { display_name: "Items", variable_name: "items", value: itemsText || "None" },
+        { display_name: "Subtotal", variable_name: "subtotal", value: money(cartState.subtotal) },
+        { display_name: "Promo Discount", variable_name: "promo_discount", value: money(cartState.discount) },
+        { display_name: "Total", variable_name: "total", value: money(cartState.total) }
+      ]
+    };
   }
 
   function handleCheckoutSubmit(formEl) {
@@ -1317,6 +1527,11 @@
 
     const paymentMethod = formEl.querySelector('input[name="paymentMethod"]:checked')?.value || "paystack";
     const paymentRef = `PAY-${Date.now().toString(36).toUpperCase()}`;
+    const metadata = buildPaystackMetadata(
+      { name, phone, email, address, orderType, preferredDate, preferredTime, notes },
+      cartState,
+      paymentRef
+    );
 
     const finalizeOrder = () => {
       const order = buildOrderObject(data, paymentRef);
@@ -1352,19 +1567,14 @@
           amount: Math.round(cartState.total * 100),
           currency: "GHS",
           ref: paymentRef,
-          metadata: {
-            custom_fields: [
-              { display_name: "Name", variable_name: "name", value: name },
-              { display_name: "Phone", variable_name: "phone", value: phone },
-              { display_name: "Address", variable_name: "address", value: address }
-            ]
-          },
+          metadata,
           callback: () => finalizeOrder(),
           onClose: () => showToast("Payment window closed.")
         });
 
         handler.openIframe();
-      } catch {
+      } catch (error) {
+        console.error("Paystack setup failed:", error);
         showToast("Payment could not be started. Completing the order in demo mode.");
         finalizeOrder();
       }
@@ -1553,13 +1763,11 @@
       });
     }
 
-    document.addEventListener("pointerenter", (event) => {
-      if (event.target.closest(".hero__slide")) stopHeroAutoplay();
-    });
-
-    document.addEventListener("pointerleave", (event) => {
-      if (event.target.closest(".hero__slide")) startHeroAutoplay();
-    });
+    const heroSlider = $("#heroSlider");
+    if (heroSlider) {
+      heroSlider.addEventListener("pointerenter", stopHeroAutoplay);
+      heroSlider.addEventListener("pointerleave", startHeroAutoplay);
+    }
 
     document.addEventListener(
       "touchstart",
