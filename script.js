@@ -1,1718 +1,1989 @@
 (() => {
-  'use strict'
+  "use strict";
 
   const STORAGE_KEYS = {
-    cart: 'wrapDistrict_cart_v1',
-    menuPrefs: 'wrapDistrict_menuPrefs_v1',
-    preorder: 'wrapDistrict_preorder_v1',
-    history: 'wrapDistrict_history_v1',
-    lastOrder: 'wrapDistrict_lastOrder_v1',
-    promoClaims: 'wrapDistrict_promoClaims_v1',
-    customer: 'wrapDistrict_customer_v1'
-  }
+    cart: "wrapdistrict_cart_v1",
+    history: "wrapdistrict_purchase_history_v1",
+    lastOrder: "wrapdistrict_last_order_v1",
+    user: "wrapdistrict_user_v1",
+    preorder: "wrapdistrict_preorder_v1",
+    promoHide: "wrapdistrict_entry_promo_hide_v1",
+    selections: "wrapdistrict_menu_selections_v1",
+  };
 
-  const PAYSTACK_PUBLIC_KEY = 'pk_test_WRAPDISTRICT_PLACEHOLDER'
-  const CURRENCY = 'GHS'
-  const SHAWARMA_PROMO_START = new Date('2026-04-28T00:00:00')
-  const SHAWARMA_PROMO_END = new Date('2026-05-01T23:59:59')
-  const LOADED_FRIES_PROMO_START = new Date('2026-04-28T00:00:00')
-  const LOADED_FRIES_PROMO_END = new Date('2026-05-01T23:59:59')
+  const PROMO_WINDOW = {
+    start: new Date("2026-04-28T00:00:00"),
+    end: new Date("2026-05-01T23:59:59"),
+  };
 
-  const PRODUCTS = {
+  const PAYMENT_FEES = {
+    paystackPercent: 1.95,
+    mtnWithdrawalPercent: 1.5,
+  };
+
+  const PAYSTACK_PUBLIC_KEY =
+    window.WRAPDISTRICT_PAYSTACK_PUBLIC_KEY || "pk_test_REPLACE_ME";
+
+  const HERO_INTERVAL_MS = 6500;
+
+  const products = {
     shawarma: {
-      id: 'shawarma',
-      name: 'Shawarma',
-      category: 'shawarma',
-      badge: 'Buy 2 -> 1 Free',
+      id: "shawarma",
+      title: "Shawarma",
+      badge: "Buy 2 → 1 Free",
+      category: "shawarma",
       image:
-        'https://images.unsplash.com/photo-1606756790138-261d2b21cd75?auto=format&fit=crop&w=1200&q=80',
-      basePrice: 45,
-      description: 'Choose size, then protein. Clear pricing tiers with rich add-ons.',
-      options: [
+        "https://images.unsplash.com/photo-1626700051175-6818013f7d4c?auto=format&fit=crop&w=1200&q=80",
+      description:
+        "Choose size, then protein. Clear pricing tiers with extra sauce and cheese available.",
+      groups: [
         {
-          id: 'size',
-          label: 'Choose size',
-          type: 'radio',
+          key: "size",
+          label: "Choose a size",
+          type: "radio",
           required: true,
-          choices: [
-            { label: 'Lite', value: 'Lite', price: 45 },
-            { label: 'Classic', value: 'Classic', price: 55 },
-            { label: 'District Max', value: 'District Max', price: 70 }
-          ]
+          options: [
+            { id: "lite", label: "Lite", price: 45 },
+            { id: "classic", label: "Classic", price: 55 },
+            { id: "district-max", label: "District Max", price: 70 },
+          ],
         },
         {
-          id: 'protein',
-          label: 'Extra protein',
-          type: 'radio',
+          key: "protein",
+          label: "Extra protein",
+          type: "radio",
           required: true,
-          choices: [
-            { label: 'None', value: 'None', price: 0 },
-            { label: 'Extra Chicken', value: 'Extra Chicken', price: 8 },
-            { label: 'Extra Sausage', value: 'Extra Sausage', price: 4 },
-            { label: 'Mixed', value: 'Mixed', price: 12 }
-          ]
+          options: [
+            { id: "none", label: "None", price: 0 },
+            { id: "extra-chicken", label: "Extra Chicken", price: 8 },
+            { id: "extra-sausage", label: "Extra Sausage", price: 4 },
+            { id: "mixed", label: "Mixed", price: 12 },
+          ],
         },
         {
-          id: 'extras',
-          label: 'Extras',
-          type: 'checkbox',
+          key: "addons",
+          label: "Extras",
+          type: "checkbox",
           required: false,
-          choices: [
-            { label: 'Extra Sauce', value: 'Extra Sauce', price: 5 },
-            { label: 'Extra Cheese', value: 'Extra Cheese', price: 10 }
-          ]
-        }
-      ]
+          options: [
+            { id: "extra-sauce", label: "Extra Sauce", price: 5 },
+            { id: "extra-cheese", label: "Extra Cheese", price: 10 },
+          ],
+        },
+      ],
+      defaultSelection: {
+        size: "lite",
+        protein: "none",
+        addons: [],
+      },
     },
-
-    'loaded-fries': {
-      id: 'loaded-fries',
-      name: 'Loaded Fries',
-      category: 'loaded-fries',
-      badge: 'Free Coke',
+    "loaded-fries": {
+      id: "loaded-fries",
+      title: "Loaded Fries",
+      badge: "Free Coke",
+      category: "shawarma",
       image:
-        'https://images.unsplash.com/photo-1573080496219-bb080dd4f877?auto=format&fit=crop&w=1200&q=80',
-      basePrice: 65,
-      description: 'Choose portion and add protein, cheese, or sauce.',
-      options: [
+        "https://images.unsplash.com/photo-1573080496219-bb080dd4f877?auto=format&fit=crop&w=1200&q=80",
+      description:
+        "Choose portion and toppings. During promo hours, a free Coke is added to your cart automatically.",
+      groups: [
         {
-          id: 'portion',
-          label: 'Choose portion',
-          type: 'radio',
+          key: "portion",
+          label: "Choose a portion",
+          type: "radio",
           required: true,
-          choices: [
-            { label: 'Regular', value: 'Regular', price: 65 },
-            { label: 'Medium', value: 'Medium', price: 75 },
-            { label: 'Large', value: 'Large', price: 85 }
-          ]
+          options: [
+            { id: "regular", label: "Regular", price: 65 },
+            { id: "medium", label: "Medium", price: 75 },
+            { id: "large", label: "Large", price: 85 },
+          ],
         },
         {
-          id: 'toppings',
-          label: 'Toppings',
-          type: 'checkbox',
+          key: "toppings",
+          label: "Toppings",
+          type: "checkbox",
           required: false,
-          choices: [
-            { label: 'Extra Chicken', value: 'Extra Chicken', price: 15 },
-            { label: 'Extra Cheese', value: 'Extra Cheese', price: 10 },
-            { label: 'Extra Sauce', value: 'Extra Sauce', price: 10 }
-          ]
-        }
-      ]
+          options: [
+            { id: "extra-chicken", label: "Extra Chicken", price: 15 },
+            { id: "extra-cheese", label: "Extra Cheese", price: 10 },
+            { id: "extra-sauce", label: "Extra Sauce", price: 10 },
+          ],
+        },
+      ],
+      defaultSelection: {
+        portion: "regular",
+        toppings: [],
+      },
     },
-
-    'fried-rice': {
-      id: 'fried-rice',
-      name: 'Fried Rice',
-      category: 'rice',
-      badge: 'Rice',
+    "fried-rice": {
+      id: "fried-rice",
+      title: "Fried Rice",
+      badge: "Rice",
+      category: "rice",
       image:
-        'https://images.unsplash.com/photo-1512058564366-18510be2db19?auto=format&fit=crop&w=1200&q=80',
-      basePrice: 60,
-      description: 'Classic spiced fried rice. Choose your protein.',
-      options: [
+        "https://images.unsplash.com/photo-1603133872878-684f208fb84b?auto=format&fit=crop&w=1200&q=80",
+      description:
+        "Classic spiced fried rice. Choose your protein and keep it simple, warm, and satisfying.",
+      groups: [
         {
-          id: 'protein',
-          label: 'Choose protein',
-          type: 'radio',
+          key: "protein",
+          label: "Choose a protein",
+          type: "radio",
           required: true,
-          choices: [
-            { label: 'Chicken', value: 'Chicken', price: 60 },
-            { label: 'Beef', value: 'Beef', price: 60 },
-            { label: 'Gizzard', value: 'Gizzard', price: 60 }
-          ]
-        }
-      ]
+          options: [
+            { id: "chicken", label: "Classic Chicken", price: 60 },
+            { id: "beef", label: "Beef", price: 60 },
+            { id: "gizzard", label: "Gizzard", price: 60 },
+          ],
+        },
+      ],
+      defaultSelection: {
+        protein: "chicken",
+      },
     },
-
-    'loaded-angwamo': {
-      id: 'loaded-angwamo',
-      name: 'Loaded Angwamo',
-      category: 'angwamo',
-      badge: 'New price',
+    "loaded-angwamo": {
+      id: "loaded-angwamo",
+      title: "Loaded Angwamo",
+      badge: "New price",
+      category: "angwamo",
       image:
-        'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1200&q=80',
-      basePrice: 60,
-      description: 'Tiered value with premium protein choices and upgraded portions.',
-      options: [
+        "https://images.unsplash.com/photo-1517244683847-7456b63c5969?auto=format&fit=crop&w=1200&q=80",
+      description:
+        "Tiered value with a bold finish. The old price is crossed out and the new price stands out clearly.",
+      groups: [
         {
-          id: 'tier',
-          label: 'Choose tier',
-          type: 'radio',
+          key: "tier",
+          label: "Choose a tier",
+          type: "radio",
           required: true,
-          choices: [
-            { label: 'Basic', value: 'Basic', price: 60, oldPrice: 65 },
-            { label: 'Classic', value: 'Classic', price: 70, oldPrice: 75 },
-            { label: 'Max', value: 'Max', price: 80, oldPrice: 85, note: '5 proteins' }
-          ]
-        }
-      ]
+          options: [
+            {
+              id: "basic",
+              label: "Basic",
+              price: 60,
+              oldPrice: 65,
+            },
+            {
+              id: "classic",
+              label: "Classic",
+              price: 70,
+              oldPrice: 75,
+            },
+            {
+              id: "max",
+              label: "Max, 5 proteins",
+              price: 80,
+              oldPrice: 85,
+            },
+          ],
+        },
+      ],
+      defaultSelection: {
+        tier: "classic",
+      },
     },
-
-    'loaded-jollof': {
-      id: 'loaded-jollof',
-      name: 'Loaded Jollof',
-      category: 'rice',
-      badge: 'New',
+    "loaded-jollof": {
+      id: "loaded-jollof",
+      title: "Loaded Jollof",
+      badge: "New",
+      category: "rice",
       image:
-        'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1200&q=80',
-      basePrice: 85,
-      description: 'Jungle Jumbo Fully Loaded Jollof rice with protein and extras.',
-      options: [
+        "https://images.unsplash.com/photo-1633436375155-5c5c9b6f5b83?auto=format&fit=crop&w=1200&q=80",
+      description:
+        "Hearty Jungle Jumbo Fully Loaded Jollof rice with protein and extras for a premium meal.",
+      groups: [
         {
-          id: 'protein',
-          label: 'Choose protein',
-          type: 'radio',
-          required: false,
-          choices: [
-            { label: 'Chicken', value: 'Chicken', price: 0 },
-            { label: 'Beef', value: 'Beef', price: 0 },
-            { label: 'Gizzard', value: 'Gizzard', price: 0 },
-            { label: 'Mixed', value: 'Mixed', price: 5 }
-          ]
+          key: "protein",
+          label: "Choose a protein",
+          type: "radio",
+          required: true,
+          options: [
+            { id: "chicken", label: "Chicken", price: 85 },
+            { id: "beef", label: "Beef", price: 85 },
+            { id: "gizzard", label: "Gizzard", price: 85 },
+          ],
         },
         {
-          id: 'extras',
-          label: 'Extras',
-          type: 'checkbox',
+          key: "extras",
+          label: "Extras",
+          type: "checkbox",
           required: false,
-          choices: [
-            { label: 'Extra Sauce', value: 'Extra Sauce', price: 5 },
-            { label: 'Extra Cheese', value: 'Extra Cheese', price: 10 }
-          ]
-        }
-      ]
+          options: [
+            { id: "extra-sauce", label: "Extra Sauce", price: 5 },
+            { id: "extra-cheese", label: "Extra Cheese", price: 10 },
+          ],
+        },
+      ],
+      defaultSelection: {
+        protein: "chicken",
+        extras: [],
+      },
     },
-
     noodles: {
-      id: 'noodles',
-      name: 'Noodles',
-      category: 'specials',
-      badge: 'Popular',
+      id: "noodles",
+      title: "Noodles",
+      badge: "Quick pick",
+      category: "other",
       image:
-        'https://images.unsplash.com/photo-1559314809-0b0f2c3b0a0a?auto=format&fit=crop&w=1200&q=80',
-      basePrice: 50,
-      description: 'Assorted proteins available for a quick and satisfying meal.',
-      options: [
+        "https://images.unsplash.com/photo-1551892374-ecf8754cf8f6?auto=format&fit=crop&w=1200&q=80",
+      description:
+        "A quick bowl with assorted proteins available. Simple, fast, and easy to enjoy.",
+      groups: [
         {
-          id: 'protein',
-          label: 'Choose protein',
-          type: 'radio',
-          required: false,
-          choices: [
-            { label: 'Chicken', value: 'Chicken', price: 0 },
-            { label: 'Beef', value: 'Beef', price: 0 },
-            { label: 'Sausage', value: 'Sausage', price: 0 },
-            { label: 'Mixed', value: 'Mixed', price: 5 }
-          ]
+          key: "protein",
+          label: "Choose a protein",
+          type: "radio",
+          required: true,
+          options: [
+            { id: "chicken", label: "Chicken", price: 50 },
+            { id: "beef", label: "Beef", price: 50 },
+            { id: "gizzard", label: "Gizzard", price: 50 },
+          ],
         },
         {
-          id: 'extras',
-          label: 'Extras',
-          type: 'checkbox',
+          key: "extras",
+          label: "Extras",
+          type: "checkbox",
           required: false,
-          choices: [
-            { label: 'Extra Sauce', value: 'Extra Sauce', price: 5 },
-            { label: 'Extra Cheese', value: 'Extra Cheese', price: 10 }
-          ]
-        }
-      ]
+          options: [
+            { id: "extra-sauce", label: "Extra Sauce", price: 5 },
+            { id: "extra-cheese", label: "Extra Cheese", price: 10 },
+          ],
+        },
+      ],
+      defaultSelection: {
+        protein: "chicken",
+        extras: [],
+      },
     },
-
-    coke: {
-      id: 'coke',
-      name: 'Coke',
-      category: 'promo',
-      badge: 'Free',
-      image:
-        'https://images.unsplash.com/photo-1629203851122-3726ec9f501a?auto=format&fit=crop&w=1200&q=80',
-      basePrice: 0,
-      description: 'Free Coke added automatically with loaded fries promo.',
-      promoOnly: true,
-      locked: true
-    }
-  }
+  };
 
   const state = {
     cart: [],
     history: [],
-    selectedHistoryId: null,
-    lastOpenProduct: null,
-    productQuantity: 1,
-    productSelections: {},
+    currentProductId: null,
+    currentConfirmedOrder: null,
     activeSlide: 0,
-    filterCategory: 'all',
-    searchQuery: '',
-    preorder: {},
-    focusStack: [],
-    sliderTimer: null,
-    promoClaims: {
-      entry: false
-    }
-  }
+    heroTimer: null,
+    openOverlayId: null,
+    menuFilter: "all",
+    menuSearch: "",
+    selectionCache: loadJSON(STORAGE_KEYS.selections, {}),
+  };
 
-  const els = {}
+  const $ = (sel, root = document) => root.querySelector(sel);
+  const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
 
-  function $(selector, root = document) {
-    return root.querySelector(selector)
-  }
-
-  function $all(selector, root = document) {
-    return Array.from(root.querySelectorAll(selector))
-  }
-
-  function money(value) {
-    const amount = Number.isFinite(value) ? value : 0
-    return `${CURRENCY} ${amount.toFixed(2)}`
-  }
-
-  function safeParse(key, fallback) {
+  function loadJSON(key, fallback) {
     try {
-      const raw = localStorage.getItem(key)
-      return raw ? JSON.parse(raw) : fallback
+      const raw = localStorage.getItem(key);
+      if (!raw) return fallback;
+      return JSON.parse(raw);
     } catch {
-      return fallback
+      return fallback;
     }
   }
 
-  function save(key, value) {
-    localStorage.setItem(key, JSON.stringify(value))
+  function saveJSON(key, value) {
+    try {
+      localStorage.setItem(key, JSON.stringify(value));
+    } catch {
+      // ignore storage failures
+    }
   }
 
-  function getProduct(id) {
-    return PRODUCTS[id] || null
+  function formatGHS(value) {
+    const number = Number(value) || 0;
+    const formatted = new Intl.NumberFormat("en-US", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(number);
+    return `GHC ${formatted}`;
   }
 
-  function capitalize(text) {
-    return String(text)
-      .replace(/[-_]/g, ' ')
-      .replace(/\b\w/g, (m) => m.toUpperCase())
+  function escapeHTML(value) {
+    return String(value)
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#39;");
   }
 
-  function formatSelections(selections) {
-    const parts = []
-    Object.entries(selections || {}).forEach(([key, value]) => {
-      if (Array.isArray(value) && value.length) {
-        parts.push(`${capitalize(key)}: ${value.join(', ')}`)
-      } else if (value) {
-        parts.push(`${capitalize(key)}: ${value}`)
+  function uid(prefix = "WD") {
+    const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+    let out = "";
+    for (let i = 0; i < 6; i += 1) {
+      out += chars[Math.floor(Math.random() * chars.length)];
+    }
+    return `${prefix}-${out}`;
+  }
+
+  function now() {
+    return new Date();
+  }
+
+  function isPromoActive() {
+    const t = now().getTime();
+    return t >= PROMO_WINDOW.start.getTime() && t <= PROMO_WINDOW.end.getTime();
+  }
+
+  function sum(arr) {
+    return arr.reduce((acc, n) => acc + (Number(n) || 0), 0);
+  }
+
+  function clone(obj) {
+    return JSON.parse(JSON.stringify(obj));
+  }
+
+  function getProduct(productId) {
+    return products[productId] || null;
+  }
+
+  function getSelectionFromCache(productId) {
+    const product = getProduct(productId);
+    const base = clone(product?.defaultSelection || {});
+    const cached = state.selectionCache?.[productId];
+    if (!cached) return base;
+
+    const selection = { ...base };
+    for (const key of Object.keys(cached)) {
+      selection[key] = Array.isArray(cached[key]) ? [...cached[key]] : cached[key];
+    }
+    return selection;
+  }
+
+  function saveSelectionCache(productId, selection) {
+    state.selectionCache = state.selectionCache || {};
+    state.selectionCache[productId] = clone(selection);
+    saveJSON(STORAGE_KEYS.selections, state.selectionCache);
+  }
+
+  function selectionSignature(selection) {
+    const normalized = {};
+    const keys = Object.keys(selection || {}).sort();
+    for (const key of keys) {
+      const value = selection[key];
+      normalized[key] = Array.isArray(value) ? [...value].sort() : value;
+    }
+    return JSON.stringify(normalized);
+  }
+
+  function buildSelectionSummary(product, selection) {
+    const parts = [];
+    for (const group of product.groups || []) {
+      const selected = selection[group.key];
+      if (group.type === "checkbox") {
+        const labels = (selected || [])
+          .map((id) => group.options.find((opt) => opt.id === id)?.label)
+          .filter(Boolean);
+        if (labels.length) parts.push(labels.join(", "));
+      } else {
+        const label = group.options.find((opt) => opt.id === selected)?.label;
+        if (label) parts.push(label);
       }
-    })
-    return parts.join(' • ')
-  }
-
-  function showToast(message, variant = 'default') {
-    let toast = document.getElementById('appToast')
-    if (!toast) {
-      toast = document.createElement('div')
-      toast.id = 'appToast'
-      toast.className = 'app-toast'
-      toast.setAttribute('role', 'status')
-      toast.setAttribute('aria-live', 'polite')
-      document.body.appendChild(toast)
     }
-
-    toast.textContent = message
-    toast.dataset.variant = variant
-    toast.classList.add('app-toast--visible')
-
-    clearTimeout(showToast._t)
-    showToast._t = setTimeout(() => {
-      toast.classList.remove('app-toast--visible')
-    }, 2600)
+    return parts.join(" • ");
   }
 
-  function lockScroll(lock) {
-    document.documentElement.classList.toggle('is-scroll-locked', lock)
-    document.body.classList.toggle('is-scroll-locked', lock)
-  }
-
-  function openDrawer(el) {
-    if (!el) return
-    el.classList.add('is-open')
-    el.setAttribute('aria-hidden', 'false')
-    lockScroll(true)
-  }
-
-  function closeDrawer(el) {
-    if (!el) return
-    el.classList.remove('is-open')
-    el.setAttribute('aria-hidden', 'true')
-    if (
-      !document.querySelector('.modal.is-open') &&
-      !document.querySelector('.cart-drawer.is-open') &&
-      !document.querySelector('.mobile-nav.is-open')
-    ) {
-      lockScroll(false)
-    }
-  }
-
-  function openModal(modalId) {
-    const modal = document.getElementById(modalId)
-    if (!modal) return
-
-    state.focusStack.push(document.activeElement)
-    modal.classList.add('is-open')
-    modal.setAttribute('aria-hidden', 'false')
-    lockScroll(true)
-
-    const firstFocusable = modal.querySelector(
-      'button, input, select, textarea, a[href], [tabindex]:not([tabindex="-1"])'
-    )
-    if (firstFocusable) firstFocusable.focus({ preventScroll: true })
-  }
-
-  function closeModal(modalId) {
-    const modal = document.getElementById(modalId)
-    if (!modal) return
-
-    modal.classList.remove('is-open')
-    modal.setAttribute('aria-hidden', 'true')
-    if (
-      !document.querySelector('.modal.is-open') &&
-      !document.querySelector('.cart-drawer.is-open') &&
-      !document.querySelector('.mobile-nav.is-open')
-    ) {
-      lockScroll(false)
-    }
-
-    const previous = state.focusStack.pop()
-    if (previous && previous.focus) previous.focus({ preventScroll: true })
-  }
-
-  function setActiveFilterButton(category) {
-    $all('.menu-pill').forEach((btn) => {
-      btn.classList.toggle('menu-pill--active', btn.dataset.filterCategory === category)
-    })
-  }
-
-  function renderHero() {
-    const slides = $all('.hero-slide')
-    const dots = $all('.hero-dot')
-
-    slides.forEach((slide, idx) => {
-      slide.classList.toggle('hero-slide--active', idx === state.activeSlide)
-      slide.setAttribute('aria-hidden', String(idx !== state.activeSlide))
-    })
-
-    dots.forEach((dot, idx) => {
-      dot.classList.toggle('hero-dot--active', idx === state.activeSlide)
-      dot.setAttribute('aria-current', idx === state.activeSlide ? 'true' : 'false')
-    })
-  }
-
-  function goToSlide(index) {
-    const slides = $all('.hero-slide')
-    if (!slides.length) return
-    state.activeSlide = (index + slides.length) % slides.length
-    renderHero()
-  }
-
-  function startHeroAutoRotate() {
-    clearInterval(state.sliderTimer)
-    state.sliderTimer = setInterval(() => goToSlide(state.activeSlide + 1), 6500)
-  }
-
-  function filterMenu() {
-    const cards = $all('.menu-feature')
-    const query = state.searchQuery.trim().toLowerCase()
-    const category = state.filterCategory
-
-    cards.forEach((card) => {
-      const text = card.textContent.toLowerCase()
-      const cardCategory = card.dataset.category || ''
-      const matchesCategory =
-        category === 'all' ||
-        cardCategory.split(' ').includes(category) ||
-        cardCategory === category ||
-        card.dataset.productId === category
-      const matchesQuery = !query || text.includes(query)
-      card.style.display = matchesCategory && matchesQuery ? '' : 'none'
-    })
-  }
-
-  function buildDefaultSelections(productId) {
-    const product = getProduct(productId)
-    const selections = {}
-    if (!product || !product.options) return selections
-
-    product.options.forEach((group) => {
-      if (group.type === 'radio' && group.choices.length) {
-        selections[group.id] = group.choices[0].value
-      } else if (group.type === 'checkbox') {
-        selections[group.id] = []
+  function calculateProductPrice(product, selection, quantity = 1) {
+    let total = 0;
+    for (const group of product.groups || []) {
+      const chosen = selection[group.key];
+      if (group.type === "checkbox") {
+        const values = Array.isArray(chosen) ? chosen : [];
+        values.forEach((id) => {
+          const opt = group.options.find((o) => o.id === id);
+          if (opt) total += Number(opt.price) || 0;
+        });
+      } else {
+        const opt = group.options.find((o) => o.id === chosen);
+        if (opt) total += Number(opt.price) || 0;
       }
-    })
-
-    return selections
-  }
-
-  function computeBasePrice(productId, selections) {
-    const product = getProduct(productId)
-    if (!product) return { price: 0, selectedText: [] }
-
-    let price = 0
-    const selectedText = []
-
-    if (!product.options || !product.options.length) {
-      price = product.basePrice || 0
-      return { price, selectedText }
     }
-
-    product.options.forEach((group) => {
-      const value = selections?.[group.id]
-      if (group.type === 'radio') {
-        const choice = group.choices.find((c) => c.value === value) || group.choices[0]
-        if (choice) {
-          price += Number(choice.price || 0)
-          selectedText.push(choice.label)
-        }
-      } else if (group.type === 'checkbox') {
-        const choices = group.choices.filter((c) => (value || []).includes(c.value))
-        choices.forEach((choice) => {
-          price += Number(choice.price || 0)
-          selectedText.push(choice.label)
-        })
-      }
-    })
-
-    return { price, selectedText }
+    return total * quantity;
   }
 
-  function generateItemKey(productId, selections, promoManaged = false, freeTag = '') {
-    const payload = JSON.stringify({
-      productId,
-      selections,
-      promoManaged: Boolean(promoManaged),
-      freeTag
-    })
-    return btoa(unescape(encodeURIComponent(payload))).slice(0, 32)
-  }
+  function buildCartItem(productId, selection, quantity = 1) {
+    const product = getProduct(productId);
+    if (!product) return null;
 
-  function buildProductDisplayName(productId, selections) {
-    const product = getProduct(productId)
-    if (!product) return 'Item'
+    const cleanSelection = clone(selection || product.defaultSelection || {});
+    const unitPrice = calculateProductPrice(product, cleanSelection, 1);
+    const summary = buildSelectionSummary(product, cleanSelection);
 
-    const extras = []
-    const sel = selections || {}
-
-    Object.entries(sel).forEach(([key, value]) => {
-      if (Array.isArray(value) && value.length) {
-        extras.push(value.join(', '))
-      } else if (value && key !== 'size' && key !== 'portion' && key !== 'tier' && key !== 'protein') {
-        extras.push(value)
-      }
-    })
-
-    const anchor = sel.size || sel.portion || sel.tier || sel.protein
-    return extras.length
-      ? `${product.name} - ${anchor || ''}${anchor ? ', ' : ''}${extras.join(', ')}`
-      : `${product.name}${anchor ? ` - ${anchor}` : ''}`
-  }
-
-  function initElementRefs() {
-    els.cartDrawer = $('#cartDrawer')
-    els.mobileNav = $('#mobileNav')
-    els.customerName = $('#customerName')
-    els.customerPhone = $('#customerPhone')
-    els.customerEmail = $('#customerEmail')
-    els.menuSearch = $('#menuSearch')
-  }
-
-  function loadState() {
-    state.cart = safeParse(STORAGE_KEYS.cart, [])
-    state.history = safeParse(STORAGE_KEYS.history, [])
-    state.preorder = safeParse(STORAGE_KEYS.preorder, {})
-    state.promoClaims = safeParse(STORAGE_KEYS.promoClaims, { entry: false })
-
-    const customer = safeParse(STORAGE_KEYS.customer, {})
-    if (customer.name && els.customerName) els.customerName.value = customer.name
-    if (customer.phone && els.customerPhone) els.customerPhone.value = customer.phone
-    if (customer.email && els.customerEmail) els.customerEmail.value = customer.email
-
-    const menuPrefs = safeParse(STORAGE_KEYS.menuPrefs, {})
-    if (typeof menuPrefs.filterCategory === 'string') state.filterCategory = menuPrefs.filterCategory
-    if (typeof menuPrefs.searchQuery === 'string') state.searchQuery = menuPrefs.searchQuery
-
-    if (els.menuSearch) els.menuSearch.value = state.searchQuery
-    setActiveFilterButton(state.filterCategory)
-  }
-
-  function persistCart() {
-    save(STORAGE_KEYS.cart, state.cart)
-  }
-
-  function persistHistory() {
-    save(STORAGE_KEYS.history, state.history)
-  }
-
-  function persistPreorder(data) {
-    state.preorder = data
-    save(STORAGE_KEYS.preorder, data)
-  }
-
-  function persistMenuPrefs() {
-    save(STORAGE_KEYS.menuPrefs, {
-      filterCategory: state.filterCategory,
-      searchQuery: state.searchQuery
-    })
-  }
-
-  function persistPromoClaims() {
-    save(STORAGE_KEYS.promoClaims, state.promoClaims)
-  }
-
-  function persistCustomer() {
-    save(STORAGE_KEYS.customer, {
-      name: els.customerName?.value || '',
-      phone: els.customerPhone?.value || '',
-      email: els.customerEmail?.value || ''
-    })
-  }
-
-  function getPromoNow() {
-    const now = new Date()
     return {
-      shawarmaActive: now >= SHAWARMA_PROMO_START && now <= SHAWARMA_PROMO_END,
-      friesActive: now >= LOADED_FRIES_PROMO_START && now <= LOADED_FRIES_PROMO_END
-    }
+      id: uid("ITEM"),
+      productId,
+      title: product.title,
+      category: product.category,
+      image: product.image,
+      badge: product.badge,
+      selection: cleanSelection,
+      selectionSummary: summary,
+      unitPrice,
+      qty: Math.max(1, Number(quantity) || 1),
+      isGift: false,
+      giftNote: "",
+    };
   }
 
-  function isCartPromoManaged(item) {
-    return Boolean(item && item.promoManaged)
-  }
+  function addToCart(productId, selection, quantity = 1) {
+    const product = getProduct(productId);
+    if (!product) return;
 
-  function addOrMergeCartItem(item) {
-    if (!item) return
+    const item = buildCartItem(productId, selection, quantity);
+    if (!item) return;
 
+    const signature = selectionSignature(item.selection);
     const existing = state.cart.find(
       (entry) =>
+        !entry.isGift &&
         entry.productId === item.productId &&
-        JSON.stringify(entry.selections || {}) === JSON.stringify(item.selections || {}) &&
-        Boolean(entry.promoManaged) === Boolean(item.promoManaged) &&
-        Boolean(entry.isFree) === Boolean(item.isFree)
-    )
+        selectionSignature(entry.selection) === signature
+    );
 
     if (existing) {
-      existing.quantity += item.quantity
+      existing.qty += item.qty;
     } else {
-      state.cart.push(item)
+      state.cart.push(item);
     }
 
-    syncPromoItems()
-    persistCart()
-    renderCart()
-    showToast(`${item.name} added to cart`, 'success')
+    persistCart();
+    renderCart();
+    showToast(`${product.title} added to cart.`);
   }
 
-  function buildCartItemFromProduct(productId, quantity, selections = {}, customName = '') {
-    const product = getProduct(productId)
-    if (!product) return null
+  function updateCartQty(itemId, delta) {
+    const index = state.cart.findIndex((item) => item.id === itemId && !item.isGift);
+    if (index < 0) return;
 
-    const normalizedSelections = selections || {}
-    const { price: unitPrice } = computeBasePrice(productId, normalizedSelections)
-
-    return {
-      id: generateItemKey(productId, normalizedSelections, false, customName || product.name),
-      productId,
-      name: customName || product.name,
-      quantity: Math.max(1, Number(quantity || 1)),
-      unitPrice,
-      selections: JSON.parse(JSON.stringify(normalizedSelections)),
-      category: product.category,
-      promoManaged: false,
-      freeTag: '',
-      isFree: false
+    state.cart[index].qty += delta;
+    if (state.cart[index].qty <= 0) {
+      state.cart.splice(index, 1);
+      showToast("Item removed from cart.");
+    } else if (delta > 0) {
+      showToast("Quantity updated.");
     }
-  }
-
-  function addProductToCart(productId, quantity, selections) {
-    const item = buildCartItemFromProduct(productId, quantity, selections)
-    addOrMergeCartItem(item)
-  }
-
-  function addSimpleProduct(productId) {
-    const selections = buildDefaultSelections(productId)
-    addProductToCart(productId, 1, selections)
-  }
-
-  function syncPromoItems() {
-    const promo = getPromoNow()
-
-    state.cart = state.cart.filter((item) => !isCartPromoManaged(item))
-
-    const shawarmaItems = state.cart.filter((item) => item.productId === 'shawarma')
-    const shawarmaQty = shawarmaItems.reduce((sum, item) => sum + Number(item.quantity || 0), 0)
-    const shawarmaFreeCount = promo.shawarmaActive ? Math.floor(shawarmaQty / 3) : 0
-
-    if (shawarmaFreeCount > 0) {
-      const sortedPrices = shawarmaItems
-        .flatMap((item) => Array.from({ length: item.quantity }, () => Number(item.unitPrice || 0)))
-        .sort((a, b) => a - b)
-
-      const discountUnits = sortedPrices.slice(0, shawarmaFreeCount)
-      const freeAmount = discountUnits.reduce((sum, price) => sum + price, 0)
-
-      state.cart.push({
-        id: 'promo-shawarma-discount',
-        productId: 'shawarma-promo',
-        name: 'Shawarma Promo Discount',
-        quantity: 1,
-        unitPrice: -freeAmount,
-        selections: { promo: 'Buy 2 get 1 free' },
-        category: 'promo',
-        promoManaged: true,
-        freeTag: 'shawarma',
-        isFree: true
-      })
-    }
-
-    const loadedFriesQty = state.cart
-      .filter((item) => item.productId === 'loaded-fries')
-      .reduce((sum, item) => sum + Number(item.quantity || 0), 0)
-
-    if (promo.friesActive && loadedFriesQty > 0) {
-      state.cart.push({
-        id: 'promo-free-coke',
-        productId: 'coke',
-        name: 'Free Coke',
-        quantity: loadedFriesQty,
-        unitPrice: 0,
-        selections: { promo: 'Free with loaded fries' },
-        category: 'promo',
-        promoManaged: true,
-        freeTag: 'loaded-fries',
-        isFree: true
-      })
-    }
-  }
-
-  function getCartItemsForTotal() {
-    return state.cart.filter((item) => !item.promoManaged && item.productId !== 'coke')
-  }
-
-  function calcCartSubtotal() {
-    return getCartItemsForTotal().reduce(
-      (sum, item) => sum + Number(item.unitPrice || 0) * Number(item.quantity || 0),
-      0
-    )
-  }
-
-  function calcPromoDiscount() {
-    const promoItem = state.cart.find((item) => item.id === 'promo-shawarma-discount')
-    return promoItem ? Math.abs(Number(promoItem.unitPrice || 0)) : 0
-  }
-
-  function calcDeliveryFee() {
-    return 0
-  }
-
-  function calcCartTotal() {
-    return Math.max(0, calcCartSubtotal() - calcPromoDiscount() + calcDeliveryFee())
-  }
-
-  function renderCart() {
-    const itemsEl = $('#cartItems')
-    const emptyEl = $('#cartEmptyState')
-    const badgeEl = $('#cartBadge')
-    const subtotalEl = $('#cartSubtotal')
-    const deliveryEl = $('#cartDelivery')
-    const discountEl = $('#cartDiscount')
-    const totalEl = $('#cartTotal')
-    const cSubtotalEl = $('#checkoutSubtotal')
-    const cDeliveryEl = $('#checkoutDelivery')
-    const cDiscountEl = $('#checkoutDiscount')
-    const cTotalEl = $('#checkoutTotal')
-
-    const visibleItems = state.cart.filter((item) => item.productId !== 'shawarma-promo')
-
-    if (badgeEl) {
-      const qty = visibleItems
-        .filter((item) => !item.promoManaged)
-        .reduce((sum, item) => sum + Number(item.quantity || 0), 0)
-      badgeEl.textContent = String(qty)
-    }
-
-    const subtotal = calcCartSubtotal()
-    const discount = calcPromoDiscount()
-    const delivery = calcDeliveryFee()
-    const total = calcCartTotal()
-
-    if (subtotalEl) subtotalEl.textContent = money(subtotal)
-    if (deliveryEl) deliveryEl.textContent = money(delivery)
-    if (discountEl) discountEl.textContent = `- ${money(discount)}`
-    if (totalEl) totalEl.textContent = money(total)
-
-    if (cSubtotalEl) cSubtotalEl.textContent = money(subtotal)
-    if (cDeliveryEl) cDeliveryEl.textContent = money(delivery)
-    if (cDiscountEl) cDiscountEl.textContent = `- ${money(discount)}`
-    if (cTotalEl) cTotalEl.textContent = money(total)
-
-    if (!itemsEl) return
-    itemsEl.innerHTML = ''
-
-    const displayItems = state.cart.filter((item) => item.productId !== 'shawarma-promo')
-
-    if (!displayItems.length) {
-      emptyEl?.classList.remove('is-hidden')
-      return
-    }
-
-    emptyEl?.classList.add('is-hidden')
-
-    displayItems.forEach((item) => {
-      const row = document.createElement('article')
-      row.className = 'cart-item'
-      row.dataset.itemId = item.id
-
-      const selectionText = formatSelections(item.selections)
-      const isPromo = Boolean(item.promoManaged || item.isFree || item.unitPrice === 0 || item.productId === 'coke')
-
-      row.innerHTML = `
-        <div class="cart-item__main">
-          <div class="cart-item__title">
-            <h3>${item.name}</h3>
-            ${isPromo ? '<span class="cart-item__promo">Promo</span>' : ''}
-          </div>
-          <p>${selectionText || 'Ready to order'}</p>
-          <strong class="cart-item__price">${item.unitPrice < 0 ? '-' : ''}${money(Math.abs(Number(item.unitPrice || 0)))}</strong>
-        </div>
-        <div class="cart-item__actions">
-          <div class="cart-stepper">
-            <button type="button" data-cart-minus="${item.id}" aria-label="Decrease quantity">
-              <i class="fa-solid fa-minus"></i>
-            </button>
-            <span>${item.quantity}</span>
-            <button type="button" data-cart-plus="${item.id}" aria-label="Increase quantity">
-              <i class="fa-solid fa-plus"></i>
-            </button>
-          </div>
-          <button type="button" class="cart-remove" data-cart-remove="${item.id}" aria-label="Remove item">
-            <i class="fa-solid fa-trash"></i>
-          </button>
-        </div>
-      `
-
-      if (isPromo) {
-        const minus = $('[data-cart-minus]', row)
-        const plus = $('[data-cart-plus]', row)
-        const remove = $('[data-cart-remove]', row)
-
-        minus?.setAttribute('disabled', 'disabled')
-        plus?.setAttribute('disabled', 'disabled')
-        remove?.setAttribute('disabled', 'disabled')
-        remove?.classList.add('is-disabled')
-
-        const promoNote = document.createElement('p')
-        promoNote.className = 'cart-item__note'
-        promoNote.textContent =
-          item.productId === 'coke'
-            ? 'Free item added automatically with loaded fries.'
-            : 'Promo discount applied automatically.'
-        row.querySelector('.cart-item__main')?.appendChild(promoNote)
-      }
-
-      itemsEl.appendChild(row)
-    })
-  }
-
-  function changeCartQuantity(itemId, delta) {
-    const item = state.cart.find((entry) => entry.id === itemId)
-    if (!item || item.promoManaged) return
-
-    item.quantity += delta
-    if (item.quantity <= 0) {
-      state.cart = state.cart.filter((entry) => entry.id !== itemId)
-    }
-
-    syncPromoItems()
-    persistCart()
-    renderCart()
+    persistCart();
+    renderCart();
   }
 
   function removeCartItem(itemId) {
-    const item = state.cart.find((entry) => entry.id === itemId)
-    if (!item || item.promoManaged) return
-
-    state.cart = state.cart.filter((entry) => entry.id !== itemId)
-    syncPromoItems()
-    persistCart()
-    renderCart()
-    showToast('Item removed', 'default')
+    const index = state.cart.findIndex((item) => item.id === itemId);
+    if (index < 0) return;
+    state.cart.splice(index, 1);
+    persistCart();
+    renderCart();
+    showToast("Item removed from cart.");
   }
 
-  function clearCart() {
-    state.cart = []
-    persistCart()
-    renderCart()
-    showToast('Cart cleared', 'default')
+  function clearCart(silent = false) {
+    state.cart = [];
+    persistCart();
+    renderCart();
+    if (!silent) showToast("Cart cleared.");
   }
 
-  function renderProductModal(productId) {
-    const product = getProduct(productId)
-    if (!product) return
+  function persistCart() {
+    saveJSON(STORAGE_KEYS.cart, state.cart.filter((item) => !item.isGift));
+  }
 
-    state.lastOpenProduct = productId
-    state.productQuantity = 1
-    state.productSelections = buildDefaultSelections(productId)
+  function loadCart() {
+    const saved = loadJSON(STORAGE_KEYS.cart, []);
+    state.cart = Array.isArray(saved) ? saved : [];
+  }
 
-    const hero = $('#productModalHero')
-    const badge = $('#productModalBadge')
-    const title = $('#productModalTitle')
-    const description = $('#productModalDescription')
-    const groups = $('#productOptionGroups')
-    const price = $('#productModalPrice')
-    const quantity = $('#productQuantity')
+  function getPaidItems() {
+    return state.cart.filter((item) => !item.isGift);
+  }
 
-    if (hero) hero.style.backgroundImage = `url('${product.image}')`
-    if (badge) badge.textContent = product.badge || 'Featured'
-    if (title) title.textContent = product.name
-    if (description) description.textContent = product.description || ''
-    if (quantity) quantity.value = '1'
-
-    if (groups) {
-      groups.innerHTML = ''
-
-      if (product.options && product.options.length) {
-        product.options.forEach((group) => {
-          const groupEl = document.createElement('div')
-          groupEl.className = 'option-group__block'
-
-          const heading = document.createElement('h3')
-          heading.textContent = group.label
-          groupEl.appendChild(heading)
-
-          if (group.type === 'radio') {
-            const wrap = document.createElement('div')
-            wrap.className = 'choice-grid choice-grid--radio'
-
-            group.choices.forEach((choice, idx) => {
-              const id = `${product.id}-${group.id}-${idx}`
-              const label = document.createElement('label')
-              label.className = 'choice-pill'
-              label.innerHTML = `
-                <input type="radio" name="${group.id}" id="${id}" value="${choice.value}">
-                <span>
-                  <strong>${choice.label}</strong>
-                  <small>${choice.oldPrice ? `<s>${money(choice.oldPrice)}</s> ` : ''}${
-                    choice.price === 0 ? 'Included' : `+ ${money(choice.price)}`
-                  }${choice.note ? ` • ${choice.note}` : ''}</small>
-                </span>
-              `
-
-              const input = label.querySelector('input')
-              input.checked = idx === 0
-              input.addEventListener('change', () => {
-                state.productSelections[group.id] = choice.value
-                updateProductModalPrice()
-              })
-
-              wrap.appendChild(label)
-            })
-
-            groupEl.appendChild(wrap)
-            state.productSelections[group.id] = group.choices[0]?.value
-          } else if (group.type === 'checkbox') {
-            const wrap = document.createElement('div')
-            wrap.className = 'choice-grid choice-grid--check'
-
-            group.choices.forEach((choice, idx) => {
-              const id = `${product.id}-${group.id}-${idx}`
-              const label = document.createElement('label')
-              label.className = 'choice-pill choice-pill--check'
-              label.innerHTML = `
-                <input type="checkbox" name="${group.id}" id="${id}" value="${choice.value}">
-                <span>
-                  <strong>${choice.label}</strong>
-                  <small>+ ${money(choice.price)}</small>
-                </span>
-              `
-
-              const input = label.querySelector('input')
-              input.addEventListener('change', () => {
-                const current = Array.isArray(state.productSelections[group.id])
-                  ? state.productSelections[group.id]
-                  : []
-                if (input.checked) {
-                  if (!current.includes(choice.value)) current.push(choice.value)
-                } else {
-                  state.productSelections[group.id] = current.filter((v) => v !== choice.value)
-                }
-                state.productSelections[group.id] = Array.isArray(state.productSelections[group.id])
-                  ? state.productSelections[group.id]
-                  : current
-                updateProductModalPrice()
-              })
-
-              wrap.appendChild(label)
-            })
-
-            groupEl.appendChild(wrap)
-            state.productSelections[group.id] = []
-          }
-
-          groups.appendChild(groupEl)
-        })
-      } else {
-        groups.innerHTML = '<p class="option-empty">This item is ready to add with no extra choices.</p>'
+  function getShawarmaAllocation(items) {
+    const units = [];
+    items.forEach((item) => {
+      if (item.productId !== "shawarma") return;
+      for (let i = 0; i < item.qty; i += 1) {
+        units.push({
+          itemId: item.id,
+          price: Number(item.unitPrice) || 0,
+        });
       }
+    });
+
+    units.sort((a, b) => a.price - b.price);
+    const freeCount = Math.floor(units.length / 3);
+    const allocation = new Map();
+    let discount = 0;
+
+    for (let i = 0; i < freeCount; i += 1) {
+      const unit = units[i];
+      if (!unit) continue;
+      discount += unit.price;
+      allocation.set(unit.itemId, (allocation.get(unit.itemId) || 0) + unit.price);
     }
 
-    updateProductModalPrice()
-    openModal('productModal')
+    return { allocation, discount, freeCount };
   }
 
-  function updateProductModalPrice() {
-    const product = getProduct(state.lastOpenProduct)
-    if (!product) return
+  function getGiftItems(items) {
+    const gifts = [];
+    if (!isPromoActive()) return gifts;
 
-    const qty = Math.max(1, Number($('#productQuantity')?.value || 1))
-    const { price } = computeBasePrice(product.id, state.productSelections)
-    const total = price * qty
+    const loadedFriesQty = items
+      .filter((item) => item.productId === "loaded-fries")
+      .reduce((acc, item) => acc + item.qty, 0);
 
-    const priceEl = $('#productModalPrice')
-    if (priceEl) priceEl.textContent = money(total)
+    for (let i = 0; i < loadedFriesQty; i += 1) {
+      gifts.push({
+        id: uid("GIFT"),
+        productId: "free-coke",
+        title: "Free Coke",
+        category: "gift",
+        image:
+          "https://images.unsplash.com/photo-1626077628826-0d0f2a0ec4f4?auto=format&fit=crop&w=900&q=80",
+        badge: "Promo",
+        selectionSummary: "Included with Loaded Fries",
+        unitPrice: 0,
+        qty: 1,
+        isGift: true,
+        giftNote: "Added automatically with Loaded Fries during promo hours.",
+      });
+    }
+
+    return gifts;
   }
 
-  function formatOrderType(orderType) {
-    return orderType === 'pickup' ? 'Pickup' : 'Delivery'
-  }
-
-  function generateReference() {
-    const ts = Date.now().toString(36).toUpperCase()
-    const rand = Math.random().toString(36).slice(2, 6).toUpperCase()
-    return `WD-${ts}-${rand}`
-  }
-
-  function summarizeSelectionsForInvoice(item) {
-    const text = formatSelections(item.selections)
-    return text || 'Standard'
-  }
-
-  function createHistoryEntry(order, status = 'paid') {
+  function getCartTotals() {
+    const paidItems = getPaidItems();
+    const { allocation, discount } = getShawarmaAllocation(paidItems);
+    const subtotal = paidItems.reduce((acc, item) => acc + item.unitPrice * item.qty, 0);
+    const total = Math.max(0, subtotal - discount);
     return {
-      ...order,
-      status,
-      savedAt: new Date().toISOString()
-    }
-  }
-
-  function renderOrderDetails(order) {
-    const details = $('#orderConfirmedDetails')
-    if (!details) return
-
-    const itemsHtml = order.items
-      .map(
-        (item) => `
-          <div class="success-item">
-            <strong>${item.name}</strong>
-            <span>${item.quantity} x ${money(item.unitPrice)}</span>
-            <small>${summarizeSelectionsForInvoice(item)}</small>
-          </div>
-        `
-      )
-      .join('')
-
-    details.innerHTML = `
-      <div class="success-grid">
-        <div><span>Reference</span><strong>${order.reference}</strong></div>
-        <div><span>Name</span><strong>${order.name}</strong></div>
-        <div><span>Phone</span><strong>${order.phone}</strong></div>
-        <div><span>Email</span><strong>${order.email}</strong></div>
-        <div><span>Order type</span><strong>${formatOrderType(order.orderType)}</strong></div>
-        <div><span>Address</span><strong>${order.address || 'Not provided'}</strong></div>
-        <div><span>Timestamp</span><strong>${order.timestamp}</strong></div>
-        <div><span>Total</span><strong>${money(order.total)}</strong></div>
-      </div>
-      <div class="success-items">${itemsHtml}</div>
-    `
-  }
-
-  function getCurrentCheckoutData() {
-    return {
-      name: els.customerName?.value?.trim() || '',
-      phone: els.customerPhone?.value?.trim() || '',
-      email: els.customerEmail?.value?.trim() || '',
-      orderType: $('#orderType')?.value || 'delivery',
-      address: $('#customerAddress')?.value?.trim() || '',
-      preferredDate: $('#preferredDate')?.value || '',
-      preferredTime: $('#preferredTime')?.value || '',
-      notes: $('#orderNotes')?.value?.trim() || '',
-      paymentMethod: $('input[name="paymentMethod"]:checked')?.value || 'paystack'
-    }
-  }
-
-  function validateCheckoutForm(data) {
-    if (!data.name || !data.phone || !data.email) {
-      return 'Please complete your name, phone, and email.'
-    }
-    if (data.orderType === 'delivery' && !data.address) {
-      return 'Please add a delivery address.'
-    }
-    return ''
-  }
-
-  function buildInvoiceHTML(order) {
-    const items = order.items
-      .map(
-        (item) => `
-          <div class="invoice-item">
-            <div>
-              <strong>${item.name}</strong>
-              <p>${summarizeSelectionsForInvoice(item)}</p>
-            </div>
-            <div>${item.quantity} x ${money(item.unitPrice)}</div>
-          </div>
-        `
-      )
-      .join('')
-
-    return `
-      <!doctype html>
-      <html>
-      <head>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <title>Invoice ${order.reference}</title>
-        <style>
-          body { font-family: Arial, sans-serif; margin: 0; padding: 24px; background: #fff; color: #111; }
-          .invoice { max-width: 800px; margin: 0 auto; }
-          .invoice__header, .invoice__totals, .invoice-item { display: flex; justify-content: space-between; gap: 16px; }
-          .invoice__header { border-bottom: 2px solid #111; padding-bottom: 16px; margin-bottom: 20px; }
-          .invoice__section { margin-bottom: 20px; }
-          .invoice-item { border-bottom: 1px solid #ddd; padding: 10px 0; }
-          h1, h2 { margin: 0 0 8px 0; }
-          p { margin: 4px 0; }
-          .muted { color: #555; }
-        </style>
-      </head>
-      <body>
-        <div class="invoice">
-          <div class="invoice__header">
-            <div>
-              <h1>WRAP District</h1>
-              <p class="muted">Tema Community 25, Devtraco</p>
-            </div>
-            <div>
-              <p><strong>Reference:</strong> ${order.reference}</p>
-              <p><strong>Timestamp:</strong> ${order.timestamp}</p>
-            </div>
-          </div>
-
-          <div class="invoice__section">
-            <h2>Customer details</h2>
-            <p><strong>Name:</strong> ${order.name}</p>
-            <p><strong>Phone:</strong> ${order.phone}</p>
-            <p><strong>Email:</strong> ${order.email}</p>
-            <p><strong>Order type:</strong> ${formatOrderType(order.orderType)}</p>
-            <p><strong>Address:</strong> ${order.address || 'Not provided'}</p>
-            <p><strong>Notes:</strong> ${order.notes || 'None'}</p>
-          </div>
-
-          <div class="invoice__section">
-            <h2>Items</h2>
-            ${items}
-          </div>
-
-          <div class="invoice__section invoice__totals">
-            <div>
-              <p><strong>Subtotal:</strong> ${money(order.subtotal)}</p>
-              <p><strong>Delivery:</strong> ${money(order.delivery)}</p>
-              <p><strong>Promo discount:</strong> - ${money(order.discount)}</p>
-              <p><strong>Total:</strong> ${money(order.total)}</p>
-            </div>
-          </div>
-        </div>
-      </body>
-      </html>
-    `
-  }
-
-  function downloadTextFile(filename, text) {
-    const blob = new Blob([text], { type: 'text/html;charset=utf-8' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = filename
-    document.body.appendChild(a)
-    a.click()
-    a.remove()
-    setTimeout(() => URL.revokeObjectURL(url), 1000)
-  }
-
-  function openPrintableInvoice(order) {
-    const win = window.open('', '_blank', 'noopener,noreferrer,width=900,height=1000')
-    if (!win) {
-      showToast('Popup blocked. Please allow popups to print the invoice.', 'default')
-      return
-    }
-
-    win.document.open()
-    win.document.write(buildInvoiceHTML(order))
-    win.document.close()
-    win.focus()
-
-    setTimeout(() => {
-      try {
-        win.print()
-      } catch {}
-    }, 500)
-  }
-
-  function saveInvoiceAsPdf(order) {
-    openPrintableInvoice(order)
-  }
-
-  function getSelectedHistoryOrder() {
-    if (!state.history.length) return null
-    const selected = state.history.find((entry) => entry.reference === state.selectedHistoryId)
-    return selected || state.history[0]
-  }
-
-  function renderHistoryList() {
-    const list = $('#historyList')
-    const query = ($('#historySearch')?.value || '').trim().toLowerCase()
-    if (!list) return
-
-    const orders = state.history
-      .slice()
-      .sort((a, b) => new Date(b.savedAt || b.timestamp || 0) - new Date(a.savedAt || a.timestamp || 0))
-      .filter((order) => {
-        if (!query) return true
-        return (
-          String(order.reference || '').toLowerCase().includes(query) ||
-          String(order.name || '').toLowerCase().includes(query) ||
-          String(order.phone || '').toLowerCase().includes(query)
-        )
-      })
-
-    list.innerHTML = ''
-
-    if (!orders.length) {
-      list.innerHTML = '<div class="history-empty">No purchases found.</div>'
-      return
-    }
-
-    orders.forEach((order) => {
-      const item = document.createElement('button')
-      item.type = 'button'
-      item.className = 'history-item'
-      item.dataset.reference = order.reference
-      item.innerHTML = `
-        <div class="history-item__main">
-          <strong>${order.reference}</strong>
-          <p>${order.name} • ${order.phone}</p>
-          <small>${order.timestamp}</small>
-        </div>
-        <div class="history-item__meta">
-          <span>${money(order.total)}</span>
-          <i class="fa-solid fa-chevron-right"></i>
-        </div>
-      `
-
-      if (order.reference === state.selectedHistoryId) {
-        item.classList.add('history-item--active')
-      }
-
-      item.addEventListener('click', () => {
-        state.selectedHistoryId = order.reference
-        renderHistoryList()
-        renderOrderDetails(order)
-      })
-
-      list.appendChild(item)
-    })
-
-    const selected = getSelectedHistoryOrder()
-    if (selected) {
-      state.selectedHistoryId = selected.reference
-      renderOrderDetails(selected)
-    }
-  }
-
-  function submitCheckout(event) {
-    event.preventDefault()
-
-    const data = getCurrentCheckoutData()
-    const error = validateCheckoutForm(data)
-    if (error) {
-      showToast(error, 'error')
-      return
-    }
-
-    const subtotal = calcCartSubtotal()
-    const discount = calcPromoDiscount()
-    const delivery = calcDeliveryFee()
-    const total = calcCartTotal()
-    const reference = generateReference()
-    const timestamp = new Date().toLocaleString()
-
-    const order = {
-      reference,
-      timestamp,
       subtotal,
       discount,
-      delivery,
       total,
-      ...data,
-      items: state.cart
-        .filter((item) => !item.promoManaged)
-        .map((item) => ({
-          ...item,
-          selections: JSON.parse(JSON.stringify(item.selections || {}))
-        }))
+      allocation,
+      paidCount: paidItems.reduce((acc, item) => acc + item.qty, 0),
+      gifts: getGiftItems(paidItems),
+    };
+  }
+
+  function renderCart() {
+    const cartItems = $("#cartItems");
+    const emptyState = $("#cartEmptyState");
+    if (!cartItems) return;
+
+    const paidItems = getPaidItems();
+    const totals = getCartTotals();
+    const allVisibleItems = [...paidItems, ...totals.gifts];
+
+    const hasItems = allVisibleItems.length > 0;
+    if (emptyState) emptyState.style.display = hasItems ? "none" : "grid";
+
+    cartItems.innerHTML = "";
+
+    if (!hasItems) {
+      updateCartUI();
+      return;
     }
 
-    persistCustomer()
-    save(STORAGE_KEYS.lastOrder, order)
-    state.history.unshift(createHistoryEntry(order, 'paid'))
-    persistHistory()
+    allVisibleItems.forEach((item) => {
+      const row = document.createElement("article");
+      row.className = `cart-item${item.isGift ? " cart-item--gift" : ""}`;
+      row.dataset.itemId = item.id;
 
-    const afterPayment = () => {
-      renderOrderDetails(order)
-      openModal('orderConfirmedModal')
-      clearCart()
-      closeModal('checkoutModal')
-      state.selectedHistoryId = order.reference
-      renderHistoryList()
-      showToast('Order confirmed', 'success')
-    }
+      const lineQty = item.qty;
+      const lineRaw = item.unitPrice * lineQty;
+      const appliedDiscount = item.isGift ? lineRaw : totals.allocation.get(item.id) || 0;
+      const lineTotal = Math.max(0, lineRaw - appliedDiscount);
 
-    if (data.paymentMethod === 'paystack' && window.PaystackPop && typeof window.PaystackPop.setup === 'function') {
-      try {
-        const handler = window.PaystackPop.setup({
-          key: PAYSTACK_PUBLIC_KEY,
-          email: data.email,
-          amount: Math.round(total * 100),
-          currency: 'GHS',
-          ref: reference,
-          callback: function () {
-            afterPayment()
-          },
-          onClose: function () {
-            showToast('Payment window closed', 'default')
+      const imageStyle = item.image
+        ? `style="background-image:url('${item.image}');"`
+        : "";
+
+      row.innerHTML = `
+        <div class="cart-item__image" ${imageStyle}></div>
+        <div class="cart-item__content">
+          <div class="cart-item__topline">
+            <div>
+              <h3>${escapeHTML(item.title)}</h3>
+              <p>${escapeHTML(item.selectionSummary || item.giftNote || "")}</p>
+            </div>
+            <div class="cart-item__price">
+              ${
+                item.isGift
+                  ? `<strong>${formatGHS(0)}</strong>`
+                  : appliedDiscount > 0
+                    ? `<s>${formatGHS(lineRaw)}</s><strong>${formatGHS(lineTotal)}</strong>`
+                    : `<strong>${formatGHS(lineRaw)}</strong>`
+              }
+            </div>
+          </div>
+
+          ${
+            item.isGift
+              ? `<div class="cart-item__meta cart-item__meta--gift"><i class="fa-solid fa-gift"></i> Included automatically</div>`
+              : appliedDiscount > 0
+                ? `<div class="cart-item__meta cart-item__meta--promo"><i class="fa-solid fa-tag"></i> Promo discount applied</div>`
+                : ""
           }
-        })
-        handler.openIframe()
-      } catch (err) {
-        console.error(err)
-        showToast('Payment could not start. Recording the order locally.', 'default')
-        afterPayment()
+
+          ${
+            item.isGift
+              ? ""
+              : `
+              <div class="cart-item__actions">
+                <button type="button" class="qty-btn" data-decrease-qty="${item.id}" aria-label="Decrease quantity">
+                  <i class="fa-solid fa-minus"></i>
+                </button>
+                <span class="qty-value">${lineQty}</span>
+                <button type="button" class="qty-btn" data-increase-qty="${item.id}" aria-label="Increase quantity">
+                  <i class="fa-solid fa-plus"></i>
+                </button>
+                <button type="button" class="remove-btn" data-remove-item="${item.id}" aria-label="Remove item">
+                  <i class="fa-solid fa-trash-can"></i>
+                </button>
+              </div>
+            `
+          }
+        </div>
+      `;
+
+      cartItems.appendChild(row);
+    });
+
+    $("#subtotalValue").textContent = formatGHS(totals.subtotal);
+    $("#promoValue").textContent = `- ${formatGHS(totals.discount)}`;
+    $("#totalValue").textContent = formatGHS(totals.total);
+
+    $("#cartSubtotal").textContent = formatGHS(totals.subtotal);
+    $("#cartDiscount").textContent = `- ${formatGHS(totals.discount)}`;
+    $("#cartTotal").textContent = formatGHS(totals.total);
+
+    $("#checkoutSubtotal").textContent = formatGHS(totals.subtotal);
+    $("#checkoutDiscount").textContent = `- ${formatGHS(totals.discount)}`;
+    $("#checkoutTotal").textContent = formatGHS(totals.total);
+    $("#checkoutDelivery").textContent = "Estimated after checkout";
+
+    updateCartUI();
+  }
+
+  function updateCartUI() {
+    const totals = getCartTotals();
+    const countTargets = ["#cartCount", "#cartHeaderCount"];
+    countTargets.forEach((sel) => {
+      const el = $(sel);
+      if (el) el.textContent = String(totals.paidCount);
+    });
+
+    const totalTargets = ["#cartHeaderTotal"];
+    totalTargets.forEach((sel) => {
+      const el = $(sel);
+      if (el) el.textContent = formatGHS(totals.total);
+    });
+  }
+
+  function populateProductModal(productId) {
+    const product = getProduct(productId);
+    if (!product) return;
+
+    state.currentProductId = productId;
+
+    const hero = $("#productDrawerHero");
+    const badge = $("#productDrawerBadge");
+    const title = $("#productDrawerTitle");
+    const description = $("#productDrawerDescription");
+    const optionsWrap = $("#productOptionGroups");
+    const quantityInput = $("#productQuantity");
+    const priceText = $("#productDrawerPrice");
+    const form = $("#productOptionsForm");
+
+    if (hero) {
+      hero.style.backgroundImage = `url('${product.image}')`;
+      hero.setAttribute("aria-hidden", "true");
+    }
+    if (badge) badge.textContent = product.badge || "Featured";
+    if (title) title.textContent = product.title;
+    if (description) description.textContent = product.description || "";
+
+    const selection = getSelectionFromCache(productId);
+    const quantity = Math.max(1, Number(quantityInput?.value) || 1);
+
+    if (optionsWrap) {
+      optionsWrap.innerHTML = "";
+      product.groups.forEach((group) => {
+        const section = document.createElement("section");
+        section.className = "option-group__section";
+        const selectedValue = selection[group.key];
+
+        const heading = document.createElement("h3");
+        heading.textContent = group.label;
+        section.appendChild(heading);
+
+        const controlGrid = document.createElement("div");
+        controlGrid.className = `option-group__controls option-group__controls--${group.type}`;
+
+        group.options.forEach((option) => {
+          const id = `${productId}-${group.key}-${option.id}`;
+          const label = document.createElement("label");
+          label.className = "option-chip";
+
+          const input = document.createElement("input");
+          input.type = group.type === "checkbox" ? "checkbox" : "radio";
+          input.name = `${productId}-${group.key}`;
+          input.value = option.id;
+          input.id = id;
+          input.dataset.groupKey = group.key;
+          input.dataset.groupType = group.type;
+          input.dataset.optionPrice = String(option.price ?? 0);
+
+          if (group.type === "checkbox") {
+            input.checked = Array.isArray(selectedValue) && selectedValue.includes(option.id);
+          } else {
+            input.checked = selectedValue === option.id;
+          }
+
+          const price = document.createElement("span");
+          price.className = "option-chip__price";
+          price.textContent =
+            option.oldPrice && Number(option.oldPrice) > Number(option.price)
+              ? `${formatGHS(option.price)}`
+              : option.price === 0 && product.id === "fried-rice"
+                ? ""
+                : option.price === 0
+                  ? "+ GHC 0.00"
+                  : `+ ${formatGHS(option.price)}`;
+
+          label.appendChild(input);
+          label.appendChild(document.createTextNode(option.label));
+
+          if (option.oldPrice && Number(option.oldPrice) > Number(option.price)) {
+            const old = document.createElement("s");
+            old.className = "option-chip__old";
+            old.textContent = formatGHS(option.oldPrice);
+            label.appendChild(old);
+          }
+
+          if (price.textContent) label.appendChild(price);
+          controlGrid.appendChild(label);
+        });
+
+        section.appendChild(controlGrid);
+        optionsWrap.appendChild(section);
+      });
+    }
+
+    if (quantityInput) quantityInput.value = String(state.selectionCache?.[productId]?.quantity || 1);
+
+    const price = calculateProductPrice(product, selection, Math.max(1, Number(quantityInput?.value) || 1));
+    if (priceText) priceText.textContent = formatGHS(price);
+
+    if (form) {
+      form.dataset.productId = productId;
+    }
+  }
+
+  function readProductSelection(productId) {
+    const product = getProduct(productId);
+    if (!product) return null;
+
+    const form = $("#productOptionsForm");
+    if (!form) return null;
+
+    const selection = clone(product.defaultSelection || {});
+    const controls = $$("input[data-group-key]", form);
+
+    const checkboxGroups = new Set(
+      product.groups.filter((g) => g.type === "checkbox").map((g) => g.key)
+    );
+
+    for (const group of product.groups) {
+      if (group.type === "checkbox") selection[group.key] = [];
+    }
+
+    controls.forEach((input) => {
+      const key = input.dataset.groupKey;
+      const type = input.dataset.groupType;
+      if (type === "checkbox") {
+        if (!Array.isArray(selection[key])) selection[key] = [];
+        if (input.checked) selection[key].push(input.value);
+      } else if (input.checked) {
+        selection[key] = input.value;
       }
+    });
+
+    for (const group of product.groups) {
+      if (group.type === "radio") {
+        const hasSelection = selection[group.key] !== undefined;
+        if (!hasSelection) {
+          selection[group.key] = group.options[0]?.id;
+        }
+      } else if (checkboxGroups.has(group.key) && !Array.isArray(selection[group.key])) {
+        selection[group.key] = [];
+      }
+    }
+
+    saveSelectionCache(productId, selection);
+    return selection;
+  }
+
+  function updateProductPricePreview() {
+    const productId = $("#productOptionsForm")?.dataset.productId;
+    const product = getProduct(productId);
+    if (!product) return;
+
+    const quantity = Math.max(1, Number($("#productQuantity")?.value) || 1);
+    const selection = readProductSelection(productId);
+    if (!selection) return;
+
+    const price = calculateProductPrice(product, selection, quantity);
+    const priceText = $("#productDrawerPrice");
+    if (priceText) priceText.textContent = formatGHS(price);
+  }
+
+  function addCurrentProductToCart() {
+    const productId = $("#productOptionsForm")?.dataset.productId;
+    const product = getProduct(productId);
+    if (!product) return;
+
+    const selection = readProductSelection(productId);
+    if (!selection) return;
+
+    const quantity = Math.max(1, Number($("#productQuantity")?.value) || 1);
+    addToCart(productId, selection, quantity);
+    closeOverlay("productDrawer");
+  }
+
+  function showToast(message, type = "info") {
+    let host = $("#toastHost");
+    if (!host) {
+      host = document.createElement("div");
+      host.id = "toastHost";
+      host.style.position = "fixed";
+      host.style.left = "16px";
+      host.style.right = "16px";
+      host.style.bottom = "16px";
+      host.style.zIndex = "9999";
+      host.style.display = "grid";
+      host.style.gap = "10px";
+      host.style.pointerEvents = "none";
+      document.body.appendChild(host);
+    }
+
+    const toast = document.createElement("div");
+    toast.style.pointerEvents = "auto";
+    toast.style.padding = "14px 16px";
+    toast.style.borderRadius = "14px";
+    toast.style.color = "#fff";
+    toast.style.background =
+      type === "error"
+        ? "rgba(165, 40, 40, 0.95)"
+        : "rgba(20, 20, 20, 0.95)";
+    toast.style.border = "1px solid rgba(255,255,255,0.12)";
+    toast.style.boxShadow = "0 18px 50px rgba(0,0,0,0.35)";
+    toast.style.backdropFilter = "blur(10px)";
+    toast.style.fontSize = "14px";
+    toast.textContent = message;
+
+    host.appendChild(toast);
+    window.setTimeout(() => {
+      toast.style.opacity = "0";
+      toast.style.transform = "translateY(8px)";
+      toast.style.transition = "all 240ms ease";
+      window.setTimeout(() => toast.remove(), 260);
+    }, 2600);
+  }
+
+  function openOverlay(id) {
+    closeTopOverlay(true);
+
+    const el = document.getElementById(id);
+    if (!el) return;
+
+    state.openOverlayId = id;
+    el.setAttribute("aria-hidden", "false");
+    el.classList.add("is-open");
+
+    if (id === "cartDrawer") {
+      document.body.style.overflow = "hidden";
     } else {
-      afterPayment()
+      document.body.style.overflow = "hidden";
+    }
+
+    if (id === "mobileNav") {
+      el.hidden = false;
+      el.setAttribute("aria-hidden", "false");
+      const firstLink = $(".mobile-nav a, .mobile-nav button", el);
+      if (firstLink) firstLink.focus();
+      return;
+    }
+
+    if (id === "productDrawer") {
+      const first = $("#productQuantity");
+      if (first) first.focus();
+    } else {
+      const focusable = el.querySelector(
+        "button, input, select, textarea, a[href], [tabindex]:not([tabindex='-1'])"
+      );
+      if (focusable) focusable.focus();
     }
   }
 
-  function handleHistoryOpen() {
-    if (!state.history.length) {
-      showToast('No purchase history yet', 'default')
-    }
-    openModal('historyModal')
-    renderHistoryList()
-  }
+  function closeOverlay(id) {
+    const el = document.getElementById(id);
+    if (!el) return;
 
-  function clearHistory() {
-    if (!confirm('Clear all purchase history from this browser?')) return
-    state.history = []
-    state.selectedHistoryId = null
-    persistHistory()
-    renderHistoryList()
-    showToast('History cleared', 'default')
-  }
+    el.setAttribute("aria-hidden", "true");
+    el.classList.remove("is-open");
 
-  function downloadSelectedHistory() {
-    const order = getSelectedHistoryOrder()
-    if (!order) {
-      showToast('No purchase available to download', 'default')
-      return
-    }
-    const html = buildInvoiceHTML(order)
-    downloadTextFile(`WRAP-District-${order.reference}.html`, html)
-    showToast('Download started', 'success')
-  }
-
-  function printSelectedHistory() {
-    const order = getSelectedHistoryOrder()
-    if (!order) {
-      showToast('No purchase available to print', 'default')
-      return
-    }
-    openPrintableInvoice(order)
-  }
-
-  function openSelectedHistory() {
-    const order = getSelectedHistoryOrder()
-    if (!order) {
-      showToast('No purchase available yet', 'default')
-      return
-    }
-    renderOrderDetails(order)
-    openModal('orderConfirmedModal')
-  }
-
-  function refreshHistory() {
-    state.history = safeParse(STORAGE_KEYS.history, [])
-    renderHistoryList()
-    showToast('History refreshed', 'success')
-  }
-
-  function handlePromoHelper() {
-    const promo = getPromoNow()
-    const shawarmaQty = state.cart
-      .filter((item) => item.productId === 'shawarma')
-      .reduce((sum, item) => sum + Number(item.quantity || 0), 0)
-    const friesQty = state.cart
-      .filter((item) => item.productId === 'loaded-fries')
-      .reduce((sum, item) => sum + Number(item.quantity || 0), 0)
-
-    if (promo.shawarmaActive && shawarmaQty >= 3) {
-      showToast('Shawarma promo is active. A free item has been applied.', 'success')
-      return
+    if (id === "mobileNav") {
+      el.hidden = true;
     }
 
-    if (promo.friesActive && friesQty > 0) {
-      showToast('Loaded fries promo is active. Free Coke is included.', 'success')
-      return
-    }
+    const anyOpen = $$(".modal.is-open, .cart-drawer.is-open, .mobile-nav.is-open").length > 0;
+    if (!anyOpen) document.body.style.overflow = "";
 
-    showToast('Add promo items during the deal window to unlock discounts.', 'default')
+    if (state.openOverlayId === id) state.openOverlayId = null;
+  }
+
+  function closeTopOverlay(silent = false) {
+    const opened =
+      [...$$(".modal.is-open"), ...$$(".cart-drawer.is-open"), ...$$(".mobile-nav.is-open")].at(
+        -1
+      ) || null;
+    if (!opened) return;
+
+    const id = opened.id;
+    if (!silent && id) closeOverlay(id);
+    else if (id) closeOverlay(id);
   }
 
   function openCart() {
-    openDrawer(els.cartDrawer)
+    renderCart();
+    openOverlay("cartDrawer");
   }
 
   function closeCart() {
-    closeDrawer(els.cartDrawer)
+    closeOverlay("cartDrawer");
   }
 
-  function openMobileNav() {
-    openDrawer(els.mobileNav)
+  function openProduct(productId) {
+    const product = getProduct(productId);
+    if (!product) return;
+
+    populateProductModal(productId);
+    openOverlay("productDrawer");
   }
 
-  function closeMobileNav() {
-    closeDrawer(els.mobileNav)
+  function openModalById(id) {
+    openOverlay(id);
   }
 
-  function updateProductQtyFromInput() {
-    const input = $('#productQuantity')
-    if (!input) return
-    input.value = String(Math.max(1, Number(input.value || 1)))
-    updateProductModalPrice()
+  function closeModalById(id) {
+    closeOverlay(id);
+  }
+
+  function setHeroSlide(index) {
+    const slides = $$(".hero-slide");
+    const dots = $$(".hero-dot");
+    if (!slides.length) return;
+
+    state.activeSlide = ((index % slides.length) + slides.length) % slides.length;
+
+    slides.forEach((slide, i) => {
+      slide.classList.toggle("is-active", i === state.activeSlide);
+    });
+
+    dots.forEach((dot, i) => {
+      dot.classList.toggle("is-active", i === state.activeSlide);
+      dot.setAttribute("aria-pressed", i === state.activeSlide ? "true" : "false");
+    });
+  }
+
+  function nextHeroSlide() {
+    setHeroSlide(state.activeSlide + 1);
+  }
+
+  function prevHeroSlide() {
+    setHeroSlide(state.activeSlide - 1);
+  }
+
+  function startHeroRotation() {
+    if (state.heroTimer) window.clearInterval(state.heroTimer);
+    state.heroTimer = window.setInterval(nextHeroSlide, HERO_INTERVAL_MS);
+  }
+
+  function stopHeroRotation() {
+    if (state.heroTimer) {
+      window.clearInterval(state.heroTimer);
+      state.heroTimer = null;
+    }
+  }
+
+  function scrollToMenu() {
+    const menu = $("#menu");
+    if (menu) {
+      menu.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }
+
+  function applyMenuFilters() {
+    const query = state.menuSearch.trim().toLowerCase();
+    const filter = state.menuFilter;
+
+    const cards = $$(".menu-feature");
+    cards.forEach((card) => {
+      const category = (card.dataset.category || "").toLowerCase();
+      const text = card.textContent.toLowerCase();
+      const matchesCategory = filter === "all" ? true : category.includes(filter);
+      const matchesSearch = !query || text.includes(query);
+      card.hidden = !(matchesCategory && matchesSearch);
+    });
+
+    const duo = $(".menu-duo");
+    if (duo) {
+      const visible = $$(".menu-feature", duo).some((card) => !card.hidden);
+      duo.hidden = !visible;
+    }
+
+    const anyVisible = cards.some((card) => !card.hidden);
+    let empty = $("#menuNoResults");
+    if (!empty) {
+      empty = document.createElement("p");
+      empty.id = "menuNoResults";
+      empty.style.margin = "18px 4px 0";
+      empty.style.color = "rgba(255,255,255,0.7)";
+      empty.style.fontSize = "14px";
+      empty.textContent = "No matching menu items found.";
+      $("#menu")?.appendChild(empty);
+    }
+    empty.hidden = anyVisible;
+  }
+
+  function setMenuFilter(filter) {
+    state.menuFilter = filter;
+    $$(".menu-pill").forEach((pill) => {
+      const active = pill.dataset.filterCategory === filter;
+      pill.classList.toggle("menu-pill--active", active);
+      pill.setAttribute("aria-selected", active ? "true" : "false");
+    });
+    applyMenuFilters();
+  }
+
+  function setMenuSearch(value) {
+    state.menuSearch = value || "";
+    applyMenuFilters();
+  }
+
+  function generateReference() {
+    const d = now();
+    const stamp = `${String(d.getFullYear()).slice(-2)}${String(d.getMonth() + 1).padStart(2, "0")}${String(
+      d.getDate()
+    ).padStart(2, "0")}`;
+    return `WD-${stamp}-${Math.floor(1000 + Math.random() * 9000)}`;
+  }
+
+  function readFormValues(form) {
+    const data = new FormData(form);
+    const out = {};
+    for (const [key, value] of data.entries()) {
+      if (out[key] !== undefined) {
+        if (!Array.isArray(out[key])) out[key] = [out[key]];
+        out[key].push(value);
+      } else {
+        out[key] = value;
+      }
+    }
+    return out;
+  }
+
+  function saveUserProfile(profile) {
+    saveJSON(STORAGE_KEYS.user, profile);
+  }
+
+  function loadUserProfile() {
+    return loadJSON(STORAGE_KEYS.user, {});
+  }
+
+  function savePreorder(data) {
+    saveJSON(STORAGE_KEYS.preorder, data);
+  }
+
+  function loadPreorder() {
+    return loadJSON(STORAGE_KEYS.preorder, {});
+  }
+
+  function populateSavedFields() {
+    const profile = loadUserProfile();
+    const preorder = loadPreorder();
+
+    const checkoutMap = {
+      "#customerName": profile.name || "",
+      "#customerPhone": profile.phone || "",
+      "#customerEmail": profile.email || "",
+      "#customerAddress": profile.address || "",
+      "#preferredDate": profile.preferredDate || "",
+      "#preferredTime": profile.preferredTime || "",
+      "#orderNotes": profile.notes || "",
+    };
+
+    Object.entries(checkoutMap).forEach(([sel, value]) => {
+      const el = $(sel);
+      if (el) el.value = value;
+    });
+
+    const preorderMap = {
+      "[name='preorderName']": preorder.preorderName || profile.name || "",
+      "[name='preorderPhone']": preorder.preorderPhone || profile.phone || "",
+      "[name='preorderDate']": preorder.preorderDate || "",
+      "[name='preorderTime']": preorder.preorderTime || "",
+      "[name='preorderNotes']": preorder.preorderNotes || "",
+    };
+
+    Object.entries(preorderMap).forEach(([sel, value]) => {
+      const el = $(sel);
+      if (el) el.value = value;
+    });
+  }
+
+  function saveCheckoutProfileFromForm(formData) {
+    const profile = {
+      name: formData.name || "",
+      phone: formData.phone || "",
+      email: formData.email || "",
+      address: formData.address || "",
+      preferredDate: formData.preferredDate || "",
+      preferredTime: formData.preferredTime || "",
+      notes: formData.notes || "",
+    };
+    saveUserProfile(profile);
+  }
+
+  function buildOrderFromCheckout(formData, paymentMeta = {}) {
+    const paidItems = getPaidItems();
+    const totals = getCartTotals();
+    const { allocation, discount } = getShawarmaAllocation(paidItems);
+    const gifts = totals.gifts;
+
+    const items = [...paidItems, ...gifts].map((item) => {
+      const itemDiscount = item.isGift ? item.qty * item.unitPrice : allocation.get(item.id) || 0;
+      const lineRaw = item.qty * item.unitPrice;
+      const lineTotal = Math.max(0, lineRaw - itemDiscount);
+      return {
+        title: item.title,
+        qty: item.qty,
+        unitPrice: item.unitPrice,
+        lineRaw,
+        discount: itemDiscount,
+        lineTotal,
+        isGift: item.isGift,
+        summary: item.selectionSummary || item.giftNote || "",
+      };
+    });
+
+    const orderType = formData.orderType === "pickup" ? "Pickup" : "Delivery";
+
+    return {
+      reference: generateReference(),
+      customer: {
+        name: formData.name || "",
+        phone: formData.phone || "",
+        email: formData.email || "",
+        address: formData.address || "",
+      },
+      orderType,
+      notes: formData.notes || "",
+      preferredDate: formData.preferredDate || "",
+      preferredTime: formData.preferredTime || "",
+      timestamp: new Date().toLocaleString(),
+      subtotal: totals.subtotal,
+      discount,
+      delivery: orderType === "Delivery" ? "Estimated after checkout" : "Pickup at Devtraco",
+      total: totals.total,
+      items,
+      payment: paymentMeta,
+      status: "Confirmed",
+    };
+  }
+
+  function saveOrderToHistory(order) {
+    const history = loadJSON(STORAGE_KEYS.history, []);
+    history.unshift(order);
+    saveJSON(STORAGE_KEYS.history, history);
+    state.history = history;
+    saveJSON(STORAGE_KEYS.lastOrder, order);
+    state.currentConfirmedOrder = order;
+  }
+
+  function loadHistory() {
+    const history = loadJSON(STORAGE_KEYS.history, []);
+    state.history = Array.isArray(history) ? history : [];
+  }
+
+  function renderHistoryList() {
+    const list = $("#historyList");
+    if (!list) return;
+
+    const query = ($("#historySearch")?.value || "").trim().toLowerCase();
+    const filtered = (state.history || []).filter((order) => {
+      const haystack = [
+        order.reference,
+        order.customer?.name,
+        order.customer?.phone,
+        order.customer?.email,
+      ]
+        .join(" ")
+        .toLowerCase();
+      return !query || haystack.includes(query);
+    });
+
+    list.innerHTML = "";
+
+    if (!filtered.length) {
+      const empty = document.createElement("div");
+      empty.className = "history-empty";
+      empty.innerHTML = `
+        <i class="fa-regular fa-folder-open"></i>
+        <h3>No orders found</h3>
+        <p>Try another reference, name, or phone number.</p>
+      `;
+      list.appendChild(empty);
+      return;
+    }
+
+    filtered.forEach((order) => {
+      const card = document.createElement("article");
+      card.className = "history-item";
+      card.innerHTML = `
+        <div class="history-item__top">
+          <div>
+            <h3>${escapeHTML(order.reference)}</h3>
+            <p>${escapeHTML(order.customer?.name || "")}</p>
+          </div>
+          <strong>${formatGHS(order.total || 0)}</strong>
+        </div>
+        <div class="history-item__meta">
+          <span><i class="fa-solid fa-phone"></i> ${escapeHTML(order.customer?.phone || "")}</span>
+          <span><i class="fa-regular fa-clock"></i> ${escapeHTML(order.timestamp || "")}</span>
+        </div>
+        <div class="history-item__actions">
+          <button type="button" class="history-btn" data-history-open="${escapeHTML(order.reference)}">Open</button>
+          <button type="button" class="history-btn" data-history-download="${escapeHTML(order.reference)}">Download</button>
+          <button type="button" class="history-btn" data-history-print="${escapeHTML(order.reference)}">Print</button>
+        </div>
+      `;
+      list.appendChild(card);
+    });
+  }
+
+  function ensureHistoryToolbarButtons() {
+    const tools = $(".history-tools");
+    if (!tools) return;
+
+    if ($(".history-tools__buttons", tools)) return;
+
+    const toolbar = document.createElement("div");
+    toolbar.className = "history-tools__buttons";
+    toolbar.style.display = "flex";
+    toolbar.style.gap = "10px";
+    toolbar.style.flexWrap = "wrap";
+    toolbar.style.marginTop = "12px";
+
+    toolbar.innerHTML = `
+      <button type="button" class="btn btn--ghost" id="historyRefreshBtn">
+        <i class="fa-solid fa-rotate-right"></i>
+        Refresh
+      </button>
+      <button type="button" class="btn btn--ghost" id="historyClearBtn">
+        <i class="fa-solid fa-trash-can"></i>
+        Clear all
+      </button>
+    `;
+
+    tools.appendChild(toolbar);
+  }
+
+  function getOrderByReference(reference) {
+    return (state.history || []).find((order) => order.reference === reference) || null;
+  }
+
+  function renderConfirmedOrder(order) {
+    const details = $("#orderConfirmedDetails");
+    if (!details || !order) return;
+
+    details.innerHTML = "";
+
+    const fields = [
+      ["Reference", order.reference],
+      ["Name", order.customer?.name || ""],
+      ["Phone", order.customer?.phone || ""],
+      ["Email", order.customer?.email || ""],
+      ["Order type", order.orderType || ""],
+      ["Address", order.customer?.address || ""],
+      ["Notes", order.notes || ""],
+      ["Timestamp", order.timestamp || ""],
+      ["Total", formatGHS(order.total || 0)],
+    ];
+
+    fields.forEach(([label, value]) => {
+      const row = document.createElement("div");
+      row.className = "success-row";
+      row.innerHTML = `
+        <span>${escapeHTML(label)}</span>
+        <strong>${escapeHTML(value || "-")}</strong>
+      `;
+      details.appendChild(row);
+    });
+
+    const itemBlock = document.createElement("div");
+    itemBlock.className = "success-items";
+    const itemList = (order.items || [])
+      .map((item) => {
+        const line = item.isGift
+          ? `${item.title} x${item.qty} - ${formatGHS(0)}`
+          : `${item.title} x${item.qty} - ${formatGHS(item.lineTotal || 0)}`;
+        const summary = item.summary ? ` <span>${escapeHTML(item.summary)}</span>` : "";
+        return `<div class="success-item">${escapeHTML(line)}${summary}</div>`;
+      })
+      .join("");
+    itemBlock.innerHTML = itemList || "<p>No items recorded.</p>";
+    details.appendChild(itemBlock);
+  }
+
+  function openConfirmedOrder(order) {
+    state.currentConfirmedOrder = order;
+    renderConfirmedOrder(order);
+    openModalById("orderConfirmedModal");
+  }
+
+  function createInvoiceHTML(order) {
+    const rows = (order.items || [])
+      .map((item) => {
+        return `
+          <tr>
+            <td>${escapeHTML(item.title)}</td>
+            <td>${escapeHTML(item.summary || "")}</td>
+            <td>${escapeHTML(item.qty)}</td>
+            <td>${escapeHTML(formatGHS(item.lineTotal || 0))}</td>
+          </tr>
+        `;
+      })
+      .join("");
+
+    return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Invoice ${escapeHTML(order.reference)}</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 24px; color: #111; }
+    .invoice { max-width: 900px; margin: 0 auto; }
+    h1 { margin: 0 0 6px; }
+    .meta, .customer, .summary { margin: 18px 0; }
+    table { width: 100%; border-collapse: collapse; margin-top: 16px; }
+    th, td { text-align: left; padding: 10px 8px; border-bottom: 1px solid #ddd; vertical-align: top; }
+    th { background: #f5f5f5; }
+    .total { font-size: 18px; font-weight: bold; text-align: right; margin-top: 16px; }
+    .muted { color: #666; }
+  </style>
+</head>
+<body>
+  <div class="invoice">
+    <h1>WRAP District</h1>
+    <p class="muted">Tema Community 25, Devtraco</p>
+
+    <div class="meta">
+      <p><strong>Reference:</strong> ${escapeHTML(order.reference)}</p>
+      <p><strong>Timestamp:</strong> ${escapeHTML(order.timestamp)}</p>
+      <p><strong>Order type:</strong> ${escapeHTML(order.orderType || "")}</p>
+    </div>
+
+    <div class="customer">
+      <p><strong>Name:</strong> ${escapeHTML(order.customer?.name || "")}</p>
+      <p><strong>Phone:</strong> ${escapeHTML(order.customer?.phone || "")}</p>
+      <p><strong>Email:</strong> ${escapeHTML(order.customer?.email || "")}</p>
+      <p><strong>Address:</strong> ${escapeHTML(order.customer?.address || "")}</p>
+      <p><strong>Notes:</strong> ${escapeHTML(order.notes || "")}</p>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Item</th>
+          <th>Option</th>
+          <th>Qty</th>
+          <th>Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${rows}
+      </tbody>
+    </table>
+
+    <div class="summary">
+      <p><strong>Subtotal:</strong> ${escapeHTML(formatGHS(order.subtotal || 0))}</p>
+      <p><strong>Promo discount:</strong> - ${escapeHTML(formatGHS(order.discount || 0))}</p>
+      <p><strong>Delivery:</strong> ${escapeHTML(order.delivery || "")}</p>
+      <div class="total">Total: ${escapeHTML(formatGHS(order.total || 0))}</div>
+    </div>
+  </div>
+</body>
+</html>`;
+  }
+
+  function downloadInvoice(order) {
+    const html = createInvoiceHTML(order);
+    const blob = new Blob([html], { type: "text/html;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `Wrap-District-${order.reference}.html`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
+  function printInvoice(order) {
+    const win = window.open("", "_blank", "width=900,height=1000");
+    if (!win) {
+      showToast("Popup blocked. Please allow popups to print the invoice.", "error");
+      return;
+    }
+
+    win.document.open();
+    win.document.write(createInvoiceHTML(order));
+    win.document.close();
+    win.focus();
+    win.onload = () => {
+      win.print();
+    };
+  }
+
+  async function ensurePaystackScriptLoaded() {
+    if (window.PaystackPop) return true;
+
+    return new Promise((resolve) => {
+      const existing = document.querySelector(
+        'script[src="https://js.paystack.co/v1/inline.js"]'
+      );
+      if (existing) {
+        existing.addEventListener("load", () => resolve(true), { once: true });
+        existing.addEventListener("error", () => resolve(false), { once: true });
+        return;
+      }
+
+      const script = document.createElement("script");
+      script.src = "https://js.paystack.co/v1/inline.js";
+      script.async = true;
+      script.onload = () => resolve(true);
+      script.onerror = () => resolve(false);
+      document.head.appendChild(script);
+    });
+  }
+
+  async function processPayment(order) {
+    const configured =
+      PAYSTACK_PUBLIC_KEY &&
+      !PAYSTACK_PUBLIC_KEY.includes("REPLACE_ME") &&
+      PAYSTACK_PUBLIC_KEY.startsWith("pk_");
+
+    if (!configured) {
+      finalizeOrder(order, {
+        method: "demo",
+        note: "Paystack key not configured, completed in demo mode.",
+      });
+      return;
+    }
+
+    const loaded = await ensurePaystackScriptLoaded();
+    if (!loaded || !window.PaystackPop) {
+      finalizeOrder(order, {
+        method: "fallback",
+        note: "Paystack script could not load, completed in fallback mode.",
+      });
+      return;
+    }
+
+    const handler = window.PaystackPop.setup({
+      key: PAYSTACK_PUBLIC_KEY,
+      email: order.customer.email || "customer@wrapdistrict.local",
+      amount: Math.round(Number(order.total || 0) * 100),
+      currency: "GHS",
+      ref: order.reference,
+      metadata: {
+        custom_fields: [
+          { display_name: "Customer Name", variable_name: "customer_name", value: order.customer.name || "" },
+          { display_name: "Phone", variable_name: "phone", value: order.customer.phone || "" },
+          { display_name: "Order Type", variable_name: "order_type", value: order.orderType || "" },
+        ],
+      },
+      callback: function () {
+        finalizeOrder(order, {
+          method: "paystack",
+          note: "Payment completed with Paystack.",
+        });
+      },
+      onClose: function () {
+        showToast("Payment window closed before completion.", "error");
+      },
+    });
+
+    handler.openIframe();
+  }
+
+  function finalizeOrder(order, paymentMeta = {}) {
+    order.payment = paymentMeta;
+    saveOrderToHistory(order);
+    clearCart(true);
+    renderCart();
+    renderHistoryList();
+    openConfirmedOrder(order);
+    showToast("Order confirmed.");
+  }
+
+  function handleCheckoutSubmit(event) {
+    event.preventDefault();
+
+    if (!getPaidItems().length) {
+      showToast("Your cart is empty.", "error");
+      return;
+    }
+
+    const form = event.currentTarget;
+    const data = readFormValues(form);
+
+    if (!data.name || !data.phone) {
+      showToast("Please add your name and phone number.", "error");
+      return;
+    }
+
+    if (String(data.orderType || "delivery") === "delivery" && !String(data.address || "").trim()) {
+      showToast("Please add a delivery address.", "error");
+      return;
+    }
+
+    saveCheckoutProfileFromForm(data);
+    const order = buildOrderFromCheckout(data, {
+      method: "pending",
+      note: "Payment initiated.",
+      feeLogic: {
+        paystackPercent: PAYMENT_FEES.paystackPercent,
+        mtnWithdrawalPercent: PAYMENT_FEES.mtnWithdrawalPercent,
+      },
+    });
+
+    closeModalById("checkoutModal");
+    processPayment(order);
+  }
+
+  function handlePreorderSubmit(event) {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const data = readFormValues(form);
+    savePreorder(data);
+    showToast("Preorder saved.");
+    closeModalById("preorderModal");
+  }
+
+  function updatePromotionModalState() {
+    const hide = loadJSON(STORAGE_KEYS.promoHide, false);
+    if (hide) return;
+    if (!isPromoActive()) return;
+
+    window.setTimeout(() => {
+      openModalById("entryPromoModal");
+    }, 700);
   }
 
   function bindEvents() {
-    document.addEventListener('click', (event) => {
-      const target = event.target.closest(
-        '[data-open-cart], [data-close-cart], [data-open-mobile-nav], [data-close-mobile-nav], [data-close-modal], [data-open-history], [data-open-checkout], [data-open-product], [data-add-simple], [data-scroll-to-menu], [data-hero-prev], [data-hero-next], [data-go-slide], [data-filter-category], [data-stepper-minus], [data-stepper-plus], [data-cart-minus], [data-cart-plus], [data-cart-remove]'
-      )
-      if (!target) return
+    const heroPrev = $('[data-hero-prev]');
+    const heroNext = $('[data-hero-next]');
+    if (heroPrev) heroPrev.addEventListener("click", prevHeroSlide);
+    if (heroNext) heroNext.addEventListener("click", nextHeroSlide);
 
-      if (target.matches('[data-open-cart]')) {
-        openCart()
-        return
-      }
+    $$(".hero-dot").forEach((dot) => {
+      dot.addEventListener("click", () => {
+        setHeroSlide(Number(dot.dataset.goSlide || 0));
+        startHeroRotation();
+      });
+    });
 
-      if (target.matches('[data-close-cart]')) {
-        closeCart()
-        return
-      }
+    $$(".menu-pill").forEach((pill) => {
+      pill.addEventListener("click", () => setMenuFilter(pill.dataset.filterCategory || "all"));
+    });
 
-      if (target.matches('[data-open-mobile-nav]')) {
-        openMobileNav()
-        return
-      }
-
-      if (target.matches('[data-close-mobile-nav]')) {
-        closeMobileNav()
-        return
-      }
-
-      if (target.matches('[data-open-history]')) {
-        handleHistoryOpen()
-        return
-      }
-
-      if (target.matches('[data-open-checkout]')) {
-        openCheckout()
-        return
-      }
-
-      if (target.matches('[data-open-product]')) {
-        const id = target.dataset.openProduct
-        renderProductModal(id === 'featured' ? 'shawarma' : id)
-        return
-      }
-
-      if (target.matches('[data-add-simple]')) {
-        addSimpleProduct(target.dataset.addSimple)
-        return
-      }
-
-      if (target.matches('[data-scroll-to-menu]')) {
-        const category = target.dataset.scrollToMenu
-        if (category && category !== 'all') {
-          state.filterCategory = category
-          setActiveFilterButton(category)
-          filterMenu()
-        } else {
-          state.filterCategory = 'all'
-          setActiveFilterButton('all')
-          filterMenu()
-        }
-        document.getElementById('menu')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-        return
-      }
-
-      if (target.matches('[data-hero-prev]')) {
-        goToSlide(state.activeSlide - 1)
-        startHeroAutoRotate()
-        return
-      }
-
-      if (target.matches('[data-hero-next]')) {
-        goToSlide(state.activeSlide + 1)
-        startHeroAutoRotate()
-        return
-      }
-
-      if (target.matches('[data-go-slide]')) {
-        goToSlide(Number(target.dataset.goSlide || 0))
-        startHeroAutoRotate()
-        return
-      }
-
-      if (target.matches('[data-filter-category]')) {
-        state.filterCategory = target.dataset.filterCategory || 'all'
-        setActiveFilterButton(state.filterCategory)
-        persistMenuPrefs()
-        filterMenu()
-        return
-      }
-
-      if (target.matches('[data-close-modal]')) {
-        closeModal(target.dataset.closeModal)
-        return
-      }
-
-      if (target.matches('[data-stepper-minus]')) {
-        const input = $('#productQuantity')
-        if (input) {
-          input.value = String(Math.max(1, Number(input.value || 1) - 1))
-          updateProductModalPrice()
-        }
-        return
-      }
-
-      if (target.matches('[data-stepper-plus]')) {
-        const input = $('#productQuantity')
-        if (input) {
-          input.value = String(Math.max(1, Number(input.value || 1) + 1))
-          updateProductModalPrice()
-        }
-        return
-      }
-
-      if (target.matches('[data-cart-minus]')) {
-        changeCartQuantity(target.dataset.cartMinus, -1)
-        return
-      }
-
-      if (target.matches('[data-cart-plus]')) {
-        changeCartQuantity(target.dataset.cartPlus, 1)
-        return
-      }
-
-      if (target.matches('[data-cart-remove]')) {
-        removeCartItem(target.dataset.cartRemove)
-      }
-    })
-
-    document.addEventListener('submit', (event) => {
-      if (event.target && event.target.id === 'productOptionsForm') {
-        event.preventDefault()
-        const product = getProduct(state.lastOpenProduct)
-        if (!product) return
-
-        const qty = Math.max(1, Number($('#productQuantity')?.value || 1))
-        const selectionsCopy = JSON.parse(JSON.stringify(state.productSelections || {}))
-        const displayName = buildProductDisplayName(product.id, selectionsCopy)
-        const item = buildCartItemFromProduct(product.id, qty, selectionsCopy, displayName)
-        addOrMergeCartItem(item)
-        closeModal('productModal')
-        openCart()
-      }
-
-      if (event.target && event.target.id === 'preorderForm') {
-        event.preventDefault()
-        const formData = new FormData(event.target)
-        const preorder = Object.fromEntries(formData.entries())
-        persistPreorder(preorder)
-        closeModal('preorderModal')
-        showToast('Preorder saved', 'success')
-      }
-
-      if (event.target && event.target.id === 'checkoutForm') {
-        submitCheckout(event)
-      }
-    })
-
-    document.addEventListener('input', (event) => {
-      if (event.target && event.target.id === 'menuSearch') {
-        state.searchQuery = event.target.value || ''
-        persistMenuPrefs()
-        filterMenu()
-      }
-
-      if (event.target && event.target.id === 'historySearch') {
-        renderHistoryList()
-      }
-
-      if (event.target && event.target.id === 'productQuantity') {
-        updateProductQtyFromInput()
-      }
-
-      if (event.target && ['customerName', 'customerPhone', 'customerEmail'].includes(event.target.id)) {
-        persistCustomer()
-      }
-    })
-
-    document.addEventListener('change', (event) => {
-      if (event.target && event.target.name === 'paymentMethod') {
-        persistCustomer()
-      }
-    })
-
-    document.addEventListener('keydown', (event) => {
-      if (event.key === 'Escape') {
-        if (els.cartDrawer?.classList.contains('is-open')) closeCart()
-        if (els.mobileNav?.classList.contains('is-open')) closeMobileNav()
-        $all('.modal.is-open').forEach((modal) => closeModal(modal.id))
-      }
-    })
-
-    $('#clearCartBtn')?.addEventListener('click', clearCart)
-    $('#promoHelperBtn')?.addEventListener('click', handlePromoHelper)
-    $('#historyOpenBtn')?.addEventListener('click', openSelectedHistory)
-    $('#historyDownloadBtn')?.addEventListener('click', downloadSelectedHistory)
-    $('#historyPrintBtn')?.addEventListener('click', printSelectedHistory)
-    $('#historyRefreshBtn')?.addEventListener('click', refreshHistory)
-    $('#historyClearBtn')?.addEventListener('click', clearHistory)
-    $('#saveInvoicePdfBtn')?.addEventListener('click', () => {
-      const order = getSelectedHistoryOrder() || safeParse(STORAGE_KEYS.lastOrder, null)
-      if (!order) {
-        showToast('No order available yet', 'default')
-        return
-      }
-      saveInvoiceAsPdf(order)
-    })
-
-    $('#orderType')?.addEventListener('change', () => {
-      const address = $('#customerAddress')
-      const isPickup = $('#orderType')?.value === 'pickup'
-      if (address) {
-        address.placeholder = isPickup
-          ? 'Pickup note or preferred collection point'
-          : 'Delivery address'
-      }
-    })
-
-    $('#dontShowPromoAgain')?.addEventListener('change', (e) => {
-      state.promoClaims.entry = Boolean(e.target.checked)
-      persistPromoClaims()
-    })
-
-    ;['customerName', 'customerPhone', 'customerEmail'].forEach((id) => {
-      $('#'+id)?.addEventListener('input', persistCustomer)
-    })
-
-    window.addEventListener(
-      'scroll',
-      () => {
-        const header = $('#siteHeader')
-        if (!header) return
-        header.classList.toggle('is-scrolled', window.scrollY > 20)
-      },
-      { passive: true }
-    )
-
-    window.addEventListener('resize', () => {
-      filterMenu()
-    })
-  }
-
-  function openCheckout() {
-    if (!getCartItemsForTotal().length) {
-      showToast('Your cart is empty', 'default')
-      return
+    const search = $("#menuSearch");
+    if (search) {
+      search.addEventListener("input", () => setMenuSearch(search.value));
     }
-    openModal('checkoutModal')
-  }
 
-  function initEntryPromo() {
-    const hide = state.promoClaims.entry
-    const checkbox = $('#dontShowPromoAgain')
-    if (checkbox) checkbox.checked = Boolean(hide)
-    if (!hide) {
-      setTimeout(() => openModal('entryPromoModal'), 350)
+    document.addEventListener("click", (event) => {
+      const target = event.target.closest("button, a");
+      if (!target) return;
+
+      if (target.matches(".mobile-menu-toggle")) {
+        const nav = $("#mobileNav");
+        if (nav.hidden) openOverlay("mobileNav");
+        else closeOverlay("mobileNav");
+        return;
+      }
+
+      if (target.id === "openCartBtn") {
+        openCart();
+        return;
+      }
+
+      if (target.id === "openHistoryBtn" || target.id === "openHistoryBtnMobile") {
+        ensureHistoryToolbarButtons();
+        renderHistoryList();
+        openModalById("historyModal");
+        return;
+      }
+
+      if (target.id === "checkoutBtn") {
+        if (!getPaidItems().length) {
+          showToast("Add something to your cart first.", "error");
+          return;
+        }
+        populateSavedFields();
+        openModalById("checkoutModal");
+        renderCart();
+        return;
+      }
+
+      if (target.id === "clearCartBtn") {
+        if (getPaidItems().length && window.confirm("Clear the cart?")) clearCart();
+        return;
+      }
+
+      if (target.id === "promoHelperBtn") {
+        openModalById("entryPromoModal");
+        return;
+      }
+
+      if (target.id === "saveInvoicePdfBtn") {
+        if (!state.currentConfirmedOrder) {
+          showToast("There is no order to save yet.", "error");
+          return;
+        }
+        printInvoice(state.currentConfirmedOrder);
+        return;
+      }
+
+      if (target.matches("[data-open-product]")) {
+        const productId = target.dataset.openProduct;
+        if (productId) openProduct(productId);
+        return;
+      }
+
+      if (target.matches("[data-add-simple]")) {
+        const productId = target.dataset.addSimple;
+        const product = getProduct(productId);
+        if (!product) return;
+        addToCart(productId, clone(product.defaultSelection || {}), 1);
+        return;
+      }
+
+      if (target.matches("[data-scroll-target]")) {
+        event.preventDefault();
+        const targetValue = target.dataset.scrollTarget;
+        scrollToMenu();
+        window.setTimeout(() => {
+          if (targetValue === "shawarma") {
+            openProduct("shawarma");
+          } else if (targetValue === "loaded-fries") {
+            openProduct("loaded-fries");
+          } else {
+            setMenuFilter("all");
+          }
+        }, 350);
+        return;
+      }
+
+      if (target.matches("[data-go-slide]")) {
+        return;
+      }
+
+      if (target.matches("[data-close-cart]")) {
+        closeCart();
+        return;
+      }
+
+      if (target.matches("[data-close-entry-promo]")) {
+        const checkbox = $("#dontShowPromoAgain");
+        if (checkbox?.checked) saveJSON(STORAGE_KEYS.promoHide, true);
+        closeModalById("entryPromoModal");
+        return;
+      }
+
+      if (target.matches("[data-close-product]")) {
+        closeModalById("productDrawer");
+        return;
+      }
+
+      if (target.matches("[data-close-preorder]")) {
+        closeModalById("preorderModal");
+        return;
+      }
+
+      if (target.matches("[data-close-checkout]")) {
+        closeModalById("checkoutModal");
+        return;
+      }
+
+      if (target.matches("[data-close-history]")) {
+        closeModalById("historyModal");
+        return;
+      }
+
+      if (target.matches("[data-close-confirmed]")) {
+        closeModalById("orderConfirmedModal");
+        return;
+      }
+
+      if (target.matches("[data-history-open]")) {
+        const order = getOrderByReference(target.dataset.historyOpen);
+        if (order) openConfirmedOrder(order);
+        return;
+      }
+
+      if (target.matches("[data-history-download]")) {
+        const order = getOrderByReference(target.dataset.historyDownload);
+        if (order) downloadInvoice(order);
+        return;
+      }
+
+      if (target.matches("[data-history-print]")) {
+        const order = getOrderByReference(target.dataset.historyPrint);
+        if (order) printInvoice(order);
+        return;
+      }
+
+      if (target.matches("[id='historyRefreshBtn']")) {
+        renderHistoryList();
+        showToast("History refreshed.");
+        return;
+      }
+
+      if (target.matches("[id='historyClearBtn']")) {
+        if (window.confirm("Clear all purchase history?")) {
+          saveJSON(STORAGE_KEYS.history, []);
+          state.history = [];
+          renderHistoryList();
+          showToast("Purchase history cleared.");
+        }
+        return;
+      }
+
+      if (target.matches("[data-decrease-qty]")) {
+        updateCartQty(target.dataset.decreaseQty, -1);
+        return;
+      }
+
+      if (target.matches("[data-increase-qty]")) {
+        updateCartQty(target.dataset.increaseQty, 1);
+        return;
+      }
+
+      if (target.matches("[data-remove-item]")) {
+        removeCartItem(target.dataset.removeItem);
+        return;
+      }
+    });
+
+    document.addEventListener("submit", (event) => {
+      const form = event.target;
+
+      if (form && form.id === "productOptionsForm") {
+        event.preventDefault();
+        addCurrentProductToCart();
+        return;
+      }
+
+      if (form && form.id === "checkoutForm") {
+        handleCheckoutSubmit(event);
+        return;
+      }
+
+      if (form && form.id === "preorderForm") {
+        handlePreorderSubmit(event);
+        return;
+      }
+    });
+
+    document.addEventListener("change", (event) => {
+      const input = event.target;
+
+      if (input && input.closest("#productOptionsForm")) {
+        const productId = $("#productOptionsForm")?.dataset.productId;
+        if (productId) {
+          const selection = readProductSelection(productId);
+          if (selection) {
+            updateProductPricePreview();
+          }
+        }
+        return;
+      }
+
+      if (input && input.id === "orderType") {
+        const addressField = $("#customerAddress");
+        if (addressField) {
+          const delivery = String(input.value) === "pickup" ? "Pickup" : "Delivery";
+          addressField.placeholder =
+            delivery === "Pickup"
+              ? "Optional pickup note"
+              : "Delivery address";
+        }
+        return;
+      }
+
+      if (input && input.id === "dontShowPromoAgain" && input.checked) {
+        saveJSON(STORAGE_KEYS.promoHide, true);
+      }
+    });
+
+    document.addEventListener("input", (event) => {
+      const input = event.target;
+
+      if (input && input.id === "productQuantity") {
+        if (Number(input.value) < 1) input.value = "1";
+        updateProductPricePreview();
+      }
+
+      if (input && input.id === "historySearch") {
+        renderHistoryList();
+      }
+
+      if (input && input.id === "checkoutForm") {
+        return;
+      }
+
+      if (input && input.closest("#checkoutForm")) {
+        const form = $("#checkoutForm");
+        if (form) {
+          const data = readFormValues(form);
+          saveCheckoutProfileFromForm(data);
+        }
+      }
+
+      if (input && input.closest("#preorderForm")) {
+        const form = $("#preorderForm");
+        if (form) {
+          const data = readFormValues(form);
+          savePreorder(data);
+        }
+      }
+    });
+
+    $$(".mobile-nav a").forEach((link) => {
+      link.addEventListener("click", () => {
+        closeOverlay("mobileNav");
+      });
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") {
+        if (state.openOverlayId) {
+          closeOverlay(state.openOverlayId);
+          return;
+        }
+
+        const anyModal = $$(".modal.is-open").at(-1);
+        const anyDrawer = $$(".cart-drawer.is-open").at(-1);
+        const mobileNav = $$(".mobile-nav.is-open").at(-1);
+        const open = anyModal || anyDrawer || mobileNav;
+        if (open) closeOverlay(open.id);
+      }
+
+      if (event.key === "ArrowLeft" && !state.openOverlayId) {
+        if ($("#hero")) prevHeroSlide();
+      }
+
+      if (event.key === "ArrowRight" && !state.openOverlayId) {
+        if ($("#hero")) nextHeroSlide();
+      }
+    });
+
+    document.addEventListener("focusin", (event) => {
+      const openModal = $$(".modal.is-open").at(-1) || $$(".cart-drawer.is-open").at(-1) || $$(".mobile-nav.is-open").at(-1);
+      if (!openModal) return;
+
+      if (!openModal.contains(event.target)) {
+        const focusable = openModal.querySelector(
+          "button, input, select, textarea, a[href], [tabindex]:not([tabindex='-1'])"
+        );
+        if (focusable) focusable.focus();
+      }
+    });
+
+    const checkoutForm = $("#checkoutForm");
+    if (checkoutForm) {
+      checkoutForm.addEventListener("click", (event) => {
+        const paymentRadio = event.target.closest("input[name='paymentMethod']");
+        if (paymentRadio && paymentRadio.disabled) {
+          event.preventDefault();
+        }
+      });
     }
   }
 
-  function seedFallbackHistory() {
-    if (state.history.length) return
-    const sample = safeParse(STORAGE_KEYS.lastOrder, null)
-    if (sample) {
-      state.history.unshift(createHistoryEntry(sample, 'paid'))
-      persistHistory()
+  function initHeaderState() {
+    const header = $("#siteHeader");
+    if (!header) return;
+
+    const onScroll = () => {
+      header.classList.toggle("is-scrolled", window.scrollY > 12);
+    };
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+  }
+
+  function initModalBackdrops() {
+    document.querySelectorAll(".modal, .cart-drawer, .mobile-nav").forEach((overlay) => {
+      overlay.addEventListener("click", (event) => {
+        const target = event.target;
+        if (target.matches(".modal__backdrop, .cart-drawer__backdrop, .mobile-nav__backdrop, .drawer-backdrop")) {
+          closeOverlay(overlay.id);
+        }
+      });
+    });
+  }
+
+  function syncHistoryToolbar() {
+    ensureHistoryToolbarButtons();
+    renderHistoryList();
+  }
+
+  function init() {
+    loadCart();
+    loadHistory();
+    initHeaderState();
+    initModalBackdrops();
+    bindEvents();
+    setHeroSlide(0);
+    startHeroRotation();
+    populateSavedFields();
+    applyMenuFilters();
+    renderCart();
+    syncHistoryToolbar();
+    updatePromotionModalState();
+
+    const checkoutOrderType = $("#orderType");
+    if (checkoutOrderType) {
+      checkoutOrderType.value = "delivery";
     }
+
+    const productQuantity = $("#productQuantity");
+    if (productQuantity && !productQuantity.value) productQuantity.value = "1";
+
+    showToast("Welcome to Wrap District.");
   }
 
-  function initPreorderFormDefaults() {
-    if (!state.preorder) return
-
-    const name = $('#preorderForm input[name="preorderName"]')
-    const phone = $('#preorderForm input[name="preorderPhone"]')
-    const date = $('#preorderForm input[name="preorderDate"]')
-    const time = $('#preorderForm input[name="preorderTime"]')
-    const notes = $('#preorderForm textarea[name="preorderNotes"]')
-
-    if (name) name.value = state.preorder.preorderName || ''
-    if (phone) phone.value = state.preorder.preorderPhone || ''
-    if (date) date.value = state.preorder.preorderDate || ''
-    if (time) time.value = state.preorder.preorderTime || ''
-    if (notes) notes.value = state.preorder.preorderNotes || ''
-  }
-
-  function initCheckoutDefaults() {
-    const last = safeParse(STORAGE_KEYS.lastOrder, null)
-    if (!last) return
-
-    if (els.customerName && !els.customerName.value) els.customerName.value = last.name || ''
-    if (els.customerPhone && !els.customerPhone.value) els.customerPhone.value = last.phone || ''
-    if (els.customerEmail && !els.customerEmail.value) els.customerEmail.value = last.email || ''
-    if ($('#customerAddress') && !$('#customerAddress').value) $('#customerAddress').value = last.address || ''
-  }
-
-  function main() {
-    initElementRefs()
-    loadState()
-    seedFallbackHistory()
-    renderHero()
-    filterMenu()
-    renderCart()
-    renderHistoryList()
-    initPreorderFormDefaults()
-    initCheckoutDefaults()
-    bindEvents()
-    syncPromoItems()
-    renderCart()
-    startHeroAutoRotate()
-    initEntryPromo()
-  }
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', main)
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init, { once: true });
   } else {
-    main()
+    init();
   }
-})()
+})();
