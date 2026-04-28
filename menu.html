@@ -6,11 +6,10 @@
   <meta name="theme-color" content="#000000" />
   <meta
     name="description"
-    content="Wrap District, a premium mobile-first food ordering experience for shawarma, loaded fries, rice, angwamo, jollof, and noodles in Tema Community 25."
+    content="Wrap District, premium shawarma, loaded fries, rice bowls, jollof, noodles, pickup and delivery in Tema Community 25, Devtraco."
   />
-  <title>Wrap District | Order Fresh, Fast, and Premium</title>
+  <title>Wrap District | Fresh wraps, bold meals, easy ordering</title>
 
-  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
@@ -18,45 +17,44 @@
     rel="stylesheet"
   />
 
-  <!-- Font Awesome -->
   <link
     rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
     referrerpolicy="no-referrer"
   />
 
-  <!-- Styles -->
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <a class="skip-link" href="#main-content">Skip to main content</a>
+  <a class="skip-link" href="#main-content">Skip to content</a>
 
-  <!-- Entry Promo Modal -->
+  <!-- Entry promo -->
   <div class="modal" id="entryPromoModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="entryPromoTitle">
     <div class="modal__backdrop" data-close-modal="entryPromoModal"></div>
     <div class="modal__panel modal__panel--promo">
       <button class="modal__close" type="button" aria-label="Close promo" data-close-modal="entryPromoModal">
         <i class="fa-solid fa-xmark"></i>
       </button>
+
       <div class="promo-intro">
-        <p class="eyebrow">This week only</p>
-        <h2 id="entryPromoTitle">Big promo days at Wrap District</h2>
+        <p class="eyebrow">Promo week</p>
+        <h2 id="entryPromoTitle">Big savings from Tuesday, 28 April to Friday, 1 May 2026</h2>
         <p class="promo-intro__text">
-          From Tuesday, 28 April 2026 to Friday, 1 May 2026, enjoy our featured deals while they last.
+          Buy two shawarmas and the third one goes free. Order loaded fries and a free Coke appears in your cart during promo hours.
         </p>
       </div>
 
       <div class="promo-intro__grid">
         <article class="promo-intro__feature">
           <span class="promo-tag">Shawarma Deal</span>
-          <h3>Buy 2 Shawarmas, Get 1 Free</h3>
-          <p>Add any two qualifying shawarmas and the third one is discounted to free automatically.</p>
+          <h3>Buy 2, Get 1 Free</h3>
+          <p>Add your shawarmas and the free one is applied automatically in the cart.</p>
         </article>
 
         <article class="promo-intro__feature">
           <span class="promo-tag">Loaded Fries Deal</span>
-          <h3>Buy Loaded Fries, Get a Free Coke</h3>
-          <p>Place a loaded fries order during promo hours and the free Coke appears in your cart.</p>
+          <h3>Free Coke Included</h3>
+          <p>Your free Coke is added automatically when you order loaded fries during promo hours.</p>
         </article>
       </div>
 
@@ -73,7 +71,7 @@
     </div>
   </div>
 
-  <!-- Mobile Menu Overlay -->
+  <!-- Mobile navigation -->
   <div class="mobile-nav" id="mobileNav" aria-hidden="true">
     <div class="mobile-nav__backdrop" data-close-mobile-nav></div>
     <aside class="mobile-nav__panel" aria-label="Mobile navigation">
@@ -90,8 +88,6 @@
       <nav class="mobile-nav__links">
         <a href="#hero" data-close-mobile-nav>Home</a>
         <a href="#menu" data-close-mobile-nav>Menu</a>
-        <a href="#promos" data-close-mobile-nav>Promotions</a>
-        <a href="#checkout" data-close-mobile-nav>Checkout</a>
         <a href="#contact" data-close-mobile-nav>Contact</a>
       </nav>
 
@@ -107,8 +103,8 @@
       </div>
 
       <div class="mobile-nav__footer">
-        <p>Pickup at Devtraco, Tema Community 25</p>
-        <p>Delivery available. Fees shown at checkout.</p>
+        <p>Tema Community 25, Devtraco</p>
+        <p>Pickup ready. Delivery fee is confirmed at checkout.</p>
       </div>
     </aside>
   </div>
@@ -116,9 +112,9 @@
   <!-- Header -->
   <header class="site-header" id="siteHeader">
     <div class="promo-strip">
-      <span><i class="fa-solid fa-fire"></i> Promo week runs from 28 April 2026 to 1 May 2026</span>
-      <span><i class="fa-solid fa-circle-check"></i> Pickup available at Devtraco</span>
-      <span><i class="fa-solid fa-truck-fast"></i> Delivery fee estimated after checkout</span>
+      <span><i class="fa-solid fa-fire"></i> Shawarma promo and loaded fries bonus are active this week</span>
+      <span><i class="fa-solid fa-location-dot"></i> Tema Community 25, Devtraco</span>
+      <span><i class="fa-solid fa-truck-fast"></i> Delivery fee is confirmed at checkout</span>
     </div>
 
     <div class="header-bar">
@@ -134,12 +130,11 @@
       <nav class="site-nav" aria-label="Primary">
         <a href="#hero">Home</a>
         <a href="#menu">Menu</a>
-        <a href="#promos">Promotions</a>
         <a href="#contact">Contact</a>
       </nav>
 
       <div class="header-tools">
-        <button class="tool-btn" type="button" data-open-history>
+        <button class="tool-btn" type="button" data-open-history aria-label="Open purchase history">
           <i class="fa-regular fa-clock"></i>
           <span>History</span>
         </button>
@@ -157,14 +152,13 @@
     <!-- Hero -->
     <section class="hero" id="hero" aria-label="Featured promotions">
       <div class="hero__slider" id="heroSlider">
-        <article class="hero-slide hero-slide--active" data-slide="0" style="background-image: url('https://images.unsplash.com/photo-1604908176997-125f25cc500f?auto=format&fit=crop&w=1600&q=80');">
+        <article class="hero-slide hero-slide--active" data-slide="0" style="background-image: url('https://source.unsplash.com/1600x1200/?shawarma,wrap,food');">
           <div class="hero-slide__overlay"></div>
           <div class="hero-slide__content">
             <span class="hero-kicker">Promo of the week</span>
             <h1>Buy 2 Shawarmas, Get 1 Free</h1>
             <p>
-              Choose your size, choose your protein, and enjoy the best shawarma deal in town.
-              Freshly packed, beautifully wrapped, and ready to go.
+              Choose your size, choose your protein, and enjoy a premium shawarma deal built for a proper meal.
             </p>
 
             <div class="hero-slide__meta">
@@ -178,19 +172,19 @@
                 Order Shawarma
               </button>
               <button class="btn btn--ghost" type="button" data-open-product="shawarma">
-                View Details
+                View Options
               </button>
             </div>
           </div>
         </article>
 
-        <article class="hero-slide" data-slide="1" style="background-image: url('https://images.unsplash.com/photo-1631515243349-e0cb75fb8d3a?auto=format&fit=crop&w=1600&q=80');">
+        <article class="hero-slide" data-slide="1" style="background-image: url('https://source.unsplash.com/1600x1200/?loaded-fries,fries,food');">
           <div class="hero-slide__overlay"></div>
           <div class="hero-slide__content">
-            <span class="hero-kicker">Sweet bonus</span>
+            <span class="hero-kicker">Bonus treat</span>
             <h2>Loaded Fries, Free Coke</h2>
             <p>
-              Crunchy, creamy, loaded and satisfying. Order any loaded fries during promo hours and your free Coke joins the cart automatically.
+              Warm fries, rich toppings, and a free Coke added automatically during promo hours.
             </p>
 
             <div class="hero-slide__meta">
@@ -204,19 +198,19 @@
                 Order Loaded Fries
               </button>
               <button class="btn btn--ghost" type="button" data-open-product="loaded-fries">
-                View Details
+                View Options
               </button>
             </div>
           </div>
         </article>
 
-        <article class="hero-slide" data-slide="2" style="background-image: url('https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1600&q=80');">
+        <article class="hero-slide" data-slide="2" style="background-image: url('https://source.unsplash.com/1600x1200/?fast-food,meal,food');">
           <div class="hero-slide__overlay"></div>
           <div class="hero-slide__content">
             <span class="hero-kicker">More to love</span>
             <h2>Enjoy Discounts on Our Other Foods</h2>
             <p>
-              Fried rice, loaded angwamo, loaded jollof, and noodles are all waiting with premium portions and rich flavors.
+              Fried rice, loaded angwamo, loaded jollof, and noodles are all waiting with bold flavor and generous portions.
             </p>
 
             <div class="hero-slide__meta">
@@ -229,8 +223,8 @@
                 <i class="fa-solid fa-list"></i>
                 Explore Menu
               </button>
-              <button class="btn btn--ghost" type="button" data-open-product="featured">
-                View Best Sellers
+              <button class="btn btn--ghost" type="button" data-open-product="fried-rice">
+                View Rice Options
               </button>
             </div>
           </div>
@@ -251,57 +245,14 @@
           <button class="hero-dot" type="button" data-go-slide="2" aria-label="Go to slide 3"></button>
         </div>
       </div>
-
-      <div class="hero__quickline" aria-label="Quick info">
-        <div class="quickline-item">
-          <i class="fa-solid fa-mobile-screen-button"></i>
-          <div>
-            <strong>Mobile first</strong>
-            <span>Easy ordering on any phone</span>
-          </div>
-        </div>
-        <div class="quickline-item">
-          <i class="fa-solid fa-sack-dollar"></i>
-          <div>
-            <strong>Clear prices</strong>
-            <span>Simple tiers and add-ons</span>
-          </div>
-        </div>
-        <div class="quickline-item">
-          <i class="fa-solid fa-shield-heart"></i>
-          <div>
-            <strong>Trusted checkout</strong>
-            <span>Paystack MoMo or card</span>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Promotions and service strip -->
-    <section class="promo-band" id="promos" aria-label="Promotions">
-      <div class="promo-band__item">
-        <span class="promo-band__label">Shawarma promo</span>
-        <strong>Buy 2, get 1 free</strong>
-        <p>Applies automatically in your cart.</p>
-      </div>
-      <div class="promo-band__item">
-        <span class="promo-band__label">Loaded fries promo</span>
-        <strong>Free Coke included</strong>
-        <p>Appears automatically during promo hours.</p>
-      </div>
-      <div class="promo-band__item">
-        <span class="promo-band__label">Pickup and delivery</span>
-        <strong>Devtraco pickup available</strong>
-        <p>Delivery fee is confirmed after checkout.</p>
-      </div>
     </section>
 
     <!-- Menu -->
     <section class="menu-area" id="menu" aria-label="Menu">
       <div class="section-head">
         <div>
-          <p class="eyebrow">Menu Studio</p>
-          <h2>Build your order with premium choices</h2>
+          <p class="eyebrow">Menu</p>
+          <h2>Choose your meal</h2>
         </div>
 
         <div class="menu-tools">
@@ -336,34 +287,33 @@
           <div class="menu-feature__body">
             <div class="menu-feature__copy">
               <h3>Shawarma</h3>
-              <p>Choose size, then protein. Rich sauces and extra cheese available.</p>
+              <p>Choose size, then protein. Rich sauce and extra cheese are ready when you want them.</p>
+
               <ul class="menu-notes">
                 <li>Lite: GHC 45</li>
                 <li>Classic: GHC 55</li>
                 <li>District Max: GHC 70</li>
               </ul>
+
               <div class="menu-actions">
                 <button class="btn btn--primary" type="button" data-open-product="shawarma">
                   <i class="fa-solid fa-pen-to-square"></i>
                   Customize Shawarma
                 </button>
-                <button class="btn btn--ghost" type="button" data-add-simple="shawarma">
-                  Add Quick Order
-                </button>
               </div>
             </div>
 
-            <div class="menu-feature__visual" style="background-image: url('https://images.unsplash.com/photo-1606756790138-261d2b21cd75?auto=format&fit=crop&w=1200&q=80');">
+            <div class="menu-feature__visual" style="background-image: url('https://source.unsplash.com/1200x1200/?shawarma,wrap,sandwich');">
               <div class="menu-feature__floating">
-                <span>Promo applies automatically</span>
-                <strong>Third shawarma becomes free</strong>
+                <span>Promo applied automatically</span>
+                <strong>Third shawarma becomes free in the cart</strong>
               </div>
             </div>
           </div>
         </article>
 
         <!-- Loaded Fries -->
-        <article class="menu-feature" data-category="loaded-fries" data-product-id="loaded-fries">
+        <article class="menu-feature menu-feature--large" data-category="loaded-fries" data-product-id="loaded-fries">
           <div class="menu-feature__topline">
             <span class="menu-badge">Free Coke</span>
             <span class="menu-label">Crunchy</span>
@@ -372,34 +322,33 @@
           <div class="menu-feature__body">
             <div class="menu-feature__copy">
               <h3>Loaded Fries</h3>
-              <p>Choose portion and add toppings for a heavy, satisfying bite.</p>
+              <p>Choose a portion and build a heavy, satisfying plate with your favorite toppings.</p>
+
               <ul class="menu-notes">
                 <li>Regular: GHC 65</li>
                 <li>Medium: GHC 75</li>
                 <li>Large: GHC 85</li>
               </ul>
+
               <div class="menu-actions">
                 <button class="btn btn--primary" type="button" data-open-product="loaded-fries">
                   <i class="fa-solid fa-pen-to-square"></i>
                   Customize Fries
                 </button>
-                <button class="btn btn--ghost" type="button" data-add-simple="loaded-fries">
-                  Add Quick Order
-                </button>
               </div>
             </div>
 
-            <div class="menu-feature__visual" style="background-image: url('https://images.unsplash.com/photo-1573080496219-bb080dd4f877?auto=format&fit=crop&w=1200&q=80');">
+            <div class="menu-feature__visual" style="background-image: url('https://source.unsplash.com/1200x1200/?loaded-fries,fries');">
               <div class="menu-feature__floating">
-                <span>Promo included automatically</span>
-                <strong>Free Coke appears in cart</strong>
+                <span>Promo applied automatically</span>
+                <strong>Free Coke appears in the cart</strong>
               </div>
             </div>
           </div>
         </article>
 
         <!-- Fried Rice -->
-        <article class="menu-feature" data-category="rice" data-product-id="fried-rice">
+        <article class="menu-feature menu-feature--large" data-category="rice" data-product-id="fried-rice">
           <div class="menu-feature__topline">
             <span class="menu-badge">Rice</span>
             <span class="menu-label">Classic</span>
@@ -408,34 +357,33 @@
           <div class="menu-feature__body">
             <div class="menu-feature__copy">
               <h3>Fried Rice</h3>
-              <p>Classic spiced fried rice with your choice of protein.</p>
+              <p>Classic spiced fried rice made with your choice of protein.</p>
+
               <ul class="menu-notes">
                 <li>Chicken: GHC 60</li>
                 <li>Beef: GHC 60</li>
                 <li>Gizzard: GHC 60</li>
               </ul>
+
               <div class="menu-actions">
                 <button class="btn btn--primary" type="button" data-open-product="fried-rice">
                   <i class="fa-solid fa-plate-wheat"></i>
                   Choose Protein
                 </button>
-                <button class="btn btn--ghost" type="button" data-add-simple="fried-rice">
-                  Add to Cart
-                </button>
               </div>
             </div>
 
-            <div class="menu-feature__visual" style="background-image: url('https://images.unsplash.com/photo-1512058564366-18510be2db19?auto=format&fit=crop&w=1200&q=80');">
+            <div class="menu-feature__visual" style="background-image: url('https://source.unsplash.com/1200x1200/?fried-rice,rice');">
               <div class="menu-feature__floating">
-                <span>Balanced and filling</span>
-                <strong>Freshly prepared to order</strong>
+                <span>Fresh and filling</span>
+                <strong>Rich flavor in every serving</strong>
               </div>
             </div>
           </div>
         </article>
 
         <!-- Loaded Angwamo -->
-        <article class="menu-feature" data-category="angwamo" data-product-id="loaded-angwamo">
+        <article class="menu-feature menu-feature--large" data-category="angwamo" data-product-id="loaded-angwamo">
           <div class="menu-feature__topline">
             <span class="menu-badge">New price</span>
             <span class="menu-label">Angwamo</span>
@@ -444,142 +392,106 @@
           <div class="menu-feature__body">
             <div class="menu-feature__copy">
               <h3>Loaded Angwamo</h3>
-              <p>Tiered portions with bold protein options and premium value.</p>
+              <p>Tiered value with bold protein choices and premium portions.</p>
+
               <ul class="menu-notes">
                 <li>Basic: <span class="price-old">GHC 65</span> <strong>GHC 60</strong></li>
                 <li>Classic: <span class="price-old">GHC 75</span> <strong>GHC 70</strong></li>
                 <li>Max, 5 proteins: <span class="price-old">GHC 85</span> <strong>GHC 80</strong></li>
               </ul>
+
               <div class="menu-actions">
                 <button class="btn btn--primary" type="button" data-open-product="loaded-angwamo">
                   <i class="fa-solid fa-pen-to-square"></i>
                   Pick a Tier
                 </button>
-                <button class="btn btn--ghost" type="button" data-add-simple="loaded-angwamo">
-                  Add to Cart
-                </button>
               </div>
             </div>
 
-            <div class="menu-feature__visual" style="background-image: url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1200&q=80');">
+            <div class="menu-feature__visual" style="background-image: url('https://source.unsplash.com/1200x1200/?ghanaian-food,rice,meal');">
               <div class="menu-feature__floating">
                 <span>Upgraded value</span>
-                <strong>Bold portions, better price</strong>
+                <strong>Better price, bigger satisfaction</strong>
               </div>
             </div>
           </div>
         </article>
 
-        <!-- Loaded Jollof -->
-        <article class="menu-feature menu-feature--small" data-category="rice specials" data-product-id="loaded-jollof">
-          <div class="menu-feature__topline">
-            <span class="menu-badge">New</span>
-            <span class="menu-label">Rice</span>
-          </div>
-          <div class="menu-feature__body">
-            <div class="menu-feature__copy">
-              <h3>Loaded Jollof</h3>
-              <p>Hearty Jungle Jumbo Fully Loaded Jollof rice with protein and extras.</p>
-              <div class="price-line">
-                <strong>GHC 85</strong>
+        <!-- Loaded Jollof and Noodles grid -->
+        <div class="menu-duo" style="display: grid; gap: 14px;">
+          <article class="menu-feature menu-feature--small" data-category="rice specials" data-product-id="loaded-jollof">
+            <div class="menu-feature__topline">
+              <span class="menu-badge">New</span>
+              <span class="menu-label">Rice</span>
+            </div>
+            <div class="menu-feature__body">
+              <div class="menu-feature__visual" style="background-image: url('https://source.unsplash.com/1200x1200/?jollof-rice,ghanaian-food'); min-height: 240px; margin-top: 0;">
+                <div class="menu-feature__floating">
+                  <span>Loaded portion</span>
+                  <strong>Jungle Jumbo Fully Loaded Jollof</strong>
+                </div>
               </div>
-              <div class="menu-actions">
-                <button class="btn btn--primary" type="button" data-open-product="loaded-jollof">
-                  <i class="fa-solid fa-circle-plus"></i>
-                  Order Loaded Jollof
-                </button>
+
+              <div class="menu-feature__copy">
+                <h3>Loaded Jollof</h3>
+                <p>Hearty jollof with protein and extras for a proper meal.</p>
+                <div class="price-line">
+                  <strong>GHC 85</strong>
+                </div>
+                <div class="menu-actions">
+                  <button class="btn btn--primary" type="button" data-add-simple="loaded-jollof">
+                    <i class="fa-solid fa-cart-plus"></i>
+                    Add to Cart
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-        </article>
+          </article>
 
-        <!-- Noodles -->
-        <article class="menu-feature menu-feature--small" data-category="specials" data-product-id="noodles">
-          <div class="menu-feature__topline">
-            <span class="menu-badge">Popular</span>
-            <span class="menu-label">Quick pick</span>
-          </div>
-          <div class="menu-feature__body">
-            <div class="menu-feature__copy">
-              <h3>Noodles</h3>
-              <p>Assorted proteins available, made for a fast and satisfying meal.</p>
-              <div class="price-line">
-                <strong>GHC 50</strong>
+          <article class="menu-feature menu-feature--small" data-category="specials" data-product-id="noodles">
+            <div class="menu-feature__topline">
+              <span class="menu-badge">Popular</span>
+              <span class="menu-label">Quick pick</span>
+            </div>
+            <div class="menu-feature__body">
+              <div class="menu-feature__visual" style="background-image: url('https://source.unsplash.com/1200x1200/?noodles,ramen'); min-height: 240px; margin-top: 0;">
+                <div class="menu-feature__floating">
+                  <span>Fast and satisfying</span>
+                  <strong>Assorted proteins available</strong>
+                </div>
               </div>
-              <div class="menu-actions">
-                <button class="btn btn--primary" type="button" data-open-product="noodles">
-                  <i class="fa-solid fa-circle-plus"></i>
-                  Order Noodles
-                </button>
+
+              <div class="menu-feature__copy">
+                <h3>Noodles</h3>
+                <p>Quick, rich, and easy to enjoy at any time of the day.</p>
+                <div class="price-line">
+                  <strong>GHC 50</strong>
+                </div>
+                <div class="menu-actions">
+                  <button class="btn btn--primary" type="button" data-add-simple="noodles">
+                    <i class="fa-solid fa-cart-plus"></i>
+                    Add to Cart
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-        </article>
-      </div>
-    </section>
-
-    <!-- Highlights -->
-    <section class="highlights" aria-label="Why order from Wrap District">
-      <div class="highlight-panel">
-        <i class="fa-solid fa-bag-shopping"></i>
-        <h3>Fast ordering flow</h3>
-        <p>Add to cart, edit quantity, and checkout in a few taps.</p>
-      </div>
-      <div class="highlight-panel">
-        <i class="fa-solid fa-receipt"></i>
-        <h3>Clear order details</h3>
-        <p>See your subtotal, delivery, promo discount, and total before paying.</p>
-      </div>
-      <div class="highlight-panel">
-        <i class="fa-solid fa-lock"></i>
-        <h3>Reliable payments</h3>
-        <p>Paystack mobile money and card checkout for a smooth experience.</p>
-      </div>
-    </section>
-
-    <!-- Checkout section teaser -->
-    <section class="checkout-teaser" id="checkout" aria-label="Checkout preview">
-      <div class="checkout-teaser__copy">
-        <p class="eyebrow">Checkout</p>
-        <h2>Simple details. Smooth payment. Premium finish.</h2>
-        <p>
-          Checkout price does not include delivery fees. Delivery is estimated after checkout, and the final fee is communicated based on the address.
-        </p>
-      </div>
-
-      <div class="checkout-teaser__facts">
-        <div>
-          <span>Name</span>
-          <strong>Customer details</strong>
-        </div>
-        <div>
-          <span>Payment</span>
-          <strong>Paystack MoMo or card</strong>
-        </div>
-        <div>
-          <span>Order type</span>
-          <strong>Delivery or pickup</strong>
+          </article>
         </div>
       </div>
-
-      <button class="btn btn--primary checkout-teaser__btn" type="button" data-open-checkout>
-        <i class="fa-solid fa-lock"></i>
-        Continue to Checkout
-      </button>
     </section>
 
     <!-- Contact -->
     <section class="contact-section" id="contact" aria-label="Contact and business information">
       <div class="contact-section__copy">
         <p class="eyebrow">Contact</p>
-        <h2>Visit Wrap District or order from your phone</h2>
-        <p>Fresh food, friendly service, and a location that is easy to find.</p>
+        <h2>Reach Wrap District anytime you are ready to order</h2>
+        <p>Fresh food, quick replies, and easy pickup at Devtraco.</p>
       </div>
 
       <div class="contact-strip">
         <a href="tel:0552509241" class="contact-chip">
           <i class="fa-solid fa-phone"></i>
-          <span>0552509241</span>
+          <span>Call 0552509241</span>
         </a>
         <a href="https://wa.me/233571118856" target="_blank" rel="noopener" class="contact-chip">
           <i class="fa-brands fa-whatsapp"></i>
@@ -587,7 +499,7 @@
         </a>
         <a href="mailto:kennethkamkam22@gmail.com" class="contact-chip">
           <i class="fa-solid fa-envelope"></i>
-          <span>kennethkamkam22@gmail.com</span>
+          <span>Email the team</span>
         </a>
         <span class="contact-chip contact-chip--static">
           <i class="fa-brands fa-snapchat"></i>
@@ -606,17 +518,25 @@
         </div>
         <div class="business-card__item">
           <span>Hours</span>
-          <strong>Mon to Fri: 5pm | Sat to Sun: 9am</strong>
+          <strong>Mon-Fri: 5pm, Sat-Sun: 9am</strong>
         </div>
         <div class="business-card__item">
           <span>Delivery</span>
-          <strong>Available, fees at checkout</strong>
+          <strong>Available, fee confirmed at checkout</strong>
+        </div>
+        <div class="business-card__item">
+          <span>Fast replies</span>
+          <strong>WhatsApp and phone support</strong>
+        </div>
+        <div class="business-card__item">
+          <span>Fresh orders</span>
+          <strong>Made to order for every customer</strong>
         </div>
       </div>
     </section>
   </main>
 
-  <!-- Cart Drawer -->
+  <!-- Cart drawer -->
   <aside class="cart-drawer" id="cartDrawer" aria-hidden="true" aria-label="Shopping cart">
     <div class="cart-drawer__backdrop" data-close-cart></div>
     <section class="cart-drawer__panel">
@@ -634,7 +554,7 @@
         <div class="cart-empty" id="cartEmptyState">
           <i class="fa-solid fa-bag-shopping"></i>
           <h3>Your cart is empty</h3>
-          <p>Add shawarma, loaded fries, rice, angwamo, jollof, or noodles to begin.</p>
+          <p>Add shawarma, loaded fries, rice bowls, jollof, or noodles to begin.</p>
         </div>
 
         <div class="cart-items" id="cartItems" aria-live="polite"></div>
@@ -646,10 +566,6 @@
             <span>Subtotal</span>
             <strong id="cartSubtotal">GHC 0.00</strong>
           </div>
-          <div>
-            <span>Delivery</span>
-            <strong id="cartDelivery">GHC 0.00</strong>
-          </div>
           <div class="cart-summary__discount">
             <span>Promo discount</span>
             <strong id="cartDiscount">- GHC 0.00</strong>
@@ -660,17 +576,6 @@
           </div>
         </div>
 
-        <div class="cart-actions">
-          <button class="btn btn--ghost" type="button" id="promoHelperBtn">
-            <i class="fa-solid fa-wand-magic-sparkles"></i>
-            Promo Helper
-          </button>
-          <button class="btn btn--ghost" type="button" id="clearCartBtn">
-            <i class="fa-solid fa-trash"></i>
-            Clear Cart
-          </button>
-        </div>
-
         <button class="btn btn--primary cart-drawer__checkout" type="button" data-open-checkout>
           <i class="fa-solid fa-lock"></i>
           Checkout
@@ -679,21 +584,21 @@
     </section>
   </aside>
 
-  <!-- Product Modal -->
-  <div class="modal" id="productModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="productModalTitle">
-    <div class="modal__backdrop" data-close-modal="productModal"></div>
+  <!-- Product drawer -->
+  <aside class="product-drawer modal" id="productDrawer" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="productDrawerTitle">
+    <div class="modal__backdrop" data-close-modal="productDrawer"></div>
     <div class="modal__panel modal__panel--product">
-      <button class="modal__close" type="button" aria-label="Close product modal" data-close-modal="productModal">
+      <button class="modal__close" type="button" aria-label="Close product drawer" data-close-modal="productDrawer">
         <i class="fa-solid fa-xmark"></i>
       </button>
 
-      <div class="product-modal__hero" id="productModalHero"></div>
+      <div class="product-modal__hero" id="productDrawerHero"></div>
 
       <div class="product-modal__content">
         <div class="product-modal__header">
-          <span class="product-modal__badge" id="productModalBadge">Featured</span>
-          <h2 id="productModalTitle">Product title</h2>
-          <p id="productModalDescription">Product description goes here.</p>
+          <span class="product-modal__badge" id="productDrawerBadge">Featured</span>
+          <h2 id="productDrawerTitle">Product title</h2>
+          <p id="productDrawerDescription">Product description goes here.</p>
         </div>
 
         <form id="productOptionsForm" class="product-options-form">
@@ -715,7 +620,7 @@
           <div class="product-modal__pricebar">
             <div>
               <span>Estimated total</span>
-              <strong id="productModalPrice">GHC 0.00</strong>
+              <strong id="productDrawerPrice">GHC 0.00</strong>
             </div>
             <button class="btn btn--primary" type="submit">
               <i class="fa-solid fa-cart-plus"></i>
@@ -725,9 +630,9 @@
         </form>
       </div>
     </div>
-  </div>
+  </aside>
 
-  <!-- Preorder Modal -->
+  <!-- Preorder modal -->
   <div class="modal" id="preorderModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="preorderTitle">
     <div class="modal__backdrop" data-close-modal="preorderModal"></div>
     <div class="modal__panel modal__panel--form">
@@ -774,7 +679,7 @@
     </div>
   </div>
 
-  <!-- Checkout Modal -->
+  <!-- Checkout modal -->
   <div class="modal" id="checkoutModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="checkoutModalTitle">
     <div class="modal__backdrop" data-close-modal="checkoutModal"></div>
     <div class="modal__panel modal__panel--form modal__panel--checkout">
@@ -786,7 +691,7 @@
         <p class="eyebrow">Checkout</p>
         <h2 id="checkoutModalTitle">Complete your order</h2>
         <p>
-          Checkout price does not include delivery fees. Delivery is estimated after checkout, and the delivery fee is communicated based on the address.
+          Checkout price does not include delivery fees. Delivery is estimated after checkout, and the final fee is communicated based on the address.
         </p>
       </div>
 
@@ -890,7 +795,7 @@
     </div>
   </div>
 
-  <!-- Purchase History Modal -->
+  <!-- Purchase history modal -->
   <div class="modal" id="historyModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="historyModalTitle">
     <div class="modal__backdrop" data-close-modal="historyModal"></div>
     <div class="modal__panel modal__panel--form modal__panel--history">
@@ -901,7 +806,7 @@
       <div class="modal__heading">
         <p class="eyebrow">Purchase history</p>
         <h2 id="historyModalTitle">Find previous orders</h2>
-        <p>Search by reference, name, or phone. All data is saved locally in the browser.</p>
+        <p>Search by reference, name, or phone. Saved orders are stored locally in this browser.</p>
       </div>
 
       <div class="history-tools">
@@ -909,36 +814,13 @@
           <i class="fa-solid fa-magnifying-glass"></i>
           <input type="search" id="historySearch" placeholder="Search reference, name, or phone" />
         </label>
-
-        <div class="history-actions">
-          <button class="btn btn--ghost" type="button" id="historyOpenBtn">
-            <i class="fa-regular fa-folder-open"></i>
-            Open
-          </button>
-          <button class="btn btn--ghost" type="button" id="historyDownloadBtn">
-            <i class="fa-solid fa-download"></i>
-            Download
-          </button>
-          <button class="btn btn--ghost" type="button" id="historyPrintBtn">
-            <i class="fa-solid fa-print"></i>
-            Print
-          </button>
-          <button class="btn btn--ghost" type="button" id="historyRefreshBtn">
-            <i class="fa-solid fa-rotate"></i>
-            Refresh
-          </button>
-          <button class="btn btn--danger" type="button" id="historyClearBtn">
-            <i class="fa-solid fa-trash-can"></i>
-            Clear all
-          </button>
-        </div>
       </div>
 
       <div class="history-list" id="historyList" aria-live="polite"></div>
     </div>
   </div>
 
-  <!-- Order Confirmed Modal -->
+  <!-- Order confirmed modal -->
   <div class="modal" id="orderConfirmedModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="orderConfirmedTitle">
     <div class="modal__backdrop" data-close-modal="orderConfirmedModal"></div>
     <div class="modal__panel modal__panel--form modal__panel--success">
@@ -967,7 +849,7 @@
     </div>
   </div>
 
-  <!-- Printable Invoice Template -->
+  <!-- Printable invoice template -->
   <template id="invoiceTemplate">
     <article class="invoice">
       <header class="invoice__header">
@@ -1012,7 +894,7 @@
         <span class="brand__mark">WRAP</span>
         <span class="brand__name">District</span>
       </div>
-      <p>Fresh wraps, bold flavors, and fast ordering for every craving.</p>
+      <p>Fresh wraps, bold meals, and quick pickup whenever hunger calls.</p>
     </div>
 
     <div class="site-footer__links">
@@ -1023,11 +905,10 @@
     </div>
 
     <p class="site-footer__note">
-      Built for mobile-first ordering with local storage, promo logic, checkout, and invoice flow.
+      Freshly made food, generous portions, and a smooth ordering experience from first tap to final bite.
     </p>
   </footer>
 
-  <!-- Scripts -->
   <script src="script.js" defer></script>
 </body>
 </html>
