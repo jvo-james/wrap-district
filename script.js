@@ -13,7 +13,7 @@
   const PAYSTACK_PUBLIC_KEY =
     window.WRAP_DISTRICT_PAYSTACK_PUBLIC_KEY ||
     window.PAYSTACK_PUBLIC_KEY ||
-    "pk_test_your_public_key_here";
+    "pk_test_297586e51710e83d3c159bfe71ff45c7e23411fa";
 
   const PROMO_WINDOW = {
     start: new Date("2026-04-28T00:00:00"),
