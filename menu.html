@@ -6,500 +6,484 @@
   <meta name="theme-color" content="#000000" />
   <meta
     name="description"
-    content="Wrap District, premium shawarma, loaded fries, rice bowls, jollof, noodles, pickup and delivery in Tema Community 25, Devtraco."
+    content="Wrap District, premium shawarma, loaded fries, rice, angwamo, jollof, and noodles in Tema Community 25, Devtraco."
   />
-  <title>Wrap District | Fresh wraps, bold meals, easy ordering</title>
+  <title>Wrap District | Order Fresh, Fast, Premium</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Bebas+Neue&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
     rel="stylesheet"
   />
-
   <link
     rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    crossorigin="anonymous"
     referrerpolicy="no-referrer"
   />
-
   <link rel="stylesheet" href="styles.css" />
 </head>
+
 <body>
-  <a class="skip-link" href="#main-content">Skip to content</a>
+  <a class="skip-link" href="#main">Skip to main content</a>
 
+  <div class="site-shell" aria-hidden="true"></div>
 
-
-  <!-- Mobile navigation -->
-  <div class="mobile-nav" id="mobileNav" aria-hidden="true">
-    <div class="mobile-nav__backdrop" data-close-mobile-nav></div>
-    <aside class="mobile-nav__panel" aria-label="Mobile navigation">
-      <div class="mobile-nav__header">
-        <div class="brand brand--mobile">
-          <span class="brand__mark">WRAP</span>
-          <span class="brand__name">District</span>
-        </div>
-        <button class="icon-btn" type="button" aria-label="Close menu" data-close-mobile-nav>
-          <i class="fa-solid fa-xmark"></i>
-        </button>
-      </div>
-
-      <nav class="mobile-nav__links">
-        <a href="#hero" data-close-mobile-nav>Home</a>
-        <a href="#menu" data-close-mobile-nav>Menu</a>
-        <a href="#contact" data-close-mobile-nav>Contact</a>
-      </nav>
-
-      <div class="mobile-nav__actions">
-        <button class="btn btn--ghost" type="button" data-open-history>
-          <i class="fa-regular fa-rectangle-list"></i>
-          Purchase History
-        </button>
-        <button class="btn btn--primary" type="button" data-open-cart>
-          <i class="fa-solid fa-bag-shopping"></i>
-          Open Cart
-        </button>
-      </div>
-
-      <div class="mobile-nav__footer">
-        <p>Tema Community 25, Devtraco</p>
-        <p>Pickup ready. Delivery fee is confirmed at checkout.</p>
-      </div>
-    </aside>
-  </div>
-
-  <!-- Header -->
-  <header class="site-header" id="siteHeader">
-    <div class="promo-strip">
-      <span><i class="fa-solid fa-fire"></i> Shawarma promo and loaded fries bonus are active this week</span>
-      <span><i class="fa-solid fa-location-dot"></i> Tema Community 25, Devtraco</span>
-      <span><i class="fa-solid fa-truck-fast"></i> Delivery fee is confirmed at checkout</span>
-    </div>
-
-    <div class="header-bar">
-      <button class="icon-btn icon-btn--menu" type="button" aria-label="Open menu" data-open-mobile-nav>
+  <header class="site-header" id="top">
+    <div class="site-header__inner">
+      <button class="icon-btn site-header__menu" type="button" aria-label="Open menu" data-open-nav>
         <i class="fa-solid fa-bars"></i>
       </button>
 
       <a class="brand" href="#hero" aria-label="Wrap District home">
         <span class="brand__mark">WRAP</span>
-        <span class="brand__name">District</span>
+        <span class="brand__word">District</span>
       </a>
 
-      <nav class="site-nav" aria-label="Primary">
-        <a href="#hero">Home</a>
-        <a href="#menu">Menu</a>
-        <a href="#contact">Contact</a>
-      </nav>
-
-      <div class="header-tools">
-        <button class="tool-btn" type="button" data-open-history aria-label="Open purchase history">
-          <i class="fa-regular fa-clock"></i>
-          <span>History</span>
+      <div class="site-header__actions">
+        <button class="icon-btn" type="button" aria-label="Search" data-open-search>
+          <i class="fa-solid fa-magnifying-glass"></i>
         </button>
 
-        <button class="tool-btn tool-btn--cart" type="button" data-open-cart aria-label="Open cart">
-          <i class="fa-solid fa-bag-shopping"></i>
-          <span>Cart</span>
-          <span class="cart-badge" id="cartBadge">0</span>
+        <button class="icon-btn" type="button" aria-label="Purchase history" data-open-history>
+          <i class="fa-regular fa-clock"></i>
+        </button>
+
+        <button class="cart-pill" type="button" aria-label="Open cart" data-open-cart>
+          <span class="cart-pill__icon">
+            <i class="fa-solid fa-bag-shopping"></i>
+          </span>
+          <span class="cart-pill__label">Cart</span>
+          <span class="cart-pill__count" id="cartBadge">0</span>
         </button>
       </div>
     </div>
   </header>
 
-  <main id="main-content">
-    <!-- Hero -->
+  <aside class="nav-drawer" id="mobileNav" aria-hidden="true" aria-label="Mobile navigation">
+    <div class="nav-drawer__backdrop" data-close-nav></div>
+    <nav class="nav-drawer__panel">
+      <div class="nav-drawer__head">
+        <div class="brand brand--drawer">
+          <span class="brand__mark">WRAP</span>
+          <span class="brand__word">District</span>
+        </div>
+        <button class="icon-btn" type="button" aria-label="Close menu" data-close-nav>
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <a href="#hero" data-close-nav>Home</a>
+      <a href="#menu" data-close-nav>Menu</a>
+      <a href="#contact" data-close-nav>Contact</a>
+      <a href="#footer" data-close-nav>Footer</a>
+
+      <div class="nav-drawer__note">
+        Pickup is available at Devtraco. Delivery is available and the fee is shown at checkout.
+      </div>
+    </nav>
+  </aside>
+
+  <main id="main">
     <section class="hero" id="hero" aria-label="Featured promotions">
       <div class="hero__slider" id="heroSlider">
-        <article class="hero-slide hero-slide--active" data-slide="0" style="background-image: url('https://source.unsplash.com/1600x1200/?shawarma,wrap,food');">
-          <div class="hero-slide__overlay"></div>
-          <div class="hero-slide__content">
-            <span class="hero-kicker">Promo of the week</span>
-            <h1>Buy 2 Shawarmas, Get 1 Free</h1>
+        <article
+          class="hero__slide hero__slide--active"
+          data-slide="0"
+          style="background-image: linear-gradient(180deg, rgba(0,0,0,.18), rgba(0,0,0,.8)), url('https://images.unsplash.com/photo-1529006557810-274b9b2fc783?auto=format&fit=crop&fm=jpg&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&ixlib=rb-4.1.0&q=60&w=3000');"
+        >
+          <div class="hero__content">
+            <p class="hero__eyebrow">This week only</p>
+            <h1>Buy 2 shawarmas, get the 3rd one free</h1>
             <p>
-              Choose your size, choose your protein, and enjoy a premium shawarma deal built for a proper meal.
+              Choose Lite, Classic, or District Max, then build the wrap the way you love it.
             </p>
-
-            <div class="hero-slide__meta">
-              <span><i class="fa-solid fa-location-dot"></i> Tema Community 25</span>
-              <span><i class="fa-solid fa-clock"></i> Tue 28 Apr to Fri 1 May, 2026</span>
-            </div>
-
-            <div class="hero-slide__actions">
-              <button class="btn btn--primary" type="button" data-scroll-to-menu="shawarma">
-                <i class="fa-solid fa-utensils"></i>
-                Order Shawarma
-              </button>
-              <button class="btn btn--ghost" type="button" data-open-product="shawarma">
-                View Options
+            <div class="hero__actions">
+              <button class="btn btn--primary" type="button" data-open-product="shawarma">
+                Order shawarma
               </button>
             </div>
           </div>
         </article>
 
-        <article class="hero-slide" data-slide="1" style="background-image: url('https://source.unsplash.com/1600x1200/?loaded-fries,fries,food');">
-          <div class="hero-slide__overlay"></div>
-          <div class="hero-slide__content">
-            <span class="hero-kicker">Bonus treat</span>
-            <h2>Loaded Fries, Free Coke</h2>
+        <article
+          class="hero__slide"
+          data-slide="1"
+          style="background-image: linear-gradient(180deg, rgba(0,0,0,.18), rgba(0,0,0,.8)), url('https://images.unsplash.com/photo-1763208385612-fbbf89e4a5ed?auto=format&fit=crop&fm=jpg&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTh8fGxvYWRlZCUyMGZyaWVzfGVufDB8fDB8fHww&ixlib=rb-4.1.0&q=60&w=3000');"
+        >
+          <div class="hero__content">
+            <p class="hero__eyebrow">Free Coke with every order</p>
+            <h2>Loaded fries come with a free Coke</h2>
             <p>
-              Warm fries, rich toppings, and a free Coke added automatically during promo hours.
+              Go rich, crispy, and loaded. The free drink appears automatically in the cart during promo hours.
             </p>
-
-            <div class="hero-slide__meta">
-              <span><i class="fa-solid fa-gift"></i> Free Coke included</span>
-              <span><i class="fa-solid fa-bowl-food"></i> Perfect for sharing</span>
-            </div>
-
-            <div class="hero-slide__actions">
-              <button class="btn btn--primary" type="button" data-scroll-to-menu="loaded-fries">
-                <i class="fa-solid fa-cart-plus"></i>
-                Order Loaded Fries
-              </button>
-              <button class="btn btn--ghost" type="button" data-open-product="loaded-fries">
-                View Options
+            <div class="hero__actions">
+              <button class="btn btn--primary" type="button" data-open-product="loaded-fries">
+                Order loaded fries
               </button>
             </div>
           </div>
         </article>
 
-        <article class="hero-slide" data-slide="2" style="background-image: url('https://source.unsplash.com/1600x1200/?fast-food,meal,food');">
-          <div class="hero-slide__overlay"></div>
-          <div class="hero-slide__content">
-            <span class="hero-kicker">More to love</span>
-            <h2>Enjoy Discounts on Our Other Foods</h2>
+        <article
+          class="hero__slide"
+          data-slide="2"
+          style="background-image: linear-gradient(180deg, rgba(0,0,0,.18), rgba(0,0,0,.8)), url('https://images.unsplash.com/photo-1665556899022-9761f95769e5?auto=format&fit=crop&fm=jpg&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&ixlib=rb-4.1.0&q=60&w=3000');"
+        >
+          <div class="hero__content">
+            <p class="hero__eyebrow">More favorites, more value</p>
+            <h2>Enjoy discounts on our other foods</h2>
             <p>
-              Fried rice, loaded angwamo, loaded jollof, and noodles are all waiting with bold flavor and generous portions.
+              Fried rice, loaded angwamo, loaded jollof, and noodles are ready for easy ordering.
             </p>
-
-            <div class="hero-slide__meta">
-              <span><i class="fa-solid fa-star"></i> Premium menu</span>
-              <span><i class="fa-solid fa-motorcycle"></i> Delivery available</span>
-            </div>
-
-            <div class="hero-slide__actions">
-              <button class="btn btn--primary" type="button" data-scroll-to-menu="all">
-                <i class="fa-solid fa-list"></i>
-                Explore Menu
-              </button>
-              <button class="btn btn--ghost" type="button" data-open-product="fried-rice">
-                View Rice Options
-              </button>
+            <div class="hero__actions">
+              <a class="btn btn--primary" href="#menu">Explore menu</a>
             </div>
           </div>
         </article>
 
-        <div class="hero-slider__controls">
-          <button type="button" class="hero-control" data-hero-prev aria-label="Previous slide">
-            <i class="fa-solid fa-chevron-left"></i>
-          </button>
-          <button type="button" class="hero-control" data-hero-next aria-label="Next slide">
-            <i class="fa-solid fa-chevron-right"></i>
-          </button>
-        </div>
-
-        <div class="hero-slider__dots" aria-label="Slider navigation">
-          <button class="hero-dot hero-dot--active" type="button" data-go-slide="0" aria-label="Go to slide 1"></button>
-          <button class="hero-dot" type="button" data-go-slide="1" aria-label="Go to slide 2"></button>
-          <button class="hero-dot" type="button" data-go-slide="2" aria-label="Go to slide 3"></button>
+        <div class="hero__dots" aria-label="Hero navigation">
+          <button class="hero-dot hero-dot--active" type="button" data-go-slide="0" aria-label="Show shawarma slide"></button>
+          <button class="hero-dot" type="button" data-go-slide="1" aria-label="Show loaded fries slide"></button>
+          <button class="hero-dot" type="button" data-go-slide="2" aria-label="Show other foods slide"></button>
         </div>
       </div>
     </section>
 
-    <!-- Menu -->
-    <section class="menu-area" id="menu" aria-label="Menu">
+    <section class="menu" id="menu" aria-labelledby="menuTitle">
       <div class="section-head">
-        <div>
-          <p class="eyebrow">Menu</p>
-          <h2>Choose your meal</h2>
-        </div>
-
-        <div class="menu-tools">
-          <div class="menu-search">
-            <i class="fa-solid fa-magnifying-glass"></i>
-            <input type="search" id="menuSearch" placeholder="Search shawarma, fries, rice, jollof, noodles" />
-          </div>
-          <button class="btn btn--ghost" type="button" data-open-history>
-            <i class="fa-regular fa-folder-open"></i>
-            Purchase History
-          </button>
-        </div>
+        <p class="eyebrow">Menu</p>
+        <h2 id="menuTitle">Choose your next craving</h2>
+        <p class="section-head__text">
+          Tap a meal, open the drawer, and build your order with ease.
+        </p>
       </div>
 
-      <div class="menu-rail" role="tablist" aria-label="Menu categories">
-        <button class="menu-pill menu-pill--active" type="button" data-filter-category="all">All Foods</button>
-        <button class="menu-pill" type="button" data-filter-category="shawarma">Shawarma</button>
-        <button class="menu-pill" type="button" data-filter-category="loaded-fries">Loaded Fries</button>
-        <button class="menu-pill" type="button" data-filter-category="rice">Rice</button>
-        <button class="menu-pill" type="button" data-filter-category="angwamo">Angwamo</button>
-        <button class="menu-pill" type="button" data-filter-category="specials">Specials</button>
+      <div class="menu-filters" role="tablist" aria-label="Menu filters">
+        <button class="menu-chip menu-chip--active" type="button" data-filter="all" role="tab" aria-selected="true">All foods</button>
+        <button class="menu-chip" type="button" data-filter="shawarma" role="tab">Shawarma</button>
+        <button class="menu-chip" type="button" data-filter="loaded-fries" role="tab">Loaded fries</button>
+        <button class="menu-chip" type="button" data-filter="rice" role="tab">Rice</button>
+        <button class="menu-chip" type="button" data-filter="angwamo" role="tab">Angwamo</button>
+        <button class="menu-chip" type="button" data-filter="specials" role="tab">Specials</button>
       </div>
 
-      <div class="menu-runway" id="menuRunway">
-        <!-- Shawarma -->
-        <article class="menu-feature menu-feature--large" data-category="shawarma" data-product-id="shawarma">
-          <div class="menu-feature__topline">
+      <div class="menu-flow">
+        <article class="menu-item menu-item--featured" data-category="shawarma" id="shawarma">
+          <div class="menu-item__media">
+            <img
+              src="https://images.unsplash.com/photo-1713810980083-229ca8c818c3?auto=format&fit=crop&fm=jpg&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&ixlib=rb-4.1.0&q=60&w=3000"
+              alt="Shawarma wrap"
+            />
             <span class="menu-badge">Buy 2 → 1 Free</span>
-            <span class="menu-label">Signature</span>
           </div>
 
-          <div class="menu-feature__body">
-            <div class="menu-feature__copy">
-              <h3>Shawarma</h3>
-              <p>Choose size, then protein. Rich sauce and extra cheese are ready when you want them.</p>
-
-              <ul class="menu-notes">
-                <li>Lite: GHC 45</li>
-                <li>Classic: GHC 55</li>
-                <li>District Max: GHC 70</li>
-              </ul>
-
-              <div class="menu-actions">
-                <button class="btn btn--primary" type="button" data-open-product="shawarma">
-                  <i class="fa-solid fa-pen-to-square"></i>
-                  Customize Shawarma
-                </button>
+          <div class="menu-item__content">
+            <div class="menu-item__top">
+              <div>
+                <p class="menu-item__category">Shawarma</p>
+                <h3>Signature Shawarma</h3>
               </div>
+              <strong class="menu-item__price">From GHC 45</strong>
             </div>
 
-            <div class="menu-feature__visual" style="background-image: url('https://source.unsplash.com/1200x1200/?shawarma,wrap,sandwich');">
-              <div class="menu-feature__floating">
-                <span>Promo applied automatically</span>
-                <strong>Third shawarma becomes free in the cart</strong>
-              </div>
+            <p class="menu-item__text">
+              Choose size, then protein. Add extra sauce or extra cheese for a richer bite.
+            </p>
+
+            <div class="menu-item__meta">
+              <span>Lite</span>
+              <span>Classic</span>
+              <span>District Max</span>
             </div>
+
+            <button class="btn btn--primary btn--wide" type="button" data-open-product="shawarma">
+              Open shawarma drawer
+            </button>
           </div>
         </article>
 
-        <!-- Loaded Fries -->
-        <article class="menu-feature menu-feature--large" data-category="loaded-fries" data-product-id="loaded-fries">
-          <div class="menu-feature__topline">
+        <article class="menu-item menu-item--featured" data-category="loaded-fries" id="loaded-fries">
+          <div class="menu-item__media">
+            <img
+              src="https://images.unsplash.com/photo-1771818708792-d671ae9b4b46?auto=format&fit=crop&fm=jpg&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTJ8fGxvYWRlZCUyMGZyaWVzfGVufDB8fDB8fHww&ixlib=rb-4.1.0&q=60&w=3000"
+              alt="Loaded fries"
+            />
             <span class="menu-badge">Free Coke</span>
-            <span class="menu-label">Crunchy</span>
           </div>
 
-          <div class="menu-feature__body">
-            <div class="menu-feature__copy">
-              <h3>Loaded Fries</h3>
-              <p>Choose a portion and build a heavy, satisfying plate with your favorite toppings.</p>
-
-              <ul class="menu-notes">
-                <li>Regular: GHC 65</li>
-                <li>Medium: GHC 75</li>
-                <li>Large: GHC 85</li>
-              </ul>
-
-              <div class="menu-actions">
-                <button class="btn btn--primary" type="button" data-open-product="loaded-fries">
-                  <i class="fa-solid fa-pen-to-square"></i>
-                  Customize Fries
-                </button>
+          <div class="menu-item__content">
+            <div class="menu-item__top">
+              <div>
+                <p class="menu-item__category">Loaded fries</p>
+                <h3>Loaded Fries</h3>
               </div>
+              <strong class="menu-item__price">From GHC 65</strong>
             </div>
 
-            <div class="menu-feature__visual" style="background-image: url('https://source.unsplash.com/1200x1200/?loaded-fries,fries');">
-              <div class="menu-feature__floating">
-                <span>Promo applied automatically</span>
-                <strong>Free Coke appears in the cart</strong>
-              </div>
+            <p class="menu-item__text">
+              Choose a portion and add toppings. The free Coke joins the cart automatically during promo hours.
+            </p>
+
+            <div class="menu-item__meta">
+              <span>Regular</span>
+              <span>Medium</span>
+              <span>Large</span>
             </div>
+
+            <button class="btn btn--primary btn--wide" type="button" data-open-product="loaded-fries">
+              Open fries drawer
+            </button>
           </div>
         </article>
 
-        <!-- Fried Rice -->
-        <article class="menu-feature menu-feature--large" data-category="rice" data-product-id="fried-rice">
-          <div class="menu-feature__topline">
-            <span class="menu-badge">Rice</span>
-            <span class="menu-label">Classic</span>
+        <article class="menu-item" data-category="rice" id="fried-rice">
+          <div class="menu-item__media">
+            <img
+              src="https://images.unsplash.com/photo-627924view0?auto=format&fit=crop&fm=jpg&w=3000&q=60"
+              alt="Fried rice"
+              onerror="this.src='https://images.unsplash.com/photo-1665556899022-9761f95769e5?auto=format&fit=crop&fm=jpg&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&ixlib=rb-4.1.0&q=60&w=3000';"
+            />
           </div>
 
-          <div class="menu-feature__body">
-            <div class="menu-feature__copy">
-              <h3>Fried Rice</h3>
-              <p>Classic spiced fried rice made with your choice of protein.</p>
-
-              <ul class="menu-notes">
-                <li>Chicken: GHC 60</li>
-                <li>Beef: GHC 60</li>
-                <li>Gizzard: GHC 60</li>
-              </ul>
-
-              <div class="menu-actions">
-                <button class="btn btn--primary" type="button" data-open-product="fried-rice">
-                  <i class="fa-solid fa-plate-wheat"></i>
-                  Choose Protein
-                </button>
+          <div class="menu-item__content">
+            <div class="menu-item__top">
+              <div>
+                <p class="menu-item__category">Rice</p>
+                <h3>Fried Rice</h3>
               </div>
+              <strong class="menu-item__price">GHC 60</strong>
             </div>
 
-            <div class="menu-feature__visual" style="background-image: url('https://source.unsplash.com/1200x1200/?fried-rice,rice');">
-              <div class="menu-feature__floating">
-                <span>Fresh and filling</span>
-                <strong>Rich flavor in every serving</strong>
-              </div>
-            </div>
+            <p class="menu-item__text">
+              Classic spiced fried rice with your choice of chicken, beef, or gizzard.
+            </p>
+
+            <button class="btn btn--primary btn--wide" type="button" data-open-product="fried-rice">
+              Open fried rice drawer
+            </button>
           </div>
         </article>
 
-        <!-- Loaded Angwamo -->
-        <article class="menu-feature menu-feature--large" data-category="angwamo" data-product-id="loaded-angwamo">
-          <div class="menu-feature__topline">
+        <article class="menu-item" data-category="angwamo" id="loaded-angwamo">
+          <div class="menu-item__media">
+            <img
+              src="https://images.unsplash.com/photo-1665556899022-9761f95769e5?auto=format&fit=crop&fm=jpg&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&ixlib=rb-4.1.0&q=60&w=3000"
+              alt="Loaded angwamo"
+            />
             <span class="menu-badge">New price</span>
-            <span class="menu-label">Angwamo</span>
           </div>
 
-          <div class="menu-feature__body">
-            <div class="menu-feature__copy">
-              <h3>Loaded Angwamo</h3>
-              <p>Tiered value with bold protein choices and premium portions.</p>
-
-              <ul class="menu-notes">
-                <li>Basic: <span class="price-old">GHC 65</span> <strong>GHC 60</strong></li>
-                <li>Classic: <span class="price-old">GHC 75</span> <strong>GHC 70</strong></li>
-                <li>Max, 5 proteins: <span class="price-old">GHC 85</span> <strong>GHC 80</strong></li>
-              </ul>
-
-              <div class="menu-actions">
-                <button class="btn btn--primary" type="button" data-open-product="loaded-angwamo">
-                  <i class="fa-solid fa-pen-to-square"></i>
-                  Pick a Tier
-                </button>
+          <div class="menu-item__content">
+            <div class="menu-item__top">
+              <div>
+                <p class="menu-item__category">Angwamo</p>
+                <h3>Loaded Angwamo</h3>
               </div>
+              <strong class="menu-item__price menu-item__price--stacked">
+                <span class="price-old">GHC 65</span>
+                <span>From GHC 60</span>
+              </strong>
             </div>
 
-            <div class="menu-feature__visual" style="background-image: url('https://source.unsplash.com/1200x1200/?ghanaian-food,rice,meal');">
-              <div class="menu-feature__floating">
-                <span>Upgraded value</span>
-                <strong>Better price, bigger satisfaction</strong>
-              </div>
-            </div>
+            <p class="menu-item__text">
+              Basic, Classic, or Max. The new price is highlighted and the old price stays crossed out.
+            </p>
+
+            <button class="btn btn--primary btn--wide" type="button" data-open-product="loaded-angwamo">
+              Open angwamo drawer
+            </button>
           </div>
         </article>
 
-        <!-- Loaded Jollof and Noodles grid -->
-        <div class="menu-duo" style="display: grid; gap: 14px;">
-          <article class="menu-feature menu-feature--small" data-category="rice specials" data-product-id="loaded-jollof">
-            <div class="menu-feature__topline">
-              <span class="menu-badge">New</span>
-              <span class="menu-label">Rice</span>
-            </div>
-            <div class="menu-feature__body">
-              <div class="menu-feature__visual" style="background-image: url('https://source.unsplash.com/1200x1200/?jollof-rice,ghanaian-food'); min-height: 240px; margin-top: 0;">
-                <div class="menu-feature__floating">
-                  <span>Loaded portion</span>
-                  <strong>Jungle Jumbo Fully Loaded Jollof</strong>
-                </div>
-              </div>
+        <article class="menu-item menu-item--split" data-category="rice" id="loaded-jollof">
+          <div class="menu-item__media">
+            <img
+              src="https://images.unsplash.com/photo-1665556899022-9761f95769e5?auto=format&fit=crop&fm=jpg&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&ixlib=rb-4.1.0&q=60&w=3000"
+              alt="Loaded jollof"
+            />
+            <span class="menu-badge menu-badge--new">New</span>
+          </div>
 
-              <div class="menu-feature__copy">
+          <div class="menu-item__content">
+            <div class="menu-item__top">
+              <div>
+                <p class="menu-item__category">Rice</p>
                 <h3>Loaded Jollof</h3>
-                <p>Hearty jollof with protein and extras for a proper meal.</p>
-                <div class="price-line">
-                  <strong>GHC 85</strong>
-                </div>
-                <div class="menu-actions">
-                  <button class="btn btn--primary" type="button" data-add-simple="loaded-jollof">
-                    <i class="fa-solid fa-cart-plus"></i>
-                    Add to Cart
-                  </button>
-                </div>
               </div>
+              <strong class="menu-item__price">GHC 85</strong>
             </div>
-          </article>
 
-          <article class="menu-feature menu-feature--small" data-category="specials" data-product-id="noodles">
-            <div class="menu-feature__topline">
-              <span class="menu-badge">Popular</span>
-              <span class="menu-label">Quick pick</span>
-            </div>
-            <div class="menu-feature__body">
-              <div class="menu-feature__visual" style="background-image: url('https://source.unsplash.com/1200x1200/?noodles,ramen'); min-height: 240px; margin-top: 0;">
-                <div class="menu-feature__floating">
-                  <span>Fast and satisfying</span>
-                  <strong>Assorted proteins available</strong>
-                </div>
-              </div>
+            <p class="menu-item__text">
+              A hearty portion of Jungle Jumbo fully loaded jollof rice with protein and extras.
+            </p>
 
-              <div class="menu-feature__copy">
+            <button class="btn btn--primary btn--wide" type="button" data-add-item="loaded-jollof">
+              Add to cart
+            </button>
+          </div>
+        </article>
+
+        <article class="menu-item menu-item--split" data-category="specials" id="noodles">
+          <div class="menu-item__media">
+            <img
+              src="https://images.unsplash.com/photo-1713810980083-229ca8c818c3?auto=format&fit=crop&fm=jpg&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&ixlib=rb-4.1.0&q=60&w=3000"
+              alt="Noodles"
+            />
+            <span class="menu-badge">Fast favorite</span>
+          </div>
+
+          <div class="menu-item__content">
+            <div class="menu-item__top">
+              <div>
+                <p class="menu-item__category">Specials</p>
                 <h3>Noodles</h3>
-                <p>Quick, rich, and easy to enjoy at any time of the day.</p>
-                <div class="price-line">
-                  <strong>GHC 50</strong>
-                </div>
-                <div class="menu-actions">
-                  <button class="btn btn--primary" type="button" data-add-simple="noodles">
-                    <i class="fa-solid fa-cart-plus"></i>
-                    Add to Cart
-                  </button>
-                </div>
               </div>
+              <strong class="menu-item__price">GHC 50</strong>
             </div>
-          </article>
-        </div>
+
+            <p class="menu-item__text">
+              Assorted proteins available, made for a quick and satisfying meal.
+            </p>
+
+            <button class="btn btn--primary btn--wide" type="button" data-add-item="noodles">
+              Add to cart
+            </button>
+          </div>
+        </article>
       </div>
     </section>
 
-    <!-- Contact -->
-    <section class="contact-section" id="contact" aria-label="Contact and business information">
-      <div class="contact-section__copy">
+    <section class="contact" id="contact" aria-labelledby="contactTitle">
+      <div class="section-head section-head--compact">
         <p class="eyebrow">Contact</p>
-        <h2>Reach Wrap District anytime you are ready to order</h2>
-        <p>Fresh food, quick replies, and easy pickup at Devtraco.</p>
+        <h2 id="contactTitle">Find Wrap District in Tema Community 25</h2>
+        <p class="section-head__text">
+          Fresh food, easy pickup, and delivery support that keeps ordering simple.
+        </p>
       </div>
 
-      <div class="contact-strip">
-        <a href="tel:0552509241" class="contact-chip">
+      <div class="contact__grid">
+        <a class="contact__chip" href="tel:0552509241">
           <i class="fa-solid fa-phone"></i>
-          <span>Call 0552509241</span>
+          <span>0552509241</span>
         </a>
-        <a href="https://wa.me/233571118856" target="_blank" rel="noopener" class="contact-chip">
+
+        <a class="contact__chip" href="https://wa.me/233571118856" target="_blank" rel="noreferrer">
           <i class="fa-brands fa-whatsapp"></i>
           <span>WhatsApp</span>
         </a>
-        <a href="mailto:kennethkamkam22@gmail.com" class="contact-chip">
-          <i class="fa-solid fa-envelope"></i>
-          <span>Email the team</span>
+
+        <a class="contact__chip" href="mailto:kennethkamkam22@gmail.com">
+          <i class="fa-regular fa-envelope"></i>
+          <span>kennethkamkam22@gmail.com</span>
         </a>
-        <span class="contact-chip contact-chip--static">
+
+        <span class="contact__chip">
           <i class="fa-brands fa-snapchat"></i>
           <span>@kenneth_idk</span>
         </span>
       </div>
 
-      <div class="business-card">
-        <div class="business-card__item">
-          <span>Location</span>
+      <div class="contact__details">
+        <div>
+          <p class="contact__label">Location</p>
           <strong>Tema Community 25, Devtraco</strong>
         </div>
-        <div class="business-card__item">
-          <span>Pickup</span>
+        <div>
+          <p class="contact__label">Pickup</p>
           <strong>Available at Devtraco</strong>
         </div>
-        <div class="business-card__item">
-          <span>Hours</span>
-          <strong>Mon-Fri: 5pm, Sat-Sun: 9am</strong>
+        <div>
+          <p class="contact__label">Hours</p>
+          <strong>Mon to Fri: 5pm. Sat to Sun: 9am</strong>
         </div>
-        <div class="business-card__item">
-          <span>Delivery</span>
-          <strong>Available, fee confirmed at checkout</strong>
+        <div>
+          <p class="contact__label">Delivery</p>
+          <strong>Available, fee shown at checkout</strong>
         </div>
-        <div class="business-card__item">
-          <span>Fast replies</span>
-          <strong>WhatsApp and phone support</strong>
+        <div>
+          <p class="contact__label">Payment</p>
+          <strong>Paystack mobile money or card</strong>
         </div>
-        <div class="business-card__item">
-          <span>Fresh orders</span>
-          <strong>Made to order for every customer</strong>
+        <div>
+          <p class="contact__label">Promise</p>
+          <strong>Fresh portions, quick service, premium finish</strong>
         </div>
       </div>
     </section>
   </main>
 
-  <!-- Cart drawer -->
-  <aside class="cart-drawer" id="cartDrawer" aria-hidden="true" aria-label="Shopping cart">
-    <div class="cart-drawer__backdrop" data-close-cart></div>
-    <section class="cart-drawer__panel">
-      <header class="cart-drawer__header">
+  <footer class="site-footer" id="footer">
+    <div class="site-footer__brand">
+      <div class="brand">
+        <span class="brand__mark">WRAP</span>
+        <span class="brand__word">District</span>
+      </div>
+      <p>Bold wraps, loaded favorites, and fast ordering for every craving.</p>
+    </div>
+
+    <div class="site-footer__links">
+      <a href="#hero">Home</a>
+      <a href="#menu">Menu</a>
+      <a href="#contact">Contact</a>
+      <button type="button" data-open-history>History</button>
+    </div>
+
+    <div class="site-footer__fineprint">
+      Tema Community 25, Devtraco. Pickup available. Delivery available.
+    </div>
+  </footer>
+
+  <aside class="drawer drawer--product" id="productDrawer" aria-hidden="true" aria-label="Food item drawer">
+    <div class="drawer__backdrop" data-close-product></div>
+    <section class="drawer__panel drawer__panel--product">
+      <button class="icon-btn drawer__close" type="button" aria-label="Close food item drawer" data-close-product>
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <div class="product-drawer">
+        <div class="product-drawer__media" id="productDrawerImage">
+          <img src="" alt="" id="productDrawerImg" />
+          <span class="product-drawer__badge" id="productDrawerBadge">Featured</span>
+        </div>
+
+        <div class="product-drawer__content">
+          <p class="eyebrow" id="productDrawerCategory">Category</p>
+          <h2 id="productDrawerTitle">Meal title</h2>
+          <p id="productDrawerDescription">
+            Choose your options and add your meal to the cart.
+          </p>
+
+          <div class="product-drawer__highlights" id="productDrawerHighlights"></div>
+
+          <form id="productDrawerForm" class="product-drawer__form">
+            <div id="productDrawerOptions"></div>
+
+            <div class="qty-row" aria-label="Quantity">
+              <button type="button" class="qty-row__btn" id="productQtyMinus" aria-label="Decrease quantity">
+                <i class="fa-solid fa-minus"></i>
+              </button>
+              <span id="productQtyValue">1</span>
+              <button type="button" class="qty-row__btn" id="productQtyPlus" aria-label="Increase quantity">
+                <i class="fa-solid fa-plus"></i>
+              </button>
+            </div>
+
+            <button class="btn btn--primary btn--wide" type="submit" id="addProductToCartBtn">
+              Add to cart
+            </button>
+          </form>
+        </div>
+      </div>
+    </section>
+  </aside>
+
+  <aside class="drawer drawer--cart" id="cartDrawer" aria-hidden="true" aria-label="Shopping cart">
+    <div class="drawer__backdrop" data-close-cart></div>
+    <section class="drawer__panel drawer__panel--cart">
+      <div class="drawer__head">
         <div>
           <p class="eyebrow">Your cart</p>
           <h2>Cart summary</h2>
@@ -507,171 +491,71 @@
         <button class="icon-btn" type="button" aria-label="Close cart" data-close-cart>
           <i class="fa-solid fa-xmark"></i>
         </button>
-      </header>
-
-      <div class="cart-drawer__body">
-        <div class="cart-empty" id="cartEmptyState">
-          <i class="fa-solid fa-bag-shopping"></i>
-          <h3>Your cart is empty</h3>
-          <p>Add shawarma, loaded fries, rice bowls, jollof, or noodles to begin.</p>
-        </div>
-
-        <div class="cart-items" id="cartItems" aria-live="polite"></div>
       </div>
 
-      <footer class="cart-drawer__footer">
-        <div class="cart-summary">
-          <div>
+      <div class="cart-drawer">
+        <div class="cart-drawer__items" id="cartItems" aria-live="polite">
+          <div class="empty-state" id="cartEmptyState">
+            <i class="fa-solid fa-bag-shopping"></i>
+            <p>Your cart is empty. Add something delicious.</p>
+          </div>
+        </div>
+
+        <div class="cart-drawer__summary">
+          <div class="summary-row">
             <span>Subtotal</span>
             <strong id="cartSubtotal">GHC 0.00</strong>
           </div>
-          <div class="cart-summary__discount">
+          <div class="summary-row">
             <span>Promo discount</span>
-            <strong id="cartDiscount">- GHC 0.00</strong>
+            <strong id="cartDiscount">GHC 0.00</strong>
           </div>
-          <div class="cart-summary__total">
+          <div class="summary-row summary-row--total">
             <span>Total</span>
             <strong id="cartTotal">GHC 0.00</strong>
           </div>
-        </div>
 
-        <button class="btn btn--primary cart-drawer__checkout" type="button" data-open-checkout>
-          <i class="fa-solid fa-lock"></i>
-          Checkout
-        </button>
-      </footer>
+          <button class="btn btn--primary btn--wide" type="button" data-open-checkout>
+            Checkout
+          </button>
+        </div>
+      </div>
     </section>
   </aside>
 
-  <!-- Product drawer -->
-  <aside class="product-drawer modal" id="productDrawer" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="productDrawerTitle">
-    <div class="modal__backdrop" data-close-modal="productDrawer"></div>
-    <div class="modal__panel modal__panel--product">
-      <button class="modal__close" type="button" aria-label="Close product drawer" data-close-modal="productDrawer">
-        <i class="fa-solid fa-xmark"></i>
-      </button>
-
-      <div class="product-modal__hero" id="productDrawerHero"></div>
-
-      <div class="product-modal__content">
-        <div class="product-modal__header">
-          <span class="product-modal__badge" id="productDrawerBadge">Featured</span>
-          <h2 id="productDrawerTitle">Product title</h2>
-          <p id="productDrawerDescription">Product description goes here.</p>
-        </div>
-
-        <form id="productOptionsForm" class="product-options-form">
-          <div class="option-group" id="productOptionGroups"></div>
-
-          <div class="option-group">
-            <h3>Quantity</h3>
-            <div class="stepper">
-              <button type="button" class="stepper__btn" data-stepper-minus aria-label="Decrease quantity">
-                <i class="fa-solid fa-minus"></i>
-              </button>
-              <input type="number" id="productQuantity" min="1" value="1" aria-label="Quantity" />
-              <button type="button" class="stepper__btn" data-stepper-plus aria-label="Increase quantity">
-                <i class="fa-solid fa-plus"></i>
-              </button>
-            </div>
-          </div>
-
-          <div class="product-modal__pricebar">
-            <div>
-              <span>Estimated total</span>
-              <strong id="productDrawerPrice">GHC 0.00</strong>
-            </div>
-            <button class="btn btn--primary" type="submit">
-              <i class="fa-solid fa-cart-plus"></i>
-              Add to Cart
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </aside>
-
-  <!-- Preorder modal -->
-  <div class="modal" id="preorderModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="preorderTitle">
-    <div class="modal__backdrop" data-close-modal="preorderModal"></div>
-    <div class="modal__panel modal__panel--form">
-      <button class="modal__close" type="button" aria-label="Close preorder modal" data-close-modal="preorderModal">
-        <i class="fa-solid fa-xmark"></i>
-      </button>
-
-      <div class="modal__heading">
-        <p class="eyebrow">Preorder</p>
-        <h2 id="preorderTitle">Plan your meal ahead</h2>
-        <p>Choose a date and time, then let us prepare your order at the right moment.</p>
-      </div>
-
-      <form id="preorderForm" class="stack-form">
-        <label>
-          <span>Name</span>
-          <input type="text" name="preorderName" placeholder="Your name" />
-        </label>
-        <label>
-          <span>Phone</span>
-          <input type="tel" name="preorderPhone" placeholder="Your phone number" />
-        </label>
-        <label>
-          <span>Preferred date</span>
-          <input type="date" name="preorderDate" />
-        </label>
-        <label>
-          <span>Preferred time</span>
-          <input type="time" name="preorderTime" />
-        </label>
-        <label>
-          <span>Notes</span>
-          <textarea name="preorderNotes" rows="4" placeholder="Add instructions here"></textarea>
-        </label>
-
-        <div class="stack-form__actions">
-          <button class="btn btn--ghost" type="button" data-close-modal="preorderModal">Cancel</button>
-          <button class="btn btn--primary" type="submit">
-            <i class="fa-solid fa-calendar-check"></i>
-            Save Preorder
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- Checkout modal -->
-  <div class="modal" id="checkoutModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="checkoutModalTitle">
+  <div class="modal" id="checkoutModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="checkoutTitle">
     <div class="modal__backdrop" data-close-modal="checkoutModal"></div>
-    <div class="modal__panel modal__panel--form modal__panel--checkout">
-      <button class="modal__close" type="button" aria-label="Close checkout modal" data-close-modal="checkoutModal">
+    <section class="modal__panel modal__panel--checkout">
+      <button class="icon-btn modal__close" type="button" aria-label="Close checkout" data-close-modal="checkoutModal">
         <i class="fa-solid fa-xmark"></i>
       </button>
 
-      <div class="modal__heading">
+      <div class="modal__head">
         <p class="eyebrow">Checkout</p>
-        <h2 id="checkoutModalTitle">Complete your order</h2>
-        <p>
-          Checkout price does not include delivery fees. Delivery is estimated after checkout, and the final fee is communicated based on the address.
+        <h2 id="checkoutTitle">Complete your order</h2>
+        <p class="modal__text">
+          Checkout price does not include delivery fees. Delivery is estimated after checkout and the fee is communicated based on your address.
         </p>
       </div>
 
       <form id="checkoutForm" class="checkout-form">
         <div class="checkout-form__grid">
-          <label>
+          <label class="field">
             <span>Name</span>
-            <input type="text" name="name" id="customerName" placeholder="Your full name" required />
+            <input type="text" name="name" autocomplete="name" placeholder="Your full name" required />
           </label>
 
-          <label>
+          <label class="field">
             <span>Phone</span>
-            <input type="tel" name="phone" id="customerPhone" placeholder="Your phone number" required />
+            <input type="tel" name="phone" autocomplete="tel" placeholder="Your phone number" required />
           </label>
 
-          <label>
+          <label class="field">
             <span>Email</span>
-            <input type="email" name="email" id="customerEmail" placeholder="Your email address" required />
+            <input type="email" name="email" autocomplete="email" placeholder="Your email address" required />
           </label>
 
-          <label>
+          <label class="field">
             <span>Order type</span>
             <select name="orderType" id="orderType" required>
               <option value="delivery">Delivery</option>
@@ -679,40 +563,40 @@
             </select>
           </label>
 
-          <label class="checkout-form__full">
+          <label class="field field--full">
             <span>Address</span>
-            <input type="text" name="address" id="customerAddress" placeholder="Delivery address or pickup note" />
+            <input type="text" name="address" autocomplete="street-address" placeholder="Delivery address or pickup note" required />
           </label>
 
-          <label>
+          <label class="field">
             <span>Preferred date</span>
-            <input type="date" name="preferredDate" id="preferredDate" />
+            <input type="date" name="preferredDate" required />
           </label>
 
-          <label>
+          <label class="field">
             <span>Preferred time</span>
-            <input type="time" name="preferredTime" id="preferredTime" />
+            <input type="time" name="preferredTime" required />
           </label>
 
-          <label class="checkout-form__full">
+          <label class="field field--full">
             <span>Notes</span>
-            <textarea name="notes" id="orderNotes" rows="4" placeholder="Add any instructions"></textarea>
+            <textarea name="notes" rows="4" placeholder="Anything special to prepare?"></textarea>
           </label>
         </div>
 
-        <div class="payment-box">
+        <div class="payment-panel">
           <h3>Payment method</h3>
 
           <label class="payment-option">
             <input type="radio" name="paymentMethod" value="paystack" checked />
             <span>
               <strong>Paystack mobile money or card</strong>
-              <small>Secure payment through Paystack inline checkout</small>
+              <small>Secure online payment</small>
             </span>
           </label>
 
           <label class="payment-option payment-option--disabled">
-            <input type="radio" name="paymentMethod" value="cod" disabled />
+            <input type="radio" name="paymentMethod" value="cash" disabled />
             <span>
               <strong>Cash on delivery</strong>
               <small>Disabled in the markup</small>
@@ -721,77 +605,73 @@
         </div>
 
         <div class="checkout-summary">
-          <div>
+          <div class="summary-row">
             <span>Subtotal</span>
             <strong id="checkoutSubtotal">GHC 0.00</strong>
           </div>
-          <div>
+          <div class="summary-row">
             <span>Delivery</span>
-            <strong id="checkoutDelivery">GHC 0.00</strong>
+            <strong id="checkoutDelivery">Calculated after checkout</strong>
           </div>
-          <div>
+          <div class="summary-row">
             <span>Promo discount</span>
-            <strong id="checkoutDiscount">- GHC 0.00</strong>
+            <strong id="checkoutDiscount">GHC 0.00</strong>
           </div>
-          <div class="checkout-summary__total">
-            <span>Total</span>
+          <div class="summary-row summary-row--total">
+            <span>Total due</span>
             <strong id="checkoutTotal">GHC 0.00</strong>
           </div>
         </div>
 
-        <div class="checkout-form__actions">
-          <button class="btn btn--ghost" type="button" data-close-modal="checkoutModal">Back to cart</button>
-          <button class="btn btn--primary" type="submit">
-            <i class="fa-solid fa-credit-card"></i>
-            Pay with Paystack
-          </button>
-        </div>
+        <button class="btn btn--primary btn--wide" type="submit" id="payNowBtn">
+          <i class="fa-solid fa-lock"></i>
+          Pay with Paystack
+        </button>
       </form>
-
-      <p class="checkout-note">
-        Paystack inline checkout is enabled in the page scripts. Processing fees are handled using the configured Paystack and MTN withdrawal percentage logic.
-      </p>
-    </div>
+    </section>
   </div>
 
-  <!-- Purchase history modal -->
-  <div class="modal" id="historyModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="historyModalTitle">
+  <div class="modal" id="historyModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="historyTitle">
     <div class="modal__backdrop" data-close-modal="historyModal"></div>
-    <div class="modal__panel modal__panel--form modal__panel--history">
-      <button class="modal__close" type="button" aria-label="Close history modal" data-close-modal="historyModal">
+    <section class="modal__panel modal__panel--history">
+      <button class="icon-btn modal__close" type="button" aria-label="Close history" data-close-modal="historyModal">
         <i class="fa-solid fa-xmark"></i>
       </button>
 
-      <div class="modal__heading">
+      <div class="modal__head">
         <p class="eyebrow">Purchase history</p>
-        <h2 id="historyModalTitle">Find previous orders</h2>
-        <p>Search by reference, name, or phone. Saved orders are stored locally in this browser.</p>
+        <h2 id="historyTitle">Find a past order</h2>
+        <p class="modal__text">
+          Search by reference, name, or phone. Open any order by tapping it.
+        </p>
       </div>
 
-      <div class="history-tools">
-        <label class="history-search">
-          <i class="fa-solid fa-magnifying-glass"></i>
-          <input type="search" id="historySearch" placeholder="Search reference, name, or phone" />
-        </label>
-      </div>
+      <label class="field field--full">
+        <span>Search history</span>
+        <input type="search" id="historySearch" placeholder="Search reference, name, or phone" />
+      </label>
 
-      <div class="history-list" id="historyList" aria-live="polite"></div>
-    </div>
+      <div class="history-list" id="historyList" aria-live="polite">
+        <button type="button" class="history-empty">
+          <i class="fa-regular fa-folder-open"></i>
+          <span>No purchases found yet.</span>
+        </button>
+      </div>
+    </section>
   </div>
 
-  <!-- Order confirmed modal -->
   <div class="modal" id="orderConfirmedModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="orderConfirmedTitle">
     <div class="modal__backdrop" data-close-modal="orderConfirmedModal"></div>
-    <div class="modal__panel modal__panel--form modal__panel--success">
-      <button class="modal__close" type="button" aria-label="Close confirmation modal" data-close-modal="orderConfirmedModal">
+    <section class="modal__panel modal__panel--success">
+      <button class="icon-btn modal__close" type="button" aria-label="Close confirmation" data-close-modal="orderConfirmedModal">
         <i class="fa-solid fa-xmark"></i>
       </button>
 
       <div class="success-head">
         <i class="fa-solid fa-circle-check"></i>
         <p class="eyebrow">Order confirmed</p>
-        <h2 id="orderConfirmedTitle">Your order is on the way</h2>
-        <p>Keep your reference details. You can save, print, or download the invoice.</p>
+        <h2 id="orderConfirmedTitle">Your order is in</h2>
+        <p>Keep your reference details. You can save or print the invoice after checkout.</p>
       </div>
 
       <div class="success-details" id="orderConfirmedDetails"></div>
@@ -805,10 +685,9 @@
           Okay
         </button>
       </div>
-    </div>
+    </section>
   </div>
 
-  <!-- Printable invoice template -->
   <template id="invoiceTemplate">
     <article class="invoice">
       <header class="invoice__header">
@@ -846,26 +725,50 @@
     </article>
   </template>
 
-  <!-- Footer -->
-  <footer class="site-footer">
+  <template id="cartItemTemplate">
+    <article class="cart-item">
+      <img class="cart-item__thumb" src="" alt="" />
+      <div class="cart-item__info">
+        <h3></h3>
+        <p></p>
+      </div>
+      <div class="cart-item__controls">
+        <button type="button" class="quantity-btn quantity-btn--minus" aria-label="Decrease quantity">
+          <i class="fa-solid fa-minus"></i>
+        </button>
+        <span class="cart-item__qty">1</span>
+        <button type="button" class="quantity-btn quantity-btn--plus" aria-label="Increase quantity">
+          <i class="fa-solid fa-plus"></i>
+        </button>
+      </div>
+      <strong class="cart-item__price"></strong>
+      <button type="button" class="icon-btn cart-item__remove" aria-label="Remove item">
+        <i class="fa-solid fa-trash-can"></i>
+      </button>
+    </article>
+  </template>
+
+  <div class="toast-stack" id="toastStack" aria-live="polite" aria-atomic="true"></div>
+
+  <footer class="site-footer" id="footer">
     <div class="site-footer__brand">
       <div class="brand">
         <span class="brand__mark">WRAP</span>
-        <span class="brand__name">District</span>
+        <span class="brand__word">District</span>
       </div>
-      <p>Fresh wraps, bold meals, and quick pickup whenever hunger calls.</p>
+      <p>Bold wraps, loaded favorites, and fast ordering for every craving.</p>
     </div>
 
     <div class="site-footer__links">
       <a href="#hero">Home</a>
       <a href="#menu">Menu</a>
       <a href="#contact">Contact</a>
-      <button type="button" data-open-history>Purchase History</button>
+      <button type="button" data-open-history>History</button>
     </div>
 
-    <p class="site-footer__note">
-      Freshly made food, generous portions, and a smooth ordering experience from first tap to final bite.
-    </p>
+    <div class="site-footer__fineprint">
+      Tema Community 25, Devtraco. Pickup available. Delivery available.
+    </div>
   </footer>
 
   <script src="script.js" defer></script>
