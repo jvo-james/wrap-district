@@ -155,7 +155,7 @@
       categoryLabel: "Shawarma",
       badge: "Buy 2 → 1 Free",
       image:
-        "https://images.unsplash.com/photo-1606756790138-261d2b21cd75?auto=format&fit=crop&fm=jpg&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&ixlib=rb-4.1.0&q=60&w=3000",
+        "thumb-shawarma.jpg",
       description:
         "Choose size, then protein. Add extra sauce or extra cheese for a richer finish.",
       highlights: ["Promo applies automatically", "Third shawarma becomes free", "Great for sharing"],
@@ -201,7 +201,7 @@
       categoryLabel: "Loaded Fries",
       badge: "Free Coke",
       image:
-        "https://images.unsplash.com/photo-1573080496219-bb080dd4f877?auto=format&fit=crop&fm=jpg&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&ixlib=rb-4.1.0&q=60&w=3000",
+        "promo-fries.jpg",
       description:
         "Choose a portion and load it with chicken, cheese, or sauce. A free Coke joins the cart automatically during promo hours.",
       highlights: ["Free Coke in cart", "Perfect for sharing", "Rich and crispy finish"],
@@ -236,7 +236,7 @@
       categoryLabel: "Rice",
       badge: "Classic",
       image:
-        "https://images.unsplash.com/photo-1665556899022-9761f95769e5?auto=format&fit=crop&fm=jpg&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&ixlib=rb-4.1.0&q=60&w=3000",
+        "hero-friedrice-large.jpg",
       description: "Classic spiced fried rice with your choice of protein.",
       highlights: ["Chicken, beef, or gizzard", "Balanced and filling", "Freshly prepared to order"],
       optionGroups: [
@@ -260,7 +260,7 @@
       categoryLabel: "Angwamo",
       badge: "New price",
       image:
-        "https://images.unsplash.com/photo-1604908176997-125f25cc500f?auto=format&fit=crop&fm=jpg&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&ixlib=rb-4.1.0&q=60&w=3000",
+        "hero-angwamo-large.jpg",
       description:
         "Tiered portions with bold fillings. The new price is highlighted and the old price stays crossed out.",
       highlights: ["Basic, Classic, Max", "Lower prices now on the menu", "Bold portions, better value"],
@@ -285,7 +285,7 @@
       categoryLabel: "Rice",
       badge: "New",
       image:
-        "https://images.unsplash.com/photo-1665556899022-9761f95769e5?auto=format&fit=crop&fm=jpg&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&ixlib=rb-4.1.0&q=60&w=3000",
+        "image.png",
       description: "A hearty portion of Jungle Jumbo fully loaded jollof rice with protein and extras.",
       highlights: ["Big portion", "Packed with flavor", "A fast favorite"],
       optionGroups: []
@@ -297,7 +297,7 @@
       categoryLabel: "Specials",
       badge: "Fast favorite",
       image:
-        "https://images.unsplash.com/photo-1713810980083-229ca8c818c3?auto=format&fit=crop&fm=jpg&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&ixlib=rb-4.1.0&q=60&w=3000",
+        "thumb-noodle.jpg",
       description: "Assorted proteins available, made for a quick and satisfying meal.",
       highlights: ["Quick and satisfying", "Assorted proteins available", "Great for busy days"],
       optionGroups: []
