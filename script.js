@@ -6,8 +6,7 @@
     history: "wrap_district_history_v1",
     user: "wrap_district_user_v1",
     checkoutDraft: "wrap_district_checkout_draft_v1",
-    lastOrder: "wrap_district_last_order_v1",
-    promoSeen: "wrap_district_promo_seen_v1"
+    lastOrder: "wrap_district_last_order_v1"
   };
 
   const PAYSTACK_PUBLIC_KEY =
@@ -15,10 +14,7 @@
     window.PAYSTACK_PUBLIC_KEY ||
     "pk_live_ad7d0e0b164d83ec61bf2bf4fdb2af366c41c0ed";
 
-  const PROMO_WINDOW = {
-    start: new Date("2026-04-28T00:00:00"),
-    end: new Date("2026-05-01T23:59:59")
-  };
+  const PROCESSING_FEE_RATE = 0.0295;
 
   const $ = (selector, root = document) => root.querySelector(selector);
   const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
@@ -57,9 +53,11 @@
     }
   };
 
+  const roundMoney = (value) => Math.round((Number(value) || 0) * 100) / 100;
+
   const money = (value) => {
     const num = Number(value) || 0;
-    return `GHS ${num.toFixed(2)}`;
+    return `GHC ${num.toFixed(2)}`;
   };
 
   const uid = (prefix = "WD") => {
@@ -99,11 +97,6 @@
 
   const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
 
-  const isPromoActive = () => {
-    const now = new Date();
-    return now >= PROMO_WINDOW.start && now <= PROMO_WINDOW.end;
-  };
-
   const els = {
     body: document.body,
     navDrawer: $("#mobileNav"),
@@ -118,11 +111,11 @@
     cartItems: $("#cartItems"),
     cartBadge: $("#cartBadge"),
     cartSubtotal: $("#cartSubtotal"),
-    cartDiscount: $("#cartDiscount"),
+    cartProcessingFee: $("#cartProcessingFee"),
     cartTotal: $("#cartTotal"),
     checkoutSubtotal: $("#checkoutSubtotal"),
     checkoutDelivery: $("#checkoutDelivery"),
-    checkoutDiscount: $("#checkoutDiscount"),
+    checkoutProcessingFee: $("#checkoutProcessingFee"),
     checkoutTotal: $("#checkoutTotal"),
     checkoutItemsList: $("#checkoutItemsList"),
     checkoutItemsCount: $("#checkoutItemsCount"),
@@ -153,12 +146,10 @@
       id: "shawarma",
       title: "Signature Shawarma",
       categoryLabel: "Shawarma",
-      badge: "Buy 2 → 1 Free",
-      image:
-        "thumb-shawarma.jpg",
-      description:
-        "Choose size, then protein. Add extra sauce or extra cheese for a richer finish.",
-      highlights: ["Promo applies automatically", "Third shawarma becomes free", "Great for sharing"],
+      badge: "Best seller",
+      image: "thumb-shawarma.jpg",
+      description: "Choose size, then protein. Add extra sauce or extra cheese for a richer finish.",
+      highlights: ["Freshly made", "Customize your wrap", "Great for sharing"],
       optionGroups: [
         {
           key: "size",
@@ -199,12 +190,10 @@
       id: "loaded-fries",
       title: "Loaded Fries",
       categoryLabel: "Loaded Fries",
-      badge: "Free Coke",
-      image:
-        "promo-fries.jpg",
-      description:
-        "Choose a portion and load it with chicken, cheese, or sauce. A free Coke joins the cart automatically during promo hours.",
-      highlights: ["Free Coke in cart", "Perfect for sharing", "Rich and crispy finish"],
+      badge: "Popular",
+      image: "promo-fries.jpg",
+      description: "Choose a portion and load it with chicken, cheese, or sauce.",
+      highlights: ["Crispy and rich", "Perfect for sharing", "Fresh toppings"],
       optionGroups: [
         {
           key: "portion",
@@ -235,20 +224,30 @@
       title: "Fried Rice",
       categoryLabel: "Rice",
       badge: "Classic",
-      image:
-        "hero-friedrice-large.jpg",
-      description: "Classic spiced fried rice with your choice of protein.",
-      highlights: ["Chicken, beef, or gizzard", "Balanced and filling", "Freshly prepared to order"],
+      image: "hero-friedrice-large.jpg",
+      description: "Classic spiced fried rice with your choice of portion and protein.",
+      highlights: ["65, 75, or 85", "Chicken, beef, or gizzard", "Freshly prepared to order"],
       optionGroups: [
+        {
+          key: "portion",
+          label: "Choose portion",
+          type: "radio",
+          required: true,
+          options: [
+            { label: "Regular", value: "Regular", price: 65, default: true },
+            { label: "Medium", value: "Medium", price: 75 },
+            { label: "Large", value: "Large", price: 85 }
+          ]
+        },
         {
           key: "protein",
           label: "Choose protein",
           type: "radio",
           required: true,
           options: [
-            { label: "Chicken", value: "Chicken", price: 60, default: true },
-            { label: "Beef", value: "Beef", price: 60 },
-            { label: "Gizzard", value: "Gizzard", price: 60 }
+            { label: "Chicken", value: "Chicken", price: 0, default: true },
+            { label: "Beef", value: "Beef", price: 0 },
+            { label: "Gizzard", value: "Gizzard", price: 0 }
           ]
         }
       ]
@@ -258,12 +257,10 @@
       id: "loaded-angwamo",
       title: "Loaded Angwamo",
       categoryLabel: "Angwamo",
-      badge: "New price",
-      image:
-        "hero-angwamo-large.jpg",
-      description:
-        "Tiered portions with bold fillings. The new price is highlighted and the old price stays crossed out.",
-      highlights: ["Basic, Classic, Max", "Lower prices now on the menu", "Bold portions, better value"],
+      badge: "Original prices",
+      image: "hero-angwamo-large.jpg",
+      description: "Basic, Classic, or Max with the original prices now restored.",
+      highlights: ["Original pricing", "Bold portions", "Better value"],
       optionGroups: [
         {
           key: "tier",
@@ -271,9 +268,9 @@
           type: "radio",
           required: true,
           options: [
-            { label: "Basic", value: "Basic", price: 60, oldPrice: 65, default: true },
-            { label: "Classic", value: "Classic", price: 70, oldPrice: 75 },
-            { label: "Max, 5 proteins", value: "Max", price: 80, oldPrice: 85 }
+            { label: "Basic", value: "Basic", price: 65, default: true },
+            { label: "Classic", value: "Classic", price: 75 },
+            { label: "Max", value: "Max", price: 85 }
           ]
         }
       ]
@@ -284,8 +281,7 @@
       title: "Loaded Jollof",
       categoryLabel: "Rice",
       badge: "New",
-      image:
-        "image.png",
+      image: "image.png",
       description: "A hearty portion of Jungle Jumbo fully loaded jollof rice with protein and extras.",
       highlights: ["Big portion", "Packed with flavor", "A fast favorite"],
       optionGroups: []
@@ -296,22 +292,9 @@
       title: "Noodles",
       categoryLabel: "Specials",
       badge: "Fast favorite",
-      image:
-        "thumb-noodle.jpg",
+      image: "thumb-noodle.jpg",
       description: "Assorted proteins available, made for a quick and satisfying meal.",
       highlights: ["Quick and satisfying", "Assorted proteins available", "Great for busy days"],
-      optionGroups: []
-    },
-
-    coke: {
-      id: "promo-coke",
-      title: "Free Coke",
-      categoryLabel: "Promo item",
-      badge: "Free",
-      image:
-        "https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&fm=jpg&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&ixlib=rb-4.1.0&q=60&w=3000",
-      description: "Free Coke added automatically with every loaded fries order during promo hours.",
-      highlights: ["Automatic promo reward", "Added to cart for free", "Included during promo hours"],
       optionGroups: []
     }
   };
@@ -435,7 +418,7 @@
   function focusFirstElement(root) {
     const focusable = $(
       [
-        'button:not([disabled])',
+        "button:not([disabled])",
         "[href]",
         "input:not([disabled])",
         "select:not([disabled])",
@@ -651,13 +634,19 @@
   function computeUnitPrice(productId, selections) {
     if (productId === "loaded-jollof") return 85;
     if (productId === "noodles") return 50;
-    if (productId === "fried-rice") return 60;
+
+    if (productId === "fried-rice") {
+      const portion = selections.portion || "Regular";
+      if (portion === "Medium") return 75;
+      if (portion === "Large") return 85;
+      return 65;
+    }
 
     if (productId === "loaded-angwamo") {
       const tier = selections.tier || "Basic";
-      if (tier === "Classic") return 70;
-      if (tier === "Max") return 80;
-      return 60;
+      if (tier === "Classic") return 75;
+      if (tier === "Max") return 85;
+      return 65;
     }
 
     if (productId === "shawarma") {
@@ -690,7 +679,10 @@
     if (productId === "loaded-jollof" || productId === "noodles") return "";
 
     if (productId === "fried-rice") {
-      return selections.protein || "";
+      const parts = [];
+      if (selections.portion) parts.push(selections.portion);
+      if (selections.protein) parts.push(selections.protein);
+      return parts.join(" • ");
     }
 
     if (productId === "loaded-angwamo") {
@@ -803,68 +795,26 @@
     renderCart();
   }
 
-  function computeDiscountAndPromos(baseLines) {
-    const shawarmaUnits = [];
-    let friesQty = 0;
-
-    for (const item of baseLines) {
-      if (item.productId === "shawarma") {
-        for (let i = 0; i < item.qty; i += 1) {
-          shawarmaUnits.push({ price: Number(item.unitPrice) || 0 });
-        }
-      }
-
-      if (item.productId === "loaded-fries") {
-        friesQty += item.qty;
-      }
-    }
-
-    shawarmaUnits.sort((a, b) => a.price - b.price);
-    const freeShawarmaCount = Math.floor(shawarmaUnits.length / 3);
-    const shawarmaDiscount = shawarmaUnits
-      .slice(0, freeShawarmaCount)
-      .reduce((sum, unit) => sum + unit.price, 0);
-
-    const promoItems = [];
-
-    if (isPromoActive() && friesQty > 0) {
-      promoItems.push({
-        id: "promo-coke",
-        productId: "promo-coke",
-        lineKey: `promo-coke::${friesQty}`,
-        name: "Free Coke",
-        categoryLabel: "Promo item",
-        image: catalog.coke.image,
-        qty: friesQty,
-        unitPrice: 0,
-        note: "With Loaded Fries promo",
-        isPromo: true
-      });
-    }
-
-    return {
-      discount: shawarmaDiscount,
-      promoItems
-    };
-  }
-
-  function getResolvedCart() {
-    const base = state.cart.filter((item) => !item.isPromo);
-    const promoState = computeDiscountAndPromos(base);
-    const lines = [...base, ...promoState.promoItems];
-    const subtotal = computeSubtotal(lines);
-    const total = Math.max(0, subtotal - promoState.discount);
-
-    return {
-      lines,
-      discount: promoState.discount,
-      subtotal,
-      total
-    };
+  function computeProcessingFee(amount) {
+    return roundMoney((Number(amount) || 0) * PROCESSING_FEE_RATE);
   }
 
   function computeSubtotal(lines) {
-    return lines.reduce((sum, item) => sum + item.unitPrice * item.qty, 0);
+    return roundMoney(lines.reduce((sum, item) => sum + item.unitPrice * item.qty, 0));
+  }
+
+  function getResolvedCart() {
+    const lines = state.cart.filter((item) => !item.isPromo);
+    const subtotal = computeSubtotal(lines);
+    const processingFee = computeProcessingFee(subtotal);
+    const total = roundMoney(subtotal + processingFee);
+
+    return {
+      lines,
+      subtotal,
+      processingFee,
+      total
+    };
   }
 
   function createEmptyState(text) {
@@ -906,7 +856,7 @@
       if (minus) minus.disabled = true;
       if (plus) plus.disabled = true;
       if (remove) remove.hidden = true;
-      if (note) note.textContent = item.note || "Promo reward";
+      if (note) note.textContent = item.note || "Promo item";
     } else {
       if (minus) minus.addEventListener("click", () => setCartItemQty(item.lineKey, item.qty - 1));
       if (plus) plus.addEventListener("click", () => setCartItemQty(item.lineKey, item.qty + 1));
@@ -919,8 +869,7 @@
   function renderCheckoutItems(lines = []) {
     if (!els.checkoutItemsList || !els.checkoutItemsCount) return;
 
-    const visibleLines = lines.filter((item) => !item.isPromo);
-    const totalItems = visibleLines.reduce((sum, item) => sum + item.qty, 0);
+    const totalItems = lines.reduce((sum, item) => sum + item.qty, 0);
 
     els.checkoutItemsCount.textContent = totalItems === 1 ? "1 item" : `${totalItems} items`;
     els.checkoutItemsList.innerHTML = "";
@@ -964,7 +913,7 @@
 
   function renderCart() {
     const cartState = getResolvedCart();
-    const { lines, discount, subtotal } = cartState;
+    const { lines, subtotal, processingFee } = cartState;
 
     if (!els.cartItems) return cartState;
 
@@ -979,11 +928,11 @@
     const count = lines.reduce((sum, item) => sum + item.qty, 0);
     if (els.cartBadge) els.cartBadge.textContent = String(count);
     if (els.cartSubtotal) els.cartSubtotal.textContent = money(subtotal);
-    if (els.cartDiscount) els.cartDiscount.textContent = money(discount);
+    if (els.cartProcessingFee) els.cartProcessingFee.textContent = money(processingFee);
     if (els.cartTotal) els.cartTotal.textContent = money(cartState.total);
 
     if (els.checkoutSubtotal) els.checkoutSubtotal.textContent = money(subtotal);
-    if (els.checkoutDiscount) els.checkoutDiscount.textContent = money(discount);
+    if (els.checkoutProcessingFee) els.checkoutProcessingFee.textContent = money(processingFee);
     if (els.checkoutTotal) els.checkoutTotal.textContent = money(cartState.total);
     if (els.checkoutDelivery) els.checkoutDelivery.textContent = "Calculated after checkout";
 
@@ -1114,6 +1063,10 @@
         <p><strong>Timestamp:</strong> ${esc(formatDateTime(order.timestamp))}</p>
       </div>
       <div class="success-total">
+        <span>Processing fee</span>
+        <strong>${esc(money(order.processingFee || 0))}</strong>
+      </div>
+      <div class="success-total">
         <span>Total</span>
         <strong>${esc(money(order.total))}</strong>
       </div>
@@ -1142,10 +1095,10 @@
       timestamp: nowIso(),
       items: cartState.lines.map((item) => ({
         ...item,
-        total: item.unitPrice * item.qty
+        total: roundMoney(item.unitPrice * item.qty)
       })),
       subtotal: cartState.subtotal,
-      discount: cartState.discount,
+      processingFee: cartState.processingFee,
       total: cartState.total
     };
   }
@@ -1307,35 +1260,32 @@
 
     y = doc.lastAutoTable.finalY + 10;
 
-    ensureSpace(40);
+    ensureSpace(44);
     doc.setFillColor(...soft);
-    doc.roundedRect(margin, y, contentWidth, 34, 4, 4, "F");
+    doc.roundedRect(margin, y, contentWidth, 38, 4, 4, "F");
 
     doc.setFont("helvetica", "bold");
     doc.setFontSize(10);
     doc.setTextColor(...muted);
     doc.text("Subtotal", margin + 8, y + 10);
     doc.text("Delivery", margin + 8, y + 17);
-    doc.text("Promo discount", margin + 8, y + 24);
+    doc.text("Processing fee", margin + 8, y + 24);
     doc.text("Total", margin + 8, y + 31);
 
     doc.setFont("helvetica", "normal");
     doc.setTextColor(...dark);
     doc.text(money(order.subtotal), margin + contentWidth - 8, y + 10, { align: "right" });
     doc.text("Calculated after checkout", margin + contentWidth - 8, y + 17, { align: "right" });
-    doc.text(money(order.discount), margin + contentWidth - 8, y + 24, { align: "right" });
+    doc.text(money(order.processingFee || 0), margin + contentWidth - 8, y + 24, { align: "right" });
     doc.setFont("helvetica", "bold");
     doc.text(money(order.total), margin + contentWidth - 8, y + 31, { align: "right" });
 
     doc.setFont("helvetica", "italic");
     doc.setFontSize(9);
     doc.setTextColor(...muted);
-    doc.text(
-      "Thank you for ordering from WRAP District.",
-      pageWidth / 2,
-      pageHeight - 12,
-      { align: "center" }
-    );
+    doc.text("Thank you for ordering from WRAP District.", pageWidth / 2, pageHeight - 12, {
+      align: "center"
+    });
 
     return doc;
   }
@@ -1449,7 +1399,7 @@
           if (selectionText) parts.push(selectionText);
         }
 
-        return `${item.qty} x ${safeText(item.name)}${parts.length ? ` — ${parts.join(" | ")}` : ""}`;
+        return `${item.qty} x ${safeText(item.name)}${parts.length ? ` - ${parts.join(" | ")}` : ""}`;
       })
       .join(" || ");
 
@@ -1459,7 +1409,7 @@
       categoryLabel: item.categoryLabel,
       qty: item.qty,
       unitPrice: item.unitPrice,
-      lineTotal: item.unitPrice * item.qty,
+      lineTotal: roundMoney(item.unitPrice * item.qty),
       note: item.note || "",
       selections: item.selections || {},
       isPromo: !!item.isPromo
@@ -1476,7 +1426,7 @@
       notes: customer.notes || "",
       cart_reference: paymentRef,
       subtotal: cartState.subtotal,
-      discount: cartState.discount,
+      processing_fee: cartState.processingFee,
       total: cartState.total,
       items_json: JSON.stringify(itemsJson),
       items_text: itemsText,
@@ -1492,7 +1442,7 @@
         { display_name: "Notes", variable_name: "notes", value: customer.notes || "None" },
         { display_name: "Items", variable_name: "items", value: itemsText || "None" },
         { display_name: "Subtotal", variable_name: "subtotal", value: money(cartState.subtotal) },
-        { display_name: "Promo Discount", variable_name: "promo_discount", value: money(cartState.discount) },
+        { display_name: "Processing Fee", variable_name: "processing_fee", value: money(cartState.processingFee) },
         { display_name: "Total", variable_name: "total", value: money(cartState.total) }
       ]
     };
@@ -1784,14 +1734,6 @@
     });
   }
 
-  function showEntryPromoIfNeeded() {
-    if (!isPromoActive()) return;
-    if (safeGet(STORAGE.promoSeen)) return;
-
-    safeSet(STORAGE.promoSeen, "1");
-    showToast("This week only: Buy 2 shawarmas, get 1 free. Loaded fries come with a free Coke.");
-  }
-
   function init() {
     renderHero(0);
     applyMenuFilter("all");
@@ -1800,7 +1742,6 @@
     syncCheckoutFields();
     bindEvents();
     startHeroAutoplay();
-    showEntryPromoIfNeeded();
   }
 
   document.readyState === "loading"
