@@ -15,6 +15,8 @@
     window.PAYSTACK_PUBLIC_KEY ||
     "pk_live_ad7d0e0b164d83ec61bf2bf4fdb2af366c41c0ed";
 
+  const PROCESSING_FEE_RATE = 0.0295;
+
   const PROMO_WINDOW = {
     start: new Date("2026-04-28T00:00:00"),
     end: new Date("2026-05-01T23:59:59")
@@ -57,9 +59,12 @@
     }
   };
 
+  const roundMoney = (value) =>
+    Math.round(((Number(value) || 0) + Number.EPSILON) * 100) / 100;
+
   const money = (value) => {
-    const num = Number(value) || 0;
-    return `GHS ${num.toFixed(2)}`;
+    const num = roundMoney(value);
+    return `GHC ${num.toFixed(2)}`;
   };
 
   const uid = (prefix = "WD") => {
@@ -123,6 +128,7 @@
     checkoutSubtotal: $("#checkoutSubtotal"),
     checkoutDelivery: $("#checkoutDelivery"),
     checkoutDiscount: $("#checkoutDiscount"),
+    checkoutProcessingFee: $("#checkoutProcessingFee"),
     checkoutTotal: $("#checkoutTotal"),
     checkoutItemsList: $("#checkoutItemsList"),
     checkoutItemsCount: $("#checkoutItemsCount"),
@@ -154,8 +160,7 @@
       title: "Signature Shawarma",
       categoryLabel: "Shawarma",
       badge: "Buy 2 → 1 Free",
-      image:
-        "thumb-shawarma.jpg",
+      image: "thumb-shawarma.jpg",
       description:
         "Choose size, then protein. Add extra sauce or extra cheese for a richer finish.",
       highlights: ["Promo applies automatically", "Third shawarma becomes free", "Great for sharing"],
@@ -200,8 +205,7 @@
       title: "Loaded Fries",
       categoryLabel: "Loaded Fries",
       badge: "Free Coke",
-      image:
-        "promo-fries.jpg",
+      image: "promo-fries.jpg",
       description:
         "Choose a portion and load it with chicken, cheese, or sauce. A free Coke joins the cart automatically during promo hours.",
       highlights: ["Free Coke in cart", "Perfect for sharing", "Rich and crispy finish"],
@@ -235,8 +239,7 @@
       title: "Fried Rice",
       categoryLabel: "Rice",
       badge: "Classic",
-      image:
-        "hero-friedrice-large.jpg",
+      image: "hero-friedrice-large.jpg",
       description: "Classic spiced fried rice with your choice of protein.",
       highlights: ["Chicken, beef, or gizzard", "Balanced and filling", "Freshly prepared to order"],
       optionGroups: [
@@ -259,8 +262,7 @@
       title: "Loaded Angwamo",
       categoryLabel: "Angwamo",
       badge: "New price",
-      image:
-        "hero-angwamo-large.jpg",
+      image: "hero-angwamo-large.jpg",
       description:
         "Tiered portions with bold fillings. The new price is highlighted and the old price stays crossed out.",
       highlights: ["Basic, Classic, Max", "Lower prices now on the menu", "Bold portions, better value"],
@@ -284,8 +286,7 @@
       title: "Loaded Jollof",
       categoryLabel: "Rice",
       badge: "New",
-      image:
-        "image.png",
+      image: "image.png",
       description: "A hearty portion of Jungle Jumbo fully loaded jollof rice with protein and extras.",
       highlights: ["Big portion", "Packed with flavor", "A fast favorite"],
       optionGroups: []
@@ -296,8 +297,7 @@
       title: "Noodles",
       categoryLabel: "Specials",
       badge: "Fast favorite",
-      image:
-        "thumb-noodle.jpg",
+      image: "thumb-noodle.jpg",
       description: "Assorted proteins available, made for a quick and satisfying meal.",
       highlights: ["Quick and satisfying", "Assorted proteins available", "Great for busy days"],
       optionGroups: []
@@ -435,7 +435,7 @@
   function focusFirstElement(root) {
     const focusable = $(
       [
-        'button:not([disabled])',
+        "button:not([disabled])",
         "[href]",
         "input:not([disabled])",
         "select:not([disabled])",
@@ -848,23 +848,27 @@
     };
   }
 
+  function computeSubtotal(lines) {
+    return lines.reduce((sum, item) => sum + item.unitPrice * item.qty, 0);
+  }
+
   function getResolvedCart() {
     const base = state.cart.filter((item) => !item.isPromo);
     const promoState = computeDiscountAndPromos(base);
     const lines = [...base, ...promoState.promoItems];
     const subtotal = computeSubtotal(lines);
-    const total = Math.max(0, subtotal - promoState.discount);
+    const preFeeTotal = Math.max(0, subtotal - promoState.discount);
+    const processingFee = roundMoney(preFeeTotal * PROCESSING_FEE_RATE);
+    const total = roundMoney(preFeeTotal + processingFee);
 
     return {
       lines,
       discount: promoState.discount,
       subtotal,
+      preFeeTotal,
+      processingFee,
       total
     };
-  }
-
-  function computeSubtotal(lines) {
-    return lines.reduce((sum, item) => sum + item.unitPrice * item.qty, 0);
   }
 
   function createEmptyState(text) {
@@ -964,7 +968,7 @@
 
   function renderCart() {
     const cartState = getResolvedCart();
-    const { lines, discount, subtotal } = cartState;
+    const { lines, discount, subtotal, preFeeTotal, processingFee } = cartState;
 
     if (!els.cartItems) return cartState;
 
@@ -980,10 +984,11 @@
     if (els.cartBadge) els.cartBadge.textContent = String(count);
     if (els.cartSubtotal) els.cartSubtotal.textContent = money(subtotal);
     if (els.cartDiscount) els.cartDiscount.textContent = money(discount);
-    if (els.cartTotal) els.cartTotal.textContent = money(cartState.total);
+    if (els.cartTotal) els.cartTotal.textContent = money(preFeeTotal);
 
     if (els.checkoutSubtotal) els.checkoutSubtotal.textContent = money(subtotal);
     if (els.checkoutDiscount) els.checkoutDiscount.textContent = money(discount);
+    if (els.checkoutProcessingFee) els.checkoutProcessingFee.textContent = money(processingFee);
     if (els.checkoutTotal) els.checkoutTotal.textContent = money(cartState.total);
     if (els.checkoutDelivery) els.checkoutDelivery.textContent = "Calculated after checkout";
 
@@ -1111,10 +1116,13 @@
         <p><strong>Preferred date:</strong> ${esc(order.preferredDate || "—")}</p>
         <p><strong>Preferred time:</strong> ${esc(order.preferredTime || "—")}</p>
         <p><strong>Notes:</strong> ${esc(order.notes || "None")}</p>
+        <p><strong>Subtotal:</strong> ${esc(money(order.subtotal || 0))}</p>
+        <p><strong>Promo discount:</strong> ${esc(money(order.discount || 0))}</p>
+        <p><strong>Processing fee:</strong> ${esc(money(order.processingFee || 0))}</p>
         <p><strong>Timestamp:</strong> ${esc(formatDateTime(order.timestamp))}</p>
       </div>
       <div class="success-total">
-        <span>Total</span>
+        <span>Total due</span>
         <strong>${esc(money(order.total))}</strong>
       </div>
       <div class="success-items">
@@ -1146,6 +1154,8 @@
       })),
       subtotal: cartState.subtotal,
       discount: cartState.discount,
+      processingFee: cartState.processingFee,
+      preFeeTotal: cartState.preFeeTotal,
       total: cartState.total
     };
   }
@@ -1307,25 +1317,27 @@
 
     y = doc.lastAutoTable.finalY + 10;
 
-    ensureSpace(40);
+    ensureSpace(48);
     doc.setFillColor(...soft);
-    doc.roundedRect(margin, y, contentWidth, 34, 4, 4, "F");
+    doc.roundedRect(margin, y, contentWidth, 40, 4, 4, "F");
 
     doc.setFont("helvetica", "bold");
     doc.setFontSize(10);
     doc.setTextColor(...muted);
-    doc.text("Subtotal", margin + 8, y + 10);
-    doc.text("Delivery", margin + 8, y + 17);
-    doc.text("Promo discount", margin + 8, y + 24);
-    doc.text("Total", margin + 8, y + 31);
+    doc.text("Subtotal", margin + 8, y + 9);
+    doc.text("Delivery", margin + 8, y + 16);
+    doc.text("Promo discount", margin + 8, y + 23);
+    doc.text("Processing fee", margin + 8, y + 30);
+    doc.text("Total", margin + 8, y + 37);
 
     doc.setFont("helvetica", "normal");
     doc.setTextColor(...dark);
-    doc.text(money(order.subtotal), margin + contentWidth - 8, y + 10, { align: "right" });
-    doc.text("Calculated after checkout", margin + contentWidth - 8, y + 17, { align: "right" });
-    doc.text(money(order.discount), margin + contentWidth - 8, y + 24, { align: "right" });
+    doc.text(money(order.subtotal), margin + contentWidth - 8, y + 9, { align: "right" });
+    doc.text("Calculated after checkout", margin + contentWidth - 8, y + 16, { align: "right" });
+    doc.text(money(order.discount), margin + contentWidth - 8, y + 23, { align: "right" });
+    doc.text(money(order.processingFee || 0), margin + contentWidth - 8, y + 30, { align: "right" });
     doc.setFont("helvetica", "bold");
-    doc.text(money(order.total), margin + contentWidth - 8, y + 31, { align: "right" });
+    doc.text(money(order.total), margin + contentWidth - 8, y + 37, { align: "right" });
 
     doc.setFont("helvetica", "italic");
     doc.setFontSize(9);
@@ -1477,6 +1489,7 @@
       cart_reference: paymentRef,
       subtotal: cartState.subtotal,
       discount: cartState.discount,
+      processing_fee: cartState.processingFee,
       total: cartState.total,
       items_json: JSON.stringify(itemsJson),
       items_text: itemsText,
@@ -1493,6 +1506,7 @@
         { display_name: "Items", variable_name: "items", value: itemsText || "None" },
         { display_name: "Subtotal", variable_name: "subtotal", value: money(cartState.subtotal) },
         { display_name: "Promo Discount", variable_name: "promo_discount", value: money(cartState.discount) },
+        { display_name: "Processing Fee", variable_name: "processing_fee", value: money(cartState.processingFee) },
         { display_name: "Total", variable_name: "total", value: money(cartState.total) }
       ]
     };
