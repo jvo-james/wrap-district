@@ -216,9 +216,9 @@
           type: "radio",
           required: true,
           options: [
-            { label: "Regular", value: "Regular", price: 65, default: true },
-            { label: "Medium", value: "Medium", price: 75 },
-            { label: "Large", value: "Large", price: 85 }
+            { label: "Regular", value: "Regular", price: 70, default: true },
+            { label: "Medium", value: "Medium", price: 80 },
+            { label: "Large", value: "Large", price: 90 }
           ]
         },
         {
@@ -249,9 +249,9 @@
           type: "radio",
           required: true,
           options: [
-            { label: "Chicken", value: "Chicken", price: 60, default: true },
-            { label: "Beef", value: "Beef", price: 60 },
-            { label: "Gizzard", value: "Gizzard", price: 60 }
+            { label: "Regular", value: "Regular", price: 65, default: true },
+            { label: "Classic", value: "Classic", price: 75 },
+            { label: "District Max", value: "District Max", price: 85 }
           ]
         }
       ]
